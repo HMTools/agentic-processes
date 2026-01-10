@@ -5,6 +5,10 @@ Purpose: Run failing test, capture full output including error messages, stack t
 
 # Step: Capture Test Failure
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Execute the failing integration test and systematically capture all relevant failure information including error messages, stack traces, test output, and any logged information. This comprehensive failure data will be used to diagnose the root cause in subsequent steps.
@@ -19,6 +23,8 @@ Execute the failing integration test and systematically capture all relevant fai
 - All findings stored in current step section of memory.md
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 - Run the specific failing test in isolation to capture clean output
@@ -128,38 +134,3 @@ graph TD
 - Infrastructure issues should be clearly distinguished from test logic issues
 - Temporary debug logging is acceptable for diagnosis but must be marked clearly and removed after fixing
 - Use standard comment format for all temporary logs: `// TODO: REMOVE - Added by agent for debugging`
-
-## Examples
-
-### Example 1: Capturing NullReferenceException
-
-**Scenario**: Test `PaymentConsumerTests.ShouldProcessPayment` is failing with NullReferenceException
-
-**Actions**:
-1. Run: `dotnet test --filter "FullyQualifiedName~PaymentConsumerTests.ShouldProcessPayment" --verbosity detailed`
-2. Capture error: `System.NullReferenceException: Object reference not set to an instance of an object`
-3. Extract stack trace showing failure at line 45 in test: `await _consumer.ProcessAsync(message)`
-4. Review logs showing message was created but consumer service is null
-5. Check Docker showing all services running
-6. Document in memory that consumer service dependency injection may not be set up correctly in test
-
-### Example 2: Capturing Assertion Failure
-
-**Scenario**: Test `OfferValidatorTests.ShouldRejectInvalidOffer` failing with assertion mismatch
-
-**Actions**:
-1. Run test with verbose output
-2. Capture assertion error: `Expected: False, Actual: True` at line 32
-3. Note that validator is returning `IsValid = true` when it should return `false`
-4. Review test setup showing offer has invalid data (negative amount)
-5. Document in memory that either test expectation is wrong or validator logic has a bug
-
-### Example 3: Capturing Infrastructure Failure
-
-**Scenario**: Test `MongoRepositoryTests.ShouldSaveEntity` failing with database connection timeout
-
-**Actions**:
-1. Run test and capture: `MongoDB.Driver.MongoConnectionException: Timeout connecting to server`
-2. Check Docker logs: `docker-compose logs mongo`
-3. Find MongoDB container is not running or not ready
-4. Document in memory that this is an infrastructure issue requiring Docker setup fix, not a code issue

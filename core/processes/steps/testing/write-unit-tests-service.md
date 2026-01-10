@@ -1,5 +1,15 @@
 # Process Step: Write Unit Tests for Service Layer
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+- [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
+- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- Project-specific unit testing best practices documentation
+- Project-specific mocking strategies documentation
+- Project-specific test data generation patterns documentation
+- Project-specific assertion patterns documentation
+
 ## Step Metadata
 - **Prerequisites**: Service layer implementation completed, business logic finalized
 - **Outputs**: Comprehensive unit test files for service layer with full code coverage
@@ -8,54 +18,27 @@
 
 This step guides the creation of comprehensive unit tests for the service layer with the goal of achieving full (100%) code coverage. Unit tests verify business logic in isolation by mocking dependencies, ensuring that each service method behaves correctly under various conditions including success scenarios, error cases, and edge cases. Every code path, branch, and condition should be tested. For project-specific testing patterns, frameworks, and conventions, reference the testing best practices documentation.
 
-## Pre-Implementation: Verify Existing Patterns ✅
+## Guidance
 
-Before creating new tests, review existing test patterns to ensure consistency and leverage reusable helpers:
+<!-- @include: _components/mandatory-logging.md -->
 
-### Existing Test Files
+<!-- @include: _components/pre-implementation-patterns.md -->
+
+**Test-Specific Pattern Checks:**
 - [ ] Search for tests of similar service components in `Tests/UnitTests/`
 - [ ] Review test class naming conventions (e.g., `ManagerTests`, `CalculatorTests`)
 - [ ] Check test method naming patterns (e.g., `MethodName_Scenario_ExpectedResult`)
-- [ ] Note common test organization patterns (Arrange-Act-Assert)
-
-### Mocking Patterns
 - [ ] Check `Tests/UnitTests/Helpers/Mocks/` for existing mock helper classes
 - [ ] Note naming convention: `Mock<InterfaceName>` (e.g., `MockLogger`, `MockFundRepository`)
 - [ ] Review mocking library usage (FakeItEasy, Moq, etc.)
 - [ ] Identify reusable mock extension methods
 - [ ] Check for parameterized mock helpers (e.g., `MockSendOffersProcessingNotification()`)
-
-### Test Helper Utilities
 - [ ] Search `Tests/UnitTests/Helpers/` for reusable test utilities
 - [ ] Check for test data builders or factories
-- [ ] Look for assertion helpers or custom matchers
-- [ ] Note any test fixture or setup helpers
-- [ ] Review extension methods for testing (e.g., `EmptyMock*` methods)
-
-### Framework Patterns
 - [ ] Identify testing framework in use (xUnit, NUnit, MSTest)
-- [ ] Review attribute usage for test organization ([Fact], [Theory], [TestCase])
-- [ ] Check async test patterns (`async Task` methods)
-- [ ] Note test isolation patterns (test data, cleanup)
-
-### Coverage Patterns
 - [ ] Review how existing tests achieve 100% coverage
 - [ ] Check patterns for testing exception scenarios
-- [ ] Note approaches for testing different code branches
-- [ ] Review edge case testing strategies
-- [ ] Identify common test scenarios (null checks, empty collections, boundary values)
-
-### Integration with Existing Tests
 - [ ] Check if service is already tested elsewhere (e.g., in handler tests)
-- [ ] Determine if new assertions should be added to existing tests
-- [ ] Review whether new test file is needed or tests should be added to existing file
-- [ ] Note any shared test setup or fixtures
-
-### Documentation
-- [ ] Document discovered test patterns in process memory file
-- [ ] Note similar test files as reference examples
-- [ ] Record any deviations from standard patterns with rationale
-- [ ] List reusable mock helpers and utilities found
 
 ## Test Code Patterns Reference
 
@@ -249,30 +232,12 @@ flowchart TD
 
 Refer to the following resources for implementation guidance:
 
-- **Test Organization**: Review existing tests for:
-  - File and folder structure conventions
-  - Test class setup and initialization patterns
-  - Private field declarations pattern (testable instance and dependencies)
-  - Test method organization (regions, grouping)
-- **Testing Framework**: Study existing tests for proper use of:
-  - Test class and method attributes/decorations
-  - Test initialization and setup patterns
-  - Parameterized testing approaches
-  - Async test patterns
-- **Mocking/Faking**: Reference project-specific mocking strategies for:
-  - Creating mocks/fakes
-  - Configuring mock behavior (returns, exceptions)
-  - Verifying mock interactions
-  - Extension methods for mock setup
-- **Test Data Generation**: Reference project-specific test data generation patterns for:
-  - Simple data generation patterns
-  - Custom data builder patterns
-  - Complex object construction
-- **Assertions**: Reference project-specific assertion patterns for:
-  - Assertion framework usage
-  - Common assertion patterns
-  - Collection and exception assertions
-- **Code Conventions**: Follow project's coding guidelines and conventions
+**Test-Specific Best Practices:**
+- **Test Organization**: Review existing tests for file/folder structure, test class setup, and method organization
+- **Testing Framework**: Study existing tests for proper use of attributes, setup patterns, and async test patterns
+- **Mocking/Faking**: Reference project-specific mocking strategies for creating mocks, configuring behavior, and verifying interactions
+- **Test Data Generation**: Reference project-specific test data generation patterns for builders and factories
+- **Assertions**: Reference project-specific assertion patterns for framework usage and common patterns
 
 ## Output
 

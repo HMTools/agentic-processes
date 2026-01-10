@@ -5,6 +5,10 @@ Purpose: Analyze process execution log and implement improvements for future ite
 
 # Step: Continuous Improvement & Learning
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 This final step analyzes the detailed process log to identify improvement opportunities based on the actual execution. It focuses on patterns where the user had to request changes, inefficiencies detected, and opportunities to automate or enhance the process for future iterations.
@@ -19,6 +23,8 @@ The step works iteratively: identify improvements → propose one → investigat
 - Summary of all improvements made
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 ### Specific Actions
 
@@ -126,7 +132,30 @@ Do NOT document:
 - What the previous state was
 - References to log entries
 
-#### 5. Summarize All Improvements
+#### 5. **MANDATORY: Propose ALL Improvements Before Completing**
+
+**⚠️ CRITICAL REQUIREMENT**: You MUST propose ALL identified improvements to the user before completing Step 4. Do NOT complete Step 4 after implementing only one improvement.
+
+**Checklist:**
+- [ ] Have all identified improvements been proposed to the user?
+- [ ] Has the user approved/rejected each improvement?
+- [ ] Have all approved improvements been implemented?
+- [ ] Have all rejected improvements been documented with reasons?
+
+**Workflow:**
+1. Identify all improvements (typically 3-5)
+2. Prioritize them (high/medium/low)
+3. **Propose ALL improvements** to the user (one at a time, but ensure all are proposed)
+4. Get user approval/rejection for each
+5. Implement approved improvements
+6. Only then complete Step 4
+
+**Do NOT:**
+- Complete Step 4 after implementing only one improvement
+- Skip proposing improvements because they seem low priority
+- Assume user doesn't want improvements without asking
+
+#### 6. Summarize All Improvements
 
 When all improvements are complete:
 - List all improvements made
@@ -178,6 +207,7 @@ When all improvements are complete:
 
 ### Best Practices
 
+- **Propose all improvements**: Before completing Step 4, ensure ALL identified improvements have been proposed to the user
 - **One at a time**: Only implement one improvement at a time
 - **Always get approval**: User must approve before proceeding to next
 - **Atomic changes**: Keep each improvement focused and self-contained
@@ -185,18 +215,38 @@ When all improvements are complete:
 - **No traceback**: Don't reference the previous state in the improved version
 - **Clean implementation**: Make it look like it was always there
 - **Validate changes**: Ensure changes don't break existing processes
+- **Complete cycle**: Do not mark Step 4 complete until all improvements have been proposed and user has approved/rejected each one
 
 ### Example Workflow
 
 ```
 1. Analyze log → Found 5 improvement opportunities
 
-2. Propose Improvement #1: Add validation checkpoint to API step
-   User: "Approved"
-   
-3. Implement → Update implement-controller-layer.md
-   
-4. Request approval → Show changes
+2. Propose ALL improvements to user:
+   - Improvement #1: Add validation checkpoint to API step
+   - Improvement #2: Clarify naming conventions in template
+   - Improvement #3: Add example to documentation
+   - Improvement #4: Update error handling pattern
+   - Improvement #5: Add validation checkpoint
+
+3. Get user approval/rejection for each:
+   - Improvement #1: "Approved"
+   - Improvement #2: "Approved"
+   - Improvement #3: "Skip this one"
+   - Improvement #4: "Approved"
+   - Improvement #5: "Skip this one"
+
+4. Implement approved improvements one at a time:
+   - Implement Improvement #1 → Update implement-controller-layer.md
+   - Request approval → Show changes → User approves
+   - Implement Improvement #2 → Update template
+   - Request approval → Show changes → User approves
+   - Implement Improvement #4 → Update error handling
+   - Request approval → Show changes → User approves
+
+5. Document skipped improvements (with reasons)
+
+6. Complete Step 4 only after all improvements have been proposed and processed
    User: "Looks good, continue"
    
 5. Document → Update memory

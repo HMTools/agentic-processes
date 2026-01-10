@@ -1,5 +1,16 @@
 # Process Step: Implement Repository Layer
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- `.github/instructions/solid.instructions.md` - SOLID principles
+- Project-specific repository pattern best practices documentation
+- Project-specific MongoDB best practices documentation
+- Project-specific error handling patterns documentation
+- Project-specific logging patterns documentation
+- Project-specific dependency injection patterns documentation
+
 ## Step Metadata
 - **Prerequisites**: Domain models defined, MongoDB collections designed
 - **Outputs**: Repository interfaces, implementations, and MongoDB entity models
@@ -48,6 +59,10 @@ flowchart TD
     style K fill:#c8e6c9
     style C fill:#fff4e6
 ```
+
+## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 ## Implementation Steps
 
@@ -117,19 +132,10 @@ flowchart TD
 
 Refer to the following resources for implementation guidance:
 
-- **MongoDB Patterns**: Review existing implementations in `Repositories/Mongo/` for:
-  - CRUD operations (Create, Read, Update, Delete)
-  - Filtering and querying patterns
-  - Pagination support
-  - Partial field updates
-  - Error handling and logging patterns
+**Repository-Specific Best Practices:**
+- **MongoDB Patterns**: Review existing implementations in `Repositories/Mongo/` for CRUD operations, filtering, pagination, and error handling
 - **Repository Pattern**: Reference project-specific repository pattern best practices
 - **MongoDB Best Practices**: Reference project-specific MongoDB best practices
-- **Error Handling**: Reference project-specific error handling patterns
-- **Logging**: Reference project-specific logging patterns
-- **Dependency Injection**: Reference project-specific dependency injection patterns
-- **Code Conventions**: Follow `.github/instructions/code-conventions.instructions.md`
-- **SOLID Principles**: Adhere to `.github/instructions/solid.instructions.md`
 
 ## Output
 

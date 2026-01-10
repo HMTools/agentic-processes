@@ -1,5 +1,14 @@
 # Process Step: Implement External API Client
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+- [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
+- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- Project-specific HTTP client patterns documentation
+- Project-specific error handling patterns documentation
+- Project-specific logging patterns documentation
+
 ## Metadata
 - **Step Name**: implement-api-client
 - **Prerequisites**: 
@@ -31,46 +40,23 @@ When invoking this step, provide:
 
 Implements a complete external API client including contracts, settings, interface, and implementation. This step handles integration with external HTTP APIs following the project's patterns for HTTP communication, authentication, error handling, and configuration management. The resulting API client can be injected into services via dependency injection.
 
-## Pre-Implementation: Verify Existing Patterns ✅
+<!-- @include: _components/pre-implementation-patterns.md -->
 
-Before creating new components, check if similar implementations exist to maintain consistency and avoid duplication:
-
-### Existing Contracts
+**API Client-Specific Pattern Checks:**
 - [ ] Search codebase for similar contract models (request/response DTOs)
 - [ ] Check if contract already exists in `ExternalServices/*/Contracts/`
-- [ ] Review existing contract patterns (nullable types, required fields, validation attributes)
-- [ ] Note naming conventions for request/response models
-
-### Existing API Clients
 - [ ] Search for similar API integrations in `ExternalServices/` subdirectories
 - [ ] Identify authentication patterns used (Apigee, JWT, OAuth, API keys)
 - [ ] Review HTTP client wrapper usage (`IHttpClientWrapper`, extension methods)
 - [ ] Check retry policies and error handling patterns
-- [ ] Look for timeout configurations and defaults
-
-### Configuration Patterns
 - [ ] Review existing `*Settings.cs` files for naming conventions
 - [ ] Check `appsettings.*.json` structure and organization
 - [ ] Verify DI registration patterns in `WebApi/Registrars/ClassesRegistrations.cs`
-- [ ] Note common configuration properties (BaseUrl, timeout values, retry counts)
-- [ ] **Review**: [Configuration vs Constants Guide](../../../../knowledge/best-practices/implementation-templates/configuration-vs-constants.md) - Determine when to use Settings classes vs constants
-
-### Authentication Patterns
 - [ ] For Apigee: Review existing Apigee integration patterns
 - [ ] For API keys: Check credential management patterns (AWS Secrets, config)
 - [ ] For OAuth: Review token management and refresh patterns
-- [ ] For custom headers: Check header construction patterns
-
-### Error Handling
 - [ ] Review exception types thrown by existing API clients
 - [ ] Check logging patterns for API calls (success, failure, performance)
-- [ ] Note how HTTP errors are handled (status codes, retries, fallbacks)
-
-### Documentation
-- [ ] Document discovered patterns in process memory file
-- [ ] Note any deviations from standard patterns with rationale
-- [ ] Record authentication pattern to follow
-- [ ] List similar API clients as reference examples
 
 ## Flow Diagram
 
@@ -209,6 +195,8 @@ Creates the following artifacts:
 
 ## Guidance
 
+<!-- @include: _components/mandatory-logging.md -->
+
 ### Specific Actions
 
 1. **Locate or Create Contracts**
@@ -298,13 +286,12 @@ Creates the following artifacts:
 
 ### Best Practices
 
-1. **Use Async/Await**: All HTTP operations must be async
-2. **Structured Logging**: Use property placeholders, not string interpolation
-3. **Null Safety**: Use nullable reference types appropriately
-4. **Configuration**: Never hardcode URLs or API keys
-5. **Authentication**: Use existing credential patterns when available
-6. **Error Context**: Include enough information in logs to debug issues
-7. **Testing**: Design for testability (interfaces, injected dependencies)
+Refer to the following resources for implementation guidance:
+
+**API Client-Specific Best Practices:**
+- **Authentication**: Use existing credential patterns when available
+- **Configuration**: Never hardcode URLs or API keys
+- **Error Context**: Include enough information in logs to debug issues
 
 ## Memory File Usage
 
@@ -322,78 +309,3 @@ Creates the following artifacts:
   - **Endpoints Implemented**: List of endpoints and their methods
   - **Dependencies**: Any special dependencies or credentials used
   - **Notes**: Any deviations from standard patterns or special considerations
-
-## Examples
-
-### Example 1: IPCN Sender API with Apigee Authentication
-
-**Context Parameters:**
-```yaml
-apiName: "IpcnSender"
-serviceLocation: "ExternalServices/Communications"
-authenticationPattern: "Apigee"
-endpoints:
-  - method: POST
-    path: "/v1/notifications/send"
-    requestContract: "NotifyMessage"
-    responseContract: null
-settingsProperties:
-  - BaseUrl
-  - SendPath
-```
-
-**Files Created:**
-- `ExternalServices/Communications/Contracts/NotifyMessage.cs` (if not exists)
-- `ExternalServices/Communications/IpcnSenderApiSettings.cs`
-- `ExternalServices/Communications/IIpcnSenderApi.cs`
-- `ExternalServices/Communications/IpcnSenderApi.cs`
-
-**Configuration Added:**
-```json
-{
-  "IpcnSenderApiSettings": {
-    "BaseUrl": "https://api-placeholder.payoneer.com",
-    "SendPath": "/v1/notifications/send"
-  }
-}
-```
-
-### Example 2: Payment Gateway API with API Key
-
-**Context Parameters:**
-```yaml
-apiName: "PaymentGateway"
-serviceLocation: "ExternalServices/Payments"
-authenticationPattern: "ApiKey"
-endpoints:
-  - method: POST
-    path: "/v2/payments"
-    requestContract: "CreatePaymentRequest"
-    responseContract: "PaymentResponse"
-  - method: GET
-    path: "/v2/payments/{id}"
-    requestContract: null
-    responseContract: "PaymentResponse"
-settingsProperties:
-  - BaseUrl
-  - ApiKey
-  - TimeoutSeconds
-```
-
-**Files Created:**
-- `ExternalServices/Payments/Contracts/CreatePaymentRequest.cs`
-- `ExternalServices/Payments/Contracts/PaymentResponse.cs`
-- `ExternalServices/Payments/PaymentGatewayApiSettings.cs`
-- `ExternalServices/Payments/IPaymentGatewayApi.cs`
-- `ExternalServices/Payments/PaymentGatewayApi.cs`
-
-## Common Pitfalls
-
-1. **Hardcoding URLs**: Always use configuration for base URLs and paths
-2. **Missing Authentication**: Ensure auth headers/tokens are applied to every request
-3. **Poor Error Handling**: Don't swallow exceptions; log and throw or return error results
-4. **Blocking Calls**: Never use `.Result` or `.Wait()`; always use `await`
-5. **Missing Logging**: Log requests, responses, and errors for debugging
-6. **Sensitive Data in Logs**: Never log API keys, tokens, or PII
-7. **Configuration Not Registered**: Remember to register settings in DI container
-8. **Testing Difficulties**: Use interfaces and DI to enable mocking in tests

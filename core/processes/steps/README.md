@@ -13,6 +13,47 @@ Modular steps promote:
 - **Discoverability**: Browse the library to find available building blocks
 - **Quality**: Rich guidance and examples in each step
 
+## Shared Components System
+
+Steps can reference shared components to reduce duplication and boilerplate. Components are stored in `_components/` directory.
+
+### Available Components
+
+- **mandatory-logging.md**: Logging requirements for steps that involve user interactions
+- **pre-implementation-patterns.md**: Checklist for verifying existing patterns before implementing
+
+See [`_components/README.md`](_components/README.md) for complete component documentation.
+
+**Note**: Instead of a generic best practices component, steps should directly reference relevant project-specific best practices files (e.g., `.github/instructions/code-conventions.instructions.md`, project-specific testing patterns, etc.) in the "Required Components" section.
+
+### Using Components in Steps
+
+1. **Add Required Components section** at the top of the step file:
+   ```markdown
+   ## Required Components
+   - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+   - [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
+   - `.github/instructions/code-conventions.instructions.md` - Code conventions
+   - [Add other relevant project-specific best practices files]
+   ```
+
+2. **Include components where needed** using include markers:
+   ```markdown
+   ## Guidance
+   
+   <!-- @include: _components/mandatory-logging.md -->
+   
+   [Step-specific guidance continues...]
+   ```
+
+### Agent Reading Requirements
+
+**IMPORTANT**: When an agent reads a step file, it MUST also read all files listed in the "Required Components" section. This ensures agents always have full context when working with steps.
+
+- Components should be read first, then the step file
+- Include markers (`<!-- @include: ... -->`) indicate where component content logically belongs
+- All component content is always available in context, not just referenced
+
 ## How Steps Work
 
 ### In Templates
@@ -47,12 +88,14 @@ When creating a new step:
 
 1. **Choose the right category**: Place the step in the appropriate subfolder
 2. **Use descriptive names**: Use kebab-case for filenames (e.g., `analyze-requirements.md`)
-3. **Be self-contained**: Steps cannot reference other steps
-4. **Include rich guidance**: Since steps are reused, provide detailed instructions
-5. **Define clear output**: Specify what the step produces
-6. **Use substeps for detail**: Break down complex steps with substeps and flow diagrams
-7. **Add examples**: Help users understand how to apply the step
-8. **Note common pitfalls**: Warn about potential issues
+3. **Be self-contained**: Steps cannot reference other steps (but can reference shared components)
+4. **Use shared components**: Reference components from `_components/` to reduce duplication
+5. **Add Required Components section**: List all components used at the top of the step
+6. **Include rich guidance**: Since steps are reused, provide detailed instructions
+7. **Define clear output**: Specify what the step produces
+8. **Use substeps for detail**: Break down complex steps with substeps and flow diagrams
+9. **Add examples**: Help users understand how to apply the step
+10. **Note common pitfalls**: Warn about potential issues
 
 ## Step Naming Conventions
 
@@ -146,10 +189,12 @@ When using Process Manager in chat mode:
 
 1. **Browse before creating**: Check if a similar step already exists
 2. **Reuse steps**: Use existing steps when possible
-3. **Keep steps focused**: Each step should accomplish one clear objective
-4. **Update centrally**: Improve existing steps rather than creating duplicates
-5. **Test with templates**: Verify steps work correctly when referenced
-6. **Document thoroughly**: Future users will benefit from clear guidance
+3. **Use shared components**: Reference components from `_components/` instead of duplicating content
+4. **Keep steps focused**: Each step should accomplish one clear objective
+5. **Update centrally**: Improve existing steps rather than creating duplicates
+6. **List required components**: Always include "Required Components" section for agent context
+7. **Test with templates**: Verify steps work correctly when referenced
+8. **Document thoroughly**: Future users will benefit from clear guidance
 
 ## Contributing
 

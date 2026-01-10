@@ -5,6 +5,10 @@ Purpose: Analyze a template to identify which process-steps are referenced and v
 
 # Step: Validate Process-Steps Exist
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Analyze the template to identify which process-steps are referenced and verify they exist in `core/processes/steps/`. Extract all `@step:category/step-name` references from the template and check if each step file exists.
@@ -16,6 +20,8 @@ Analyze the template to identify which process-steps are referenced and verify t
 - List of missing process-steps with suggested category locations
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 - Review each step definition in the template

@@ -5,6 +5,10 @@ Purpose: Update flow documentation, component documentation, and other relevant 
 
 # Step: Update Documentation
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Update flow documentation after implementing a new feature or making significant changes to existing workflows. This step ensures that flow documentation is kept in sync with the code changes and clearly explains how features work.
@@ -25,6 +29,8 @@ Update flow documentation after implementing a new feature or making significant
   - Configuration requirements (if applicable)
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 ### Documentation Scope Decision Tree 📋
 
@@ -168,37 +174,3 @@ graph TD
 - Both new flows and modifications to existing flows need documentation updates
 - Focus on end-to-end flows, not individual components
 - Mermaid diagrams are highly valuable for complex flows
-
-## Examples
-
-### Example 1: New SFTP Integration Feature
-
-**Scenario**: Feature adds webhook-triggered SFTP-to-S3 file copy
-
-**Documentation Updates**:
-1. **Flow Documentation**: Create `ai/docs/flows/sftp-file-copy-flow.md`
-   - Document webhook trigger → SFTP download → S3 upload flow
-   - Include sequence diagram showing component interactions
-   - Explain the complete end-to-end process
-
-### Example 2: Payment Processing Workflow
-
-**Scenario**: Feature integrates with new third-party payment provider API
-
-**Documentation Updates**:
-1. **Flow Documentation**: Create `ai/docs/flows/payment-processing-flow.md`
-   - Document end-to-end payment flow
-   - Show interaction with payment provider API
-   - Include error scenarios and retry logic
-   - Document webhook callbacks if applicable
-
-### Example 3: Offer Processing Enhancement
-
-**Scenario**: Feature adds new calculation step to existing offer processing flow
-
-**Documentation Updates**:
-1. **Flow Documentation**: Update existing `ai/docs/flows/offer-processing-flow.md`
-   - Add new calculation step in the flow diagram
-   - Update sequence diagram to show new calculation interaction
-   - Document how the new step integrates with existing flow
-

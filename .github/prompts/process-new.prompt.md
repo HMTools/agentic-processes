@@ -68,17 +68,28 @@ When the user invokes `/process-new`, follow these steps:
    - Scan the template for `@step:category/step-name` references
    - For each reference:
      - Read the step file from `core/processes/steps/{category}/{step-name}.md`
-     - Extract all sections (Description, Output, Guidance, Flow, Substeps, Examples, Common Pitfalls)
-     - Replace the reference with fully expanded step content
+     - Extract brief description from the step's Description section
+     - **Keep the reference as a reference** (do not expand with full step details)
+     - Include brief description and output summary
    - Apply any context parameters from the template
+   - **Important**: Full step details (Guidance, Substeps, Examples, etc.) remain in step files and can be read when needed. This keeps process.md concise (typically 100-150 lines instead of 700+ lines).
 
 5. **Create Process Instance**
    - Create directory: `core/processes/active/process-{name}-{YYYYMMDD}/`
    - Create process file: `process.md` with:
      - All `{{placeholders}}` substituted with actual values
-     - All step references expanded with full step details
+     - All step references kept as references (not expanded) with brief descriptions
      - Status set to "Running"
      - Current State section initialized with first step
+   - **Format for step references in process.md:**
+     ```markdown
+     - [ ] Step 1: Step name
+       - **Step**: `@step:category/step-name`
+       - **Description**: Brief description from step's Description section
+       - **Output**: Brief output description
+       - **Context**: (if applicable)
+     ```
+   - **Do NOT expand** with full Guidance, Substeps, Examples, etc. - those remain in the step file
    - Initialize `memory.md` file:
      - Use template structure from `core/processes/templates/memory-template.md`
      - Ready to track information across steps
@@ -116,7 +127,10 @@ When the user invokes `/process-new`, follow these steps:
 
 - Ensure all step references are resolved before creating the process
 - If a referenced step doesn't exist, inform the user and pause process creation
-- Expand step content fully so the process is self-contained
+- **Keep step references as references** (do not expand with full step details)
+- Include brief descriptions from step files
+- Full step details remain in step files and can be read when needed during execution
+- This keeps process.md concise and readable (typically 100-150 lines instead of 700+ lines)
 
 ### Process Initialization
 
@@ -125,7 +139,7 @@ When the user invokes `/process-new`, follow these steps:
 - Set initial status to "Running"
 - Initialize Current State section appropriately
 - **CRITICAL**: Always create three files:
-  1. `process.md` - Main process file with expanded steps
+  1. `process.md` - Main process file with step references (not expanded) and brief descriptions
   2. `memory.md` - Memory file initialized from template
   3. `log.md` - Log file initialized from template with metadata
 - Never skip creating any of these files - all three are required

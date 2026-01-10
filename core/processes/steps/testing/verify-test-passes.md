@@ -5,6 +5,10 @@ Purpose: Run the originally failing test to verify the fix works, and clean up t
 
 # Step: Verify Test Passes
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Execute the originally failing test to verify that the implemented fix resolves the issue. If the test passes, remove any temporary debug logging that was added during the diagnostic process and mark the fix as successful. If the test still fails, present the failure to the user and offer options to continue debugging or end the process.
@@ -20,6 +24,8 @@ Execute the originally failing test to verify that the implemented fix resolves 
 - Final status documented
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 - Run the specific test that was originally failing
@@ -150,84 +156,3 @@ graph TD
 - If test fails, help user understand whether to iterate or stop
 - Document the outcome clearly for future reference
 - Consider running the test multiple times if it was previously intermittent
-
-## Examples
-
-### Example 1: Test Passes - Remove Debug Logging
-
-**Scenario**: Test `OfferValidatorTests.ShouldRejectNegativeAmountForNonRefundOffers` now passes after fixing test logic
-
-**Actions**:
-1. Run: `dotnet test --filter "FullyQualifiedName~OfferValidatorTests.ShouldRejectNegativeAmountForNonRefundOffers"`
-2. Test output shows: ✓ Test passed
-3. Search for debug logging in `Tests/IntegrationTests/Validators/OfferValidatorTests.cs`
-4. Found 2 debug log statements:
-   ```csharp
-   // TODO: REMOVE - Added by agent for debugging
-   _logger.LogInformation("Offer type: {OfferType}", offer.OfferType);
-   ```
-5. Remove both debug log statements
-6. Verify no other debug markers exist
-7. Document in current step section of memory.md:
-   - Test passed successfully
-   - Fixed test expectations to match new business rules
-   - Removed 2 debug log statements from OfferValidatorTests.cs
-   - Cleanup complete
-   - **Final outcome: Success**
-
-### Example 2: Test Fails - Same Error
-
-**Scenario**: Test `PaymentCalculatorTests.ShouldCalculateCorrectFee` still fails with same calculation error
-
-**Actions**:
-1. Run test and capture output
-2. Test output shows: Fee = 3.00m, expected 30.00m (same as original failure)
-3. Compare with original failure - identical issue
-4. Present to user: "Test still fails with the same error. The fix may not have addressed the root cause."
-5. Offer options:
-   - Option A: Revise analysis - perhaps root cause was misidentified
-   - Option B: Add diagnostics - perhaps need more visibility into calculation flow
-   - Option C: End process - need manual investigation
-6. User chooses Option A
-7. Document in current step section of memory.md:
-   - Test failed with same error as original
-   - Fix did not resolve the issue
-   - User decision: Revise analysis (return to Step 2)
-   - **Final outcome: Retry with revised analysis**
-
-### Example 3: Test Fails - Different Error (Progress Made)
-
-**Scenario**: Test `MongoRepositoryTests.ShouldSaveAndRetrieveEntity` fails but with different error
-
-**Actions**:
-1. Run test and capture output
-2. Original error: MongoDB connection timeout
-3. New error: Entity saved but has null property after retrieval
-4. Compare - progress made! MongoDB connection now works, but new issue found
-5. Present to user: "Test still fails but error changed. MongoDB connection is now working, but there's a serialization issue."
-6. Offer options with context:
-   - Option A: Revise analysis - to address the new serialization issue
-   - Option B: Add diagnostics - to understand property serialization
-   - Option C: End process - if this is a separate issue to fix later
-7. User chooses Option A
-8. Document in current step section of memory.md:
-   - Original issue (connection timeout) is fixed
-   - New issue discovered (null property after retrieval)
-   - Progress made but test not fully passing
-   - User decision: Revise analysis to fix serialization issue
-   - **Final outcome: Retry with focus on new issue**
-
-### Example 4: Test Passes - No Debug Logging Added
-
-**Scenario**: Test `FundManagerTests.ShouldCreateFund` passes, no debug logging was needed during diagnosis
-
-**Actions**:
-1. Run test: Test passes
-2. Search for debug logging markers in modified files
-3. No markers found - no debug logging was added
-4. Document in current step section of memory.md:
-   - Test passed successfully
-   - Fixed business logic in FundManager
-   - No temporary logging was added during diagnosis
-   - **Final outcome: Success**
-

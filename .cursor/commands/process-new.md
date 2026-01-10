@@ -55,13 +55,15 @@ When you invoke `/process-new`, the AI will:
    - Confirm optional parameters
 
 4. **Resolve Step References**
-   - Automatically resolve all `@step:category/step-name` references
-   - Expand step content with full details from step files
+   - Scan the template for `@step:category/step-name` references
+   - **Keep step references as references** (do not expand with full step details)
+   - Include brief description from the step's Description section
    - Apply context parameters from template
+   - Full step details remain in step files and can be read when needed
 
 5. **Create Process Instance**
    - Create process directory: `core/processes/active/process-{name}-{YYYYMMDD}/`
-   - Create `process.md` with all placeholders substituted and step references expanded
+   - Create `process.md` with all placeholders substituted and step references kept as references (not expanded)
    - Initialize `memory.md` file using the memory template structure
    - Initialize `log.md` file using the log template structure with metadata
    - Set status to "Running"
@@ -79,7 +81,7 @@ Type `/process-new` in Cursor's chat to start creating a new process. The AI wil
 ## What Gets Created
 
 - Process directory: `core/processes/active/process-{name}-{YYYYMMDD}/`
-- Process file: `process.md` with fully expanded steps and all placeholders substituted
+- Process file: `process.md` with step references kept as references (not expanded) and all placeholders substituted
 - Memory file: `memory.md` for tracking information across steps
 - Log file: `log.md` for detailed execution log with metadata initialized
 
@@ -93,9 +95,10 @@ When creating a process instance, the AI must create three files:
 
 1. **process.md**: Main process file with:
    - All `{{placeholders}}` substituted with actual parameter values
-   - All `@step:category/step-name` references expanded with full step details
+   - All `@step:category/step-name` references kept as references (not expanded) with brief descriptions
    - Status set to "Running"
    - Current State section initialized
+   - **Note**: Step references should remain as `@step:category/step-name` with a brief description. Full step details remain in step files and can be read when needed. This keeps process.md concise and readable.
 
 2. **memory.md**: Memory file initialized with:
    - Template structure from `core/processes/templates/memory-template.md`
@@ -114,7 +117,18 @@ When creating a process instance, the AI must create three files:
 
 ## Step Resolution
 
-All step references (`@step:category/step-name`) are automatically resolved and expanded with full step details, making the process self-contained and ready to execute.
+When creating process.md, step references (`@step:category/step-name`) should be kept as references with brief descriptions, not expanded with full step details. This keeps process.md concise and readable (typically 100-150 lines instead of 700+ lines). Full step details remain in the step files and can be read when needed during execution.
+
+**Format in process.md:**
+```markdown
+- [ ] Step 1: Step name
+  - **Step**: `@step:category/step-name`
+  - **Description**: Brief description from step's Description section
+  - **Output**: Brief output description
+  - **Context**: (if applicable)
+```
+
+**Do NOT expand** with full Guidance, Substeps, Examples, etc. - those remain in the step file.
 
 ## ⚠️ MANDATORY REQUIREMENT: Log User Interactions Immediately
 

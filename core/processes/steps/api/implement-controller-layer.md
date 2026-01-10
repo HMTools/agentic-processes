@@ -1,5 +1,16 @@
 # Process Step: Implement Controller Layer
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- Project-specific API design best practices documentation
+- Project-specific authentication patterns documentation
+- Project-specific API versioning patterns documentation
+- Project-specific service layer patterns documentation
+- Project-specific dependency injection patterns documentation
+- Project-specific logging patterns documentation
+
 ## Metadata
 - **Prerequisites**: 
   - Understanding of required endpoints (HTTP verbs, routes, data)
@@ -46,6 +57,10 @@ flowchart TD
     O --> P[Verify Compilation]
     P --> Q[Complete]
 ```
+
+## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 ## Implementation Steps
 

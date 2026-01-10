@@ -1,5 +1,13 @@
 # Process Step: Write Integration Tests
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- Project-specific integration testing patterns documentation
+- Project-specific test data generation patterns documentation
+- Project-specific assertion patterns documentation
+
 ## Step Metadata
 - **Prerequisites**: Components implemented (API/Subscribers/Services), integration test infrastructure available
 - **Outputs**: Comprehensive end-to-end integration test files with full scenario coverage
@@ -7,6 +15,10 @@
 ## Description
 
 This step guides the creation of comprehensive integration tests that verify the complete flow of system components working together. Integration tests can be triggered by various entry points: API endpoints (HTTP requests), message queue subscribers (Kafka messages), or scheduled jobs. These tests validate the entire system working together, including business logic, database interactions, external service integration, and message processing. Integration tests ensure that all components integrate correctly and that the system behaves as expected in realistic scenarios.
+
+## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 ## When to Use This Step
 
@@ -218,43 +230,14 @@ For comprehensive integration test patterns and examples, see: Project-specific 
 
 Refer to the following resources for implementation guidance:
 
-- **Test Infrastructure**: Understand the base setup:
-  - TestServer and HttpClient usage
-  - Docker container initialization (MongoDB, Redis, Kafka, etc.)
-  - WireMock server setup and management
-  - Test database isolation and cleanup
-- **Story Builder Pattern**: For complex multi-step workflows:
-  - Fluent API for chaining actions
-  - Story context for state sharing
-  - Data bucket for passing data between steps
-  - Callbacks for test-specific customizations
-  - Reference existing story-based tests
-- **WireMock Integration**: Reference project-specific integration testing patterns for:
-  - Setting up external service mocks
-  - Creating realistic response stubs
-  - Verifying external service calls
-  - Simulating failures and timeouts
-- **Database Testing**: Reference project-specific integration testing patterns for:
-  - Direct database verification using MongoDBContext
-  - Test data cleanup patterns
-  - Transaction testing
-  - Query verification
-- **HTTP Client Testing** (for API endpoint tests): Study existing tests for:
-  - Making authenticated requests
-  - Asserting response status and content
-  - Deserializing response bodies
-  - Testing different HTTP methods
-- **Message Queue Testing** (for subscriber and publisher tests): Study existing subscriber tests for:
-  - Publishing messages to Kafka queues
-  - Consuming messages from queues
-  - Waiting for asynchronous message processing
-  - Verifying message processing side effects
-  - Testing error scenarios and retry logic
-- **Test Organization**: Reference project-specific test organization patterns for:
-  - File and folder structure
-  - Test naming conventions
-  - Test grouping and organization
-- **Code Conventions**: Follow project's coding guidelines and conventions
+**Integration Test-Specific Best Practices:**
+- **Test Infrastructure**: Understand TestServer, HttpClient, Docker containers, WireMock setup, and database isolation
+- **Story Builder Pattern**: For complex workflows - fluent API, story context, data bucket, callbacks
+- **WireMock Integration**: Reference project-specific patterns for external service mocking, stubs, and failure simulation
+- **Database Testing**: Reference project-specific patterns for MongoDB verification, cleanup, and transactions
+- **HTTP Client Testing**: Study existing tests for authenticated requests, response assertions, and HTTP methods
+- **Message Queue Testing**: Study existing subscriber tests for Kafka publishing/consuming and error scenarios
+- **Test Organization**: Reference project-specific patterns for file structure and naming conventions
 
 ## Output
 

@@ -1,5 +1,13 @@
 # Process Step: Implement Service Layer
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+- [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
+- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- `.github/instructions/solid.instructions.md` - SOLID principles
+- `.github/instructions/service-flow-pattern.instructions.md` - Service flow patterns
+
 ## Metadata
 - **Step Name**: implement-service-layer
 - **Prerequisites**: 
@@ -25,55 +33,25 @@ When invoking this step, provide:
 
 Implements business logic in the service layer following SOLID principles and clean architecture patterns. This step can implement one or multiple service components including managers, calculators, checkers, validators, publishers, subscribers, configurations, and utility services. These components implement the core business logic that orchestrates operations between repositories, external services, and applies domain rules.
 
-## Pre-Implementation: Verify Existing Patterns ✅
+## Guidance
 
-Before creating new service components, check if similar implementations exist to maintain consistency:
+<!-- @include: _components/mandatory-logging.md -->
 
-### Existing Service Components
+<!-- @include: _components/pre-implementation-patterns.md -->
+
+**Service-Specific Pattern Checks:**
 - [ ] Search for similar managers/calculators/validators in `Service/` subdirectories
 - [ ] Check naming conventions (e.g., `UserManager`, `LoanCalculator`, `EligibilityChecker`)
-- [ ] Review existing component structure and method signatures
-- [ ] Note common dependencies injected (repositories, external services, configuration)
-
-### Internal Contracts
 - [ ] Search `Contracts.Internal/Arguments/` for similar argument models
 - [ ] Search `Contracts.Internal/Results/` for similar result models
 - [ ] Review naming patterns for arguments (e.g., `Create*Arguments`, `Update*Arguments`)
-- [ ] Check immutability patterns (`init` properties, `required` modifier)
-- [ ] Note validation patterns on internal contracts
-
-### Business Logic Patterns
-- [ ] Review how existing services handle similar operations
-- [ ] Check error handling approaches (exceptions vs. result objects)
-- [ ] Identify common validation patterns
-- [ ] Note logging patterns for business operations
-- [ ] Review async/await usage in similar scenarios
-
-### Integration Patterns
 - [ ] Check how existing services interact with repositories
 - [ ] Review patterns for calling external APIs
-- [ ] Note transaction management patterns (if applicable)
 - [ ] Check event publishing patterns (if using publishers)
 - [ ] Review data mapping approaches (arguments → domain → results)
-
-### Configuration & Settings
-- [ ] Check if similar services use configuration classes
 - [ ] Review `Contracts.Internal/Configuration/` for existing patterns
-- [ ] Note where configuration values should come from (appsettings, database, etc.)
 - [ ] Check DI registration patterns for service components
-- [ ] **Review**: [Configuration vs Constants Guide](../../../../knowledge/best-practices/implementation-templates/configuration-vs-constants.md) - Determine when to use Settings classes vs constants
-
-### Built-in Helpers
-- [ ] Search for existing utility methods that might solve the problem
-- [ ] Check for built-in framework features (e.g., `JsonLinesReader` counters)
-- [ ] Review extension methods that might simplify implementation
 - [ ] Note reusable helper classes in `Service/Utils/`
-
-### Documentation
-- [ ] Document discovered patterns in process memory file
-- [ ] Note similar service components as reference examples
-- [ ] Record any deviations from standard patterns with rationale
-- [ ] List reusable utilities/helpers found
 
 ## Flow Diagram
 
@@ -265,19 +243,6 @@ All implementations should include:
    - [ ] Validate error handling
    - [ ] Confirm async/await usage where needed
    - [ ] Test interactions between components if they depend on each other
-
-## Common Pitfalls to Avoid
-
-1. **Tight Coupling**: Don't reference concrete implementations directly
-2. **Single Responsibility Violation**: Keep components focused on one concern
-3. **Missing Validation**: Always validate inputs before processing
-4. **Poor Error Messages**: Provide clear, actionable error messages
-5. **Synchronous I/O**: Never block on async operations
-6. **Missing Logging**: Log all significant operations and errors
-7. **No Transaction Management**: Consider data consistency for multi-step operations (especially in Managers)
-8. **Leaking Implementation Details**: Return appropriate contracts, not internal entities
-9. **Side Effects in Pure Functions**: Calculators should be pure functions without side effects
-10. **Wrong Component Type**: Use the right component type for the task (don't put validation in a Calculator, don't put calculations in a Checker, etc.)
 
 ## Success Criteria
 

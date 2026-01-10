@@ -5,6 +5,10 @@ Purpose: Analyze test failure to identify root cause - test logic issue, code bu
 
 # Step: Diagnose Integration Test Failure
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Systematically analyze the captured test failure information to determine the root cause. This step distinguishes between three types of issues: incorrect test logic/expectations, bugs in the application code being tested, or infrastructure/setup problems. The goal is to make an informed decision about what needs to be fixed.
@@ -19,6 +23,8 @@ Systematically analyze the captured test failure information to determine the ro
 - All findings stored in current step section of memory.md
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 - Review the test failure information from previous step in memory.md
@@ -169,54 +175,3 @@ graph TD
 - If genuinely unsure, note what additional information would help
 - Consider multiple contributing factors - root cause may not be singular
 - Temporary debug logging is acceptable for better visibility but must be marked and removed later
-
-## Examples
-
-### Example 1: Test Logic Issue
-
-**Scenario**: Test `OfferValidatorTests.ShouldRejectNegativeAmount` is failing
-
-**Root Cause Analysis**:
-1. Test expects validator to return `IsValid = false` for negative amounts
-2. Test assertion: `Assert.False(result.IsValid)`
-3. Actual behavior: Validator returns `IsValid = true`
-4. **Investigation**: Review validator code - it correctly rejects negative amounts
-5. **Investigation**: Review test setup - test creates offer with amount `-100`
-6. **Investigation**: Check recent changes - validator was updated to allow negative amounts for refunds
-7. **Root Cause**: Business requirements changed - negative amounts are now valid for refund scenarios
-8. **Category**: Test Issue - test expectations are outdated
-9. **Evidence**: Git commit shows intentional change to support refunds
-10. **Fix Decision**: Update test to reflect new business rules or make test more specific (reject negative amounts for non-refund offers)
-
-### Example 2: Code Bug Issue
-
-**Scenario**: Test `PaymentCalculatorTests.ShouldCalculateCorrectFee` is failing
-
-**Root Cause Analysis**:
-1. Test expects fee calculation: amount * 0.03 (3%)
-2. Test assertion: `Assert.Equal(30.00m, result.Fee)` for amount 1000
-3. Actual behavior: Test gets `Fee = 3.00m`
-4. **Investigation**: Review calculator code - found multiplication by 0.03 but result is divided by 10 instead of 100
-5. **Investigation**: Review test - test logic and expectations are correct
-6. **Investigation**: Check recent changes - fee calculation was recently refactored
-7. **Root Cause**: Bug introduced in recent refactoring - incorrect division
-8. **Category**: Code Issue - application code has a bug
-9. **Evidence**: Code has `amount * 0.03 / 10` should be `amount * 0.03` or `amount * 3 / 100`
-10. **Fix Decision**: Fix the calculator code to use correct calculation
-
-### Example 3: Infrastructure Issue
-
-**Scenario**: Test `MongoRepositoryTests.ShouldSaveAndRetrieveEntity` is failing
-
-**Root Cause Analysis**:
-1. Test expects to save entity and retrieve it by ID
-2. Test assertion: `Assert.NotNull(retrieved)` and `Assert.Equal(entity.Id, retrieved.Id)`
-3. Actual behavior: NullReferenceException on retrieved entity
-4. **Investigation**: Review repository code - save and find logic looks correct
-5. **Investigation**: Review test setup - uses TestContainers for MongoDB
-6. **Investigation**: Check Docker logs - MongoDB container is not fully initialized before test runs
-7. **Investigation**: Check test base class - no wait for MongoDB readiness
-8. **Root Cause**: Test infrastructure - MongoDB container not ready when test executes
-9. **Category**: Infrastructure Issue - test setup timing problem
-10. **Evidence**: Docker logs show connection attempts before MongoDB is ready to accept connections
-11. **Fix Decision**: Add health check or wait logic in test setup to ensure MongoDB is ready before tests run

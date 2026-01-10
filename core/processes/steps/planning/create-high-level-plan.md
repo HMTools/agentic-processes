@@ -5,6 +5,10 @@ Purpose: Generate a comprehensive task plan with complexity ratings, LLD, and Q&
 
 # Step: Create High-Level Plan
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Create a comprehensive high-level plan for the user story following the Task Planner format. This step generates a structured plan document that includes an overview, requirements, Q&A section for missing information, comprehensive Low Level Design (LLD), and a breakdown of major implementation steps with complexity ratings. The plan also identifies which process-steps will be needed for each implementation step.
@@ -29,6 +33,8 @@ Create a comprehensive high-level plan for the user story following the Task Pla
 - Memory file updated: current step section in memory.md with plan directory path
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 

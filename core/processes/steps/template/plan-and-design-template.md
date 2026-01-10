@@ -5,6 +5,10 @@ Purpose: Analyze requirements, define purpose, identify use cases, plan step bre
 
 # Step: Plan and Design Template
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Analyze requirements for the new template, define its purpose, identify use cases, plan the step breakdown, identify all required and optional parameters, design the process flow structure, create the mermaid flow diagram, and plan the step organization. This step establishes the complete foundation and design for the template.
@@ -23,6 +27,8 @@ Analyze requirements for the new template, define its purpose, identify use case
 
 ## Guidance
 
+<!-- @include: _components/mandatory-logging.md -->
+
 **Specific Actions:**
 - Review the need or problem that requires a new template
 - Identify the workflow or process the template will represent
@@ -30,6 +36,10 @@ Analyze requirements for the new template, define its purpose, identify use case
 - Write a clear, concise purpose statement
 - Define when this template should be used versus alternatives
 - Determine how detailed the step breakdown should be
+- **Before planning steps**: Check existing generic steps in `core/processes/steps/planning/` and `core/processes/steps/common/` to see if any can be reused
+- **When planning steps**: Prefer generic, reusable step categories over template-specific categories
+- **When planning steps**: Ensure each step represents actual work, not just flow control (decision points and loops belong in the flow diagram, not as steps)
+- **When planning steps**: Consider if existing steps can be reused (steps can be referenced multiple times in a template)
 - Identify all values that must be provided by the user (required parameters)
 - Use descriptive, camelCase names for parameters (e.g., `featureName`, `targetBranch`)
 - Identify values that are helpful but not mandatory (optional parameters)
@@ -54,6 +64,22 @@ Analyze requirements for the new template, define its purpose, identify use case
 - Keep node labels concise but descriptive
 - Use Title Case for visual consistency
 - Steps flow sequentially without explicit phase divisions
+
+**Step Design Best Practices:**
+- **Prefer generic, reusable steps**: When planning steps, prefer generic step categories (planning, common) over template-specific categories. Steps should be reusable across different template types when possible.
+  - Example: Use `@step:planning/understand-context` instead of `@step:investigation/understand-scope`
+  - Example: Use `@step:common/apply-changes` instead of `@step:investigation/apply-fixes`
+  - Check existing generic steps in `core/processes/steps/planning/` and `core/processes/steps/common/` before creating new template-specific steps
+- **Avoid flow transitions as steps**: Steps should represent actual work, not just flow control. Decision points and loops are handled in the flow diagram, not as separate steps.
+  - ❌ Bad: "Step 5: Wait for user approval" (this is a decision point, not a step)
+  - ❌ Bad: "Step 10: Iterate if needed" (this is a flow transition, not a step)
+  - ✅ Good: "Step 4: Propose fixes and wait for approval" (includes the work of proposing fixes)
+- **Reuse existing steps**: Before planning a new step, check if an existing step can be reused. Steps can be referenced multiple times in a template (e.g., a verification step used both initially and after fixes are applied).
+  - Check `core/processes/steps/` for existing steps that match your needs
+  - Consider if a step can be reused with different context parameters
+- **Make steps generic in description**: When describing steps, use generic language that applies across template types, not template-specific language.
+  - ❌ Bad: "Understand the investigation scope" (too specific to investigations)
+  - ✅ Good: "Fully understand the context, sources, and requirements" (generic, reusable)
 
 ## Memory File Usage
 

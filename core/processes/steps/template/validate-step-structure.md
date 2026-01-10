@@ -1,13 +1,17 @@
 <!--
 Step: Validate Step Structure
-Purpose: Perform comprehensive validation of the created step file to ensure it meets all requirements including self-contained check, section completeness, diagram validation, guidance quality, examples quality, pitfalls documentation, naming compliance, and best practices compliance
+Purpose: Perform comprehensive validation of the created step file to ensure it meets all requirements including self-contained check, section completeness, diagram validation, guidance quality, naming compliance, and best practices compliance
 -->
 
 # Step: Validate Step Structure
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
-Perform comprehensive validation of the created step file to ensure it meets all requirements. Verify the step is self-contained (no references to other steps), check that all required sections are present and properly formatted, validate the mermaid diagram syntax and that it matches the substeps, ensure guidance is detailed and actionable with specific file paths and code patterns, verify examples are included and relevant, check that common pitfalls are documented, and confirm compliance with naming conventions and best practices from steps/README.md.
+Perform comprehensive validation of the created step file to ensure it meets all requirements. Verify the step is self-contained (no references to other steps), check that all required sections are present and properly formatted, validate the mermaid diagram syntax and that it matches the substeps, ensure guidance is detailed and actionable with specific file paths and code patterns, and confirm compliance with naming conventions and best practices from steps/README.md.
 
 ## Output
 
@@ -16,8 +20,6 @@ Perform comprehensive validation of the created step file to ensure it meets all
   - Section completeness check (all required sections present)
   - Diagram validation (syntax and alignment with substeps)
   - Guidance quality check (detailed and actionable)
-  - Examples quality check (relevant and concrete)
-  - Pitfalls documentation check (warnings included)
   - Naming compliance check (kebab-case filename, proper structure)
   - Best practices compliance check (follows README guidelines)
 - List of any issues found with specific fixes needed
@@ -25,14 +27,7 @@ Perform comprehensive validation of the created step file to ensure it meets all
 
 ## Guidance
 
-**⚠️ MANDATORY: Log User Interactions Immediately**
-
-Before making ANY file changes in response to user input:
-- [ ] Log user interaction in `log.md` under current step's "User Interactions" section
-- [ ] Include timestamp, user request, reason, and agent response
-- [ ] **STOP** if user interaction not logged - log it first before proceeding
-
-**Reference**: See `docs/process-management.md` for complete logging guidelines.
+<!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 - Read the created step file: `core/processes/steps/{{stepCategory}}/{{stepName}}.md`
@@ -49,8 +44,6 @@ Before making ANY file changes in response to user input:
   - Verify Memory File Usage section exists
   - Verify Flow section exists with mermaid diagram
   - Verify Substeps section exists with actionable tasks
-  - Verify Examples section exists with 1-3 examples
-  - Verify Common Pitfalls section exists with 2-3 pitfalls
 - Perform diagram validation:
   - Check mermaid syntax is correct (use mermaid validator if available)
   - Verify diagram nodes match substeps listed
@@ -63,15 +56,6 @@ Before making ANY file changes in response to user input:
   - Check Code Patterns subsection if applicable
   - Verify Tools subsection if applicable
   - Check Best Practices subsection is included
-- Perform examples quality check:
-  - Verify at least 1 example is included (preferably 2-3)
-  - Check each example has Context, Actions, and Result subsections
-  - Verify examples are concrete and relevant to the step
-  - Check examples use realistic scenarios
-- Perform pitfalls documentation check:
-  - Verify at least 2 pitfalls are documented (preferably 3)
-  - Check each pitfall has Problem and Solution subsections
-  - Verify pitfalls are relevant and helpful
 - Perform naming compliance check:
   - Verify filename uses kebab-case (lowercase with hyphens)
   - Check filename matches step name parameter
@@ -96,8 +80,6 @@ Before making ANY file changes in response to user input:
 - Provide specific file locations for issues found
 - Give clear guidance on how to fix issues
 - Verify mermaid syntax is valid (test if possible)
-- Check that examples are realistic and helpful
-- Ensure pitfalls are actually common issues
 - Validate against all guidelines in README.md
 
 ## Memory File Usage

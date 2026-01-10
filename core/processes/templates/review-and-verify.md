@@ -44,8 +44,8 @@ flowchart TD
     E -->|Yes| G[Step 4: Propose Fixes]
     G --> H{User Approved?}
     H -->|No| F
-    H -->|Yes| I[Step 5: Apply Approved Fixes]
-    I --> J[Step 6: Re-verify After Fixes]
+    H -->|Yes| I[Step 5: Apply Approved Changes]
+    I --> J[Step 6: Re-verify After Changes]
     J --> K{All Issues Resolved?}
     K -->|No| D
     K -->|Yes| F
@@ -57,25 +57,25 @@ flowchart TD
 
 - [ ] Step 1: Understand context
   - **Step**: `@step:planning/understand-context`
-  - **Description**: Fully understand the context, sources, and requirements for this investigation. Clarify what needs to be investigated, identify relevant information sources, understand verification criteria, and document any specific requirements or constraints. Gather all necessary context to proceed with the investigation.
-  - **Output**: Context documentation, requirements definition, sources identified, verification criteria documented
+  - **Description**: Fully understand the context, sources, and requirements for this task or process. This step establishes a clear foundation by gathering all necessary context information before proceeding with work. It clarifies what needs to be accomplished, identifies relevant information sources, understands success criteria (verification criteria in this case), and documents any specific requirements or constraints. Gather all necessary context to proceed with the investigation.
+  - **Output**: Context documentation organized by categories (process parameters, information sources, requirements, success criteria, constraints), Q&A section if context is incomplete, complete context understanding verified and documented
   - **Context**:
     - `investigationScope`: {{investigationScope}}
     - `verificationCriteria`: {{verificationCriteria}}
 
 - [ ] Step 2: Identify files to review
   - **Step**: `@step:investigation/identify-files`
-  - **Description**: Determine which files and directories need to be reviewed based on the investigation scope. If targetFiles parameter is provided, use those; otherwise, identify relevant files based on scope. Apply excludePatterns if provided. Create a comprehensive list of files to review.
-  - **Output**: List of files and directories to review, file identification report
+  - **Description**: Identify which files and directories need to be processed based on flexible criteria (patterns, scope descriptions, or both). The step supports two search modes: Simple search (fast, default) using available tools, and Deep search (exhaustive, directory/file listing with tracking). If targetFiles parameter is provided, use those as patterns; otherwise, identify relevant files based on investigation scope. Apply excludePatterns if provided. The step applies exclusion filtering and produces a comprehensive list of files ready for processing, saved to a separate JSON file with a reference stored in memory.
+  - **Output**: Comprehensive list of identified files (saved to `identified-files.json`), file identification report (summary of search approach, criteria applied, exclusions applied, file counts), memory reference (file count, path to JSON file, brief summary)
   - **Context**:
-    - `targetFiles`: {{targetFiles}}
+    - `targetFiles`: {{targetFiles}} (used as filePatterns)
     - `excludePatterns`: {{excludePatterns}}
-    - `investigationScope`: {{investigationScope}}
+    - `investigationScope`: {{investigationScope}} (used as scope)
 
 - [ ] Step 3: Review, verify, and document findings
   - **Step**: `@step:investigation/review-verify-document`
-  - **Description**: Systematically review each identified file for content relevant to the investigation scope. Read files, analyze content, extract relevant information, and verify against criteria. For each item found, verify whether it meets the criteria. Identify any violations, issues, or items that do not meet the criteria. Categorize issues by type and severity. Create a comprehensive summary of findings - if no issues were found, document that all items passed verification; if issues were found, document each issue with details including location, description, and how it violates the criteria. Prepare findings for presentation to the user.
-  - **Output**: Review report with findings from each file, verification report, list of issues found (if any), categorization of issues, findings summary document, issue details (if issues found), verification status report
+  - **Description**: Systematically review each identified file for content relevant to the investigation scope. Read files, analyze content, extract relevant information, and verify against criteria. For each item found, verify whether it meets the criteria. Identify any violations, issues, or items that do not meet the criteria. Categorize issues by type and severity. Create a comprehensive summary of findings - if no issues were found, document that all items passed verification; if issues were found, document each issue with details including location, description, and how it violates the criteria. Prepare findings for presentation to the user. This step produces a findings report and structured issues list (JSON) if issues are found.
+  - **Output**: Findings report (`findings-report.md` with executive summary, review findings, verification results, issues found), issues list (`issues-list.json` with structured data if issues found), memory update with file paths, counts, status, and references to report files
   - **Context**:
     - `investigationScope`: {{investigationScope}}
     - `verificationCriteria`: {{verificationCriteria}}
@@ -87,25 +87,25 @@ flowchart TD
 
 - [ ] Step 4: Propose fixes
   - **Step**: `@step:investigation/propose-fixes`
-  - **Description**: For each issue identified, propose specific fixes. Analyze each issue to determine the best fix approach. Provide detailed fix proposals including what needs to change, how to change it, and why this fix addresses the issue. Present fixes in a clear, actionable format to the user and wait for approval. User can approve all fixes, approve some fixes, reject fixes, or request modifications.
-  - **Output**: Fix proposals document, detailed fix instructions for each issue, fix rationale, user approval status
+  - **Description**: Propose specific fixes for issues identified during review and verification. For each issue, analyze the problem, determine the best fix approach, and provide detailed proposals including what needs to change, how to change it, and why this fix addresses the issue. Present all fix proposals to the user in a clear, actionable format and wait for approval. The user can approve specific fixes by issue ID (or all by approving all IDs), and any fixes not explicitly approved remain unapproved. The user can also request modifications to proposals, which will trigger a revision cycle.
+  - **Output**: Fix proposals document (`fix-proposals.md` with header, summary, detailed proposals for each issue, approval section), approval status (list of approved issue IDs stored in memory), memory update with proposals document path, total proposals created, approval status, and list of approved issue IDs
   - **Decision**:
     - **IF** user approves fixes:
-      - Proceed to Step 5 (Apply Approved Fixes)
+      - Proceed to Step 5 (Apply Approved Changes)
     - **ELSE** (user rejects or no approval):
       - Proceed to Step 7 (Final Summary)
   - **Note**: This step only runs if issues were found in Step 3
 
-- [ ] Step 5: Apply approved fixes
-  - **Step**: `@step:investigation/apply-fixes`
-  - **Description**: Apply all user-approved fixes to the relevant files. Make the necessary changes to files based on approved fix proposals. Ensure fixes are applied correctly and completely. Document which fixes were applied and to which files.
-  - **Output**: Modified files with fixes applied, fix application report, list of changes made
-  - **Note**: This step only runs if user approved fixes in Step 4
+- [ ] Step 5: Apply approved changes
+  - **Step**: `@step:common/apply-changes`
+  - **Description**: Apply all user-approved changes to relevant files based on approved change proposals. Read approved change proposals from memory, apply each approved change to the target files using the detailed change instructions provided, verify that each change was applied correctly, and document all changes made in a change application report. The step is designed to be simple and focused - it executes approved proposals and does not make decisions about what changes to make.
+  - **Output**: Modified files (all files that had approved changes applied), change application report (`changes-applied.md` documenting all changes made with summary, change details, and list of modified files), memory update with report path, files modified, and results
+  - **Note**: This step only runs if user approved changes in Step 4
 
-- [ ] Step 6: Re-verify after fixes
-  - **Step**: `@step:investigation/re-verify`
-  - **Description**: After fixes are applied, re-verify the modified content against the verification criteria. Check that the fixes resolved the issues and that no new issues were introduced. Verify that all previously identified issues are now resolved.
-  - **Output**: Re-verification report, status of previously identified issues, new issues found (if any)
+- [ ] Step 6: Re-verify after changes
+  - **Step**: `@step:investigation/review-verify-document`
+  - **Description**: After changes are applied, re-run the review, verification, and documentation process to check that the changes resolved the issues and that no new issues were introduced. Use the same process as Step 3: systematically review modified files for content relevant to the investigation scope, read files, analyze content, extract relevant information, and verify against criteria. For each item found, verify whether it meets the criteria. Identify any remaining violations, issues, or items that do not meet the criteria. Categorize any remaining issues by type and severity. Create a comprehensive summary of findings. This step produces a findings report and structured issues list (JSON) if issues remain.
+  - **Output**: Findings report (`findings-report.md` with executive summary, review findings, verification results, remaining issues if any), issues list (`issues-list.json` with structured data if issues remain), memory update with file paths, counts, status, and references to report files
   - **Decision**:
     - **IF** all issues resolved:
       - Proceed to Step 7 (Final Summary)
@@ -114,8 +114,8 @@ flowchart TD
 
 - [ ] Step 7: Final summary
   - **Step**: `@step:investigation/final-summary`
-  - **Description**: Provide a final comprehensive summary of the investigation. Include the investigation scope, what was reviewed, findings, fixes applied (if any), final verification status, and any remaining issues or recommendations. Present a clear conclusion of the investigation.
-  - **Output**: Final investigation summary, conclusion report, recommendations (if any)
+  - **Description**: Provide a final comprehensive summary of the investigation that consolidates information from all previous steps. Read investigation data from memory (scope, files reviewed, findings, issues, fixes, verification status), compile all information into organized sections, create a comprehensive final summary document, and present a clear conclusion to the user. The summary handles all scenarios: investigations where no issues were found, investigations where issues were found but not fixed, and investigations where issues were found and fixed.
+  - **Output**: Final summary document (`final-summary.md` containing executive summary, investigation scope, files reviewed, findings summary, issues found if any, fixes applied if any, final verification status, remaining issues if any, recommendations if any, clear conclusion), memory update with final summary document path, overall conclusion, final verification status, and recommendations
 
 ### Final Phase: Learning & Improvement
 
@@ -140,8 +140,8 @@ This process uses a unified memory file to track state and share information bet
 - **Step 2**: List of files to review, file identification results
 - **Step 3**: Review findings, verification results, issues found, categorization, findings summary, issue details
 - **Step 4**: Fix proposals, fix instructions, user approval status
-- **Step 5**: Applied fixes, modified files
-- **Step 6**: Re-verification results, remaining issues
+- **Step 5**: Applied changes, modified files
+- **Step 6**: Re-verification results (using Step 3 process), remaining issues
 - **Step 7**: Final summary, conclusions
 - **Step 8**: Continuous improvement analysis and implemented improvements
 

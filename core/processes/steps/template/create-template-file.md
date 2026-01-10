@@ -5,6 +5,10 @@ Purpose: Create the template file with all sections including header comment, pr
 
 # Step: Create Template File
 
+## Required Components
+
+- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
+
 ## Description
 
 Create the template file in `core/processes/templates/` with the proper filename and write all sections including the header comment block, process header, parameters section, context section, process flow diagram, and all sequential step definitions. Each step must reference an actual process-step file using `@step:category/step-name` syntax. Include the mandatory continuous improvement step as the final step. Then comprehensively validate the template by verifying all required sections are present, checking parameter placeholders are properly documented, ensuring the flow diagram matches the steps, and reviewing compliance with best practices.
@@ -19,9 +23,11 @@ Create the template file in `core/processes/templates/` with the proper filename
 - Process flow diagram section with mermaid code
 - Complete Steps section with all step definitions
 - Continuous improvement step added as final step
-- Validation reports (structure, parameters, diagram alignment, best practices compliance)
+- Validation reports (structure, parameters, diagram alignment, flow transition check, step description alignment check, best practices compliance)
 
 ## Guidance
+
+<!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 - Create file: `core/processes/templates/{{templateName}}.md` using kebab-case for filename
@@ -45,6 +51,17 @@ Create the template file in `core/processes/templates/` with the proper filename
 - Validate the template by verifying all required sections are present
 - Check that all parameter placeholders are properly documented in the Parameters section
 - Verify the flow diagram matches the step sequence exactly
+- **Validate steps are not flow transitions**: Check each step description for flow transition patterns:
+  - Steps that are just "wait for X" (these should be decision points in the flow diagram, not separate steps)
+  - Steps that are just "iterate if needed" or "loop back" (these are handled by flow diagram loops, not separate steps)
+  - Steps that are just "transition to next step" (these are implicit in sequential flow)
+  - Flag any steps that appear to be flow transitions rather than actual work
+- **Validate step descriptions align with actual step files**: For each step reference (`@step:category/step-name`), verify the template step description aligns with the actual step file:
+  - Read the referenced step file from `core/processes/steps/{category}/{step-name}.md`
+  - Compare the template step description with the step file's Description section
+  - Verify the template step Output matches the step file's Output section
+  - Flag any significant misalignments (e.g., template says "investigation scope" but step file says "context, sources, and requirements")
+  - Note: Minor wording differences are acceptable, but core purpose and outputs should align
 - Review compliance with best practices from `core/processes/templates/README.md`
 - Fix any validation issues found before proceeding
 
@@ -62,6 +79,10 @@ Create the template file in `core/processes/templates/` with the proper filename
 - Steps are sequential (no dependencies field needed)
 - Use clear, actionable descriptions
 - Continuous improvement step is MANDATORY for all templates
+- **Steps must represent actual work**: Each step should perform work, not just control flow. Decision points, loops, and transitions belong in the flow diagram, not as separate steps.
+  - ❌ Bad: "Step 5: Wait for user approval" (decision point - handle in flow diagram)
+  - ❌ Bad: "Step 10: Iterate if needed" (flow transition - handle with loop in flow diagram)
+  - ✅ Good: "Step 4: Propose fixes and wait for approval" (includes work of proposing fixes)
 
 ## Memory File Usage
 
