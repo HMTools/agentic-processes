@@ -61,7 +61,7 @@ flowchart TD
   - **Description**: Analyze requirements for the new step, define its purpose, identify use cases, determine the appropriate category, plan the step structure, identify required sections (description, output, guidance, flow diagram, substeps, examples, common pitfalls), and design the mermaid flow diagram. This step establishes the complete foundation and design for the step file.
   - **Output**: Requirements document, purpose statement, use cases documentation, category selection rationale, step structure plan, section breakdown plan, mermaid flow diagram code, substeps outline
   - **Iterative Review**: User can request changes to the design, flow, or structure; revise and re-present until satisfactory
-  - **Approval Checkpoint**: User must explicitly approve the complete step design (requirements, purpose, use cases, category, structure, and flow) before proceeding to Step 2
+  - **⚠️ APPROVAL CHECKPOINT - STOP AND WAIT**: User must explicitly approve the complete step design before proceeding to Step 2. Present deliverables, ask "Do you approve? (approve/modify/reject)", and WAIT for user response. Do NOT proceed automatically.
   - **Decision**:
     - **IF** user approves:
       - Proceed to Step 2 (Create Step File)

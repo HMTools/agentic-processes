@@ -14,6 +14,11 @@ The mandatory consultation requirement when agents are uncertain about how to pr
 
 **Usage**: Include this component in the Description section of steps that require agents to make decisions or take actions where uncertainty might arise.
 
+### mandatory-approval-checkpoint.md
+The mandatory approval checkpoint requirement for steps that require user approval before proceeding. This component contains the checklist and workflow for stopping and waiting for user approval.
+
+**Usage**: Include this component in process templates at steps that have approval checkpoints. The component should be included immediately after the step's approval checkpoint description to reinforce the requirement to stop and wait.
+
 ### pre-implementation-patterns.md
 A checklist for verifying existing patterns before implementing new components. This helps maintain consistency and avoid duplication.
 

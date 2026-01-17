@@ -74,7 +74,7 @@ flowchart TD
   - **Analysis Criteria**: Check if concept is already implemented in existing files
 
 - [ ] Step 4: Design implementation plan
-  - **Step**: `@step:planning/create-high-level-plan`
+  - **Step**: `@step:planning/design-implementation-plan`
   - **Description**: Understand the requested state (how files should look after implementation) and design a comprehensive plan for implementing the concept. The plan includes modifications to existing files and creation of new files as needed. Break down into actionable steps with change proposals.
   - **Output**: Implementation plan with requested state specification, step-by-step approach, and change proposals (for both file modifications and new file creation)
   - **Parameters Used**: `conceptDescription`, `requestedState` (if provided), `existingState` (from Step 3), `verificationCriteria`

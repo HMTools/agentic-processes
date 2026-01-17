@@ -59,7 +59,7 @@ flowchart TD
   - **Description**: Analyze requirements for the new template, define its purpose, identify use cases, plan the step breakdown, identify all required and optional parameters, design the process flow structure, create the mermaid flow diagram, and plan the step organization. This step establishes the complete foundation and design for the template.
   - **Output**: Requirements document, purpose statement, use cases documentation, step breakdown plan, parameter lists (required and optional), process flow structure outline, mermaid flow diagram code, step organization plan
   - **Iterative Review**: User can request changes to the design, flow, or parameters; revise and re-present until satisfactory
-  - **Approval Checkpoint**: User must explicitly approve the complete template design (requirements, purpose, use cases, parameters, and flow) before proceeding to Step 2
+  - **⚠️ APPROVAL CHECKPOINT - STOP AND WAIT**: User must explicitly approve the complete template design before proceeding to Step 2. Present deliverables, ask "Do you approve? (approve/modify/reject)", and WAIT for user response. Do NOT proceed automatically.
   - **Decision**:
     - **IF** user approves:
       - Proceed to Step 2 (Create Template File)

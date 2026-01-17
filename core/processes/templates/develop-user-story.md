@@ -78,7 +78,7 @@ flowchart TD
   - **Q&A Checkpoint**: If plan includes Q&A section, user must answer questions before proceeding
   - **LLD Checkpoint**: Complete Low Level Design after Q&A is resolved
   - **Iterative Review**: User can request changes to the plan; revise and re-present until satisfactory
-  - **Approval Checkpoint**: User must explicitly approve the high-level plan before proceeding
+  - **⚠️ APPROVAL CHECKPOINT - STOP AND WAIT**: User must explicitly approve the high-level plan before proceeding. Present deliverables, ask "Do you approve? (approve/modify/reject)", and WAIT for user response. Do NOT proceed automatically.
   - **Post-Approval Action**: Once plan is approved, update the Implementation Steps section (Phase 2) of this process file with the actual tasks from the approved high-level plan
   - **Note**: This step is complete only when user approves the plan and implementation steps are updated
 
@@ -170,7 +170,7 @@ flowchart TD
   - **LLD Checkpoint**: Create step-specific LLD after step Q&A is resolved
   - **Presentation**: Present all detailed plans together for user review
   - **Iterative Approval**: User can request changes; revise and re-present until approved
-  - **Approval Checkpoint**: User must explicitly approve all detailed plans before proceeding
+  - **⚠️ APPROVAL CHECKPOINT - STOP AND WAIT**: User must explicitly approve all detailed plans before proceeding. Present all plans, ask "Do you approve? (approve/modify/reject)", and WAIT for user response. Do NOT proceed automatically.
   - **Note**: This step is complete only when user approves all detailed plans
 
 ### Phase 2: Implementation
