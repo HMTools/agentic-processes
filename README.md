@@ -108,24 +108,24 @@ agentic-processes/
 │   ├── getting-started.md       # Quick start guide
 │   ├── architecture.md          # System architecture
 │   └── examples.md              # Usage examples
-├── core/                        # Core system components
-│   ├── processes/
-│   │   ├── templates/           # Process templates
-│   │   │   ├── develop-user-story.md
-│   │   │   ├── integration-test-fix.md
-│   │   │   └── README.md
-│   │   ├── steps/               # Modular step definitions
-│   │   │   ├── api/             # API-related steps
-│   │   │   ├── data/            # Data layer steps
-│   │   │   ├── service/         # Service layer steps
-│   │   │   ├── testing/         # Testing steps
-│   │   │   ├── planning/        # Planning steps
-│   │   │   ├── documentation/   # Documentation steps
-│   │   │   ├── external-services/ # External service steps
-│   │   │   ├── learning/        # Learning/improvement steps
-│   │   │   └── README.md
+├── .processes/                  # Processes framework (hidden folder)
+│   ├── templates/               # Process templates
+│   │   ├── develop-user-story.md
+│   │   ├── integration-test-fix.md
 │   │   └── README.md
-│   └── README.md                # Core system overview
+│   ├── steps/                   # Modular step definitions
+│   │   ├── api/                 # API-related steps
+│   │   ├── data/                # Data layer steps
+│   │   ├── service/             # Service layer steps
+│   │   ├── testing/             # Testing steps
+│   │   ├── planning/            # Planning steps
+│   │   ├── documentation/       # Documentation steps
+│   │   ├── external-services/   # External service steps
+│   │   ├── learning/            # Learning/improvement steps
+│   │   └── README.md
+│   ├── active/                  # Currently running processes
+│   ├── prompts/                 # Process management prompts
+│   └── (completed/ and failed/ created as needed)
 ├── .cursor/                     # Cursor IDE integration
 │   └── commands/
 │       ├── process-new.md
@@ -147,9 +147,9 @@ A **process** is an instance of a workflow created from a template. It tracks:
 - Audit log of all actions
 
 Processes are stored in:
-- `core/processes/active/` - Currently running processes
-- `core/processes/completed/` - Finished processes
-- `core/processes/failed/` - Failed processes
+- `.processes/active/` - Currently running processes
+- `.processes/completed/` - Finished processes
+- `.processes/failed/` - Failed processes
 
 ### Templates
 
@@ -159,7 +159,7 @@ Processes are stored in:
 - Process flow diagrams (mermaid)
 - Sequential step definitions
 
-Templates are stored in `core/processes/templates/`.
+Templates are stored in `.processes/templates/`.
 
 ### Steps
 
@@ -171,7 +171,7 @@ Templates are stored in `core/processes/templates/`.
 - Substeps breakdown
 - Examples and common pitfalls
 
-Steps are stored in `core/processes/steps/{category}/`.
+Steps are stored in `.processes/steps/{category}/`.
 
 ### Step References
 
@@ -233,6 +233,44 @@ Memory files store information across steps:
 - `ai/plans/user-authentication/plan.md`
 ```
 
+## How It Works
+
+### 1. Template Selection
+
+User selects a template from `.processes/templates/`.
+
+### 2. Parameter Collection
+
+System collects required parameters and substitutes placeholders.
+
+### 3. Step Resolution
+
+System resolves all `@step:category/step-name` references:
+- Reads step files from `.processes/steps/{category}/`
+- Expands step content with full details
+- Applies context parameters
+
+### 4. Process Creation
+
+System creates process instance in `.processes/active/`:
+- Process file with all steps expanded
+- Memory file initialized
+- Status set to "Running"
+
+### 5. Process Execution
+
+Process Manager:
+- Tracks current step
+- Updates state and memory
+- Maintains audit log
+- Enforces step order
+
+### 6. Process Completion
+
+When complete:
+- Status updated to "Completed"
+- Process moved to `.processes/completed/`
+
 ## Integration
 
 ### Cursor IDE
@@ -255,16 +293,16 @@ Prompts are defined in `.github/prompts/`.
 
 ### Adding New Templates
 
-1. Create template file in `core/processes/templates/`
-2. Follow template structure (see `core/processes/templates/README.md`)
+1. Create template file in `.processes/templates/`
+2. Follow template structure (see `.processes/templates/README.md`)
 3. Include parameter placeholders
 4. Reference steps using `@step:category/step-name` syntax
 5. Add mermaid flow diagram
 
 ### Adding New Steps
 
-1. Create step file in `core/processes/steps/{category}/`
-2. Follow step template (see `core/processes/steps/step-template.md`)
+1. Create step file in `.processes/steps/{category}/`
+2. Follow step template (see `.processes/steps/step-template.md`)
 3. Include all required sections:
    - Description
    - Output
@@ -276,8 +314,9 @@ Prompts are defined in `.github/prompts/`.
 
 ### Best Practices
 
-- **Templates**: Keep focused, use parameters for flexibility
-- **Steps**: Be self-contained, provide rich guidance
+- **Templates**: Keep focused and specific, use parameters for flexibility, reference existing steps, include flow diagrams, document when to use
+- **Steps**: Be self-contained, provide rich guidance, include examples, document common pitfalls, use flow diagrams for complex steps
+- **Processes**: Follow step guidance exactly, update memory as you go, check state regularly, complete steps fully before moving on, document decisions in memory
 - **Naming**: Use kebab-case for files, descriptive names
 - **Documentation**: Update README files when adding content
 
@@ -286,9 +325,8 @@ Prompts are defined in `.github/prompts/`.
 - [Getting Started](docs/getting-started.md) - Detailed quick start guide
 - [Architecture](docs/architecture.md) - System architecture deep dive
 - [Examples](docs/examples.md) - More usage examples
-- [Core System](core/README.md) - Core system overview
-- [Templates Guide](core/processes/templates/README.md) - Template authoring
-- [Steps Guide](core/processes/steps/README.md) - Step creation guide
+- [Templates Guide](.processes/templates/README.md) - Template authoring
+- [Steps Guide](.processes/steps/README.md) - Step creation guide
 
 ## License
 

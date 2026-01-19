@@ -27,7 +27,7 @@ Templates define reusable workflows with:
 - Process flow diagrams
 - Sequential step definitions
 
-**Location**: `core/processes/templates/`
+**Location**: `.processes/templates/`
 
 **Structure**:
 ```markdown
@@ -53,7 +53,7 @@ Steps are modular, self-contained definitions with:
 - Substeps
 - Examples
 
-**Location**: `core/processes/steps/{category}/`
+**Location**: `.processes/steps/{category}/`
 
 **Categories**:
 - `api/` - API layer steps
@@ -72,7 +72,7 @@ Process instances are created from templates and contain:
 - Memory file (`memory.md`)
 - Log file (`log.md`)
 
-**Location**: `core/processes/{state}/process-{name}-{YYYYMMDD}/`
+**Location**: `.processes/{state}/process-{name}-{YYYYMMDD}/`
 
 **States**:
 - `active/` - Currently running
@@ -114,7 +114,7 @@ When a process is created from a template:
 1. **Template Reading**: Read template file
 2. **Reference Scanning**: Find all `@step:category/step-name` references
 3. **Step Loading**: For each reference:
-   - Read step file from `core/processes/steps/{category}/{step-name}.md`
+   - Read step file from `.processes/steps/{category}/{step-name}.md`
    - Extract all sections (Description, Output, Guidance, Flow, Substeps, Examples)
 4. **Expansion**: Replace reference with full step content
 5. **Context Application**: Apply context parameters from template
@@ -277,14 +277,14 @@ System automatically updates:
 
 ### Adding New Templates
 
-1. Create template file in `core/processes/templates/`
+1. Create template file in `.processes/templates/`
 2. Follow template structure
 3. Reference existing steps
 4. Add to template list
 
 ### Adding New Steps
 
-1. Create step file in `core/processes/steps/{category}/`
+1. Create step file in `.processes/steps/{category}/`
 2. Follow step template
 3. Include all required sections
 4. Add examples and guidance

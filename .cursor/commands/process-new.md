@@ -1,1 +1,1 @@
-Read and follow the instructions from: `core/processes/prompts/process-new.md`
+Read and follow the instructions from: `.processes/prompts/process-new.md`

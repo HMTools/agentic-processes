@@ -52,7 +52,7 @@ Provide the requested information.
 The system will:
 1. Resolve all step references
 2. Substitute all parameters
-3. Create process instance in `core/processes/active/process-{name}-{YYYYMMDD}/`
+3. Create process instance in `.processes/active/process-{name}-{YYYYMMDD}/`
 4. Display the process with all steps expanded
 
 ### Step 5: Begin Work
@@ -113,9 +113,9 @@ The system will:
 ### Process States
 
 Processes can be in three states:
-- **Running**: Currently active, in `core/processes/active/`
-- **Completed**: Finished successfully, moved to `core/processes/completed/`
-- **Failed**: Encountered errors, moved to `core/processes/failed/`
+- **Running**: Currently active, in `.processes/active/`
+- **Completed**: Finished successfully, moved to `.processes/completed/`
+- **Failed**: Encountered errors, moved to `.processes/failed/`
 
 ## Key Concepts
 
@@ -179,7 +179,7 @@ When creating a process, references are automatically expanded with full step de
 - Read [Architecture Guide](architecture.md) for system details
 - Check [Examples](examples.md) for more use cases
 - Review [Core System](../core/README.md) documentation
-- Explore [Templates](../core/processes/templates/README.md) and [Steps](../core/processes/steps/README.md)
+- Explore [Templates](../.processes/templates/README.md) and [Steps](../.processes/steps/README.md)
 
 ## Getting Help
 

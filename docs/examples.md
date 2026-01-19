@@ -29,7 +29,7 @@ You need to implement a new feature: "User Authentication" that allows users to 
    ```
 
 4. **Process Created**:
-   - Process instance created in `core/processes/active/process-user-authentication-20250115/`
+   - Process instance created in `.processes/active/process-user-authentication-20250115/`
    - All steps expanded and ready
 
 ### Process Execution
@@ -133,7 +133,7 @@ You want to create a template for a specific workflow your team uses frequently.
 ### Template Creation
 
 1. **Create Template File**:
-   - Location: `core/processes/templates/custom-workflow.md`
+   - Location: `.processes/templates/custom-workflow.md`
 
 2. **Template Structure**:
    ```markdown
@@ -185,7 +185,7 @@ You need a step that doesn't exist in the steps library.
    - Determine appropriate category (api, service, data, testing, etc.)
 
 2. **Create Step File**:
-   - Location: `core/processes/steps/{category}/step-name.md`
+   - Location: `.processes/steps/{category}/step-name.md`
 
 3. **Step Structure**:
    ```markdown

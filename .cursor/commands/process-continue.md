@@ -1,1 +1,1 @@
-Read and follow the instructions from: `core/processes/prompts/process-continue.md`
+Read and follow the instructions from: `.processes/prompts/process-continue.md`
