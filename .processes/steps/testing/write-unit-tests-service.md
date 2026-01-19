@@ -4,7 +4,7 @@
 
 - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
 - [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
-- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- `.user-processes/guidelines/code-conventions.instructions.md` - Code conventions
 - Project-specific unit testing best practices documentation
 - Project-specific mocking strategies documentation
 - Project-specific test data generation patterns documentation

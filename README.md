@@ -24,8 +24,8 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 ### Modular Architecture
 - **Templates**: Define reusable workflows with placeholders
 - **Steps**: Self-contained step definitions with rich guidance
-- **Step References**: Compose processes using `@step:category/step-name` syntax
-- **Automatic Resolution**: Step references are automatically expanded with full details
+- **Step References**: Compose processes using `@framework-step:category/step-name` or `@user-step:category/step-name` syntax
+- **Pluggable Resources**: Add your own templates, steps, components, and guidelines
 
 ### State Persistence
 - Process state stored in markdown files
@@ -101,17 +101,20 @@ graph TD
 
 ## Directory Structure
 
+The framework uses a **pluggable resources** model with two locations:
+
+### Framework Resources (`.processes/`)
+
+Core templates, steps, and infrastructure provided by the framework:
+
 ```
 agentic-processes/
-├── README.md                    # This file
-├── docs/                        # System documentation
-│   ├── getting-started.md       # Quick start guide
-│   ├── architecture.md          # System architecture
-│   └── examples.md              # Usage examples
-├── .processes/                  # Processes framework (hidden folder)
-│   ├── templates/               # Process templates
-│   │   ├── develop-user-story.md
-│   │   ├── integration-test-fix.md
+├── .processes/                  # Framework-provided resources
+│   ├── templates/               # Process templates (by category)
+│   │   ├── development/         # Feature development templates
+│   │   ├── testing/             # Testing templates
+│   │   ├── review/              # Review templates
+│   │   ├── infrastructure/      # Infrastructure templates
 │   │   └── README.md
 │   ├── steps/                   # Modular step definitions
 │   │   ├── api/                 # API-related steps
@@ -119,21 +122,33 @@ agentic-processes/
 │   │   ├── service/             # Service layer steps
 │   │   ├── testing/             # Testing steps
 │   │   ├── planning/            # Planning steps
-│   │   ├── documentation/       # Documentation steps
-│   │   ├── external-services/   # External service steps
-│   │   ├── learning/            # Learning/improvement steps
-│   │   └── README.md
+│   │   └── ...
+│   └── prompts/                 # Process management prompts
+├── .user-processes/             # User resources & process instances
 │   ├── active/                  # Currently running processes
-│   ├── prompts/                 # Process management prompts
-│   └── (completed/ and failed/ created as needed)
-├── .cursor/                     # Cursor IDE integration
-│   └── commands/
-│       ├── process-new.md
-│       └── process-continue.md
-└── .github/                     # GitHub integration
-    └── prompts/
-        ├── process-new.prompt.md
-        └── process-continue.prompt.md
+│   ├── completed/               # Finished processes
+│   ├── failed/                  # Failed processes
+│   ├── templates/               # User-defined templates
+│   ├── steps/                   # User-defined steps
+│   ├── components/              # User-defined components
+│   └── guidelines/              # Project-specific guidelines
+└── docs/                        # Documentation
+```
+
+### User Resources (`.user-processes/`)
+
+Your project-specific resources and all process instances. **Created on-demand** - folders only exist when needed:
+
+```
+your-project/
+└── .user-processes/             # Created when first process starts
+    ├── active/                  # Running process instances
+    ├── completed/               # Created when processes complete
+    ├── failed/                  # Created when processes fail
+    ├── templates/               # Created when you add custom templates
+    ├── steps/                   # Created when you add custom steps
+    ├── components/              # Created when you add shared components
+    └── guidelines/              # Created when you add project guidelines
 ```
 
 ## Core Concepts
@@ -146,20 +161,22 @@ A **process** is an instance of a workflow created from a template. It tracks:
 - Memory and context
 - Audit log of all actions
 
-Processes are stored in:
-- `.processes/active/` - Currently running processes
-- `.processes/completed/` - Finished processes
-- `.processes/failed/` - Failed processes
+Processes are stored in `.user-processes/`:
+- `.user-processes/active/` - Currently running processes
+- `.user-processes/completed/` - Finished processes
+- `.user-processes/failed/` - Failed processes
 
 ### Templates
 
 **Templates** define reusable workflows with:
 - Parameter placeholders (`{{paramName}}`)
-- Step references (`@step:category/step-name`)
+- Step references (`@framework-step:category/step-name` or `@user-step:category/step-name`)
 - Process flow diagrams (mermaid)
 - Sequential step definitions
 
-Templates are stored in `.processes/templates/`.
+Templates are stored in:
+- **Framework templates**: `.processes/templates/{category}/`
+- **User templates**: `.user-processes/templates/{category}/`
 
 ### Steps
 
@@ -171,19 +188,29 @@ Templates are stored in `.processes/templates/`.
 - Substeps breakdown
 - Examples and common pitfalls
 
-Steps are stored in `.processes/steps/{category}/`.
+Steps are stored in:
+- **Framework steps**: `.processes/steps/{category}/`
+- **User steps**: `.user-processes/steps/{category}/`
 
 ### Step References
 
-Templates reference steps using:
+Templates reference steps using explicit prefixes:
+
 ```markdown
+# Framework steps (from .processes/steps/)
 - [ ] Step 1: Implement feature
-  - **Step**: `@step:api/implement-controller-layer`
-  - **Context**:
-    - `targetArea`: {{featureName}}
+  - **Step**: `@framework-step:api/implement-controller-layer`
+
+# User steps (from .user-processes/steps/)
+- [ ] Step 2: Apply project conventions
+  - **Step**: `@user-step:my-category/my-custom-step`
 ```
 
-When a process is created, step references are automatically resolved and expanded with full step details.
+The prefix makes it clear where each resource comes from:
+- `@framework-step:` → `.processes/steps/`
+- `@user-step:` → `.user-processes/steps/`
+- `@framework-template:` → `.processes/templates/`
+- `@user-template:` → `.user-processes/templates/`
 
 ## Usage Examples
 
@@ -245,15 +272,15 @@ System collects required parameters and substitutes placeholders.
 
 ### 3. Step Resolution
 
-System resolves all `@step:category/step-name` references:
-- Reads step files from `.processes/steps/{category}/`
-- Expands step content with full details
+System resolves all step references:
+- `@framework-step:` → reads from `.processes/steps/{category}/`
+- `@user-step:` → reads from `.user-processes/steps/{category}/`
 - Applies context parameters
 
 ### 4. Process Creation
 
-System creates process instance in `.processes/active/`:
-- Process file with all steps expanded
+System creates process instance in `.user-processes/active/`:
+- Process file with step references
 - Memory file initialized
 - Status set to "Running"
 
@@ -269,7 +296,7 @@ Process Manager:
 
 When complete:
 - Status updated to "Completed"
-- Process moved to `.processes/completed/`
+- Process moved to `.user-processes/completed/`
 
 ## Integration
 
@@ -291,17 +318,17 @@ Prompts are defined in `.github/prompts/`.
 
 ## Contributing
 
-### Adding New Templates
+### Adding Your Own Templates
 
-1. Create template file in `.processes/templates/`
+1. Create template file in `.user-processes/templates/{category}/`
 2. Follow template structure (see `.processes/templates/README.md`)
 3. Include parameter placeholders
-4. Reference steps using `@step:category/step-name` syntax
+4. Reference steps using `@framework-step:` or `@user-step:` syntax
 5. Add mermaid flow diagram
 
-### Adding New Steps
+### Adding Your Own Steps
 
-1. Create step file in `.processes/steps/{category}/`
+1. Create step file in `.user-processes/steps/{category}/`
 2. Follow step template (see `.processes/steps/step-template.md`)
 3. Include all required sections:
    - Description

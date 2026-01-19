@@ -24,13 +24,15 @@ A checklist for verifying existing patterns before implementing new components. 
 
 **Usage**: Include this component in steps that involve creating new implementations (services, tests, API clients, etc.).
 
-## Best Practices Files
+## Guidelines Files
 
-Instead of a generic best practices component, steps should directly reference the relevant project-specific best practices files in the "Required Components" section. Common references include:
+Instead of a generic best practices component, steps should directly reference the relevant project-specific guidelines files in the "Required Components" section. Guidelines are stored in `.user-processes/guidelines/`. Common references include:
 
-- `.github/instructions/code-conventions.instructions.md` - Code conventions
-- `.github/instructions/solid.instructions.md` - SOLID principles
-- Project-specific documentation files (testing patterns, API patterns, repository patterns, etc.)
+- `.user-processes/guidelines/code-conventions.md` - Code conventions
+- `.user-processes/guidelines/solid.md` - SOLID principles
+- `.user-processes/guidelines/testing-patterns.md` - Testing patterns
+- `.user-processes/guidelines/api-patterns.md` - API patterns
+- Other project-specific guidelines as needed
 
 ## How to Use Components
 

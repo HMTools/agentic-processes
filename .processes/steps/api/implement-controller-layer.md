@@ -3,7 +3,7 @@
 ## Required Components
 
 - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- `.user-processes/guidelines/code-conventions.instructions.md` - Code conventions
 - Project-specific API design best practices documentation
 - Project-specific authentication patterns documentation
 - Project-specific API versioning patterns documentation

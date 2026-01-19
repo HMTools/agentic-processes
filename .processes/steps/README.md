@@ -24,7 +24,7 @@ Steps can reference shared components to reduce duplication and boilerplate. Com
 
 See [`_components/README.md`](_components/README.md) for complete component documentation.
 
-**Note**: Instead of a generic best practices component, steps should directly reference relevant project-specific best practices files (e.g., `.github/instructions/code-conventions.instructions.md`, project-specific testing patterns, etc.) in the "Required Components" section.
+**Note**: Instead of a generic best practices component, steps should directly reference relevant project-specific best practices files in `.user-processes/guidelines/` (e.g., `code-conventions.md`, testing patterns, etc.) in the "Required Components" section.
 
 ### Using Components in Steps
 
@@ -33,8 +33,8 @@ See [`_components/README.md`](_components/README.md) for complete component docu
    ## Required Components
    - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
    - [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
-   - `.github/instructions/code-conventions.instructions.md` - Code conventions
-   - [Add other relevant project-specific best practices files]
+   - `.user-processes/guidelines/code-conventions.md` - Code conventions
+   - [Add other relevant project-specific guidelines from .user-processes/guidelines/]
    ```
 
 2. **Include components where needed** using include markers:
@@ -58,18 +58,18 @@ See [`_components/README.md`](_components/README.md) for complete component docu
 
 ### In Templates
 
-Templates reference steps using the `@step:category/step-name` syntax:
+Templates reference steps using the `@framework-step:category/step-name` syntax:
 
 ```markdown
 ## Steps
 
 - [ ] Step 1: Analyze requirements for {{featureName}}
-  - **Step**: `@step:common/analyze-requirements`
+  - **Step**: `@framework-step:common/analyze-requirements`
   - **Context**:
     - `targetArea`: {{featureName}}
 
 - [ ] Step 2: Create technical design
-  - **Step**: `@step:common/create-technical-design`
+  - **Step**: `@framework-step:common/create-technical-design`
 ```
 
 ### In Process Instances

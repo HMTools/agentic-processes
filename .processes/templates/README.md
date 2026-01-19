@@ -6,6 +6,26 @@ This guide explains how to create new process templates for the Process Manageme
 
 Process templates are reusable markdown files that define common workflows. They provide a structured approach to recurring tasks and ensure consistency across the team.
 
+## Template Locations
+
+Templates can be stored in two locations:
+
+| Location | Description | Reference Syntax |
+|----------|-------------|------------------|
+| `.processes/templates/{category}/` | Framework-provided templates | `@framework-template:category/name` |
+| `.user-processes/templates/{category}/` | User-defined templates | `@user-template:category/name` |
+
+## Template Categories
+
+Templates are organized by category:
+
+- `development/` - Feature development, bug fixes, refactoring
+- `testing/` - Test creation, test fixes, coverage improvement
+- `review/` - Code review, verification processes
+- `infrastructure/` - Setup, migrations, configuration, template/step creation
+- `documentation/` - Documentation updates, API docs
+- `learning/` - Process improvement, retrospectives
+
 ## Template Structure
 
 Every process template should follow this structure:
@@ -62,10 +82,10 @@ graph TD
 ### Final Phase: Learning & Improvement
 
 - [ ] Step N: Continuous Improvement & Learning
-  - **Step**: `@step:learning/continuous-improvement`
+  - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
     - `processName`: {{processName}}
     - `templateName`: [template-name]
   - **Output**: Analysis report, implemented improvements, updated templates/steps
@@ -511,10 +531,10 @@ This step is mandatory and should be added before the "Errors & Notes" section:
 ### Final Phase: Learning & Improvement
 
 - [ ] Step N: Continuous Improvement & Learning
-  - **Step**: `@step:learning/continuous-improvement`
+  - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
     - `processName`: {{processName}}
     - `templateName`: [template-name]
   - **Output**: Analysis report, implemented improvements, updated templates/steps
@@ -537,7 +557,7 @@ This step is mandatory and should be added before the "Errors & Notes" section:
 5. Updates templates/steps/documentation
 6. Makes future processes more efficient
 
-See `@step:learning/continuous-improvement` for detailed guidance on this step.
+See `@framework-step:learning/continuous-improvement` for detailed guidance on this step.
 
 ## Getting Help
 

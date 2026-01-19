@@ -56,7 +56,7 @@ flowchart TD
 ## Steps
 
 - [ ] Step 1: Understand context
-  - **Step**: `@step:planning/understand-context`
+  - **Step**: `@framework-step:planning/understand-context`
   - **Description**: Fully understand the context, sources, and requirements for this task or process. This step establishes a clear foundation by gathering all necessary context information before proceeding with work. It clarifies what needs to be accomplished, identifies relevant information sources, understands success criteria (verification criteria in this case), and documents any specific requirements or constraints. Gather all necessary context to proceed with the investigation.
   - **Output**: Context documentation organized by categories (process parameters, information sources, requirements, success criteria, constraints), Q&A section if context is incomplete, complete context understanding verified and documented
   - **Context**:
@@ -64,7 +64,7 @@ flowchart TD
     - `verificationCriteria`: {{verificationCriteria}}
 
 - [ ] Step 2: Identify files to review
-  - **Step**: `@step:investigation/identify-files`
+  - **Step**: `@framework-step:investigation/identify-files`
   - **Description**: Identify which files and directories need to be processed based on flexible criteria (patterns, scope descriptions, or both). The step supports two search modes: Simple search (fast, default) using available tools, and Deep search (exhaustive, directory/file listing with tracking). If targetFiles parameter is provided, use those as patterns; otherwise, identify relevant files based on investigation scope. Apply excludePatterns if provided. The step applies exclusion filtering and produces a comprehensive list of files ready for processing, saved to a separate JSON file with a reference stored in memory.
   - **Output**: Comprehensive list of identified files (saved to `identified-files.json`), file identification report (summary of search approach, criteria applied, exclusions applied, file counts), memory reference (file count, path to JSON file, brief summary)
   - **Context**:
@@ -73,7 +73,7 @@ flowchart TD
     - `investigationScope`: {{investigationScope}} (used as scope)
 
 - [ ] Step 3: Review, verify, and document findings
-  - **Step**: `@step:investigation/review-verify-document`
+  - **Step**: `@framework-step:investigation/review-verify-document`
   - **Description**: Systematically review each identified file for content relevant to the investigation scope. Read files, analyze content, extract relevant information, and verify against criteria. For each item found, verify whether it meets the criteria. Identify any violations, issues, or items that do not meet the criteria. Categorize issues by type and severity. Create a comprehensive summary of findings - if no issues were found, document that all items passed verification; if issues were found, document each issue with details including location, description, and how it violates the criteria. Prepare findings for presentation to the user. This step produces a findings report and structured issues list (JSON) if issues are found.
   - **Output**: Findings report (`findings-report.md` with executive summary, review findings, verification results, issues found), issues list (`issues-list.json` with structured data if issues found), memory update with file paths, counts, status, and references to report files
   - **Context**:
@@ -86,7 +86,7 @@ flowchart TD
       - Proceed to Step 4 (Propose Fixes)
 
 - [ ] Step 4: Propose fixes
-  - **Step**: `@step:investigation/propose-fixes`
+  - **Step**: `@framework-step:investigation/propose-fixes`
   - **Description**: Propose specific fixes for issues identified during review and verification. For each issue, analyze the problem, determine the best fix approach, and provide detailed proposals including what needs to change, how to change it, and why this fix addresses the issue. Present all fix proposals to the user in a clear, actionable format and wait for approval. The user can approve specific fixes by issue ID (or all by approving all IDs), and any fixes not explicitly approved remain unapproved. The user can also request modifications to proposals, which will trigger a revision cycle.
   - **Output**: Fix proposals document (`fix-proposals.md` with header, summary, detailed proposals for each issue, approval section), approval status (list of approved issue IDs stored in memory), memory update with proposals document path, total proposals created, approval status, and list of approved issue IDs
   - **Decision**:
@@ -97,13 +97,13 @@ flowchart TD
   - **Note**: This step only runs if issues were found in Step 3
 
 - [ ] Step 5: Apply approved changes
-  - **Step**: `@step:common/apply-changes`
+  - **Step**: `@framework-step:common/apply-changes`
   - **Description**: Apply all user-approved changes to relevant files based on approved change proposals. Read approved change proposals from memory, apply each approved change to the target files using the detailed change instructions provided, verify that each change was applied correctly, and document all changes made in a change application report. The step is designed to be simple and focused - it executes approved proposals and does not make decisions about what changes to make.
   - **Output**: Modified files (all files that had approved changes applied), change application report (`changes-applied.md` documenting all changes made with summary, change details, and list of modified files), memory update with report path, files modified, and results
   - **Note**: This step only runs if user approved changes in Step 4
 
 - [ ] Step 6: Re-verify after changes
-  - **Step**: `@step:investigation/review-verify-document`
+  - **Step**: `@framework-step:investigation/review-verify-document`
   - **Description**: After changes are applied, re-run the review, verification, and documentation process to check that the changes resolved the issues and that no new issues were introduced. Use the same process as Step 3: systematically review modified files for content relevant to the investigation scope, read files, analyze content, extract relevant information, and verify against criteria. For each item found, verify whether it meets the criteria. Identify any remaining violations, issues, or items that do not meet the criteria. Categorize any remaining issues by type and severity. Create a comprehensive summary of findings. This step produces a findings report and structured issues list (JSON) if issues remain.
   - **Output**: Findings report (`findings-report.md` with executive summary, review findings, verification results, remaining issues if any), issues list (`issues-list.json` with structured data if issues remain), memory update with file paths, counts, status, and references to report files
   - **Decision**:
@@ -113,17 +113,17 @@ flowchart TD
       - Return to Step 3 (Review, Verify, and Document Findings) to iterate
 
 - [ ] Step 7: Final summary
-  - **Step**: `@step:investigation/final-summary`
+  - **Step**: `@framework-step:investigation/final-summary`
   - **Description**: Provide a final comprehensive summary of the investigation that consolidates information from all previous steps. Read investigation data from memory (scope, files reviewed, findings, issues, fixes, verification status), compile all information into organized sections, create a comprehensive final summary document, and present a clear conclusion to the user. The summary handles all scenarios: investigations where no issues were found, investigations where issues were found but not fixed, and investigations where issues were found and fixed.
   - **Output**: Final summary document (`final-summary.md` containing executive summary, investigation scope, files reviewed, findings summary, issues found if any, fixes applied if any, final verification status, remaining issues if any, recommendations if any, clear conclusion), memory update with final summary document path, overall conclusion, final verification status, and recommendations
 
 ### Final Phase: Learning & Improvement
 
 - [ ] Step 8: Continuous Improvement & Learning
-  - **Step**: `@step:learning/continuous-improvement`
+  - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
     - `processName`: Review and Verify {{investigationScope}}
     - `templateName`: review-and-verify
   - **Output**: Analysis report, implemented improvements, updated templates/steps

@@ -15,7 +15,7 @@ This information is used by the Continuous Improvement step to identify patterns
 
 ## Location
 
-Process logs are stored at: `.processes/active/{process-name}/log.md`
+Process logs are stored at: `.user-processes/active/{process-name}/log.md`
 
 ## Template Structure
 

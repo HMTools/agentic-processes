@@ -50,7 +50,7 @@ Implement the appropriate fix based on the root cause analysis from the previous
 - Use appropriate edit tools (replace_string_in_file, insert_edit_into_file)
 - Search for related code if needed (grep_search, semantic_search)
 - Read files to understand context before editing
-- Review project coding conventions in `.github/instructions/`
+- Review project coding conventions in `.user-processes/guidelines/`
 
 **Best Practices:**
 - Make minimal, focused changes addressing only the identified issue
@@ -133,7 +133,7 @@ graph TD
   - [ ] 5b. Read the code to understand current implementation
   - [ ] 5c. Implement the fix following project patterns and SOLID principles
   - [ ] 5d. Ensure fix doesn't break other functionality
-  - [ ] 5e. Follow project coding conventions from `.github/instructions/`
+  - [ ] 5e. Follow project coding conventions from `.user-processes/guidelines/`
 - [ ] **Substep 6**: **Branch C - Infrastructure Fix** (if root cause is infrastructure issue):
   - [ ] 6a. Identify infrastructure component to fix (test base, Docker, mocks)
   - [ ] 6b. Read current configuration/setup code

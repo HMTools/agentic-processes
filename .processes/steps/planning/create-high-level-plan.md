@@ -78,7 +78,7 @@ Create a comprehensive high-level plan for the user story following the Task Pla
    - For each implementation step, determine which process-step from `.processes/steps/` will execute it
    - Check if the required process-steps exist in the library
    - List any missing process-steps that need to be created before detailed planning
-   - Common steps: `@step:api/implement-controller-layer`, `@step:service/implement-service-layer`, `@step:data/implement-repository-layer`, `@step:testing/write-unit-tests-service`, `@step:testing/write-integration-tests-api`
+   - Common steps: `@framework-step:api/implement-controller-layer`, `@framework-step:service/implement-service-layer`, `@framework-step:data/implement-repository-layer`, `@framework-step:testing/write-unit-tests-service`, `@framework-step:testing/write-integration-tests-api`
 
 7. **Store in Memory**
    - Update current step section in memory.md with:
@@ -116,7 +116,7 @@ Create a comprehensive high-level plan for the user story following the Task Pla
 - Present Q&A section clearly and wait for user to provide answers
 - Only complete LLD after all Q&A questions are answered
 - Include mermaid diagrams in LLD for visual clarity
-- Reference project conventions from `.github/instructions/`
+- Reference project conventions from `.user-processes/guidelines/`
 
 **Common Information Gaps to Watch For:**
 - External API endpoints, authentication, request/response formats
@@ -259,33 +259,33 @@ Questions to ask the user if information is missing:
 - [ ] 1.2. Implement Controller with endpoints
 - [ ] 1.3. Add request validation
 - [ ] 1.4. Implement mapping extensions
-- **Required Process-Step**: `@step:api/implement-controller-layer`
+- **Required Process-Step**: `@framework-step:api/implement-controller-layer`
 
 ### 2. Implement Service Layer [Complexity: 6]
 - [ ] 2.1. Define service interface
 - [ ] 2.2. Create Arguments and Results models
 - [ ] 2.3. Implement business logic manager
 - [ ] 2.4. Add validation and error handling
-- **Required Process-Step**: `@step:service/implement-service-layer`
+- **Required Process-Step**: `@framework-step:service/implement-service-layer`
 
 ### 3. Implement Repository Layer [Complexity: 4]
 - [ ] 3.1. Define entity model
 - [ ] 3.2. Create repository interface
 - [ ] 3.3. Implement MongoDB repository
 - [ ] 3.4. Add necessary indexes
-- **Required Process-Step**: `@step:data/implement-repository-layer`
+- **Required Process-Step**: `@framework-step:data/implement-repository-layer`
 
 ### 4. Write Unit Tests [Complexity: 5]
 - [ ] 4.1. Write service layer unit tests
 - [ ] 4.2. Write repository unit tests
 - [ ] 4.3. Achieve >80% code coverage
-- **Required Process-Step**: `@step:testing/write-unit-tests-service`
+- **Required Process-Step**: `@framework-step:testing/write-unit-tests-service`
 
 ### 5. Write Integration Tests [Complexity: 4]
 - [ ] 5.1. Create integration test setup
 - [ ] 5.2. Write end-to-end test scenarios
 - [ ] 5.3. Test all acceptance criteria
-- **Required Process-Step**: `@step:testing/write-integration-tests-api`
+- **Required Process-Step**: `@framework-step:testing/write-integration-tests-api`
 
 ### 6. Update Documentation [Complexity: 2]
 - [ ] 6.1. Add API documentation comments

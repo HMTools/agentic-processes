@@ -11,7 +11,7 @@ Purpose: Create the template file with all sections including header comment, pr
 
 ## Description
 
-Create the template file in `.processes/templates/` with the proper filename and write all sections including the header comment block, process header, parameters section, context section, process flow diagram, and all sequential step definitions. Each step must reference an actual process-step file using `@step:category/step-name` syntax. Include the mandatory continuous improvement step as the final step. Then comprehensively validate the template by verifying all required sections are present, checking parameter placeholders are properly documented, ensuring the flow diagram matches the steps, and reviewing compliance with best practices.
+Create the template file in `.processes/templates/` with the proper filename and write all sections including the header comment block, process header, parameters section, context section, process flow diagram, and all sequential step definitions. Each step must reference an actual process-step file using `@framework-step:category/step-name` syntax. Include the mandatory continuous improvement step as the final step. Then comprehensively validate the template by verifying all required sections are present, checking parameter placeholders are properly documented, ensuring the flow diagram matches the steps, and reviewing compliance with best practices.
 
 ## Output
 
@@ -47,7 +47,7 @@ Create the template file in `.processes/templates/` with the proper filename and
 - Use parameter placeholders where appropriate
 - Number steps sequentially without phase divisions
 - Add the continuous improvement step in "### Final Phase: Learning & Improvement" section
-- Use standard format: `@step:learning/continuous-improvement`
+- Use standard format: `@framework-step:learning/continuous-improvement`
 - Validate the template by verifying all required sections are present
 - Check that all parameter placeholders are properly documented in the Parameters section
 - Verify the flow diagram matches the step sequence exactly
@@ -56,7 +56,7 @@ Create the template file in `.processes/templates/` with the proper filename and
   - Steps that are just "iterate if needed" or "loop back" (these are handled by flow diagram loops, not separate steps)
   - Steps that are just "transition to next step" (these are implicit in sequential flow)
   - Flag any steps that appear to be flow transitions rather than actual work
-- **Validate step descriptions align with actual step files**: For each step reference (`@step:category/step-name`), verify the template step description aligns with the actual step file:
+- **Validate step descriptions align with actual step files**: For each step reference (`@framework-step:category/step-name`), verify the template step description aligns with the actual step file:
   - Read the referenced step file from `.processes/steps/{category}/{step-name}.md`
   - Compare the template step description with the step file's Description section
   - Verify the template step Output matches the step file's Output section

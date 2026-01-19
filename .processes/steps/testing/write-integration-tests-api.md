@@ -3,7 +3,7 @@
 ## Required Components
 
 - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-- `.github/instructions/code-conventions.instructions.md` - Code conventions
+- `.user-processes/guidelines/code-conventions.instructions.md` - Code conventions
 - Project-specific integration testing patterns documentation
 - Project-specific test data generation patterns documentation
 - Project-specific assertion patterns documentation

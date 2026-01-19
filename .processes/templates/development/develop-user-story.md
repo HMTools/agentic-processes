@@ -67,7 +67,7 @@ flowchart TD
 ### Phase 1: Planning
 
 - [ ] Step 1: Create high-level plan
-  - **Step**: `@step:planning/create-high-level-plan`
+  - **Step**: `@framework-step:planning/create-high-level-plan`
   - **Description**: Generate comprehensive task plan with Q&A for missing info, LLD, and complexity ratings
   - **Context**:
     - `userStoryTitle`: {{userStoryTitle}}
@@ -86,7 +86,7 @@ flowchart TD
   - **Description**: Analyze approved plan to identify which process-steps are needed and verify they exist
   - **Actions**:
     - Review each implementation step in the approved high-level plan
-    - List the process-steps required (e.g., `@step:api/implement-controller-layer`, `@step:service/implement-service-layer`, etc.)
+    - List the process-steps required (e.g., `@framework-step:api/implement-controller-layer`, `@framework-step:service/implement-service-layer`, etc.)
     - Check if each required process-step exists in `.processes/steps/`
     - If any are missing, list them with suggested category locations
   - **Output**: Validation report of existing vs. missing process-steps
@@ -104,35 +104,35 @@ flowchart TD
   
   **By Implementation Type:**
   
-  **External Services** (`@step:external-services/*`):
+  **External Services** (`@framework-step:external-services/*`):
   - Creating new API client for external service
   - Implementing HTTP communication with third-party APIs
   - Adding authentication patterns (Apigee, OAuth, API keys)
   - **Keywords**: "API client", "external service", "HTTP integration", "third-party", "REST API"
   
-  **Service Layer** (`@step:service/*`):
+  **Service Layer** (`@framework-step:service/*`):
   - Implementing managers, calculators, checkers, validators
   - Creating business logic components
   - Modifying existing service handlers or subscribers
   - **Keywords**: "manager", "calculator", "service", "handler", "subscriber", "business logic"
   
-  **Repository** (`@step:data/*`):
+  **Repository** (`@framework-step:data/*`):
   - Creating new repository classes
   - Adding data access methods
   - Implementing database queries
   - **Keywords**: "repository", "data access", "database", "MongoDB", "query"
   
-  **API Controllers** (`@step:api/*`):
+  **API Controllers** (`@framework-step:api/*`):
   - Creating new controller endpoints
   - Adding HTTP endpoints for external consumption
   - **Keywords**: "controller", "endpoint", "API route", "HTTP verb", "REST endpoint"
   
-  **Testing** (`@step:testing/*`):
+  **Testing** (`@framework-step:testing/*`):
   - `write-unit-tests-service`: Testing service layer components
   - `write-integration-tests-api`: Testing API endpoints end-to-end
   - **Keywords**: "unit test", "integration test", "test coverage"
   
-  **Documentation** (`@step:documentation/*`):
+  **Documentation** (`@framework-step:documentation/*`):
   - Creating or updating flow documentation
   - Adding component documentation
   - **Keywords**: "documentation", "flow doc", "component doc"
@@ -140,16 +140,16 @@ flowchart TD
   **Common Mistakes to Avoid:**
   
   ❌ **Integration Points ≠ Integration Tests**
-  - "Integrate with offers file processing" → Use `@step:service/implement-service-layer`
-  - "Add integration test assertions" → Use `@step:testing/write-integration-tests-api`
+  - "Integrate with offers file processing" → Use `@framework-step:service/implement-service-layer`
+  - "Add integration test assertions" → Use `@framework-step:testing/write-integration-tests-api`
   
   ❌ **Handlers are Service Layer, not API Layer**
-  - "Update S3 handler" → Use `@step:service/implement-service-layer`
-  - "Create controller" → Use `@step:api/implement-controller`
+  - "Update S3 handler" → Use `@framework-step:service/implement-service-layer`
+  - "Create controller" → Use `@framework-step:api/implement-controller`
   
   ❌ **Don't confuse external services with service layer**
-  - "Create IPCN API client" → Use `@step:external-services/implement-api-client`
-  - "Create IPCN manager" → Use `@step:service/implement-service-layer`
+  - "Create IPCN API client" → Use `@framework-step:external-services/implement-api-client`
+  - "Create IPCN manager" → Use `@framework-step:service/implement-service-layer`
   
   **Validation Checklist:**
   
@@ -160,7 +160,7 @@ flowchart TD
   - [ ] Document the mapping in memory file for reference
 
 - [ ] Step 3: Create detailed step plans
-  - **Step**: `@step:planning/create-detailed-step-plans`
+  - **Step**: `@framework-step:planning/create-detailed-step-plans`
   - **Description**: Break down each high-level step into detailed implementation plan with step-specific Q&A, LLD, and process-step links
   - **Context**:
     - `planDirectory`: plans/{user-story-name}/
@@ -183,7 +183,7 @@ flowchart TD
 3. Each task from the plan should become a step here with:
    - Task name and description
    - Link to detailed step plan (if created in Step 3)
-   - Process-step reference (e.g., `@step:api/implement-controller-layer`)
+   - Process-step reference (e.g., `@framework-step:api/implement-controller-layer`)
    - Dependencies from the plan
    - Acceptance criteria from the plan
    - Complexity rating from the plan
@@ -191,7 +191,7 @@ flowchart TD
 **Example structure** (this will be replaced with actual tasks):
 
 - [ ] Step 4: [Task Name from Plan]
-  - **Step**: `@step:{category}/{step-name}`
+  - **Step**: `@framework-step:{category}/{step-name}`
   - **Detailed Plan**: `plans/{user-story-name}/step-{n}-{name}.md` (if applicable)
   - **Complexity**: [⭐ Low / ⭐⭐ Medium / ⭐⭐⭐ High]
   - **Description**: [Task description from plan]
@@ -204,7 +204,7 @@ flowchart TD
 <!-- PLACEHOLDER: Steps 4-N will be added here after high-level plan approval -->
 
 - [ ] Step N+1: Write Unit Tests
-  - **Step**: `@step:testing/write-unit-tests-service`
+  - **Step**: `@framework-step:testing/write-unit-tests-service`
   - **Detailed Plan**: `plans/{user-story-name}/step-X-unit-tests.md` (if created in Step 3)
   - **Description**: Write comprehensive unit tests for service layer with 100% code coverage
   - **Context**:
@@ -217,7 +217,7 @@ flowchart TD
   - **References**: Project-specific testing best practices (add to your project's knowledge base)
 
 - [ ] Step N+2: Write Integration Tests
-  - **Step**: `@step:testing/write-integration-tests-api`
+  - **Step**: `@framework-step:testing/write-integration-tests-api`
   - **Detailed Plan**: `plans/{user-story-name}/step-Y-integration-tests.md` (if created in Step 3)
   - **Description**: Write end-to-end integration tests for API endpoints
   - **Context**:
@@ -230,7 +230,7 @@ flowchart TD
   - **References**: Existing integration tests, project-specific integration testing patterns
 
 - [ ] Step N+3: Update documentation
-  - **Step**: `@step:documentation/update-documentation`
+  - **Step**: `@framework-step:documentation/update-documentation`
   - **Description**: Update all relevant documentation
   - **Actions**:
     - Update flow documentation in `ai/docs/flows/` if new workflow introduced
@@ -239,10 +239,10 @@ flowchart TD
 ### Final Phase: Learning & Improvement
 
 - [ ] Step N+4: Continuous Improvement & Learning
-  - **Step**: `@step:learning/continuous-improvement`
+  - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
     - `processName`: {{userStoryTitle}}
     - `templateName`: develop-user-story
   - **Output**: Analysis report, implemented improvements, updated templates/steps

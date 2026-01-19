@@ -11,9 +11,9 @@ Purpose: [What this step accomplishes]
 
 - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
 - [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification (if step involves creating new implementations)
-- `.github/instructions/code-conventions.instructions.md` - Code conventions (if step involves coding)
-- `.github/instructions/solid.instructions.md` - SOLID principles (if step involves architecture)
-- [Add other relevant project-specific best practices files as needed]
+- `.user-processes/guidelines/code-conventions.md` - Code conventions (if step involves coding)
+- `.user-processes/guidelines/solid.md` - SOLID principles (if step involves architecture)
+- [Add other relevant project-specific guidelines from .user-processes/guidelines/]
 
 ## Description
 

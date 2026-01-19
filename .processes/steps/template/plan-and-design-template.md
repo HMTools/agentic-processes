@@ -67,8 +67,8 @@ Analyze requirements for the new template, define its purpose, identify use case
 
 **Step Design Best Practices:**
 - **Prefer generic, reusable steps**: When planning steps, prefer generic step categories (planning, common) over template-specific categories. Steps should be reusable across different template types when possible.
-  - Example: Use `@step:planning/understand-context` instead of `@step:investigation/understand-scope`
-  - Example: Use `@step:common/apply-changes` instead of `@step:investigation/apply-fixes`
+  - Example: Use `@framework-step:planning/understand-context` instead of `@framework-step:investigation/understand-scope`
+  - Example: Use `@framework-step:common/apply-changes` instead of `@framework-step:investigation/apply-fixes`
   - Check existing generic steps in `.processes/steps/planning/` and `.processes/steps/common/` before creating new template-specific steps
 - **Avoid flow transitions as steps**: Steps should represent actual work, not just flow control. Decision points and loops are handled in the flow diagram, not as separate steps.
   - ❌ Bad: "Step 5: Wait for user approval" (this is a decision point, not a step)

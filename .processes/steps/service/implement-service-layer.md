@@ -4,9 +4,9 @@
 
 - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
 - [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
-- `.github/instructions/code-conventions.instructions.md` - Code conventions
-- `.github/instructions/solid.instructions.md` - SOLID principles
-- `.github/instructions/service-flow-pattern.instructions.md` - Service flow patterns
+- `.user-processes/guidelines/code-conventions.instructions.md` - Code conventions
+- `.user-processes/guidelines/solid.instructions.md` - SOLID principles
+- `.user-processes/guidelines/service-flow-pattern.instructions.md` - Service flow patterns
 
 ## Metadata
 - **Step Name**: implement-service-layer
@@ -195,9 +195,9 @@ All implementations should include:
   - Logging patterns
 
 **Reference Documentation**:
-- `.github/instructions/solid.instructions.md` - SOLID principles
-- `.github/instructions/code-conventions.instructions.md` - Coding standards
-- `.github/instructions/service-flow-pattern.instructions.md` - Service flow
+- `.user-processes/guidelines/solid.instructions.md` - SOLID principles
+- `.user-processes/guidelines/code-conventions.instructions.md` - Coding standards
+- `.user-processes/guidelines/service-flow-pattern.instructions.md` - Service flow
 
 **Best Practices**: Project-specific best practices (add to your project's knowledge base)
 - Service layer design patterns

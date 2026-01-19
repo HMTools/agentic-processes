@@ -3,8 +3,8 @@
 ## Required Components
 
 - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-- `.github/instructions/code-conventions.instructions.md` - Code conventions
-- `.github/instructions/solid.instructions.md` - SOLID principles
+- `.user-processes/guidelines/code-conventions.instructions.md` - Code conventions
+- `.user-processes/guidelines/solid.instructions.md` - SOLID principles
 - Project-specific repository pattern best practices documentation
 - Project-specific MongoDB best practices documentation
 - Project-specific error handling patterns documentation

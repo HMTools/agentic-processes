@@ -36,13 +36,13 @@ Reference the process management knowledge file for complete instructions:
 
 **What this means:**
 - ✅ **ALWAYS**: Create a process instance with `process.md`, `memory.md`, and `log.md` files
-- ✅ **ALWAYS**: Create the process directory: `.processes/active/process-{name}-{YYYYMMDD}/`
+- ✅ **ALWAYS**: Create the process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
 - ❌ **NEVER**: Create a plan document instead of a process instance
 - ❌ **NEVER**: Create a design document instead of a process instance
 - ❌ **NEVER**: Create any other type of document instead of a process instance
 
 **Process Instance Structure:**
-- Process directory: `.processes/active/process-{name}-{YYYYMMDD}/`
+- Process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
 - Process file: `process.md` (with template placeholders substituted)
 - Memory file: `memory.md` (initialized with template structure)
 - Log file: `log.md` (initialized with template structure and metadata)
@@ -50,14 +50,14 @@ Reference the process management knowledge file for complete instructions:
 **Enforcement:**
 - When user invokes `/process-new`, you MUST create a process instance
 - Do NOT create plans, designs, or any other documents
-- The output of `/process-new` is ALWAYS a process instance in `.processes/active/`
+- The output of `/process-new` is ALWAYS a process instance in `.user-processes/active/`
 
 ## Command Behavior
 
 When you invoke `/process-new`, the AI will:
 
 1. **Check for Existing Processes**
-   - Check if a similar process already exists in `.processes/active/`
+   - Check if a similar process already exists in `.user-processes/active/`
    - If found, inform you and ask if you want to resume or create new
 
 2. **List Available Templates**
@@ -77,7 +77,7 @@ When you invoke `/process-new`, the AI will:
    - Confirm optional parameters
 
 4. **Resolve Step References**
-   - Scan the template for `@step:category/step-name` references
+   - Scan the template for `@framework-step:category/step-name` references
    - **Keep step references as references** (do not expand with full step details)
    - Include brief description from the step's Description section
    - Apply context parameters from template
@@ -85,7 +85,7 @@ When you invoke `/process-new`, the AI will:
 
 5. **Create Process Instance** (MANDATORY - never create a plan or other document)
    - **CRITICAL**: This step MUST create a process instance, never a plan or design document
-   - Create process directory: `.processes/active/process-{name}-{YYYYMMDD}/`
+   - Create process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
    - Create `process.md` with all placeholders substituted and step references kept as references (not expanded)
    - Initialize `memory.md` file using the memory template structure
    - Initialize `log.md` file using the log template structure with metadata
@@ -104,7 +104,7 @@ Type `/process-new` to start creating a new process. The AI will guide you throu
 
 ## What Gets Created
 
-- Process directory: `.processes/active/process-{name}-{YYYYMMDD}/`
+- Process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
 - Process file: `process.md` with step references kept as references (not expanded) and all placeholders substituted
 - Memory file: `memory.md` for tracking information across steps
 - Log file: `log.md` for detailed execution log with metadata initialized
@@ -119,10 +119,10 @@ When creating a process instance, the AI must create three files:
 
 1. **process.md**: Main process file with:
    - All `{{placeholders}}` substituted with actual parameter values
-   - All `@step:category/step-name` references kept as references (not expanded) with brief descriptions
+   - All `@framework-step:category/step-name` references kept as references (not expanded) with brief descriptions
    - Status set to "Running"
    - Current State section initialized
-   - **Note**: Step references should remain as `@step:category/step-name` with a brief description. Full step details remain in step files and can be read when needed. This keeps process.md concise and readable.
+   - **Note**: Step references should remain as `@framework-step:category/step-name` with a brief description. Full step details remain in step files and can be read when needed. This keeps process.md concise and readable.
 
 2. **memory.md**: Memory file initialized with:
    - Template structure from `.processes/templates/memory-template.md`
@@ -141,12 +141,12 @@ When creating a process instance, the AI must create three files:
 
 ## Step Resolution
 
-When creating process.md, step references (`@step:category/step-name`) should be kept as references with brief descriptions, not expanded with full step details. This keeps process.md concise and readable (typically 100-150 lines instead of 700+ lines). Full step details remain in the step files and can be read when needed during execution.
+When creating process.md, step references (`@framework-step:category/step-name`) should be kept as references with brief descriptions, not expanded with full step details. This keeps process.md concise and readable (typically 100-150 lines instead of 700+ lines). Full step details remain in the step files and can be read when needed during execution.
 
 **Format in process.md:**
 ```markdown
 - [ ] Step 1: Step name
-  - **Step**: `@step:category/step-name`
+  - **Step**: `@framework-step:category/step-name`
   - **Description**: Brief description from step's Description section
   - **Output**: Brief output description
   - **Context**: (if applicable)

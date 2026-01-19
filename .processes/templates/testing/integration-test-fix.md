@@ -59,7 +59,7 @@ graph TD
 ## Steps
 
 - [ ] Step 1: Capture Test Failure Information for {{testName}}
-  - **Step**: `@step:testing/capture-test-failure`
+  - **Step**: `@framework-step:testing/capture-test-failure`
   - **Context**:
     - `testName`: {{testName}}
     - `testClass`: {{testClass}}
@@ -76,7 +76,7 @@ graph TD
     - Store failure details in current step section of memory.md
 
 - [ ] Step 2: Identify Root Cause for {{testName}} failure
-  - **Step**: `@step:testing/diagnose-integration-test-failure`
+  - **Step**: `@framework-step:testing/diagnose-integration-test-failure`
   - **Context**:
     - `testName`: {{testName}}
     - `testClass`: {{testClass}}
@@ -113,7 +113,7 @@ graph TD
       - Return to Step 1 (Capture Test Failure Information)
 
 - [ ] Step 5: Implement Fix for {{testName}} based on decision
-  - **Step**: `@step:testing/implement-integration-test-fix`
+  - **Step**: `@framework-step:testing/implement-integration-test-fix`
   - **Context**:
     - `testName`: {{testName}}
     - `testClass`: {{testClass}}
@@ -136,7 +136,7 @@ graph TD
     - Track all modified files in "Files Modified/Created" subsection
 
 - [ ] Step 6: Verify {{testName}} passes
-  - **Step**: `@step:testing/verify-test-passes`
+  - **Step**: `@framework-step:testing/verify-test-passes`
   - **Context**:
     - `testName`: {{testName}}
     - `testClass`: {{testClass}}
@@ -173,10 +173,10 @@ Files modified during the process are tracked in each step's "Files Modified/Cre
 ### Final Phase: Learning & Improvement
 
 - [ ] Step 7: Continuous Improvement & Learning
-  - **Step**: `@step:learning/continuous-improvement`
+  - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
     - `processName`: Fix Integration Test - {{testName}}
     - `templateName`: integration-test-fix
   - **Output**: Analysis report, implemented improvements, updated templates/steps

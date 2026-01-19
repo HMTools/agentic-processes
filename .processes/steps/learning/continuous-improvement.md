@@ -30,7 +30,7 @@ The step works iteratively: identify improvements → propose one → investigat
 
 #### 1. Read Process Log
 
-- Load the process log file from `.processes/active/{process-name}/log.md`
+- Load the process log file from `.user-processes/active/{process-name}/log.md`
 - Parse all user interactions and change requests
 - Identify patterns and recurring issues
 - Note high iteration counts on files or steps
@@ -197,7 +197,7 @@ When all improvements are complete:
 ### Files/Folders
 
 **Read:**
-- `.processes/active/{process-name}/log.md`
+- `.user-processes/active/{process-name}/log.md`
 
 **Update (as needed):**
 - Process templates in `.processes/templates/`

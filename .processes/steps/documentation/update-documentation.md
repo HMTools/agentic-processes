@@ -130,7 +130,7 @@ Before writing documentation, use this decision tree to determine the scope and 
 - Document both the "what" and the "why"
 - Keep documentation up-to-date - don't let it drift from code
 - Use consistent terminology across all documentation
-- Reference project conventions from `.github/instructions/`
+- Reference project conventions from `.user-processes/guidelines/`
 - Link to related flows when relevant
 
 ## Memory File Usage

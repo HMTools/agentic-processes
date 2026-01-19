@@ -32,7 +32,7 @@ Perform comprehensive validation of the created step file to ensure it meets all
 **Specific Actions:**
 - Read the created step file: `.processes/steps/{{stepCategory}}/{{stepName}}.md`
 - Perform self-contained check:
-  - Search for any `@step:` references (should not exist)
+  - Search for any `@framework-step:` references (should not exist)
   - Verify step doesn't depend on other steps
   - Check that step is complete and standalone
 - Perform section completeness check:

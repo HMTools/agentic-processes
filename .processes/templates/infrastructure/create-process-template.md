@@ -55,7 +55,7 @@ flowchart TD
 ## Steps
 
 - [ ] Step 1: Plan and design template
-  - **Step**: `@step:template/plan-and-design-template`
+  - **Step**: `@framework-step:template/plan-and-design-template`
   - **Description**: Analyze requirements for the new template, define its purpose, identify use cases, plan the step breakdown, identify all required and optional parameters, design the process flow structure, create the mermaid flow diagram, and plan the step organization. This step establishes the complete foundation and design for the template.
   - **Output**: Requirements document, purpose statement, use cases documentation, step breakdown plan, parameter lists (required and optional), process flow structure outline, mermaid flow diagram code, step organization plan
   - **Iterative Review**: User can request changes to the design, flow, or parameters; revise and re-present until satisfactory
@@ -69,8 +69,8 @@ flowchart TD
   - **Note**: This step is complete only when user approves the complete design
 
 - [ ] Step 2: Create template file
-  - **Step**: `@step:template/create-template-file`
-  - **Description**: Create the template file in `.processes/templates/` with the proper filename and write all sections including the header comment block, process header, parameters section, context section, process flow diagram, and all sequential step definitions. Each step must reference an actual process-step file using `@step:category/step-name` syntax. Include the mandatory continuous improvement step as the final step. Then comprehensively validate the template by verifying all required sections are present, checking parameter placeholders are properly documented, ensuring the flow diagram matches the steps, and reviewing compliance with best practices.
+  - **Step**: `@framework-step:template/create-template-file`
+  - **Description**: Create the template file in `.processes/templates/` with the proper filename and write all sections including the header comment block, process header, parameters section, context section, process flow diagram, and all sequential step definitions. Each step must reference an actual process-step file using `@framework-step:category/step-name` syntax. Include the mandatory continuous improvement step as the final step. Then comprehensively validate the template by verifying all required sections are present, checking parameter placeholders are properly documented, ensuring the flow diagram matches the steps, and reviewing compliance with best practices.
   - **Output**: Complete template file with all sections, validation reports (structure, parameters, diagram alignment, best practices compliance)
   - **Decision**:
     - **IF** validation passes (all checks pass):
@@ -81,13 +81,13 @@ flowchart TD
   - **Note**: Only proceed to Step 3 when all validation checks pass
 
 - [ ] Step 3: Validate required process-steps exist
-  - **Step**: `@step:template/validate-process-steps-exist`
-  - **Description**: Analyze the template to identify which process-steps are referenced and verify they exist in `.processes/steps/`. Extract all `@step:category/step-name` references from the template and check if each step file exists.
+  - **Step**: `@framework-step:template/validate-process-steps-exist`
+  - **Description**: Analyze the template to identify which process-steps are referenced and verify they exist in `.processes/steps/`. Extract all `@framework-step:category/step-name` references from the template and check if each step file exists.
   - **Output**: Validation report of existing vs. missing process-steps
   - **Checkpoint**: If missing process-steps are found:
     - **PAUSE the process**
     - Notify user of missing process-steps and where to create them
-    - List each missing step with format: `@step:{category}/{step-name}` → should be in `.processes/steps/{category}/{step-name}.md`
+    - List each missing step with format: `@framework-step:{category}/{step-name}` → should be in `.processes/steps/{category}/{step-name}.md`
     - User must create missing process-steps manually in `.processes/steps/{category}/`
     - Reference: `.processes/steps/README.md` and `.processes/steps/step-template.md` for step creation guidelines
     - User resumes process at Step 4 once all process-steps exist
@@ -96,10 +96,10 @@ flowchart TD
 ### Final Phase: Learning & Improvement
 
 - [ ] Step 4: Continuous Improvement & Learning
-  - **Step**: `@step:learning/continuous-improvement`
+  - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
     - `processName`: Create {{templateName}} Template
     - `templateName`: create-process-template
   - **Output**: Analysis report, implemented improvements, updated templates/steps

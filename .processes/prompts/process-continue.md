@@ -66,7 +66,7 @@ Update log.md with what was changed
 When you invoke `/process-continue`, the AI will:
 
 1. **MANDATORY: Discover Active Processes**
-   - Search `.processes/active/` directory for all active processes
+   - Search `.user-processes/active/` directory for all active processes
    - **CRITICAL**: If no processes exist:
      - Inform the user that no active process exists
      - **MANDATORY**: Suggest using `/process-new` to create a process from a template first
@@ -79,12 +79,12 @@ When you invoke `/process-continue`, the AI will:
    - If only one process exists, proceed directly to resumption
 
 2. **Read Process State**
-   - Read the process file: `.processes/active/{process-folder}/process.md`
+   - Read the process file: `.user-processes/active/{process-folder}/process.md`
    - Check **Current State** section to see what was being worked on
    - Review completed steps and identify next incomplete step
 
 3. **Read Memory File**
-   - Read `.processes/active/{process-folder}/memory.md` to retrieve stored information
+   - Read `.user-processes/active/{process-folder}/memory.md` to retrieve stored information
    - Summarize key information from previous steps:
      - Information produced
      - Decisions made

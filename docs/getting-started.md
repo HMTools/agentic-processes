@@ -10,10 +10,18 @@ This guide will help you get started with the Agentic Process System, from insta
 
 ## Installation
 
-The Agentic Process System is a repository-based system. To use it:
+The Agentic Process System uses a **multi-folder workspace** setup:
 
-1. Clone or download this repository
-2. Open the repository in Cursor IDE or access via GitHub Copilot
+1. **Add the framework to your workspace:**
+   - In Cursor/VS Code: File → Add Folder to Workspace
+   - Add your project folder
+   - Add the `agentic-processes` folder
+
+2. **No manual setup required** - the `.user-processes/` directory is created automatically when you start your first process. Folders are created on-demand:
+   - `active/` - created when a process starts
+   - `completed/` - created when a process completes
+   - `templates/`, `steps/`, etc. - created when you add custom resources
+
 3. The system is ready to use - no additional installation required
 
 ## Your First Process
@@ -52,8 +60,8 @@ Provide the requested information.
 The system will:
 1. Resolve all step references
 2. Substitute all parameters
-3. Create process instance in `.processes/active/process-{name}-{YYYYMMDD}/`
-4. Display the process with all steps expanded
+3. Create process instance in `.user-processes/active/process-{name}-{YYYYMMDD}/`
+4. Display the process with steps ready to execute
 
 ### Step 5: Begin Work
 
@@ -113,9 +121,9 @@ The system will:
 ### Process States
 
 Processes can be in three states:
-- **Running**: Currently active, in `.processes/active/`
-- **Completed**: Finished successfully, moved to `.processes/completed/`
-- **Failed**: Encountered errors, moved to `.processes/failed/`
+- **Running**: Currently active, in `.user-processes/active/`
+- **Completed**: Finished successfully, moved to `.user-processes/completed/`
+- **Failed**: Encountered errors, moved to `.user-processes/failed/`
 
 ## Key Concepts
 
@@ -123,9 +131,13 @@ Processes can be in three states:
 
 Templates define reusable workflows:
 - Use parameter placeholders: `{{paramName}}`
-- Reference steps: `@step:category/step-name`
+- Reference steps: `@framework-step:category/step-name` or `@user-step:category/step-name`
 - Include flow diagrams
 - Define sequential steps
+
+Templates are available from:
+- **Framework**: `.processes/templates/{category}/`
+- **User**: `.user-processes/templates/{category}/`
 
 ### Steps
 
@@ -135,14 +147,19 @@ Steps are modular building blocks:
 - Flow diagrams for complex steps
 - Substeps for detailed breakdown
 
+Steps are available from:
+- **Framework**: `.processes/steps/{category}/`
+- **User**: `.user-processes/steps/{category}/`
+
 ### Step References
 
-Templates reference steps using:
+Templates reference steps using explicit prefixes:
 ```markdown
-- **Step**: `@step:api/implement-controller-layer`
+- **Step**: `@framework-step:api/implement-controller-layer`  # Framework step
+- **Step**: `@user-step:my-category/my-custom-step`           # User step
 ```
 
-When creating a process, references are automatically expanded with full step details.
+The prefix makes it clear where each resource comes from.
 
 ## Common Workflows
 

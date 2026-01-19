@@ -27,7 +27,9 @@ Templates define reusable workflows with:
 - Process flow diagrams
 - Sequential step definitions
 
-**Location**: `.processes/templates/`
+**Locations**:
+- Framework templates: `.processes/templates/{category}/`
+- User templates: `.user-processes/templates/{category}/`
 
 **Structure**:
 ```markdown
@@ -40,7 +42,7 @@ Required Parameters: param1, param2
 # Process: {{processName}}
 ## Steps
 - [ ] Step 1: Description
-  - **Step**: `@step:category/step-name`
+  - **Step**: `@framework-step:category/step-name`
 ```
 
 ### 3. Steps
@@ -53,7 +55,9 @@ Steps are modular, self-contained definitions with:
 - Substeps
 - Examples
 
-**Location**: `.processes/steps/{category}/`
+**Locations**:
+- Framework steps: `.processes/steps/{category}/`
+- User steps: `.user-processes/steps/{category}/`
 
 **Categories**:
 - `api/` - API layer steps
@@ -72,7 +76,7 @@ Process instances are created from templates and contain:
 - Memory file (`memory.md`)
 - Log file (`log.md`)
 
-**Location**: `.processes/{state}/process-{name}-{YYYYMMDD}/`
+**Location**: `.user-processes/{state}/process-{name}-{YYYYMMDD}/`
 
 **States**:
 - `active/` - Currently running
@@ -112,13 +116,13 @@ graph TD
 When a process is created from a template:
 
 1. **Template Reading**: Read template file
-2. **Reference Scanning**: Find all `@step:category/step-name` references
+2. **Reference Scanning**: Find all step references (`@framework-step:` and `@user-step:`)
 3. **Step Loading**: For each reference:
-   - Read step file from `.processes/steps/{category}/{step-name}.md`
-   - Extract all sections (Description, Output, Guidance, Flow, Substeps, Examples)
-4. **Expansion**: Replace reference with full step content
-5. **Context Application**: Apply context parameters from template
-6. **Process Creation**: Create process instance with expanded steps
+   - `@framework-step:category/name` → read from `.processes/steps/{category}/{name}.md`
+   - `@user-step:category/name` → read from `.user-processes/steps/{category}/{name}.md`
+   - Extract relevant sections (Description, Output, Guidance)
+4. **Context Application**: Apply context parameters from template
+5. **Process Creation**: Create process instance in `.user-processes/active/`
 
 ## State Management
 
@@ -221,18 +225,29 @@ Audit log is automatically maintained:
 ## File Structure
 
 ```
-agentic-processes/
-├── core/
-│   └── processes/
-│       ├── templates/          # Process templates
-│       ├── steps/              # Modular step definitions
-│       ├── active/             # Running processes
-│       ├── completed/          # Finished processes
-│       └── failed/             # Failed processes
-├── integrations/
-│   ├── cursor/                 # Cursor IDE integration
-│   └── github/                 # GitHub integration
-└── docs/                       # Documentation
+# Framework (agentic-processes/)
+.processes/                      # Framework-provided resources
+├── templates/                   # Process templates (by category)
+│   ├── development/
+│   ├── testing/
+│   ├── review/
+│   └── infrastructure/
+├── steps/                       # Modular step definitions
+│   ├── api/
+│   ├── service/
+│   ├── testing/
+│   └── ...
+└── prompts/                     # Process management prompts
+
+# User Resources (.user-processes/)
+.user-processes/                 # User resources & process instances
+├── active/                      # Running processes
+├── completed/                   # Finished processes
+├── failed/                      # Failed processes
+├── templates/                   # User-defined templates
+├── steps/                       # User-defined steps
+├── components/                  # User-defined components
+└── guidelines/                  # Project-specific guidelines
 ```
 
 ## Design Principles
@@ -275,17 +290,17 @@ System automatically updates:
 
 ## Extension Points
 
-### Adding New Templates
+### Adding Your Own Templates
 
-1. Create template file in `.processes/templates/`
+1. Create template file in `.user-processes/templates/{category}/`
 2. Follow template structure
-3. Reference existing steps
-4. Add to template list
+3. Reference steps using `@framework-step:` or `@user-step:` prefix
+4. Add mermaid flow diagram
 
-### Adding New Steps
+### Adding Your Own Steps
 
-1. Create step file in `.processes/steps/{category}/`
-2. Follow step template
+1. Create step file in `.user-processes/steps/{category}/`
+2. Follow step template (see `.processes/steps/step-template.md`)
 3. Include all required sections
 4. Add examples and guidance
 

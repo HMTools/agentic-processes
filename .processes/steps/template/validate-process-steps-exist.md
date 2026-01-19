@@ -11,7 +11,7 @@ Purpose: Analyze a template to identify which process-steps are referenced and v
 
 ## Description
 
-Analyze the template to identify which process-steps are referenced and verify they exist in `.processes/steps/`. Extract all `@step:category/step-name` references from the template and check if each step file exists.
+Analyze the template to identify which process-steps are referenced and verify they exist in `.processes/steps/`. Extract all `@framework-step:category/step-name` references from the template and check if each step file exists.
 
 ## Output
 
@@ -25,10 +25,10 @@ Analyze the template to identify which process-steps are referenced and verify t
 
 **Specific Actions:**
 - Review each step definition in the template
-- Extract all process-step references (e.g., `@step:template/plan-template-design`, `@step:learning/continuous-improvement`, etc.)
+- Extract all process-step references (e.g., `@framework-step:template/plan-template-design`, `@framework-step:learning/continuous-improvement`, etc.)
 - Check if each required process-step exists in `.processes/steps/{category}/{step-name}.md`
 - If any are missing, list them with their category locations
-- Verify the continuous improvement step exists: `@step:learning/continuous-improvement`
+- Verify the continuous improvement step exists: `@framework-step:learning/continuous-improvement`
 - Store validation results in current step section of memory.md
 
 **Files/Folders:**
@@ -36,7 +36,7 @@ Analyze the template to identify which process-steps are referenced and verify t
 - Check: `.processes/steps/{category}/{step-name}.md` for each referenced step
 
 **Best Practices:**
-- Extract all `@step:` references systematically
+- Extract all `@framework-step:` references systematically
 - Check file existence for each referenced step
 - Provide clear paths for missing steps
 - Include category suggestions for missing steps
@@ -58,7 +58,7 @@ Analyze the template to identify which process-steps are referenced and verify t
 **If missing process-steps are found:**
 - **PAUSE the process**
 - Notify user of missing process-steps and where to create them
-- List each missing step with format: `@step:{category}/{step-name}` → should be in `.processes/steps/{category}/{step-name}.md`
+- List each missing step with format: `@framework-step:{category}/{step-name}` → should be in `.processes/steps/{category}/{step-name}.md`
 - User must create missing process-steps manually in `.processes/steps/{category}/`
 - Reference: `.processes/steps/README.md` and `.processes/steps/step-template.md` for step creation guidelines
 - User resumes process once all process-steps exist

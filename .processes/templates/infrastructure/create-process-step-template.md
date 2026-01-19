@@ -57,7 +57,7 @@ flowchart TD
 ## Steps
 
 - [ ] Step 1: Plan and design step
-  - **Step**: `@step:template/plan-and-design-step`
+  - **Step**: `@framework-step:template/plan-and-design-step`
   - **Description**: Analyze requirements for the new step, define its purpose, identify use cases, determine the appropriate category, plan the step structure, identify required sections (description, output, guidance, flow diagram, substeps, examples, common pitfalls), and design the mermaid flow diagram. This step establishes the complete foundation and design for the step file.
   - **Output**: Requirements document, purpose statement, use cases documentation, category selection rationale, step structure plan, section breakdown plan, mermaid flow diagram code, substeps outline
   - **Iterative Review**: User can request changes to the design, flow, or structure; revise and re-present until satisfactory
@@ -71,7 +71,7 @@ flowchart TD
   - **Note**: This step is complete only when user approves the complete design
 
 - [ ] Step 2: Create step file
-  - **Step**: `@step:template/create-step-file`
+  - **Step**: `@framework-step:template/create-step-file`
   - **Description**: Create the step file in `.processes/steps/{{stepCategory}}/` with the proper filename and write all sections including the header comment block, step title, description, output, guidance (with mandatory logging section), memory file usage, flow diagram with mermaid code, substeps breakdown, examples section, and common pitfalls section. The step must be self-contained and follow the step-template.md structure. Then comprehensively validate the step by verifying all required sections are present, checking the flow diagram matches the substeps, ensuring guidance is detailed and actionable, and reviewing compliance with best practices from steps/README.md.
   - **Output**: Complete step file with all sections, validation reports (structure, diagram alignment, guidance completeness, best practices compliance)
   - **Decision**:
@@ -83,7 +83,7 @@ flowchart TD
   - **Note**: Only proceed to Step 3 when all validation checks pass
 
 - [ ] Step 3: Validate step structure
-  - **Step**: `@step:template/validate-step-structure`
+  - **Step**: `@framework-step:template/validate-step-structure`
   - **Description**: Perform comprehensive validation of the created step file to ensure it meets all requirements. Verify the step is self-contained (no references to other steps), check that all required sections are present and properly formatted, validate the mermaid diagram syntax and that it matches the substeps, ensure guidance is detailed and actionable with specific file paths and code patterns, verify examples are included and relevant, check that common pitfalls are documented, and confirm compliance with naming conventions and best practices from steps/README.md.
   - **Output**: Comprehensive validation report with all checks (self-contained check, section completeness, diagram validation, guidance quality, examples quality, pitfalls documentation, naming compliance, best practices compliance)
   - **Decision**:
@@ -97,10 +97,10 @@ flowchart TD
 ### Final Phase: Learning & Improvement
 
 - [ ] Step 4: Continuous Improvement & Learning
-  - **Step**: `@step:learning/continuous-improvement`
+  - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
     - `processName`: Create {{stepName}} Step
     - `templateName`: create-process-step-template
   - **Output**: Analysis report, implemented improvements, updated templates/steps
