@@ -55,6 +55,15 @@ Use this step when you need to:
 
 Follow the substeps below in sequence. Each substep contains detailed instructions for completing that part of the context gathering process. The workflow is: gather parameters → identify sources → clarify requirements → understand success criteria → document constraints → verify completeness → request missing info (if needed) → document in memory.
 
+**⚠️ IMPORTANT: Keep Memory Concise**
+
+Create a dedicated file:
+- Create `step{N}-context.md` for detailed documentation
+- Keep `memory.md` concise with a summary and reference to the dedicated file
+- Example: "**Detailed Context**: See [`step1-context.md`](./step1-context.md)"
+
+This improves readability and makes memory.md a quick reference rather than a verbose document.
+
 **Files/Folders:**
 - Read: `process.md` (process description and parameters)
 - Update: `memory.md` (current step section with context documentation)
@@ -71,7 +80,6 @@ Follow the substeps below in sequence. Each substep contains detailed instructio
 - Ask clarifying questions if anything is ambiguous
 - Document all assumptions explicitly
 - Organize context information clearly in memory.md
-- **For extensive context documentation (>100 lines)**: Consider moving detailed context to a dedicated file (e.g., `step{N}-context.md`) and keep memory.md concise with references. This improves readability and maintainability.
 - Use specific, actionable questions when requesting missing information
 - Wait for user answers before proceeding if context is incomplete
 - Verify context completeness before moving to next step

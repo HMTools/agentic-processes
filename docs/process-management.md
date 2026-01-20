@@ -8,6 +8,8 @@ This document provides essential guidelines for working with the Agentic Process
 2. [Process State Management](#process-state-management)
 3. [File Modification Guidelines](#file-modification-guidelines)
 4. [User Interaction Handling](#user-interaction-handling)
+5. [Sub-Processes](#sub-processes)
+6. [Design Principles](#design-principles)
 
 ---
 
@@ -177,6 +179,128 @@ When a user corrects something:
 
 ---
 
+## Sub-Processes
+
+Sub-processes allow a parent process to spawn child processes for delegation or parallel work.
+
+### Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Sub-process** | A regular process with a parent reference |
+| **Sync Point** | Where parent checks if sub-processes are complete |
+| **Push Model** | Child notifies parent when done (updates parent's memory) |
+
+### When to Use Sub-Processes
+
+| Scenario | Example |
+|----------|---------|
+| **Delegation** | Missing template steps → spawn `create-process-step-template` for each |
+| **Parallel work** | After LLD → spawn test plan and code dev processes |
+
+### Sync Point Placement
+
+Place sync points where parent needs sub-process results:
+- **Immediate**: Right after spawn (delegation pattern - parent waits)
+- **Deferred**: Later in parent flow (parallel pattern - parent continues)
+- **At end**: Before parent completes
+
+### How It Works
+
+```
+1. SPAWN: Parent uses @framework-step:common/spawn-sub-process
+   ├── Creates sub-process with parent reference
+   └── Records child in parent's memory
+
+2. NOTIFY: When sub-process completes, uses @framework-step:common/notify-parent-complete
+   └── Updates parent's memory with completion status (push model)
+
+3. SYNC: At sync points, process-continue checks parent's own memory
+   ├── If children complete: proceed
+   └── If children pending: wait or offer to continue sub-process
+```
+
+### Creating Sub-Processes
+
+Use `@framework-step:common/spawn-sub-process` with:
+- `template`: Template for sub-process
+- `parameters`: Parameters to pass
+- `syncPoint`: When to wait ("immediate", "step-N", "end")
+
+### Notifying Parent
+
+At end of sub-process, use `@framework-step:common/notify-parent-complete`:
+- Updates parent's memory with completion status
+- No polling needed - parent just reads its own memory at sync points
+
+### Example: Delegation Pattern
+
+```markdown
+- [ ] Step 3: Validate process-steps exist
+  - **Sub-Process Trigger**: If missing steps found
+    - For each missing step, spawn `create-process-step-template`
+    - **Sync Point**: Immediate (wait for all to complete)
+    - Continue with newly created steps
+```
+
+### Memory Structure for Sub-Processes
+
+Parent memory includes Sub-Process State section:
+
+```markdown
+## Sub-Process State
+
+### Parent Process
+- **Parent**: None - this is a root process
+
+### Child Sub-Processes
+| Name | Template | Status | Spawned At | Sync Point |
+|------|----------|--------|------------|------------|
+| process-create-step-xyz-20260120 | create-process-step-template | completed | Step 3 | immediate |
+
+### Sync Points
+- **Next Sync Point**: None
+- **Pending Sub-Processes**: []
+```
+
+---
+
+---
+
+## Design Principles
+
+When designing new concepts, patterns, or processes, follow these principles:
+
+### Start Simple
+
+**Avoid over-engineering.** Start with the simplest solution that could work, then add complexity only when justified.
+
+| Approach | Example |
+|----------|---------|
+| ✅ **Simple** | Sub-processes are regular processes with parent-child references |
+| ❌ **Over-engineered** | Sub-processes have special directories, monitoring, and execution modes |
+
+**Signs of over-engineering:**
+- Creating new categories when existing ones suffice
+- Adding special handling for cases that don't need it
+- Separating concepts that are actually the same (e.g., "sync" and "async" when sync is just async with immediate wait)
+
+### Leverage Existing Patterns
+
+Before creating something new, check if existing infrastructure can be extended:
+- Can JSON files store this metadata?
+- Can existing templates be modified?
+- Does a similar pattern already exist?
+
+### The Entity That Knows Should Report
+
+For notifications and status updates, prefer push over pull:
+- The entity that knows something happened should report it
+- Don't poll when you can notify
+- Example: Child process notifies parent when done (instead of parent polling child)
+
+---
+
 ## Why This Matters
 
 ### For Continuous Improvement
@@ -253,6 +377,6 @@ These guidelines are **MANDATORY** for all AI agents working within processes. F
 
 ---
 
-**Last Updated**: 2026-01-03
-**Version**: 1.0
+**Last Updated**: 2026-01-20
+**Version**: 1.1
 

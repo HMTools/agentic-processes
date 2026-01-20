@@ -72,7 +72,13 @@
       "name": "Validate process-steps exist",
       "stepRef": null,
       "output": "Validation report of existing vs. missing process-steps",
-      "checkpoint": "Pause if missing steps"
+      "subProcessTrigger": {
+        "condition": "missing steps found",
+        "template": "create-process-step-template",
+        "forEach": "missingStep",
+        "syncPoint": "immediate"
+      },
+      "fallback": "manual PAUSE if user prefers"
     },
     {
       "number": 3,

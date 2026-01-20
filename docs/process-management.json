@@ -4,7 +4,7 @@
   "metadata": {
     "title": "Process Management Guide",
     "purposeAndUsage": "Comprehensive guide to process management including creating, running, and improving processes.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-20"
   },
   "sections": [
     {"name": "Overview", "description": "Introduction to process management"},
@@ -12,12 +12,14 @@
     {"name": "Running Processes", "description": "Executing and tracking process progress"},
     {"name": "Memory Management", "description": "Using memory files for continuity"},
     {"name": "Logging", "description": "Logging conventions and requirements"},
+    {"name": "Sub-Processes", "description": "Creating and managing child processes for delegation or parallel work"},
     {"name": "Continuous Improvement", "description": "Learning from process execution"}
   ],
   "references": {
     "relatedDocs": ["architecture", "getting-started", "examples"],
     "templates": ["set-concept", "develop-user-story", "create-process-template"],
-    "prompts": ["process-new", "process-continue"]
+    "prompts": ["process-new", "process-continue"],
+    "subProcessSteps": ["spawn-sub-process", "notify-parent-complete"]
   }
 }
 

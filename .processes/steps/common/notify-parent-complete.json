@@ -1,0 +1,59 @@
+{
+  "type": "step",
+  "name": "notify-parent-complete",
+  "category": "common",
+  "metadata": {
+    "title": "Notify Parent Complete",
+    "purposeAndUsage": "Notify parent process that sub-process has completed by updating parent's memory. Used at end of sub-processes.",
+    "lastUpdated": "2026-01-20"
+  },
+  "parameters": {
+    "required": [],
+    "optional": ["status", "summary"],
+    "defaults": {
+      "status": "completed"
+    },
+    "definitions": {
+      "status": {
+        "description": "Completion status",
+        "type": "string",
+        "enum": ["completed", "failed"],
+        "default": "completed"
+      },
+      "summary": {
+        "description": "Brief summary of what was accomplished",
+        "type": "string",
+        "example": "Created 3 new process steps"
+      }
+    }
+  },
+  "output": {
+    "description": "Parent memory updated with completion status",
+    "artifacts": ["parent memory update"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "substeps"]
+    }
+  },
+  "substeps": [
+    { "number": 1, "name": "Check if this is a sub-process", "conditional": "skip if no parent" },
+    { "number": 2, "name": "Read parent process memory" },
+    { "number": 3, "name": "Find this sub-process in parent's table" },
+    { "number": 4, "name": "Update status to completed or failed" },
+    { "number": 5, "name": "Add completion summary" },
+    { "number": 6, "name": "Write updated parent memory" }
+  ],
+  "references": {
+    "relatedSteps": ["spawn-sub-process"],
+    "usedInTemplates": []
+  },
+  "notes": {
+    "pushModel": "This step implements push notification - child updates parent, no polling needed",
+    "skipCondition": "Skip if process has no parent (is a root process)"
+  }
+}
+

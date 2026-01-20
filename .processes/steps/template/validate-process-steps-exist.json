@@ -9,8 +9,19 @@
   },
   "output": {
     "description": "Validation report of existing vs. missing process-steps",
-    "artifacts": [],
-    "memoryUpdates": ["validationResults", "missingStepsList"]
+    "artifacts": ["spawnedSubProcesses"],
+    "memoryUpdates": ["validationResults", "missingStepsList", "spawnedSubProcesses"]
+  },
+  "parameters": {
+    "required": [],
+    "optional": ["autoSpawnMissing"],
+    "defaults": { "autoSpawnMissing": false }
+  },
+  "subProcessSupport": {
+    "canSpawnSubProcesses": true,
+    "template": "create-process-step-template",
+    "forEach": "missingStep",
+    "defaultSyncPoint": "immediate"
   },
   "structure": {
     "userLayer": {
@@ -29,7 +40,8 @@
     {"number": 2, "name": "Extract step references"},
     {"number": 3, "name": "Check step existence"},
     {"number": 4, "name": "Create validation report"},
-    {"number": 5, "name": "List missing steps"}
+    {"number": 5, "name": "List missing steps"},
+    {"number": 6, "name": "Handle missing steps", "options": ["spawn sub-processes", "PAUSE for manual"]}
   ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],

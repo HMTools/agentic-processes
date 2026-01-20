@@ -39,6 +39,23 @@ Use this template when:
 
 ---
 
+## Sub-Process State
+
+### Parent Process
+- **Parent**: {parent-process-path or "None - this is a root process"}
+- **Spawned At Step**: {step number where this process was spawned, or "N/A"}
+
+### Child Sub-Processes
+| Name | Template | Status | Spawned At | Sync Point |
+|------|----------|--------|------------|------------|
+| {sub-process-name} | {template-name} | {pending/running/completed/failed} | Step {N} | {immediate/step-N/end} |
+
+### Sync Points
+- **Next Sync Point**: {step number or "None"}
+- **Pending Sub-Processes**: {list of sub-processes to wait for at next sync point}
+
+---
+
 ## Step 1: {Step Name}
 
 ### Information Produced

@@ -22,6 +22,12 @@
       "fields": ["process", "created", "lastUpdated", "currentStep"]
     },
     {
+      "name": "Sub-Process State",
+      "required": false,
+      "purpose": "Track parent-child relationships and sync points",
+      "subsections": ["parentProcess", "childSubProcesses", "syncPoints"]
+    },
+    {
       "name": "Step Section",
       "required": true,
       "repeatable": true,

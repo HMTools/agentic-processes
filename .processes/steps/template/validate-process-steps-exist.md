@@ -37,6 +37,7 @@ Use this step when you need to:
 - Validation report with existence status
 - List of all referenced process-steps
 - List of missing process-steps with suggested locations
+- (Optional) Spawned sub-processes for missing steps if `autoSpawnMissing` is true
 
 ### Guidance
 
@@ -78,6 +79,16 @@ flowchart TD
 - [ ] **Substep 3**: Check existence of each referenced step
 - [ ] **Substep 4**: Create validation report
 - [ ] **Substep 5**: List missing steps with suggested locations
+- [ ] **Substep 6**: Handle missing steps (if any found)
+  - **Option A - Sub-Process**: If template has `subProcessTrigger` configured or user approves:
+    - Use `@framework-step:common/spawn-sub-process` for each missing step
+    - Template: `create-process-step-template`
+    - Parameters: `{ stepName, category }` for each missing step
+    - Sync Point: As configured (usually "immediate")
+  - **Option B - PAUSE**: If user prefers manual creation:
+    - PAUSE process and notify user
+    - List missing steps with locations
+    - User creates manually and resumes
 
 ### Memory File Usage
 

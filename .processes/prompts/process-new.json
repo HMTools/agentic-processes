@@ -46,6 +46,13 @@
       {"name": "log.md", "purpose": "Detailed execution log"}
     ]
   },
+  "subProcessSupport": {
+    "detectParent": true,
+    "createWithParentReference": true,
+    "updateParentMemory": true,
+    "standardDirectory": true,
+    "note": "Sub-processes are regular processes with parent-child references"
+  },
   "references": {
     "templatesLocation": ".processes/templates/",
     "knowledgeFile": "ai/knowledge/best-practices/ai-tooling/process-management.md",

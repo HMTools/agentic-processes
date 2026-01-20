@@ -145,6 +145,24 @@ Ensure continuity by:
 - Update process state files as you progress
 - Never skip process steps or workflow
 
+### Sync Point Handling
+
+When continuing a process that has sub-processes:
+
+1. **Read Sub-Process State from Memory**
+   - Read memory.md "Sub-Process State" section
+   - Check "Child Sub-Processes" table for status
+   - Sub-processes update this table when they complete (via notify-parent-complete)
+
+2. **At Sync Points**
+   - If current step is a sync point, check Child Sub-Processes status in memory
+   - If any sub-processes still "running": Report which ones, offer to continue sub-process or wait
+   - If all relevant sub-processes "completed": Proceed past sync point
+
+3. **No Polling Needed**
+   - Sub-processes notify parent by updating parent's memory when done
+   - Parent just reads its own memory - no need to check child process files
+
 ### Error Handling
 
 If issues are found:

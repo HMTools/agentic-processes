@@ -41,6 +41,11 @@
     ],
     "information": ["Current step", "Completed work", "Decisions made", "Files created", "Important notes"]
   },
+  "syncPointHandling": {
+    "checkMemoryForSubProcessStatus": true,
+    "waitAtSyncPoints": true,
+    "noPollingNeeded": "Children update parent memory via notify-parent-complete step"
+  },
   "references": {
     "activeProcessLocation": ".user-processes/active/",
     "knowledgeFile": "ai/knowledge/best-practices/ai-tooling/process-management.md",

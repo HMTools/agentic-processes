@@ -136,3 +136,27 @@ Update log.md with changes
    - **Agent Response**: {what changed}
    - **Timestamp**: {YYYY-MM-DD HH:mm:ss}
 ```
+
+### Sub-Process Creation
+
+When `/process-new` is invoked from within an active process (spawning a sub-process):
+
+1. **Detect Parent Context**
+   - Check if there's an active parent process in context
+   - If spawning from a step, record parent process path
+
+2. **Create with Parent Reference**
+   - Set `parentProcess` in log.md metadata
+   - Set parent reference in memory.md Sub-Process State section
+   - Record "Spawned At Step" from parent context
+
+3. **Update Parent Process**
+   - Add new sub-process to parent's memory.md Child Sub-Processes table
+   - Set status to "running"
+   - Record sync point from spawn instruction
+
+4. **Standard Creation**
+   - Continue with normal process creation flow
+   - Directory is standard: `.user-processes/active/process-{name}-{YYYYMMDD}/`
+
+**Note**: Sub-processes are regular processes with parent-child references. They use the same directory structure and monitoring as any other process.

@@ -1,0 +1,59 @@
+{
+  "type": "step",
+  "name": "spawn-sub-process",
+  "category": "common",
+  "metadata": {
+    "title": "Spawn Sub-Process",
+    "purposeAndUsage": "Create a sub-process from within a parent process with proper parent-child linking and sync point configuration.",
+    "lastUpdated": "2026-01-20"
+  },
+  "parameters": {
+    "required": ["template", "parameters"],
+    "optional": ["syncPoint"],
+    "defaults": {
+      "syncPoint": "immediate"
+    },
+    "definitions": {
+      "template": {
+        "description": "Template to use for the sub-process",
+        "type": "string",
+        "example": "create-process-step-template"
+      },
+      "parameters": {
+        "description": "Parameters to pass to the sub-process",
+        "type": "object",
+        "example": { "stepName": "my-step", "category": "common" }
+      },
+      "syncPoint": {
+        "description": "When parent waits for sub-process completion",
+        "type": "string",
+        "enum": ["immediate", "step-N", "end"],
+        "default": "immediate"
+      }
+    }
+  },
+  "output": {
+    "description": "Sub-process created with parent reference, parent memory updated",
+    "artifacts": ["sub-process directory", "parent memory update"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "substeps"]
+    }
+  },
+  "substeps": [
+    { "number": 1, "name": "Determine sub-process template and parameters" },
+    { "number": 2, "name": "Determine sync point" },
+    { "number": 3, "name": "Create sub-process with parent context" },
+    { "number": 4, "name": "Update parent memory with child reference" },
+    { "number": 5, "name": "Handle sync point (immediate wait or continue)" }
+  ],
+  "references": {
+    "relatedSteps": ["notify-parent-complete"],
+    "usedInTemplates": ["create-process-template", "develop-user-story"]
+  }
+}
+

@@ -36,6 +36,8 @@ Use this template when:
 - **Template**: {template-name}
 - **Started**: {YYYY-MM-DD HH:mm:ss}
 - **Completed**: {YYYY-MM-DD HH:mm:ss}
+- **Parent Process**: {parent-process-name or "None (root process)"}
+- **Sub-Processes**: {list of spawned sub-process names, or "None"}
 
 ---
 

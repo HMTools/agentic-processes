@@ -19,7 +19,7 @@
     {
       "name": "Metadata",
       "required": true,
-      "fields": ["process", "template", "started", "completed"]
+      "fields": ["process", "template", "started", "completed", "parentProcess", "subProcesses"]
     },
     {
       "name": "Step Section",

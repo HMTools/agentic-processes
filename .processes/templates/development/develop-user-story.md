@@ -116,12 +116,15 @@ flowchart TD
     - Check if each required process-step exists in `.processes/steps/`
     - If any are missing, list them with suggested category locations
   - **Output**: Validation report of existing vs. missing process-steps
-  - **Checkpoint**: If missing process-steps are found:
-    - **PAUSE the process**
-    - Notify user of missing process-steps and where to create them
-    - User must create missing process-steps manually in `.processes/steps/{category}/`
-    - Reference: `.processes/steps/README.md` for step creation guidelines
-    - User resumes process at Step 3 once all process-steps exist
+  - **Sub-Process Trigger**: If missing process-steps are found:
+    - For each missing step, spawn `create-process-step-template` sub-process
+    - Use `@framework-step:common/spawn-sub-process` with:
+      - `template`: create-process-step-template
+      - `parameters`: { stepName, category } for each missing step
+      - `syncPoint`: immediate
+    - **Sync Point**: Wait for all sub-processes to complete
+    - Continue to Step 3 with newly created steps
+  - **Fallback**: If user prefers manual creation, can still PAUSE and create manually
   - **Note**: Only proceed to Step 3 if all required process-steps exist
   
   ##### Process-Step Correlation Guidelines
