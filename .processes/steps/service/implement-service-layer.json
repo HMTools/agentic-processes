@@ -1,0 +1,59 @@
+{
+  "type": "step",
+  "name": "implement-service-layer",
+  "category": "service",
+  "metadata": {
+    "title": "Implement Service Layer",
+    "purposeAndUsage": "Implement business logic in the service layer following SOLID principles and clean architecture patterns. Use when creating managers, calculators, validators, or other service components.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Service component files with interfaces and implementations",
+    "artifacts": ["Service/Managers/Interfaces/*.cs", "Service/Managers/*.cs", "Contracts.Internal/Arguments/*.cs", "Contracts.Internal/Results/*.cs"],
+    "memoryUpdates": ["serviceComponentsCreated", "interfaces", "implementations"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "metadata", "contextParameters", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "componentTypes": [
+    {"type": "Manager", "purpose": "Orchestrate business operations", "example": "UserManager"},
+    {"type": "Calculator", "purpose": "Compute values/decisions", "example": "InterestCalculator"},
+    {"type": "Checker", "purpose": "Validate conditions", "example": "EligibilityChecker"},
+    {"type": "Validator", "purpose": "Validate input data", "example": "RequestValidator"},
+    {"type": "Publisher", "purpose": "Publish events", "example": "NotificationPublisher"},
+    {"type": "Subscriber", "purpose": "Handle events", "example": "PaymentSubscriber"}
+  ],
+  "contextParameters": {
+    "components": {
+      "required": true,
+      "type": "array",
+      "description": "List of service components to implement"
+    }
+  },
+  "substeps": [
+    {"number": 1, "name": "Parse Components and Study Patterns"},
+    {"number": 2, "name": "Create Service Interface"},
+    {"number": 3, "name": "Create Service Implementation"},
+    {"number": 4, "name": "Create Arguments/Results Models"},
+    {"number": 5, "name": "Register in Dependency Injection"},
+    {"number": 6, "name": "Verify Implementation"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "requiredFiles": [],
+    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["implement-repository-layer", "implement-controller-layer", "write-unit-tests-service"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+
+
+
+

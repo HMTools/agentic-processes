@@ -1,0 +1,54 @@
+{
+  "type": "step",
+  "name": "propose-fixes",
+  "category": "investigation",
+  "metadata": {
+    "title": "Propose Fixes",
+    "purposeAndUsage": "Propose specific fixes for issues identified during review and verification. Use when you need to create detailed fix proposals and get user approval before applying fixes.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Fix proposals document and approval status",
+    "artifacts": ["fix-proposals.md"],
+    "memoryUpdates": ["fixProposalsPath", "totalProposals", "approvalStatus", "approvedIssueIds"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    }
+  },
+  "proposalElements": [
+    {"name": "issueId", "description": "Reference to the identified issue"},
+    {"name": "location", "description": "File path, line number"},
+    {"name": "issueDescription", "description": "Brief description of the issue"},
+    {"name": "currentState", "description": "What exists now"},
+    {"name": "proposedFix", "description": "What should change"},
+    {"name": "fixInstructions", "description": "Step-by-step fix instructions"},
+    {"name": "rationale", "description": "Why this fix addresses the issue"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Read Issues from Previous Step"},
+    {"number": 2, "name": "Read Issues JSON File"},
+    {"number": 3, "name": "Create Fix Proposals for Each Issue"},
+    {"number": 4, "name": "Create Fix Proposals Document"},
+    {"number": 5, "name": "Present Proposals and Get Approval"},
+    {"number": 6, "name": "Process Approval Response"}
+  ],
+  "approvalRequired": true,
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["memory.md", "issues-list.json", "findings-report.md"],
+    "requiredTools": ["read_file", "grep", "codebase_search", "write", "search_replace"]
+  },
+  "references": {
+    "relatedSteps": ["review-verify-document", "apply-changes"],
+    "usedInTemplates": ["review-and-verify"]
+  }
+}
+
+
+
+

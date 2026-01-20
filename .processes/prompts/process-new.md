@@ -2,187 +2,127 @@
 
 Create a new process from a template with parameter substitution and step resolution.
 
-## Instructions
+## Description
+
+This prompt guides the creation of a new process instance from an existing template. It ensures all required parameters are collected, validates templates exist, and creates a complete process instance with tracking files.
+
+## When to Use
+
+- Starting new work that requires a process workflow
+- Creating a process from an existing template
+- Initializing tracked work with memory and logging
+
+## Quick Reference
+
+| Requirement | Description |
+|-------------|-------------|
+| Must use template | Never skip templates or work directly |
+| Must create instance | Always create process.md, memory.md, log.md |
+| Must log interactions | Log user interactions before file changes |
+
+---
+
+## Agent Layer
+
+### Instructions
 
 Reference the process management knowledge file for complete instructions:
 `ai/knowledge/best-practices/ai-tooling/process-management.md`
 
-## ⚠️ MANDATORY REQUIREMENT: Always Use Templates
+### Mandatory Requirements
+
+#### Always Use Templates
 
 **CRITICAL RULE**: You MUST always use an existing process template. **NEVER** skip templates or do work directly without a template.
 
-**What this means:**
 - ✅ **ALWAYS**: Use a template from `.processes/templates/`
 - ❌ **NEVER**: Create files directly without a template
 - ❌ **NEVER**: Skip the template selection process
 - ❌ **NEVER**: Implement work outside of a process
 
-**If no template exists for the task:**
+**If no template exists:**
 - Inform the user that no relevant template is available
 - List what templates exist and explain why they don't fit
-- Stop and wait for user's decision on what to do next
-- Do NOT automatically create a template - let the user decide manually
-- Do NOT proceed with any work - your job is done
+- Stop and wait for user's decision
+- Do NOT automatically create a template
+- Do NOT proceed with any work
 
-**Enforcement:**
-- Before any work, check: "Is there a template for this task?"
-- If yes: Use that template
-- If no: Inform the user and stop - do NOT proceed
-- Never proceed without a template - wait for user's explicit decision
+#### Always Create Process Instance
 
-## ⚠️ MANDATORY REQUIREMENT: Always Create Process Instance
-
-**CRITICAL RULE**: The `/process-new` command MUST always create a process instance. **NEVER** create a plan, design document, or any other type of document instead of a process instance.
-
-**What this means:**
-- ✅ **ALWAYS**: Create a process instance with `process.md`, `memory.md`, and `log.md` files
-- ✅ **ALWAYS**: Create the process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
-- ❌ **NEVER**: Create a plan document instead of a process instance
-- ❌ **NEVER**: Create a design document instead of a process instance
-- ❌ **NEVER**: Create any other type of document instead of a process instance
+**CRITICAL RULE**: The `/process-new` command MUST always create a process instance. **NEVER** create a plan, design document, or any other type of document instead.
 
 **Process Instance Structure:**
-- Process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
-- Process file: `process.md` (with template placeholders substituted)
-- Memory file: `memory.md` (initialized with template structure)
-- Log file: `log.md` (initialized with template structure and metadata)
+- Directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
+- `process.md` (with template placeholders substituted)
+- `memory.md` (initialized with template structure)
+- `log.md` (initialized with template structure and metadata)
 
-**Enforcement:**
-- When user invokes `/process-new`, you MUST create a process instance
-- Do NOT create plans, designs, or any other documents
-- The output of `/process-new` is ALWAYS a process instance in `.user-processes/active/`
+### Command Behavior
 
-## Command Behavior
-
-When you invoke `/process-new`, the AI will:
+When `/process-new` is invoked:
 
 1. **Check for Existing Processes**
-   - Check if a similar process already exists in `.user-processes/active/`
-   - If found, inform you and ask if you want to resume or create new
+   - Check `.user-processes/active/` for similar processes
+   - If found, ask if user wants to resume or create new
 
 2. **List Available Templates**
-   - Display all available templates from `.processes/templates/` (including `create-process-template` if it exists)
-   - Show template purposes and required parameters
-   - Help you select the appropriate template
-   - **If no template fits**: 
-     - Inform the user that no relevant template is available
-     - List what templates exist and explain why they don't fit
-     - Stop and wait for user's decision on what to do next
-     - Do NOT automatically create a template - let the user decide manually
-     - Do NOT proceed with any work - your job is done
+   - Display templates from `.processes/templates/`
+   - Show purposes and required parameters
+   - Help select appropriate template
+   - **If no template fits**: Inform user and stop
 
 3. **Collect Parameters**
-   - Ask for required parameters from the selected template
+   - Ask for required parameters
    - Infer parameters from context when possible
    - Confirm optional parameters
 
 4. **Resolve Step References**
-   - Scan the template for `@framework-step:category/step-name` references
-   - **Keep step references as references** (do not expand with full step details)
-   - Include brief description from the step's Description section
-   - Apply context parameters from template
-   - Full step details remain in step files and can be read when needed
+   - Scan template for `@framework-step:category/step-name` references
+   - Keep references as references (don't expand)
+   - Include brief description from step's Description section
 
-5. **Create Process Instance** (MANDATORY - never create a plan or other document)
-   - **CRITICAL**: This step MUST create a process instance, never a plan or design document
-   - Create process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
-   - Create `process.md` with all placeholders substituted and step references kept as references (not expanded)
-   - Initialize `memory.md` file using the memory template structure
-   - Initialize `log.md` file using the log template structure with metadata
+5. **Create Process Instance** (MANDATORY)
+   - Create process directory
+   - Create `process.md` with substituted placeholders
+   - Initialize `memory.md` from template
+   - Initialize `log.md` from template
    - Set status to "Running"
-   - Set Current State section appropriately
-   - **Remember**: `/process-new` always creates a process instance, never a plan
 
 6. **Start Process**
-   - Display summary of created process
+   - Display summary
    - Highlight first step
-   - Offer to begin working immediately
+   - Offer to begin immediately
 
-## Usage
+### File Initialization
 
-Type `/process-new` to start creating a new process. The AI will guide you through template selection and parameter collection.
+1. **process.md**: All `{{placeholders}}` substituted, step references kept as references
+2. **memory.md**: Initialized from `.processes/templates/memory-template.md`
+3. **log.md**: Initialized from `.processes/templates/log-template.md` with metadata
 
-## What Gets Created
+### Step Reference Format
 
-- Process directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
-- Process file: `process.md` with step references kept as references (not expanded) and all placeholders substituted
-- Memory file: `memory.md` for tracking information across steps
-- Log file: `log.md` for detailed execution log with metadata initialized
-
-## Template Selection
-
-The AI will help you choose the right template based on your needs. Available templates are in `.processes/templates/`.
-
-## File Initialization
-
-When creating a process instance, the AI must create three files:
-
-1. **process.md**: Main process file with:
-   - All `{{placeholders}}` substituted with actual parameter values
-   - All `@framework-step:category/step-name` references kept as references (not expanded) with brief descriptions
-   - Status set to "Running"
-   - Current State section initialized
-   - **Note**: Step references should remain as `@framework-step:category/step-name` with a brief description. Full step details remain in step files and can be read when needed. This keeps process.md concise and readable.
-
-2. **memory.md**: Memory file initialized with:
-   - Template structure from `.processes/templates/memory-template.md`
-   - Ready to track information across steps
-
-3. **log.md**: Log file initialized with:
-   - Template structure from `.processes/templates/log-template.md`
-   - Metadata section filled with process name, template name, and start timestamp
-   - Ready to log detailed execution information
-
-## Parameter Collection
-
-- Required parameters must be provided
-- Optional parameters can be inferred from context
-- The AI will ask clarifying questions if needed
-
-## Step Resolution
-
-When creating process.md, step references (`@framework-step:category/step-name`) should be kept as references with brief descriptions, not expanded with full step details. This keeps process.md concise and readable (typically 100-150 lines instead of 700+ lines). Full step details remain in the step files and can be read when needed during execution.
-
-**Format in process.md:**
 ```markdown
 - [ ] Step 1: Step name
   - **Step**: `@framework-step:category/step-name`
-  - **Description**: Brief description from step's Description section
+  - **Description**: Brief description
   - **Output**: Brief output description
-  - **Context**: (if applicable)
 ```
 
-**Do NOT expand** with full Guidance, Substeps, Examples, etc. - those remain in the step file.
+### User Interaction Logging
 
-## ⚠️ MANDATORY REQUIREMENT: Log User Interactions Immediately
-
-**CRITICAL RULE**: Once a process is created and work begins, you MUST log every user interaction BEFORE making any file changes.
-
-**Mandatory Workflow (applies once process is active):**
+**Mandatory Workflow (once process is active):**
 ```
-User Makes Request/Correction → 
-IMMEDIATELY Log to log.md (before any file changes) → 
+User Makes Request → 
+IMMEDIATELY Log to log.md → 
 Make File Changes → 
-Update log.md with what was changed
+Update log.md with changes
 ```
 
-**Enforcement Checklist (MUST verify before ANY file modification):**
-- [ ] **Did the user make a request/correction?** → Log it immediately in current step's "User Interactions" section
-- [ ] **Am I about to modify a file?** → Check if I logged the user interaction first
-- [ ] **Did I just modify a file?** → Update log.md "Files Modified" section with change details
-
-**If user interaction not logged → STOP and log it first**
-
-**Log Format (required for every user interaction):**
+**Log Format:**
 ```markdown
 ### User Interactions
-1. **User Request**: {exact user request or summary}
-   - **Reason**: {why user explained, or inferred reason}
-   - **Agent Response**: {what I changed in response}
-   - **Timestamp**: {current timestamp in YYYY-MM-DD HH:mm:ss format}
+1. **User Request**: {exact request}
+   - **Reason**: {why}
+   - **Agent Response**: {what changed}
+   - **Timestamp**: {YYYY-MM-DD HH:mm:ss}
 ```
-
-**Reference**: See `docs/process-management.md` for complete guidelines.
-
-**Note**: This requirement applies once the process is created and work on steps begins. During process creation itself, log any user corrections in the initial log.md file.
-

@@ -1,0 +1,55 @@
+{
+  "type": "step",
+  "name": "identify-files",
+  "category": "investigation",
+  "metadata": {
+    "title": "Identify Files",
+    "purposeAndUsage": "Identify which files and directories need to be processed based on flexible criteria (patterns, scope descriptions, or both). Use when you need to create a comprehensive list of files for subsequent processing.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "File list and identification report",
+    "artifacts": ["identified-files.json"],
+    "memoryUpdates": ["fileCount", "resultsJsonPath", "summary", "searchApproach", "exclusionsApplied"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    }
+  },
+  "searchModes": [
+    {"mode": "simple", "default": true, "description": "Fast search using glob, grep, codebase_search"},
+    {"mode": "deep", "default": false, "description": "Exhaustive search with tracking"}
+  ],
+  "parameters": {
+    "filePatterns": {"type": "string", "description": "Glob patterns to match"},
+    "scope": {"type": "string", "description": "Scope description for semantic search"},
+    "excludePatterns": {"type": "string", "description": "Patterns to exclude"},
+    "searchDepth": {"type": "string", "enum": ["simple", "deep"], "default": "simple"},
+    "includeMatchReason": {"type": "boolean", "default": false}
+  },
+  "substeps": [
+    {"number": 1, "name": "Read Context Parameters"},
+    {"number": 2, "name": "Handle Deep Search Mode", "conditional": true},
+    {"number": 3, "name": "Handle Simple Search Mode", "conditional": true},
+    {"number": 4, "name": "Apply Exclusion Patterns"},
+    {"number": 5, "name": "Create File Identification Report"},
+    {"number": 6, "name": "Save Results to JSON File and Update Memory"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["memory.md or process.md"],
+    "requiredTools": ["read_file", "glob_file_search", "list_dir", "grep", "codebase_search", "write"]
+  },
+  "references": {
+    "relatedSteps": ["review-verify-document"],
+    "usedInTemplates": ["set-concept", "review-and-verify"]
+  }
+}
+
+
+
+

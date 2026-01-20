@@ -1,0 +1,57 @@
+{
+  "type": "step",
+  "name": "create-high-level-plan",
+  "category": "planning",
+  "metadata": {
+    "title": "Create High-Level Plan",
+    "purposeAndUsage": "Generate a comprehensive task plan with complexity ratings, LLD, and Q&A for missing information. Use when starting a user story implementation.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "High-level plan document with LLD and complexity-rated steps",
+    "artifacts": ["plans/{user-story-name}/plan.md"],
+    "memoryUpdates": ["planDirectoryPath", "qaStatus", "implementationSteps", "processStepsValidation"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    }
+  },
+  "complexityScale": {
+    "low": {"range": "1-3", "description": "Straightforward implementation"},
+    "medium": {"range": "4-6", "description": "Some complexity, well-defined approach"},
+    "high": {"range": "7-9", "description": "Needs detailed breakdown, potential challenges"}
+  },
+  "criticalRules": [
+    "Never assume unspecified information",
+    "Wait for Q&A answers before completing LLD",
+    "Flag complexity 7+ steps for further breakdown"
+  ],
+  "substeps": [
+    {"number": 1, "name": "Gather requirements from user story context"},
+    {"number": 2, "name": "Identify missing information and create Q&A section"},
+    {"number": 3, "name": "Wait for Q&A answers", "conditional": true},
+    {"number": 4, "name": "Create Low Level Design with diagrams"},
+    {"number": 5, "name": "Break down into complexity-rated steps"},
+    {"number": 6, "name": "Identify and validate required process-steps"},
+    {"number": 7, "name": "Present plan for approval"},
+    {"number": 8, "name": "Process approval response"}
+  ],
+  "approvalRequired": true,
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": [],
+    "requiredTools": ["read_file", "codebase_search", "write", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": ["create-detailed-step-plans"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+
+
+
+

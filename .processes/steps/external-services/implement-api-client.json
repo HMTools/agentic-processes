@@ -1,0 +1,58 @@
+{
+  "type": "step",
+  "name": "implement-api-client",
+  "category": "external-services",
+  "metadata": {
+    "title": "Implement External API Client",
+    "purposeAndUsage": "Implement a complete external API client including contracts, settings, interface, and implementation. Use when integrating with external HTTP APIs.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Complete API client with contracts, settings, interface, implementation",
+    "artifacts": ["ExternalServices/*/Contracts/*.cs", "ExternalServices/*/Settings/*.cs", "ExternalServices/*/I*Client.cs", "ExternalServices/*/*Client.cs"],
+    "memoryUpdates": ["apiClientCreated", "endpointsImplemented"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "metadata", "contextParameters", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "authenticationPatterns": [
+    {"pattern": "Apigee", "useCase": "Enterprise API gateway"},
+    {"pattern": "ApiKey", "useCase": "Simple key authentication"},
+    {"pattern": "OAuth", "useCase": "OAuth 2.0 flows"},
+    {"pattern": "BearerToken", "useCase": "JWT/Bearer tokens"},
+    {"pattern": "Custom", "useCase": "Custom authentication"}
+  ],
+  "contextParameters": {
+    "apiName": {"required": true, "description": "Name of the external API"},
+    "serviceLocation": {"required": true, "description": "Path for API client"},
+    "authenticationPattern": {"required": true, "description": "Type of authentication"},
+    "endpoints": {"required": true, "description": "List of endpoints to implement"},
+    "settingsProperties": {"required": true, "description": "Configuration properties needed"}
+  },
+  "substeps": [
+    {"number": 1, "name": "Study Existing Patterns"},
+    {"number": 2, "name": "Create/Locate Contracts"},
+    {"number": 3, "name": "Create Settings Class"},
+    {"number": 4, "name": "Create Client Interface"},
+    {"number": 5, "name": "Implement Client Class"},
+    {"number": 6, "name": "Register in DI Container"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "requiredFiles": ["API documentation"],
+    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["implement-service-layer"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+
+
+
+

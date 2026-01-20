@@ -1,0 +1,25 @@
+{
+  "type": "documentation",
+  "name": "architecture",
+  "metadata": {
+    "title": "Architecture Documentation",
+    "purposeAndUsage": "Explains the overall architecture of the process management framework including directory structure, file types, and system components.",
+    "lastUpdated": "2026-01-19"
+  },
+  "sections": [
+    {"name": "Overview", "description": "High-level architecture overview"},
+    {"name": "Directory Structure", "description": "Organization of framework directories"},
+    {"name": "Components", "description": "Main components and their responsibilities"},
+    {"name": "File Types", "description": "Types of files used in the framework"}
+  ],
+  "references": {
+    "relatedDocs": ["getting-started", "process-management", "examples"],
+    "templatesLocation": ".processes/templates/",
+    "stepsLocation": ".processes/steps/",
+    "promptsLocation": ".processes/prompts/"
+  }
+}
+
+
+
+

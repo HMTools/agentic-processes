@@ -11,27 +11,53 @@ When to use: When you need to create a new process template for the Agentic Proc
 **Template**: create-process-template
 **Status**: Not Started
 
-## Current State
+## Description
+
+Create a new process template for the Agentic Process System. This template guides you through designing, creating, validating, and documenting a new template that can be used to instantiate processes.
+
+## Purpose & Usage
+
+Use this template when you need to:
+- Create a new reusable process template for the framework
+- Define a systematic workflow for a specific type of task
+- Establish a standardized approach that others can follow
+
+**Not suitable for**: Creating process steps (use `create-process-step-template`), modifying existing templates, or one-time processes.
+
+## Quick Reference
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `templateName` | Yes | Name of the template to create |
+| `templatePurpose` | Yes | What the template is designed to accomplish |
+| `useCases` | Yes | Scenarios where this template should be used |
+| `exampleParameters` | No | Example parameter values for testing |
+
+**Process Flow (Simplified)**:
+1. Plan and design template → 2. Create template file → 3. Validate process-steps exist → 4. Learn
+
+---
+
+## Agent Layer
+
+### Current State
 **Active Step**: Not started yet
 **Current Action**: Waiting to begin
 **Details**: Process will start when first step is initiated
 
-## Description
-Create a new process template named {{templateName}} that {{templatePurpose}}. This template will guide users through {{useCases}}.
-
-## Parameters
+### Parameters (Full)
 - `templateName`: {{templateName}}
 - `templatePurpose`: {{templatePurpose}}
 - `useCases`: {{useCases}}
 - `exampleParameters`: {{exampleParameters}}
 
-## Context
+### Context
 - `repository`: agentic-processes
 - `templateDirectory`: .processes/templates/
 - `templateFile`: .processes/templates/{{templateName}}.md
 - `referenceGuide`: .processes/templates/README.md
 
-## Process Flow
+### Process Flow (Detailed)
 
 ```mermaid
 flowchart TD
@@ -52,7 +78,7 @@ flowchart TD
     E --> F[End: Template Complete]
 ```
 
-## Steps
+### Steps
 
 - [ ] Step 1: Plan and design template
   - **Step**: `@framework-step:template/plan-and-design-template`
@@ -93,7 +119,7 @@ flowchart TD
     - User resumes process at Step 4 once all process-steps exist
   - **Note**: Only proceed to Step 4 if all required process-steps exist
 
-### Final Phase: Learning & Improvement
+#### Final Phase: Learning & Improvement
 
 - [ ] Step 4: Continuous Improvement & Learning
   - **Step**: `@framework-step:learning/continuous-improvement`
@@ -106,7 +132,7 @@ flowchart TD
   - **Iterative Workflow**: For each improvement: propose → investigate → implement → request approval → next
   - **Note**: User must approve each improvement before proceeding to the next one
 
-## Memory File
+### Memory File
 
 **Memory Location**: `./memory.md`
 
@@ -117,9 +143,8 @@ This process uses a unified memory file to track state and share information bet
 - **Step 3**: Process-step validation results (existing vs. missing steps)
 - **Step 4**: Continuous improvement analysis and implemented improvements
 
-## Errors & Notes
+### Errors & Notes
 <!-- Add any notes, warnings, or observations here during execution -->
 
-## Audit Log
+### Audit Log
 <!-- Automatically maintained by Process Manager -->
-

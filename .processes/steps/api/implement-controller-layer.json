@@ -1,0 +1,51 @@
+{
+  "type": "step",
+  "name": "implement-controller-layer",
+  "category": "api",
+  "metadata": {
+    "title": "Implement Controller Layer",
+    "purposeAndUsage": "Implement ASP.NET Core API controllers with proper versioning, DTOs, validation, and authentication. Use when creating new API endpoints.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Controller class, request/response DTOs, mapping extensions",
+    "artifacts": ["WebApi/Controllers/{category}/*.cs", "Contracts/Requests/*.cs", "Contracts/Responses/*.cs", "WebApi/Mapping/*.cs"],
+    "memoryUpdates": ["endpointsCreated", "dtosCreated", "controllerLocation"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "metadata", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "endpointCategories": [
+    {"category": "v1", "auth": "Standard", "useCase": "Standard API endpoints"},
+    {"category": "External", "auth": "MyAccount", "useCase": "External user-facing endpoints"},
+    {"category": "Internal", "auth": "Service", "useCase": "Internal service communication"},
+    {"category": "ngv1", "auth": "Partner", "useCase": "External partner APIs"},
+    {"category": "Public", "auth": "None", "useCase": "Public endpoints"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Determine Endpoint Category"},
+    {"number": 2, "name": "Study Existing Patterns"},
+    {"number": 3, "name": "Create Request/Response DTOs"},
+    {"number": 4, "name": "Create Controller Class"},
+    {"number": 5, "name": "Implement Endpoints"},
+    {"number": 6, "name": "Create Mapping Extensions"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Service layer contracts (Arguments, Results)"],
+    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["implement-service-layer", "write-integration-tests-api"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+
+
+
+

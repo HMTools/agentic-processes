@@ -1,23 +1,42 @@
 <!--
 Step: Design Implementation Plan
-Purpose: Design a comprehensive implementation plan for implementing or updating a concept (pattern, structure, standard, or approach) across non-code files. The plan includes understanding the requested state, designing how files should be modified or created, and creating detailed change proposals for both existing file modifications and new file creation.
+Purpose: Design a comprehensive implementation plan for implementing or updating a concept across non-code files. Includes understanding requested state, designing file modifications/creations, and creating detailed change proposals.
 -->
 
 # Step: Design Implementation Plan
 
-## Required Components
-
-- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-
 ## Description
 
-This step designs a comprehensive implementation plan for implementing or updating a concept across **non-code files** such as documentation, processes, AI agentic files, best practices, and configuration files.
+Design a comprehensive implementation plan for implementing or updating a concept across non-code files. Creates detailed change proposals for both existing file modifications and new file creation.
 
-The step takes context from previous steps (concept definition, existing state analysis, identified gaps) and creates a detailed implementation plan with specific change proposals. Each proposal includes detailed instructions for either modifying existing files or creating new files.
+## Purpose & Usage
 
-**Important**: This step is designed for concepts/patterns/standards applied to non-code files, NOT for code development. For code development tasks, use a code-focused planning step instead.
+Use this step when you need to:
+- Design an implementation plan for a concept/pattern/standard
+- Create detailed change proposals for file modifications
+- Specify new files to be created
+- Get user approval before applying changes
 
-## Output
+**Output**: Implementation plan document (`implementation-plan.md`), memory update with approval status.
+
+## Quick Reference
+
+| Action | Tool |
+|--------|------|
+| Read context | `read_file` on memory.md, process.md |
+| Read target files | `read_file` |
+| Create plan document | `write` |
+| Update memory | `search_replace` |
+
+---
+
+## Agent Layer
+
+### Required Components
+
+- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
+
+### Output (Detailed)
 
 - **Implementation plan document** (`implementation-plan.md`) containing:
   - Requested state specification (how files should look after implementation)
@@ -29,204 +48,79 @@ The step takes context from previous steps (concept definition, existing state a
   - Verification approach (how to confirm implementation is complete)
 - **Memory update**: Summary written to memory.md with plan document path, total change proposals, and plan summary
 
-## Guidance
+### Guidance
 
 <!-- @include: _components/mandatory-logging.md -->
 
-### Specific Actions
+**Specific Actions:**
 
-#### 1. Read Context from Previous Steps
+1. **Read Context from Previous Steps**
+   - Read from `memory.md`: Concept definition, findings, gaps
+   - Read from `process.md`: conceptDescription, requestedState, verificationCriteria
+   - Read the findings report to understand current state
 
-- Read from `memory.md`:
-  - Concept definition, characteristics, requirements, success criteria (from understanding step)
-  - Findings report path, current state, existing implementations, gaps identified (from analysis step)
-- Read from `process.md`:
-  - `conceptDescription`: Description of the concept to implement
-  - `requestedState`: (optional) How files should look after implementation
-  - `verificationCriteria`: (optional) Criteria to verify successful implementation
-- Read the findings report to understand current state
+2. **Understand Requested State**
+   - If `requestedState` parameter provided: Use as specification
+   - If NOT provided: Derive from concept description and characteristics
+   - Document requested state specification clearly
 
-#### 2. Understand Requested State
+3. **Analyze Existing State and Gaps**
+   - Review findings report from previous step
+   - Identify files that need modification vs. creation
+   - Map gaps to change proposals needed
 
-- If `requestedState` parameter is provided:
-  - Use it as the specification for how files should look after implementation
-  - Clarify any ambiguities
-- If `requestedState` is NOT provided:
-  - Derive requested state from concept description and characteristics
-  - Design how files should look to fully implement the concept
-  - Consider examples and patterns from concept definition
-- Document requested state specification clearly
-- Ensure requested state addresses all gaps identified in findings
+4. **Design Implementation Approach**
+   - Break down into logical steps
+   - Determine order of changes (dependencies)
+   - Design verification approach
 
-#### 3. Analyze Existing State and Gaps
+5. **Create Change Proposals**
+   - For modifications: Change ID, file path, type, current/requested state, instructions, rationale
+   - For new files: Change ID, file path, type, content specification, rationale
 
-- Review findings report from previous step
-- Understand current implementation state (if any)
-- Identify specific gaps that need to be addressed
-- List files that need modification
-- List files that need to be created
-- Map gaps to change proposals needed
+6. **Present Plan and Get Approval**
+   - Present implementation-plan.md to user
+   - Explain approval options
+   - Wait for user response
+   - Log user interaction before processing
 
-#### 4. Design Implementation Approach
+**Files/Folders:**
+- Read: `memory.md`, `process.md`, findings report, target files
+- Create: `implementation-plan.md`
+- Update: `memory.md`, `log.md`
 
-- Break down implementation into logical steps
-- Determine order of changes (dependencies, prerequisites)
-- Identify which files to modify first
-- Identify which files to create first
-- Consider impact of changes on related files
-- Design verification approach (how to confirm implementation is complete)
-
-#### 5. Create Change Proposals
-
-**For existing files that need modification:**
-- Read the file to understand current content
-- Identify specific changes needed
-- Create detailed change proposal with:
-  - **Change ID**: Unique identifier (e.g., `MOD-001`)
-  - **File path**: Full path to the file
-  - **Type**: `modification`
-  - **Current state**: What exists now (relevant excerpt)
-  - **Requested state**: What should exist
-  - **Change description**: What needs to change
-  - **Detailed instructions**: Step-by-step how to make the change
-  - **Rationale**: Why this change is needed
-
-**For new files that need creation:**
-- Determine file path and name
-- Design file content based on concept requirements
-- Create detailed change proposal with:
-  - **Change ID**: Unique identifier (e.g., `NEW-001`)
-  - **File path**: Where to create the file
-  - **Type**: `new_file`
-  - **Content specification**: What should be in the file
-  - **Content structure**: Organization of the file
-  - **Rationale**: Why this file is needed
-
-#### 6. Create Implementation Plan Document
-
-Create `implementation-plan.md` with these sections:
-
-```markdown
-# Implementation Plan for {conceptName}
-
-## Summary
-- **Concept**: {name and description}
-- **Current State**: {summary from findings}
-- **Requested State**: {specification}
-- **Total Files to Modify**: {count}
-- **Total Files to Create**: {count}
-- **Total Change Proposals**: {count}
-
-## Requested State Specification
-{Detailed description of how files should look after implementation}
-
-## Implementation Approach
-{Step-by-step approach, order of changes, dependencies}
-
-## Change Proposals
-
-### Modifications to Existing Files
-{List of modification proposals with full details}
-
-### New Files to Create
-{List of new file proposals with full details}
-
-## Verification Criteria
-{How to verify implementation is complete}
-
-## Approval
-**Status**: Pending Approval
-{Instructions for user on how to approve}
-```
-
-#### 7. Present Plan and Get Approval
-
-- Present implementation-plan.md to user
-- Explain approval options:
-  - Approve all proposals
-  - Approve specific proposals by Change ID
-  - Request modifications to specific proposals
-  - Request clarification
-- Wait for user response
-- **IMMEDIATELY log user interaction** before processing response
-
-#### 8. Process Approval Response
-
-- If user requests modifications:
-  - Revise specific proposals
-  - Update implementation-plan.md
-  - Log revision in log.md
-  - Return to step 7 (present again)
-- If user approves:
-  - Mark approved proposals in implementation-plan.md
-  - Update memory.md with approval status and approved Change IDs
-  - Log approval in log.md
-  - Step complete - plan ready for next step
-
-### Files/Folders
-
-**Read:**
-- `memory.md` - Previous step outputs (concept definition, findings)
-- `process.md` - Process parameters (conceptDescription, requestedState, verificationCriteria)
-- Findings report from previous step
-- Target files that need modification
-
-**Create:**
-- `implementation-plan.md` - The implementation plan document
-
-**Update:**
-- `memory.md` - Plan summary and approval status
-- `log.md` - Step actions and user interactions
-
-### Tools
-
-- `read_file` - Read context from memory, process, findings, and target files
+**Tools:**
+- `read_file` - Read context from memory, process, findings, target files
 - `write` - Create implementation-plan.md
 - `search_replace` - Update memory.md and log.md
-- `codebase_search` - Find related files if needed
-- `grep` - Search for patterns in files
 
-### Best Practices
+**Best Practices:**
+- Be specific: Change proposals should be detailed enough for next step to apply without ambiguity
+- Consider dependencies: Order changes to avoid breaking things
+- Provide rationale: Explain why each change is needed
+- Keep proposals atomic: Each proposal should be self-contained
+- Use consistent IDs: Makes it easy for user to approve specific proposals
 
-- **Be specific**: Change proposals should be detailed enough for next step to apply without ambiguity
-- **Consider dependencies**: Order changes to avoid breaking things
-- **Think holistically**: Consider impact on related files
-- **Provide rationale**: Explain why each change is needed
-- **Keep proposals atomic**: Each proposal should be self-contained
-- **Use consistent IDs**: Makes it easy for user to approve specific proposals
-
-## Memory File Usage
+### Memory File Usage
 
 **When to Use Memory:**
 - Always use memory for this step - implementation plan is needed by next step
 
 **Memory Usage for This Step:**
 - **Read from**:
-  - Previous concept understanding step - concept definition, characteristics, requirements, success criteria
-  - Previous analysis step - findings report path, current state, existing implementations, gaps, files to create
+  - Previous concept understanding step - concept definition, characteristics, requirements
+  - Previous analysis step - findings report path, current state, gaps
   - process.md - conceptDescription, requestedState, verificationCriteria
 - **Write to**: Current step section in memory.md
   - Information Produced:
-    - Implementation plan document path (`implementation-plan.md`)
+    - Implementation plan document path
     - Requested state specification
-    - Total change proposals (count of modifications and new files)
-    - List of files to modify (file paths)
-    - List of files to create (file paths)
-    - Approval status (pending/approved)
+    - Total change proposals (count)
+    - List of files to modify/create
+    - Approval status
     - List of approved Change IDs (if approved)
-  - Decisions Made:
-    - Requested state design (if not provided in parameters)
-    - Implementation approach selected
-    - Change proposal structure and organization
-  - Files Modified/Created:
-    - `implementation-plan.md`
-    - `memory.md` (plan summary)
-  - Notes:
-    - Any assumptions made about requested state
-    - Rationale for implementation approach
-    - Dependencies between changes
 
-## Flow
+### Flow
 
 ```mermaid
 flowchart TD
@@ -260,67 +154,24 @@ flowchart TD
 - [ ] **Substep 11**: Process user response (approve/modify/clarify)
 - [ ] **Substep 12**: Update memory.md with plan summary and approval status
 
-## Examples
+### Change Proposal Format
 
-### Example 1: Documentation Standard Implementation
-
-**Concept**: Consistent header structure across all markdown files
-
-**Change Proposals Created**:
+**For Modifications:**
 ```markdown
-### MOD-001: Update README.md
-- **File**: docs/README.md
+### MOD-001: Update {filename}
+- **File**: path/to/file.md
 - **Type**: modification
-- **Current state**: No metadata header
-- **Requested state**: Add YAML front matter with title, description, last_updated
-- **Instructions**: Add metadata block at line 1 before existing content
-- **Rationale**: Required by documentation standard
+- **Current state**: What exists now
+- **Requested state**: What should exist
+- **Detailed instructions**: Step-by-step how to make the change
+- **Rationale**: Why this change is needed
+```
 
-### NEW-001: Create Documentation Template
-- **File**: docs/templates/doc-template.md
+**For New Files:**
+```markdown
+### NEW-001: Create {filename}
+- **File**: path/to/new-file.md
 - **Type**: new_file
-- **Content specification**: Template with YAML front matter, standard sections
-- **Rationale**: Provides consistent starting point for new docs
+- **Content specification**: What should be in the file
+- **Rationale**: Why this file is needed
 ```
-
-### Example 2: Process Template Structure
-
-**Concept**: Consistent memory file section in all process templates
-
-**Change Proposals Created**:
-```markdown
-### MOD-001: Update feature-development.md template
-- **File**: .processes/templates/feature-development.md
-- **Type**: modification
-- **Current state**: Memory File section missing step breakdown
-- **Requested state**: Add per-step memory guidance
-- **Instructions**: Add bullet points listing what each step stores in memory
-- **Rationale**: Helps users understand memory usage pattern
-```
-
-## Common Pitfalls
-
-### 1. Vague Change Proposals
-**Problem**: Proposals like "update the file to match the concept"
-**Solution**: Be specific - include exact content to add/modify, line numbers if helpful
-
-### 2. Missing Dependencies
-**Problem**: Proposing changes that depend on other changes without noting the dependency
-**Solution**: Always note dependencies in implementation approach section
-
-### 3. Forgetting New Files
-**Problem**: Only proposing modifications when new files are also needed
-**Solution**: During gap analysis, explicitly consider if new files are required
-
-### 4. Not Logging User Interactions
-**Problem**: Processing user feedback without logging first
-**Solution**: Always log user interaction BEFORE making any changes in response
-
-### 5. Overly Complex Plans
-**Problem**: Creating a plan so detailed it's hard to follow
-**Solution**: Group related changes, use clear Change IDs, keep proposals atomic
-
-### 6. Ignoring Existing State
-**Problem**: Proposing changes without understanding current file content
-**Solution**: Always read target files and note current state in proposals
-

@@ -1,21 +1,42 @@
 <!--
 Step: Review, Verify, and Document
-Purpose: Systematically review identified files for content relevant to the investigation scope, verify against criteria, identify issues, categorize them, and create comprehensive findings documentation. This step is the core verification step in investigation processes where files are reviewed, analyzed, and checked against specific criteria to identify violations or issues.
+Purpose: Systematically review identified files for content relevant to the investigation scope, verify against criteria, identify issues, categorize them, and create comprehensive findings documentation.
 -->
 
 # Step: Review, Verify, and Document
 
-## Required Components
-
-- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-
 ## Description
 
-Systematically review each identified file for content relevant to the investigation scope. Read files, analyze content, extract relevant information, and verify against criteria. For each item found, verify whether it meets the criteria. Identify any violations, issues, or items that do not meet the criteria. Categorize issues by type and severity. Create a comprehensive summary of findings - if no issues were found, document that all items passed verification; if issues were found, document each issue with details including location, description, and how it violates the criteria. Prepare findings for presentation to the user.
+Systematically review each identified file for content relevant to the investigation scope. Verify against criteria, identify issues, categorize them, and create comprehensive findings documentation.
 
-This step is designed to be thorough and systematic, ensuring all identified files are reviewed and all relevant content is verified against the verification criteria. The step produces detailed documentation that can be used for proposing fixes or presenting final results.
+## Purpose & Usage
 
-## Output
+Use this step when you need to:
+- Review files against specific verification criteria
+- Identify violations, issues, or items that don't meet criteria
+- Create comprehensive findings documentation
+- Prepare findings for proposing fixes or presenting results
+
+**Output**: Findings report (`findings-report.md`), issues list (`issues-list.json` if issues found), memory update.
+
+## Quick Reference
+
+| Action | Tool |
+|--------|------|
+| Read context/files | `read_file` |
+| Search for patterns | `grep` |
+| Find related content | `codebase_search` |
+| Create reports | `write` |
+
+---
+
+## Agent Layer
+
+### Required Components
+
+- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
+
+### Output (Detailed)
 
 - **Findings report**: Comprehensive report that includes:
   - Executive summary with overall status (issues found or no issues)
@@ -26,7 +47,7 @@ This step is designed to be thorough and systematic, ensuring all identified fil
 - **Issues list** (if issues found): Structured JSON file (`issues-list.json`) containing all issues with details for programmatic processing
 - **Memory update**: Summary written to memory.md with file paths, counts, status, and references to report files
 
-## Guidance
+### Guidance
 
 <!-- @include: _components/mandatory-logging.md -->
 
@@ -65,12 +86,10 @@ Follow the substeps below in sequence. The workflow involves reading files, anal
 - Log progress for large file sets (>50 files)
 - Save issues data to separate JSON file to keep memory.md clean
 
-## Memory File Usage
+### Memory File Usage
 
 **When to Use Memory:**
 - Always use memory for this step - findings are needed by later steps
-- Use when this step produces review and verification results needed by subsequent steps
-- Use when this step makes decisions about issue categorization that should be documented
 
 **Memory Usage for This Step:**
 - **Read from**: 
@@ -99,7 +118,7 @@ Follow the substeps below in sequence. The workflow involves reading files, anal
     - Any ambiguous criteria interpretations
     - Verification methodology used
 
-## Flow
+### Flow
 
 ```mermaid
 flowchart TD
@@ -128,157 +147,41 @@ flowchart TD
 
 - [ ] **Substep 1: Read Context Parameters and File List**
   - Read from memory.md previous step section: identified files list
-    - If JSON file reference exists, read identified-files.json
-    - If file list is in memory directly, read from memory
-    - Get total file count
   - Read from memory.md previous step section: investigationScope, verificationCriteria
-    - If not in memory, read from process.md
   - Understand investigation scope: what content to look for in files
   - Understand verification criteria: what conditions must be met
   - Document context parameters in log.md
-  - Verify that criteria are clear and actionable
 
 - [ ] **Substep 2: Initialize Tracking Structures**
-  - Create tracking structure for review progress:
-    - Files to review (list from previous step)
-    - Files reviewed (empty list, to be populated)
-    - Items verified (empty list, to be populated)
-    - Issues found (empty list, to be populated)
+  - Create tracking structure for review progress
   - Initialize issue categorization structure:
-    - Categories: e.g., "Missing", "Incorrect", "Violation", "Incomplete", "Format Error", "Other"
-    - Severity levels: e.g., "Critical", "High", "Medium", "Low"
-  - Initialize counters:
-    - Files reviewed: 0
-    - Items verified: 0
-    - Issues found: 0
-  - Log initialization in log.md
+    - Categories: "Missing", "Incorrect", "Violation", "Incomplete", "Format Error", "Other"
+    - Severity levels: "Critical", "High", "Medium", "Low"
+  - Initialize counters (files reviewed, items verified, issues found)
 
 - [ ] **Substep 3: Review Each File Systematically**
   - For each file in the identified files list:
     - Log progress: "Reviewing file X of Y: {file path}"
     - Read file content using read_file
-    - Analyze file content for relevance to investigation scope:
-      - Extract all content that matches or relates to investigation scope
-      - Use grep or codebase_search if needed to find relevant sections
-      - Identify specific items (e.g., references, patterns, code sections, documentation sections)
+    - Analyze file content for relevance to investigation scope
     - For each relevant item found:
-      - Document item location (file path, line number if applicable, section name)
-      - Document item content or description
-      - Verify item against verification criteria:
-        - Check if item meets each applicable criterion
-        - Determine if item passes or fails verification
-        - If fails, identify which criteria are violated
-      - Increment items verified counter
-      - If verification fails:
-        - Create issue record with:
-          - Location: file path, line number (if applicable)
-          - Item description: what was found
-          - Issue description: what's wrong
-          - Criteria violated: which criteria are not met
-          - How it violates: explanation of the violation
-        - Add issue to issues found list
-        - Increment issues found counter
-    - Mark file as reviewed
-    - Increment files reviewed counter
-    - Log file review completion in log.md
-  - Continue until all files are reviewed
+      - Document item location (file path, line number)
+      - Verify item against verification criteria
+      - If verification fails, create issue record
+    - Mark file as reviewed, increment counters
   - Log completion: "Reviewed {count} files, verified {count} items, found {count} issues"
 
 - [ ] **Substep 4: Categorize and Assign Severity to Issues**
-  - For each issue in issues found list:
-    - Determine issue category based on issue type:
-      - "Missing": Required item is absent
-      - "Incorrect": Item exists but is wrong
-      - "Violation": Item violates a rule or standard
-      - "Incomplete": Item exists but is incomplete
-      - "Format Error": Item has formatting or syntax issues
-      - "Other": Doesn't fit other categories
-    - Assign severity level based on impact:
-      - "Critical": Blocks functionality or causes major problems
-      - "High": Significant impact, should be fixed soon
-      - "Medium": Moderate impact, should be addressed
-      - "Low": Minor impact, nice to have fixed
-    - Update issue record with category and severity
-  - Count issues by category
-  - Count issues by severity
-  - Log categorization results in log.md
+  - For each issue, determine category and severity
+  - Count issues by category and severity
+  - Log categorization results
 
 - [ ] **Substep 5: Create Findings Documentation**
   - Create `findings-report.md` with:
-    - Header: Findings Report for {investigationScope}
-    - Executive Summary:
-      - Investigation scope
-      - Files reviewed count
-      - Items verified count
-      - Overall verification status (all passed, issues found, or partial)
-      - Total issues found (0 if none)
-    - Review Findings:
-      - For each file reviewed:
-        - File path
-        - Items found (list of relevant items extracted)
-        - Items verified (list of items checked against criteria)
-        - Issues found in this file (if any)
-    - Verification Results:
-      - Verification criteria used (list all criteria)
-      - For each item verified:
-        - Item location
-        - Item description
-        - Verification result (passed/failed)
-        - Criteria checked (list of criteria applied)
-        - If failed: which criteria were violated
-    - Issues Found (if any):
-      - Summary: Total issues, counts by category and severity
-      - For each issue:
-        - Issue ID
-        - Location (file path, line number)
-        - Category and Severity
-        - Item Description (what was found)
-        - Issue Description (what's wrong)
-        - Criteria Violated (list)
-        - How It Violates (explanation)
-        - Full context (relevant code/content around the issue)
-    - If no issues found:
-      - Success message: "All items passed verification. No issues found."
-  - If issues found, create `issues-list.json` with structured data:
-    ```json
-    {
-      "totalIssues": 5,
-      "issues": [
-        {
-          "id": "issue-1",
-          "file": "path/to/file.md",
-          "line": 42,
-          "category": "Missing",
-          "severity": "High",
-          "itemDescription": "Missing required reference",
-          "issueDescription": "Required reference to X is missing",
-          "criteriaViolated": ["Criterion 1: All files must reference X"],
-          "howItViolates": "File does not contain any reference to X"
-        }
-      ],
-      "countsByCategory": {
-        "Missing": 2,
-        "Incorrect": 1,
-        "Violation": 2
-      },
-      "countsBySeverity": {
-        "Critical": 0,
-        "High": 3,
-        "Medium": 2,
-        "Low": 0
-      }
-    }
-    ```
-  - Write to current step section in memory.md:
-    - Findings report path: `findings-report.md`
-    - Issues list path: `issues-list.json` (if issues found)
-    - Total files reviewed: {count}
-    - Total items verified: {count}
-    - Total issues found: {count}
-    - Issue counts by category: {object}
-    - Issue counts by severity: {object}
-    - Verification status: {all passed, issues found, or partial}
-    - Issue categorization scheme: {list of categories used}
-    - Severity levels: {list of severity levels used}
-    - Verification approach: {description}
-  - Document in log.md: "Created findings-report.md and issues-list.json (if issues found)"
+    - Executive Summary
+    - Review Findings
+    - Verification Results
+    - Issues Found (if any) with full details
+  - If issues found, create `issues-list.json`
+  - Write summary to memory.md
+  - Document in log.md

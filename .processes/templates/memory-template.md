@@ -2,7 +2,31 @@
 
 Use this template when creating a new process memory file.
 
-## Structure
+## Purpose & Usage
+
+Use this template when:
+- Creating a new memory file for a process instance
+- Understanding what information should be stored between steps
+- Learning how to maintain process state effectively
+
+**Memory files track**: Information produced, decisions made, files modified, and cross-references for quick navigation.
+
+## Quick Reference
+
+| Section | Purpose |
+|---------|---------|
+| Metadata | Process identification and current step |
+| Step Sections | Information from each completed step |
+| Cross-References | Quick lookup for common items |
+| Search Helpers | Navigation aids by category |
+
+**Location**: `.user-processes/active/{process-name}/memory.md`
+
+---
+
+## Agent Layer
+
+### Template Structure
 
 ```markdown
 # Process Memory: {Process Name}
@@ -83,16 +107,16 @@ Quick reference to important decisions:
 **Note**: This section is optional and can be maintained for quick navigation
 ```
 
-## Usage Guidelines
+### Usage Guidelines
 
-### When to Add a Step Section
+#### When to Add a Step Section
 
 Add a new step section when:
 1. A step begins execution
 2. The step produces information that should be remembered
 3. The step makes decisions that affect future work
 
-### What to Include
+#### What to Include
 
 **Information Produced:**
 - Files created or modified
@@ -120,7 +144,7 @@ Add a new step section when:
 - Constraints or limitations discovered
 - Future considerations identified
 
-### When to Update Cross-References
+#### When to Update Cross-References
 
 Update the Cross-References section:
 - After completing steps that define APIs or database schemas
@@ -222,7 +246,7 @@ Update the Cross-References section:
 **Updated**: 2025-12-06 16:20:00
 ```
 
-## Tips
+### Tips
 
 - Start simple - you can always add more detail later
 - Focus on information that helps future steps

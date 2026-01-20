@@ -1,67 +1,86 @@
 <!--
 Step: Validate Process-Steps Exist
-Purpose: Analyze a template to identify which process-steps are referenced and verify they exist in .processes/steps/
+Purpose: Analyze a template to identify which process-steps are referenced and verify they exist
 -->
 
 # Step: Validate Process-Steps Exist
 
-## Required Components
-
-- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-
 ## Description
 
-Analyze the template to identify which process-steps are referenced and verify they exist in `.processes/steps/`. Extract all `@framework-step:category/step-name` references from the template and check if each step file exists.
+Analyze a template to identify which process-steps are referenced and verify they exist in `.processes/steps/`.
 
-## Output
+## Purpose & Usage
 
-- Validation report of existing vs. missing process-steps
-- List of all referenced process-steps with their existence status
-- List of missing process-steps with suggested category locations
+Use this step when you need to:
+- Validate a template's step references
+- Ensure all referenced steps exist
+- Identify missing steps that need to be created
 
-## Guidance
+**Output**: Validation report of existing vs. missing process-steps.
+
+## Quick Reference
+
+| Reference Format | Location |
+|------------------|----------|
+| `@framework-step:category/step-name` | `.processes/steps/category/step-name.md` |
+
+---
+
+## Agent Layer
+
+### Required Components
+
+- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
+
+### Output (Detailed)
+
+- Validation report with existence status
+- List of all referenced process-steps
+- List of missing process-steps with suggested locations
+
+### Guidance
 
 <!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
 - Review each step definition in the template
-- Extract all process-step references (e.g., `@framework-step:template/plan-template-design`, `@framework-step:learning/continuous-improvement`, etc.)
-- Check if each required process-step exists in `.processes/steps/{category}/{step-name}.md`
-- If any are missing, list them with their category locations
-- Verify the continuous improvement step exists: `@framework-step:learning/continuous-improvement`
-- Store validation results in current step section of memory.md
+- Extract all `@framework-step:category/step-name` references
+- Check if each step exists in `.processes/steps/{category}/{step-name}.md`
+- List missing steps with category locations
+- Verify continuous improvement step exists
+- Store validation results in memory
 
 **Files/Folders:**
-- Review: `.processes/templates/{{templateName}}.md` (the template being validated)
-- Check: `.processes/steps/{category}/{step-name}.md` for each referenced step
+- Review: Template being validated
+- Check: `.processes/steps/{category}/{step-name}.md`
 
-**Best Practices:**
-- Extract all `@framework-step:` references systematically
-- Check file existence for each referenced step
-- Provide clear paths for missing steps
-- Include category suggestions for missing steps
+### Flow
 
-## Memory File Usage
+```mermaid
+flowchart TD
+    A[Start: Validate Steps] --> B[Read Template File]
+    B --> C[Extract Step References]
+    C --> D[For Each Reference]
+    D --> E{Step File Exists?}
+    E -->|Yes| F[Mark as Valid]
+    E -->|No| G[Mark as Missing]
+    F --> H{More References?}
+    G --> H
+    H -->|Yes| D
+    H -->|No| I[Create Validation Report]
+    I --> J[Complete: Validation Done]
+```
 
-**When to Use Memory:**
-- Use when this step produces information needed by later steps
-- Use when this step makes decisions that should be documented
+### Substeps
 
-**Memory Usage for This Step:**
-- **Read from**: Step 2 section in memory.md - Template file with step references
-- **Write to**: Step 3 section in memory.md
-  - Information Produced: Validation report of existing vs. missing process-steps
-  - Notes: List of missing steps with locations, validation status
+- [ ] **Substep 1**: Read template file
+- [ ] **Substep 2**: Extract all `@framework-step:` references
+- [ ] **Substep 3**: Check existence of each referenced step
+- [ ] **Substep 4**: Create validation report
+- [ ] **Substep 5**: List missing steps with suggested locations
 
-## Checkpoint Behavior
+### Memory File Usage
 
-**If missing process-steps are found:**
-- **PAUSE the process**
-- Notify user of missing process-steps and where to create them
-- List each missing step with format: `@framework-step:{category}/{step-name}` → should be in `.processes/steps/{category}/{step-name}.md`
-- User must create missing process-steps manually in `.processes/steps/{category}/`
-- Reference: `.processes/steps/README.md` and `.processes/steps/step-template.md` for step creation guidelines
-- User resumes process once all process-steps exist
-
-**Note**: Only proceed to next step if all required process-steps exist.
-
+**Write to**: Current step section in memory.md
+- Information Produced: Validation results, missing steps list
+- Decisions Made: Which steps need to be created

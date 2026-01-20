@@ -1,0 +1,55 @@
+{
+  "type": "step",
+  "name": "design-implementation-plan",
+  "category": "planning",
+  "metadata": {
+    "title": "Design Implementation Plan",
+    "purposeAndUsage": "Design a comprehensive implementation plan for implementing or updating a concept across non-code files. Creates detailed change proposals for modifications and new file creation.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Implementation plan document with change proposals",
+    "artifacts": ["implementation-plan.md"],
+    "memoryUpdates": ["implementationPlanPath", "requestedState", "totalChangeProposals", "filesToModify", "filesToCreate", "approvalStatus", "approvedChangeIds"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps", "changeProposalFormat"]
+    }
+  },
+  "substeps": [
+    {"number": 1, "name": "Read context from memory.md"},
+    {"number": 2, "name": "Read process parameters"},
+    {"number": 3, "name": "Read findings report"},
+    {"number": 4, "name": "Understand/derive requested state"},
+    {"number": 5, "name": "Analyze gaps and map to proposals"},
+    {"number": 6, "name": "Design implementation approach"},
+    {"number": 7, "name": "Create modification proposals"},
+    {"number": 8, "name": "Create new file proposals"},
+    {"number": 9, "name": "Create implementation-plan.md"},
+    {"number": 10, "name": "Present plan to user"},
+    {"number": 11, "name": "Process user response"},
+    {"number": 12, "name": "Update memory with approval status"}
+  ],
+  "changeProposalTypes": [
+    {"type": "modification", "prefix": "MOD"},
+    {"type": "new_file", "prefix": "NEW"}
+  ],
+  "approvalRequired": true,
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["memory.md", "process.md", "findings-report.md"],
+    "requiredTools": ["read_file", "write", "search_replace"]
+  },
+  "references": {
+    "relatedSteps": ["understand-context", "review-verify-document", "apply-changes"],
+    "usedInTemplates": ["set-concept"]
+  }
+}
+
+
+
+

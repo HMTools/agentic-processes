@@ -1,106 +1,103 @@
 <!--
 Step: Validate Step Structure
-Purpose: Perform comprehensive validation of the created step file to ensure it meets all requirements including self-contained check, section completeness, diagram validation, guidance quality, naming compliance, and best practices compliance
+Purpose: Perform comprehensive validation of a step file to ensure it meets all requirements
 -->
 
 # Step: Validate Step Structure
 
-## Required Components
-
-- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-
 ## Description
 
-Perform comprehensive validation of the created step file to ensure it meets all requirements. Verify the step is self-contained (no references to other steps), check that all required sections are present and properly formatted, validate the mermaid diagram syntax and that it matches the substeps, ensure guidance is detailed and actionable with specific file paths and code patterns, and confirm compliance with naming conventions and best practices from steps/README.md.
+Perform comprehensive validation of a step file to ensure it meets all requirements including section completeness, diagram validation, guidance quality, and best practices compliance.
 
-## Output
+## Purpose & Usage
 
-- Comprehensive validation report with all checks:
-  - Self-contained check (no references to other steps)
-  - Section completeness check (all required sections present)
-  - Diagram validation (syntax and alignment with substeps)
-  - Guidance quality check (detailed and actionable)
-  - Naming compliance check (kebab-case filename, proper structure)
-  - Best practices compliance check (follows README guidelines)
-- List of any issues found with specific fixes needed
-- Validation status (pass/fail with details)
+Use this step when you need to:
+- Validate a newly created step file
+- Ensure step follows all required conventions
+- Verify step is self-contained and complete
 
-## Guidance
+**Output**: Comprehensive validation report with pass/fail status.
+
+## Quick Reference
+
+| Check | Requirement |
+|-------|-------------|
+| Self-contained | No references to other steps |
+| Section completeness | All required sections present |
+| Diagram validation | Mermaid syntax correct |
+| Guidance quality | Detailed and actionable |
+| Naming compliance | Kebab-case filename |
+
+---
+
+## Agent Layer
+
+### Required Components
+
+- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
+
+### Output (Detailed)
+
+- Comprehensive validation report with all checks
+- List of issues found with specific fixes
+- Validation status (pass/fail)
+
+### Guidance
 
 <!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
-- Read the created step file: `.processes/steps/{{stepCategory}}/{{stepName}}.md`
-- Perform self-contained check:
-  - Search for any `@framework-step:` references (should not exist)
-  - Verify step doesn't depend on other steps
-  - Check that step is complete and standalone
-- Perform section completeness check:
-  - Verify header comment block exists with step name and purpose
-  - Verify step title exists (`# Step: ...`)
-  - Verify Description section exists and is detailed
-  - Verify Output section exists and clearly defines deliverables
-  - Verify Guidance section exists with mandatory logging section
-  - Verify Memory File Usage section exists
-  - Verify Flow section exists with mermaid diagram
-  - Verify Substeps section exists with actionable tasks
-- Perform diagram validation:
-  - Check mermaid syntax is correct (use mermaid validator if available)
-  - Verify diagram nodes match substeps listed
-  - Check diagram flow is logical and sequential
-  - Verify decision points and loops are properly represented
-- Perform guidance quality check:
-  - Verify mandatory logging section is present at top of Guidance
-  - Check that Specific Actions subsection has detailed instructions
-  - Verify Files/Folders subsection includes project-specific paths
-  - Check Code Patterns subsection if applicable
-  - Verify Tools subsection if applicable
-  - Check Best Practices subsection is included
-- Perform naming compliance check:
-  - Verify filename uses kebab-case (lowercase with hyphens)
-  - Check filename matches step name parameter
-  - Verify step is in correct category directory
-- Perform best practices compliance check:
-  - Review against `.processes/steps/README.md` guidelines
-  - Verify step follows self-contained principle
-  - Check appropriate granularity (not too broad, not too narrow)
-  - Verify rich guidance is provided
-  - Check flow diagram is clear and readable
-- Generate validation report with all checks and results
-- List any issues found with specific file locations and fixes needed
-- If issues found, provide clear guidance on how to fix them
+- Read the step file
+- **Self-contained check**:
+  - No `@framework-step:` references
+  - Step is complete and standalone
+- **Section completeness check**:
+  - Header comment block
+  - Step title
+  - Description section
+  - Purpose & Usage section (User Layer)
+  - Agent Layer with guidance
+  - Flow section with mermaid
+  - Substeps section
+- **Diagram validation**:
+  - Correct mermaid syntax
+  - Diagram matches substeps
+- **Guidance quality**:
+  - Specific and actionable
+  - Includes file paths and patterns
+- **Naming compliance**:
+  - Kebab-case filename
+  - Proper step title format
 
-**Files/Folders:**
-- Review: `.processes/steps/{{stepCategory}}/{{stepName}}.md`
-- Reference: `.processes/steps/step-template.md` for structure reference
-- Reference: `.processes/steps/README.md` for best practices
+### Flow
 
-**Best Practices:**
-- Be thorough in validation - check every requirement
-- Provide specific file locations for issues found
-- Give clear guidance on how to fix issues
-- Verify mermaid syntax is valid (test if possible)
-- Validate against all guidelines in README.md
+```mermaid
+flowchart TD
+    A[Start: Validate Step] --> B[Read Step File]
+    B --> C[Self-contained Check]
+    C --> D[Section Completeness Check]
+    D --> E[Diagram Validation]
+    E --> F[Guidance Quality Check]
+    F --> G[Naming Compliance Check]
+    G --> H{All Checks Pass?}
+    H -->|Yes| I[Validation Passed]
+    H -->|No| J[List Issues with Fixes]
+    I --> K[Complete: Validation Done]
+    J --> K
+```
 
-## Memory File Usage
+### Substeps
 
-**When to Use Memory:**
-- Use when this step produces information needed by later steps
-- Use when this step makes decisions that should be documented
+- [ ] **Substep 1**: Read step file
+- [ ] **Substep 2**: Perform self-contained check
+- [ ] **Substep 3**: Perform section completeness check
+- [ ] **Substep 4**: Validate mermaid diagram
+- [ ] **Substep 5**: Check guidance quality
+- [ ] **Substep 6**: Check naming compliance
+- [ ] **Substep 7**: Create validation report
 
-**Memory Usage for This Step:**
-- **Read from**: Step 2 section in memory.md - Step file creation information
-- **Write to**: Step 3 section in memory.md
-  - Information Produced: Comprehensive validation report with all checks, validation status
-  - Decisions Made: Validation results, issues identified, fixes needed
-  - Notes: Any validation issues found and their resolutions
+### Memory File Usage
 
-## Decision
-
-- **IF** all validation checks pass:
-  - Proceed to Step 4 (Continuous Improvement)
-- **ELSE** (validation fails - issues found):
-  - Fix issues identified in validation report
-  - Re-run validation until all checks pass
-  - Only proceed to Step 4 when all validation checks pass
-
+**Write to**: Current step section in memory.md
+- Information Produced: Validation results, issues found
+- Decisions Made: Pass/fail status, required fixes

@@ -1,0 +1,55 @@
+{
+  "type": "step",
+  "name": "plan-and-design-step",
+  "category": "template",
+  "metadata": {
+    "title": "Plan and Design Step",
+    "purposeAndUsage": "Analyze requirements and design a new process step. Use before creating step files.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Complete step design including purpose, structure, and flow diagram",
+    "artifacts": [],
+    "memoryUpdates": ["purpose", "category", "structurePlan", "flowDiagram"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "categories": [
+    {"category": "api", "useCase": "Controller/endpoint steps"},
+    {"category": "service", "useCase": "Business logic steps"},
+    {"category": "data", "useCase": "Repository/database steps"},
+    {"category": "template", "useCase": "Template creation steps"},
+    {"category": "testing", "useCase": "Test-related steps"},
+    {"category": "planning", "useCase": "Planning/design steps"},
+    {"category": "learning", "useCase": "Improvement steps"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Review requirements"},
+    {"number": 2, "name": "Check existing steps"},
+    {"number": 3, "name": "Determine category"},
+    {"number": 4, "name": "Write purpose statement"},
+    {"number": 5, "name": "Define use cases"},
+    {"number": 6, "name": "Plan step structure"},
+    {"number": 7, "name": "Design flow diagram"},
+    {"number": 8, "name": "Plan substeps"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["step-template.md", "steps/README.md"],
+    "requiredTools": ["read_file", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": ["create-step-file", "validate-step-structure"],
+    "usedInTemplates": ["create-process-step-template"]
+  }
+}
+
+
+
+

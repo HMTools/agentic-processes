@@ -1,0 +1,58 @@
+{
+  "type": "prompt",
+  "name": "process-new",
+  "metadata": {
+    "title": "Process New",
+    "purposeAndUsage": "Create a new process from a template with parameter substitution and step resolution. Use to start new tracked work.",
+    "lastUpdated": "2026-01-19"
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "whenToUse", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["instructions", "mandatoryRequirements", "commandBehavior", "fileInitialization", "stepReferenceFormat", "userInteractionLogging"]
+    }
+  },
+  "mandatoryRequirements": [
+    {
+      "name": "Always Use Templates",
+      "description": "Must use existing process template, never skip or work directly"
+    },
+    {
+      "name": "Always Create Process Instance",
+      "description": "Must create process.md, memory.md, log.md - never a plan document"
+    },
+    {
+      "name": "Log User Interactions",
+      "description": "Log every user interaction before making file changes"
+    }
+  ],
+  "commandBehavior": {
+    "steps": [
+      {"number": 1, "action": "Check for Existing Processes"},
+      {"number": 2, "action": "List Available Templates"},
+      {"number": 3, "action": "Collect Parameters"},
+      {"number": 4, "action": "Resolve Step References"},
+      {"number": 5, "action": "Create Process Instance"},
+      {"number": 6, "action": "Start Process"}
+    ]
+  },
+  "processInstance": {
+    "directory": ".user-processes/active/process-{name}-{YYYYMMDD}/",
+    "files": [
+      {"name": "process.md", "purpose": "Main process file with substituted placeholders"},
+      {"name": "memory.md", "purpose": "Track information across steps"},
+      {"name": "log.md", "purpose": "Detailed execution log"}
+    ]
+  },
+  "references": {
+    "templatesLocation": ".processes/templates/",
+    "knowledgeFile": "ai/knowledge/best-practices/ai-tooling/process-management.md",
+    "relatedPrompts": ["process-continue"]
+  }
+}
+
+
+
+

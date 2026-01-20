@@ -1,0 +1,52 @@
+{
+  "type": "step",
+  "name": "validate-step-structure",
+  "category": "template",
+  "metadata": {
+    "title": "Validate Step Structure",
+    "purposeAndUsage": "Perform comprehensive validation of a step file. Use after creating step files to ensure compliance.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Comprehensive validation report with pass/fail status",
+    "artifacts": [],
+    "memoryUpdates": ["validationResults", "issuesFound", "passFail"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "validationChecks": [
+    {"check": "Self-contained", "requirement": "No references to other steps"},
+    {"check": "Section completeness", "requirement": "All required sections present"},
+    {"check": "Diagram validation", "requirement": "Mermaid syntax correct"},
+    {"check": "Guidance quality", "requirement": "Detailed and actionable"},
+    {"check": "Naming compliance", "requirement": "Kebab-case filename"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Read step file"},
+    {"number": 2, "name": "Self-contained check"},
+    {"number": 3, "name": "Section completeness check"},
+    {"number": 4, "name": "Validate mermaid diagram"},
+    {"number": 5, "name": "Check guidance quality"},
+    {"number": 6, "name": "Check naming compliance"},
+    {"number": 7, "name": "Create validation report"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Step file to validate"],
+    "requiredTools": ["read_file", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["create-step-file", "plan-and-design-step"],
+    "usedInTemplates": ["create-process-step-template"]
+  }
+}
+
+
+
+

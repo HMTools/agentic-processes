@@ -1,0 +1,45 @@
+{
+  "type": "step",
+  "name": "review-verify-document",
+  "category": "investigation",
+  "metadata": {
+    "title": "Review, Verify, and Document",
+    "purposeAndUsage": "Systematically review identified files for content relevant to the investigation scope, verify against criteria, identify issues, categorize them, and create comprehensive findings documentation.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Findings report and issues list",
+    "artifacts": ["findings-report.md", "issues-list.json (if issues found)"],
+    "memoryUpdates": ["findingsReportPath", "issuesListPath", "filesReviewed", "itemsVerified", "issuesFound", "countsByCategory", "countsBySeverity", "verificationStatus"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    }
+  },
+  "substeps": [
+    {"number": 1, "name": "Read Context Parameters and File List"},
+    {"number": 2, "name": "Initialize Tracking Structures"},
+    {"number": 3, "name": "Review Each File Systematically"},
+    {"number": 4, "name": "Categorize and Assign Severity to Issues"},
+    {"number": 5, "name": "Create Findings Documentation"}
+  ],
+  "issueCategories": ["Missing", "Incorrect", "Violation", "Incomplete", "Format Error", "Other"],
+  "severityLevels": ["Critical", "High", "Medium", "Low"],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["memory.md", "identified-files.json"],
+    "requiredTools": ["read_file", "grep", "codebase_search", "write", "search_replace"]
+  },
+  "references": {
+    "relatedSteps": ["identify-files", "propose-fixes"],
+    "usedInTemplates": ["set-concept", "review-and-verify"]
+  }
+}
+
+
+
+

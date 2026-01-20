@@ -1,0 +1,43 @@
+{
+  "type": "step",
+  "name": "apply-changes",
+  "category": "common",
+  "metadata": {
+    "title": "Apply Changes",
+    "purposeAndUsage": "Apply all user-approved changes to relevant files based on approved change proposals. Use after changes have been proposed and approved to execute the modifications.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Modified files and change application report",
+    "artifacts": ["changes-applied.md", "modified files"],
+    "memoryUpdates": ["changeApplicationReportPath", "totalChangesApplied", "filesModified"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    }
+  },
+  "substeps": [
+    {"number": 1, "name": "Read Approved Change Proposals from Memory"},
+    {"number": 2, "name": "Read Change Proposals Document"},
+    {"number": 3, "name": "Apply Each Approved Change"},
+    {"number": 4, "name": "Create Change Application Report"},
+    {"number": 5, "name": "Update Memory with Results"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md", "mandatory-consultation.md"],
+    "requiredFiles": ["memory.md", "change proposals document"],
+    "requiredTools": ["read_file", "search_replace", "write"]
+  },
+  "references": {
+    "relatedSteps": ["propose-fixes", "review-verify-document"],
+    "usedInTemplates": ["set-concept", "review-and-verify"]
+  }
+}
+
+
+
+

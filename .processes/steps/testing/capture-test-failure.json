@@ -1,0 +1,51 @@
+{
+  "type": "step",
+  "name": "capture-test-failure",
+  "category": "testing",
+  "metadata": {
+    "title": "Capture Test Failure",
+    "purposeAndUsage": "Execute failing test and capture all relevant failure information. Use as first step when investigating test failures.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Complete failure information documented",
+    "artifacts": [],
+    "memoryUpdates": ["errorMessages", "stackTraces", "failurePoint"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "captureTypes": [
+    {"type": "Error message", "capture": "Exception type and message"},
+    {"type": "Stack trace", "capture": "Full trace showing failure point"},
+    {"type": "Test logs", "capture": "Setup, execution, teardown logs"},
+    {"type": "Infrastructure", "capture": "Docker, database, queue errors"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Run failing test in isolation"},
+    {"number": 2, "name": "Capture error message and exception"},
+    {"number": 3, "name": "Record full stack trace"},
+    {"number": 4, "name": "Check test initialization logs"},
+    {"number": 5, "name": "Note infrastructure errors"},
+    {"number": 6, "name": "Identify exact failure line"},
+    {"number": 7, "name": "Store findings in memory"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": [],
+    "requiredTools": ["run_terminal_cmd", "read_file"]
+  },
+  "references": {
+    "relatedSteps": ["diagnose-integration-test-failure", "implement-integration-test-fix"],
+    "usedInTemplates": ["integration-test-fix"]
+  }
+}
+
+
+
+

@@ -1,0 +1,48 @@
+{
+  "type": "step",
+  "name": "implement-integration-test-fix",
+  "category": "testing",
+  "metadata": {
+    "title": "Implement Integration Test Fix",
+    "purposeAndUsage": "Implement fix based on root cause analysis. Use after diagnosing failure to apply the appropriate fix.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Fix implemented according to root cause",
+    "artifacts": ["Modified test or application files"],
+    "memoryUpdates": ["fixDetails", "changesMAde", "modifiedFiles"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "fixBranches": [
+    {"branch": "Test Fix", "target": "Test logic, assertions, data", "location": "Test project"},
+    {"branch": "Code Fix", "target": "Application bugs", "location": "Service, Repository, Controller"},
+    {"branch": "Infrastructure Fix", "target": "Setup, mocks, Docker", "location": "Test base, fixtures, config"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Read root cause from previous step"},
+    {"number": 2, "name": "Identify fix branch"},
+    {"number": 3, "name": "Implement focused fix"},
+    {"number": 4, "name": "Document changes"},
+    {"number": 5, "name": "Track modified files"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Previous step memory with root cause"],
+    "requiredTools": ["read_file", "write", "search_replace"]
+  },
+  "references": {
+    "relatedSteps": ["diagnose-integration-test-failure", "verify-test-passes"],
+    "usedInTemplates": ["integration-test-fix"]
+  }
+}
+
+
+
+

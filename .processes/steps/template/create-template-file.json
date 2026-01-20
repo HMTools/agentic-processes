@@ -1,0 +1,55 @@
+{
+  "type": "step",
+  "name": "create-template-file",
+  "category": "template",
+  "metadata": {
+    "title": "Create Template File",
+    "purposeAndUsage": "Create a template file with all required sections. Use when creating new process templates.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Complete template file with all sections",
+    "artifacts": [".processes/templates/{template-name}.md", ".processes/templates/{template-name}.json"],
+    "memoryUpdates": ["templateFilePath", "validationResults"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "requiredSections": [
+    {"name": "Header comment", "required": true},
+    {"name": "Parameters", "required": true},
+    {"name": "Process Flow", "required": true},
+    {"name": "Steps", "required": true},
+    {"name": "Continuous Improvement", "required": true}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Create template file"},
+    {"number": 2, "name": "Write header comment"},
+    {"number": 3, "name": "Write User Layer sections"},
+    {"number": 4, "name": "Write separator and Agent Layer"},
+    {"number": 5, "name": "Write parameters section"},
+    {"number": 6, "name": "Write process flow diagram"},
+    {"number": 7, "name": "Write step definitions"},
+    {"number": 8, "name": "Add continuous improvement step"},
+    {"number": 9, "name": "Create JSON companion"},
+    {"number": 10, "name": "Validate all sections"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["template-template.md"],
+    "requiredTools": ["write", "read_file"]
+  },
+  "references": {
+    "relatedSteps": ["plan-and-design-template", "validate-process-steps-exist"],
+    "usedInTemplates": ["create-process-template"]
+  }
+}
+
+
+
+

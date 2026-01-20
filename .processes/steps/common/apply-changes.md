@@ -5,20 +5,39 @@ Purpose: Apply all user-approved changes to relevant files based on approved cha
 
 # Step: Apply Changes
 
-## Required Components
-
-- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-- [mandatory-consultation.md](_components/mandatory-consultation.md) - Consultation requirements when uncertain
-
 ## Description
 
-Apply all user-approved changes to relevant files based on approved change proposals. This step reads approved change proposals from the previous step (stored in memory), applies each approved change to the target files using the detailed change instructions provided, verifies that each change was applied correctly, and documents all changes made in a change application report.
+Apply all user-approved changes to relevant files based on approved change proposals. This step executes approved proposals without making decisions about what changes to make - it simply applies what was approved.
 
-The step is designed to be simple and focused - it executes approved proposals and does not make decisions about what changes to make. For each approved change, the step reads the target file, applies the change using the specified instructions, verifies the change was applied correctly, and moves to the next change. All changes are documented in a report that lists what was changed and in which files.
+## Purpose & Usage
 
-<!-- @include: _components/mandatory-consultation.md -->
+Use this step when you need to:
+- Apply previously approved change proposals to files
+- Execute a set of file modifications systematically
+- Document all changes made in a change application report
 
-## Output
+**Output**: Modified files, change application report (`changes-applied.md`), memory update with results.
+
+## Quick Reference
+
+| Action | Tool |
+|--------|------|
+| Read approved proposals | `read_file` on memory.md |
+| Read target files | `read_file` |
+| Modify existing content | `search_replace` |
+| Create/replace files | `write` |
+| Verify changes | `read_file` |
+
+---
+
+## Agent Layer
+
+### Required Components
+
+- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
+- [mandatory-consultation.md](../_components/mandatory-consultation.md) - Consultation requirements when uncertain
+
+### Output (Detailed)
 
 - **Modified files** - All files that had approved changes applied
 - **Change application report** - `changes-applied.md` documenting all changes made, including:
@@ -27,7 +46,7 @@ The step is designed to be simple and focused - it executes approved proposals a
   - List of all files modified
 - **Memory update** - Summary written to memory.md with report path, files modified, and results
 
-## Guidance
+### Guidance
 
 <!-- @include: _components/mandatory-logging.md -->
 
@@ -59,7 +78,7 @@ Follow the substeps below in sequence. The workflow involves reading approved ch
 - Log progress for each change applied
 - Document all changes in the change application report
 
-## Memory File Usage
+### Memory File Usage
 
 **When to Use Memory:**
 - Always use memory for this step - change application results are needed by later steps
@@ -84,7 +103,7 @@ Follow the substeps below in sequence. The workflow involves reading approved ch
     - Any issues encountered during change application
     - Observations about the changes applied
 
-## Flow
+### Flow
 
 ```mermaid
 flowchart TD

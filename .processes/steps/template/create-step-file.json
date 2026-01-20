@@ -1,0 +1,56 @@
+{
+  "type": "step",
+  "name": "create-step-file",
+  "category": "template",
+  "metadata": {
+    "title": "Create Step File",
+    "purposeAndUsage": "Create a step file with all required sections following the layered documentation structure. Use when creating new process steps.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Complete step file with all sections",
+    "artifacts": [".processes/steps/{category}/{step-name}.md", ".processes/steps/{category}/{step-name}.json"],
+    "memoryUpdates": ["stepFilePath", "validationResults"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "requiredSections": [
+    {"name": "Header comment", "required": true},
+    {"name": "Description", "required": true},
+    {"name": "Purpose & Usage", "required": true},
+    {"name": "Quick Reference", "required": true},
+    {"name": "Agent Layer", "required": true},
+    {"name": "Flow diagram", "required": true},
+    {"name": "Substeps", "required": true}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Create category directory if needed"},
+    {"number": 2, "name": "Write header comment block"},
+    {"number": 3, "name": "Write User Layer sections"},
+    {"number": 4, "name": "Write separator and Agent Layer header"},
+    {"number": 5, "name": "Write Agent Layer sections"},
+    {"number": 6, "name": "Write Flow diagram"},
+    {"number": 7, "name": "Write Substeps section"},
+    {"number": 8, "name": "Create JSON companion file"},
+    {"number": 9, "name": "Validate all sections"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["step-template.md"],
+    "requiredTools": ["write", "read_file"]
+  },
+  "references": {
+    "relatedSteps": ["validate-step-structure", "plan-and-design-step"],
+    "usedInTemplates": ["create-process-step-template"]
+  }
+}
+
+
+
+

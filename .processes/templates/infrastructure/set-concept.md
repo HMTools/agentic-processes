@@ -11,15 +11,45 @@ When to use: When you need to implement or update a concept across non-code file
 **Template**: set-concept
 **Status**: Not Started
 
-## Current State
+## Description
+
+Implement or update a concept systematically across multiple non-code files. This template guides you through understanding the concept, analyzing the current state, designing an implementation plan, applying changes, and verifying complete implementation.
+
+## Purpose & Usage
+
+Use this template when you need to:
+- Implement a new pattern, structure, or standard across documentation files
+- Update an existing concept across multiple files consistently
+- Apply best practices or conventions to non-code files (markdown, processes, configurations)
+- Ensure consistent implementation of architectural decisions or guidelines
+
+**Not suitable for**: Code changes, single-file modifications, or verification-only tasks.
+
+## Quick Reference
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `conceptName` | Yes | Name of the concept to implement |
+| `conceptDescription` | Yes | Detailed description of what the concept entails |
+| `targetFiles` | Yes | Files/patterns to apply the concept to |
+| `existingState` | No | Description of current state |
+| `requestedState` | No | Description of desired end state |
+| `verificationCriteria` | No | Criteria to verify successful implementation |
+| `excludePatterns` | No | File patterns to exclude |
+
+**Process Flow (Simplified)**:
+1. Understand concept → 2. Identify files → 3. Analyze state → 4. Design plan → 5. Apply changes → 6. Verify → 7. Learn
+
+---
+
+## Agent Layer
+
+### Current State
 **Active Step**: Not started yet
 **Current Action**: Waiting to begin
 **Details**: Process will start when first step is initiated
 
-## Description
-Implement or update the {{conceptName}} concept across target files. This process will guide you through understanding the concept, analyzing the current state, designing an implementation plan, applying changes (including creating new files when necessary), and verifying complete implementation.
-
-## Parameters
+### Parameters (Full)
 - `conceptName`: {{conceptName}}
 - `conceptDescription`: {{conceptDescription}}
 - `targetFiles`: {{targetFiles}}
@@ -28,13 +58,13 @@ Implement or update the {{conceptName}} concept across target files. This proces
 - `verificationCriteria`: {{verificationCriteria}}
 - `excludePatterns`: {{excludePatterns}}
 
-## Context
+### Context
 - `repository`: {{repository}}
 - `conceptName`: {{conceptName}}
 - `targetFiles`: {{targetFiles}}
 - `excludePatterns`: {{excludePatterns}}
 
-## Process Flow
+### Process Flow (Detailed)
 
 ```mermaid
 flowchart TD
@@ -52,7 +82,7 @@ flowchart TD
     J --> K[End: Concept Set]
 ```
 
-## Steps
+### Steps
 
 - [ ] Step 1: Understand concept
   - **Step**: `@framework-step:planning/understand-context`
@@ -92,7 +122,7 @@ flowchart TD
   - **Output**: Verification report confirming concept is fully implemented, or list of gaps if not complete
   - **Parameters Used**: `verificationCriteria`, `requestedState`
 
-### Final Phase: Learning & Improvement
+#### Final Phase: Learning & Improvement
 
 - [ ] Step 7: Continuous Improvement & Learning
   - **Step**: `@framework-step:learning/continuous-improvement`
@@ -105,7 +135,7 @@ flowchart TD
   - **Iterative Workflow**: For each improvement: propose → investigate → implement → request approval → next
   - **Note**: User must approve each improvement before proceeding to the next one
 
-## Memory File
+### Memory File
 
 **Memory Location**: `./memory.md`
 
@@ -119,8 +149,8 @@ This process uses a unified memory file to track state and share information bet
 - **Step 6**: Verification report confirming concept is fully implemented, or list of gaps
 - **Step 7**: Continuous improvement analysis and implemented improvements
 
-## Errors & Notes
+### Errors & Notes
 <!-- Add any notes, warnings, or observations here during execution -->
 
-## Audit Log
+### Audit Log
 <!-- Automatically maintained by Process Manager -->

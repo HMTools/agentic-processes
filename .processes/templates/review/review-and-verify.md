@@ -11,28 +11,55 @@ When to use: When you need to systematically investigate, review, and verify asp
 **Template**: review-and-verify
 **Status**: Not Started
 
-## Current State
+## Description
+
+Systematically investigate and verify aspects of a codebase against specific criteria. This template provides an iterative review-fix-verify cycle to ensure thorough investigation and complete resolution of any issues found.
+
+## Purpose & Usage
+
+Use this template when you need to:
+- Investigate and verify code quality, file references, or project-specific content
+- Review multiple files against defined criteria
+- Iteratively fix issues until verification passes
+- Document findings and applied fixes comprehensively
+
+**Not suitable for**: Implementing new features (use `develop-user-story`), one-time file changes, or concept implementation (use `set-concept`).
+
+## Quick Reference
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `investigationScope` | Yes | What aspect to investigate (e.g., "dead code", "file references") |
+| `verificationCriteria` | Yes | Criteria to verify against |
+| `targetFiles` | No | Specific files/patterns to review |
+| `excludePatterns` | No | Patterns to exclude from review |
+
+**Process Flow (Simplified)**:
+1. Understand context → 2. Identify files → 3. Review & verify → 4. Propose fixes (if issues) → 5. Apply fixes → 6. Re-verify → 7. Summary → 8. Learn
+
+---
+
+## Agent Layer
+
+### Current State
 **Active Step**: Not started yet
 **Current Action**: Waiting to begin
 **Details**: Process will start when first step is initiated
 
-## Description
-Systematically investigate and verify {{investigationScope}} against {{verificationCriteria}}. This process will review relevant files, verify against criteria, document findings, propose fixes if issues are found, apply approved fixes, and iterate until all issues are resolved.
-
-## Parameters
+### Parameters (Full)
 - `investigationScope`: {{investigationScope}}
 - `verificationCriteria`: {{verificationCriteria}}
 - `targetFiles`: {{targetFiles}}
 - `excludePatterns`: {{excludePatterns}}
 
-## Context
+### Context
 - `repository`: (current repository)
 - `investigationScope`: {{investigationScope}}
 - `verificationCriteria`: {{verificationCriteria}}
 - `targetFiles`: {{targetFiles}}
 - `excludePatterns`: {{excludePatterns}}
 
-## Process Flow
+### Process Flow (Detailed)
 
 ```mermaid
 flowchart TD
@@ -53,7 +80,7 @@ flowchart TD
     L --> M[End: Investigation Complete]
 ```
 
-## Steps
+### Steps
 
 - [ ] Step 1: Understand context
   - **Step**: `@framework-step:planning/understand-context`
@@ -117,7 +144,7 @@ flowchart TD
   - **Description**: Provide a final comprehensive summary of the investigation that consolidates information from all previous steps. Read investigation data from memory (scope, files reviewed, findings, issues, fixes, verification status), compile all information into organized sections, create a comprehensive final summary document, and present a clear conclusion to the user. The summary handles all scenarios: investigations where no issues were found, investigations where issues were found but not fixed, and investigations where issues were found and fixed.
   - **Output**: Final summary document (`final-summary.md` containing executive summary, investigation scope, files reviewed, findings summary, issues found if any, fixes applied if any, final verification status, remaining issues if any, recommendations if any, clear conclusion), memory update with final summary document path, overall conclusion, final verification status, and recommendations
 
-### Final Phase: Learning & Improvement
+#### Final Phase: Learning & Improvement
 
 - [ ] Step 8: Continuous Improvement & Learning
   - **Step**: `@framework-step:learning/continuous-improvement`
@@ -130,7 +157,7 @@ flowchart TD
   - **Iterative Workflow**: For each improvement: propose → investigate → implement → request approval → next
   - **Note**: User must approve each improvement before proceeding to the next one
 
-## Memory File
+### Memory File
 
 **Memory Location**: `./memory.md`
 
@@ -145,9 +172,8 @@ This process uses a unified memory file to track state and share information bet
 - **Step 7**: Final summary, conclusions
 - **Step 8**: Continuous improvement analysis and implemented improvements
 
-## Errors & Notes
+### Errors & Notes
 <!-- Add any notes, warnings, or observations here during execution -->
 
-## Audit Log
+### Audit Log
 <!-- Automatically maintained by Process Manager -->
-

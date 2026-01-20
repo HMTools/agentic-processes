@@ -1,0 +1,51 @@
+{
+  "type": "step",
+  "name": "diagnose-integration-test-failure",
+  "category": "testing",
+  "metadata": {
+    "title": "Diagnose Integration Test Failure",
+    "purposeAndUsage": "Analyze test failure to identify root cause. Use after capturing failure information to determine what needs fixing.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Root cause identified and categorized with rationale",
+    "artifacts": [],
+    "memoryUpdates": ["rootCauseCategory", "analysisResults", "fixDecision"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "rootCauseCategories": [
+    {"category": "Test Issue", "description": "Wrong assertions, bad test data", "fixTarget": "Test code"},
+    {"category": "Code Issue", "description": "Bug in application code", "fixTarget": "Application code"},
+    {"category": "Infrastructure", "description": "Setup, Docker, mocks broken", "fixTarget": "Infrastructure/setup"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Review failure info from previous step"},
+    {"number": 2, "name": "Validate test expectations"},
+    {"number": 3, "name": "Check test assertions"},
+    {"number": 4, "name": "Review test data setup"},
+    {"number": 5, "name": "Examine recent code changes"},
+    {"number": 6, "name": "Check infrastructure"},
+    {"number": 7, "name": "Categorize root cause"},
+    {"number": 8, "name": "Document decision rationale"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Previous step memory with failure info"],
+    "requiredTools": ["read_file", "grep", "run_terminal_cmd"]
+  },
+  "references": {
+    "relatedSteps": ["capture-test-failure", "implement-integration-test-fix"],
+    "usedInTemplates": ["integration-test-fix"]
+  }
+}
+
+
+
+

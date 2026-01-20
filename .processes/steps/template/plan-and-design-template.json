@@ -1,0 +1,51 @@
+{
+  "type": "step",
+  "name": "plan-and-design-template",
+  "category": "template",
+  "metadata": {
+    "title": "Plan and Design Template",
+    "purposeAndUsage": "Analyze requirements and design a new process template. Use before creating template files.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Complete template design including purpose, parameters, steps, and flow diagram",
+    "artifacts": [],
+    "memoryUpdates": ["purpose", "parameters", "stepBreakdown", "flowDiagram"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "parameterTypes": [
+    {"type": "Required", "description": "Must be provided by user"},
+    {"type": "Optional", "description": "Helpful but not mandatory"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Review requirements"},
+    {"number": 2, "name": "Check existing templates"},
+    {"number": 3, "name": "Write purpose statement"},
+    {"number": 4, "name": "Define use cases"},
+    {"number": 5, "name": "Check existing reusable steps"},
+    {"number": 6, "name": "Plan step breakdown"},
+    {"number": 7, "name": "Identify parameters"},
+    {"number": 8, "name": "Design process flow"},
+    {"number": 9, "name": "Create mermaid diagram"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["template-template.md", "templates/README.md"],
+    "requiredTools": ["read_file", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": ["create-template-file", "validate-process-steps-exist"],
+    "usedInTemplates": ["create-process-template"]
+  }
+}
+
+
+
+

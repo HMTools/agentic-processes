@@ -2,22 +2,31 @@
 
 This template defines the structure for detailed process log files that capture comprehensive information about process execution.
 
-## Purpose
+## Purpose & Usage
 
-Process logs capture detailed information about:
-- Every action taken by the agent
-- Agent reasoning and decision-making process
-- All user requests for changes or corrections
-- Problems encountered and their solutions
-- File modifications and iterations
+Use this template when:
+- Creating a new process log file for a process instance
+- Understanding what information should be captured during process execution
+- Learning how to effectively document process execution for future improvement
 
-This information is used by the Continuous Improvement step to identify patterns and implement improvements for future processes.
+**Log files capture**: Actions taken, agent reasoning, user interactions, problems encountered, file modifications, and decisions made.
 
-## Location
+## Quick Reference
 
-Process logs are stored at: `.user-processes/active/{process-name}/log.md`
+| Section | Purpose |
+|---------|---------|
+| Metadata | Process identification and timing |
+| Step Sections | Detailed log for each process step |
+| User Interactions | **Critical** - All user requests/corrections |
+| Process-Wide Observations | Patterns and metrics across all steps |
 
-## Template Structure
+**Location**: `.user-processes/active/{process-name}/log.md`
+
+---
+
+## Agent Layer
+
+### Template Structure
 
 ```markdown
 # Process Detailed Log: {Process Name}
@@ -84,37 +93,6 @@ Process logs are stored at: `.user-processes/active/{process-name}/log.md`
 ---
 
 ## Step 2: {Step Name}
-
-### Timestamp
-- **Started**: {YYYY-MM-DD HH:mm:ss}
-- **Completed**: {YYYY-MM-DD HH:mm:ss}
-
-### Actions Taken
-1. {Detailed description of action 1}
-2. {Detailed description of action 2}
-
-### Agent Reasoning
-- {Why certain decisions were made}
-- {Context considered}
-
-### User Interactions
-{Document any user corrections or feedback}
-
-### Problems Encountered
-{Document any issues and their resolutions}
-
-### Files Modified
-{List all files changed in this step}
-
-### Decisions Made
-{Document all decisions with rationale}
-
-### Performance Notes
-{Any relevant performance observations}
-
----
-
-## Step 3: {Step Name}
 {Continue pattern for all steps...}
 
 ---
@@ -143,61 +121,61 @@ Process logs are stored at: `.user-processes/active/{process-name}/log.md`
 - {Documentation gaps to fill}
 ```
 
-## What to Log
+### What to Log
 
-### Actions Taken
+#### Actions Taken
 Be specific and detailed:
 - ✅ "Created API controller with POST endpoint at /api/auth/login"
 - ❌ "Created controller"
 
-### Agent Reasoning
+#### Agent Reasoning
 Explain your thought process:
 - Why you chose a particular approach
 - What alternatives you considered
 - What context influenced the decision
 
-### User Interactions
+#### User Interactions
 **This is critical for learning!** Document every user request:
 - What the user asked you to change
 - Why it was needed (if user explained)
 - What you changed in response
 - Timestamp of the interaction
 
-### Problems Encountered
+#### Problems Encountered
 Don't just note what went wrong - analyze it:
 - What was the problem?
 - What caused it?
 - How was it resolved?
 - How can it be prevented in future processes?
 
-### Files Modified
+#### Files Modified
 Track iterations:
 - List every file touched in the step
 - Note how many times each file was modified
 - Describe what was changed
 
-### Decisions Made
+#### Decisions Made
 Document the "why" not just the "what":
 - Technical choices
 - Architectural decisions
 - Pattern selections
 - Library/framework choices
 
-## What NOT to Log
+### What NOT to Log
 
 - Routine, expected actions that went smoothly
 - Detailed code snippets (unless relevant to a problem)
 - Trivial decisions with obvious outcomes
 - Repetitive information already in memory file
 
-## Logging Frequency
+### Logging Frequency
 
 - **Start of Step**: Log timestamp and planned actions
 - **During Step**: **MANDATORY** - Log each user interaction immediately (BEFORE making any file changes)
 - **End of Step**: Log completion time, summary, and observations
 - **End of Process**: Add process-wide observations section
 
-## ⚠️ CRITICAL: Mandatory Logging Workflow
+### ⚠️ CRITICAL: Mandatory Logging Workflow
 
 **When user makes a request/correction:**
 1. **STOP** what you're doing
@@ -209,7 +187,7 @@ Document the "why" not just the "what":
 
 **Reference**: See `docs/process-management.md` for complete guidelines and enforcement checklist.
 
-## Relationship to Memory File
+### Relationship to Memory File
 
 | Memory File | Log File |
 |-------------|----------|
@@ -222,7 +200,7 @@ Document the "why" not just the "what":
 
 **Memory = Results | Log = Process**
 
-## Example Log Entry
+### Example Log Entry
 
 ```markdown
 ## Step 3: Implement Service Layer
@@ -280,7 +258,7 @@ Document the "why" not just the "what":
 - BCrypt hashing adds ~50ms to login time (acceptable for security benefit)
 ```
 
-## Tips for Effective Logging
+### Tips for Effective Logging
 
 1. **Be specific** - Vague logs don't help identify patterns
 2. **Capture user corrections immediately** - Don't wait until end of step
@@ -289,7 +267,7 @@ Document the "why" not just the "what":
 5. **Document workarounds** - These are often candidates for systematic fixes
 6. **Be honest about mistakes** - They're valuable learning opportunities
 
-## Using Logs for Improvement
+### Using Logs for Improvement
 
 The Continuous Improvement step will analyze logs to find:
 - **Patterns in user corrections** → Automation opportunities

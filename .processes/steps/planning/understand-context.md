@@ -1,21 +1,41 @@
 <!--
 Step: Understand Context
-Purpose: Fully understand the context, sources, and requirements for a task or process. Clarify what needs to be accomplished, identify relevant information sources, understand success criteria, and document any specific requirements or constraints. Gather all necessary context to proceed with the work.
+Purpose: Fully understand the context, sources, and requirements for a task or process. Clarify what needs to be accomplished, identify relevant information sources, understand success criteria, and document any specific requirements or constraints.
 -->
 
 # Step: Understand Context
 
-## Required Components
-
-- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-
 ## Description
 
-Fully understand the context, sources, and requirements for a task or process. This step establishes a clear foundation by gathering all necessary context information before proceeding with work. It clarifies what needs to be accomplished, identifies relevant information sources, understands success criteria, and documents any specific requirements or constraints.
+Fully understand the context, sources, and requirements for a task or process. This step establishes a clear foundation by gathering all necessary context information before proceeding with work.
 
-This step is general-purpose and can be used at the beginning of any process type (investigations, implementations, reviews, etc.) to ensure all necessary context is understood and documented before work begins.
+## Purpose & Usage
 
-## Output
+Use this step when you need to:
+- Start a new process and gather all necessary context
+- Understand requirements, constraints, and success criteria
+- Document parameters, sources, and decisions before proceeding
+
+**Output**: Context documentation in memory.md with parameters, sources, requirements, success criteria, and constraints.
+
+## Quick Reference
+
+| Action | Tool |
+|--------|------|
+| Read process parameters | `read_file` on process.md |
+| Find relevant files | `codebase_search`, `grep` |
+| Explore directories | `list_dir` |
+| Document context | Update memory.md |
+
+---
+
+## Agent Layer
+
+### Required Components
+
+- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
+
+### Output (Detailed)
 
 - Context documentation in memory.md organized by categories:
   - Process parameters (values and meanings)
@@ -27,7 +47,7 @@ This step is general-purpose and can be used at the beginning of any process typ
 - Complete context understanding verified and documented
 - Any decisions made during context gathering documented
 
-## Guidance
+### Guidance
 
 <!-- @include: _components/mandatory-logging.md -->
 
@@ -51,11 +71,12 @@ Follow the substeps below in sequence. Each substep contains detailed instructio
 - Ask clarifying questions if anything is ambiguous
 - Document all assumptions explicitly
 - Organize context information clearly in memory.md
+- **For extensive context documentation (>100 lines)**: Consider moving detailed context to a dedicated file (e.g., `step{N}-context.md`) and keep memory.md concise with references. This improves readability and maintainability.
 - Use specific, actionable questions when requesting missing information
 - Wait for user answers before proceeding if context is incomplete
 - Verify context completeness before moving to next step
 
-## Memory File Usage
+### Memory File Usage
 
 **When to Use Memory:**
 - Always use memory for this step - it's the primary output
@@ -82,7 +103,7 @@ Follow the substeps below in sequence. Each substep contains detailed instructio
     - References to process parameters
     - Any gaps or areas that may need future clarification
 
-## Flow
+### Flow
 
 ```mermaid
 flowchart TD
@@ -155,13 +176,6 @@ flowchart TD
       - Context: [Why this information is needed]
       - Category: Parameters / Sources / Requirements / Success Criteria / Constraints
       - **Answer:** _[User provides answer here]_
-    
-    - [ ] Q2: [Another specific question]
-      - Context: [Why this information is needed]
-      - Category: Parameters / Sources / Requirements / Success Criteria / Constraints
-      - **Answer:** _[User provides answer here]_
-    
-    *Note: This section should be empty if all context information is available. User must answer all questions before context documentation is complete.*
     ```
   - Question categories:
     - **Parameters**: Missing or unclear process parameter values
@@ -169,11 +183,6 @@ flowchart TD
     - **Requirements**: Ambiguous or incomplete requirements
     - **Success Criteria**: Undefined success measures or acceptance criteria
     - **Constraints**: Unknown technical limitations, dependencies, or restrictions
-  - Best practices for questions:
-    - Be specific: Ask about concrete information, not general concepts
-    - Provide context: Explain why the information is needed
-    - Categorize: Group questions by category for organization
-    - Wait for answers: Do not proceed until all questions are answered
   - Present questions to user clearly
   - Wait for responses before proceeding
   - Update context documentation with answers once provided
@@ -196,4 +205,3 @@ flowchart TD
 - Substep 7 is conditional - only execute if context verification reveals gaps
 - Substep 8 is always executed after context is complete
 - If Substep 7 is executed, return to Substep 3 after receiving answers to re-clarify requirements with new information
-

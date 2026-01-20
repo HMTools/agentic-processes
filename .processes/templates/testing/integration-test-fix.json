@@ -1,0 +1,121 @@
+{
+  "type": "template",
+  "name": "integration-test-fix",
+  "category": "testing",
+  "metadata": {
+    "title": "Integration Test Fix",
+    "purposeAndUsage": "Systematic approach to diagnosing and fixing integration test failures. Use when an integration test is failing and needs diagnosis to determine if the issue is in the test, code, or infrastructure.",
+    "lastUpdated": "2026-01-19"
+  },
+  "parameters": {
+    "required": ["testName", "testClass"],
+    "optional": ["testProject", "failureDescription"],
+    "definitions": {
+      "testName": {
+        "description": "Name of the failing test method",
+        "type": "string",
+        "example": "Should_ReturnSuccess_When_ValidInput"
+      },
+      "testClass": {
+        "description": "Class containing the test",
+        "type": "string",
+        "example": "AuthenticationServiceTests"
+      },
+      "testProject": {
+        "description": "Test project name",
+        "type": "string",
+        "example": "Tests.IntegrationTests"
+      },
+      "failureDescription": {
+        "description": "Description of the failure",
+        "type": "string",
+        "example": "Expected 200 OK but received 401 Unauthorized"
+      }
+    }
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
+    }
+  },
+  "fixTypes": [
+    {
+      "type": "Test Issue",
+      "description": "Test logic, assertions, or test data is incorrect",
+      "branch": "5A"
+    },
+    {
+      "type": "Code Issue",
+      "description": "Underlying business logic or code has a bug",
+      "branch": "5B"
+    },
+    {
+      "type": "Infrastructure Issue",
+      "description": "Test infrastructure, setup, or environment problem",
+      "branch": "5C"
+    }
+  ],
+  "steps": [
+    {
+      "number": 1,
+      "name": "Capture test failure information",
+      "stepRef": "@framework-step:testing/capture-test-failure",
+      "output": "Failure details in memory"
+    },
+    {
+      "number": 2,
+      "name": "Identify root cause",
+      "stepRef": "@framework-step:testing/diagnose-integration-test-failure",
+      "output": "Root cause analysis"
+    },
+    {
+      "number": 3,
+      "name": "Make fix decision",
+      "stepRef": null,
+      "output": "Fix decision and rationale"
+    },
+    {
+      "number": 4,
+      "name": "User approval",
+      "stepRef": null,
+      "output": "Approval to proceed",
+      "approvalRequired": true
+    },
+    {
+      "number": 5,
+      "name": "Implement fix",
+      "stepRef": "@framework-step:testing/implement-integration-test-fix",
+      "output": "Code changes applied"
+    },
+    {
+      "number": 6,
+      "name": "Verify test passes",
+      "stepRef": "@framework-step:testing/verify-test-passes",
+      "output": "Test execution results"
+    },
+    {
+      "number": 7,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "output": "Improvements implemented"
+    }
+  ],
+  "references": {
+    "steps": [
+      "@framework-step:testing/capture-test-failure",
+      "@framework-step:testing/diagnose-integration-test-failure",
+      "@framework-step:testing/implement-integration-test-fix",
+      "@framework-step:testing/verify-test-passes",
+      "@framework-step:learning/continuous-improvement"
+    ],
+    "relatedTemplates": [],
+    "dependencies": []
+  }
+}
+
+
+
+

@@ -11,22 +11,49 @@ When to use: When you need to create a new process step file for the Agentic Pro
 **Template**: create-process-step-template
 **Status**: Not Started
 
-## Current State
+## Description
+
+Create a new process step file for the Agentic Process System. This template guides you through designing, creating, and validating a new step that can be referenced by templates using the `@framework-step:` syntax.
+
+## Purpose & Usage
+
+Use this template when you need to:
+- Create a new reusable process step for the framework
+- Define a self-contained unit of work that templates can reference
+- Establish standardized guidance for a specific type of action
+
+**Not suitable for**: Creating process templates (use `create-process-template`), modifying existing steps, or one-time actions.
+
+## Quick Reference
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `stepName` | Yes | Name of the step (kebab-case) |
+| `stepCategory` | Yes | Category folder (e.g., planning, testing) |
+| `stepPurpose` | Yes | What the step accomplishes |
+| `useCases` | Yes | When this step should be used |
+| `exampleContext` | No | Example context for testing |
+
+**Process Flow (Simplified)**:
+1. Plan and design step → 2. Create step file → 3. Validate step structure → 4. Learn
+
+---
+
+## Agent Layer
+
+### Current State
 **Active Step**: Not started yet
 **Current Action**: Waiting to begin
 **Details**: Process will start when first step is initiated
 
-## Description
-Create a new process step file named {{stepName}} in the {{stepCategory}} category that {{stepPurpose}}. This step will be used when {{useCases}}.
-
-## Parameters
+### Parameters (Full)
 - `stepName`: {{stepName}}
 - `stepCategory`: {{stepCategory}}
 - `stepPurpose`: {{stepPurpose}}
 - `useCases`: {{useCases}}
 - `exampleContext`: {{exampleContext}}
 
-## Context
+### Context
 - `repository`: agentic-processes
 - `stepsDirectory`: .processes/steps/
 - `stepCategoryDirectory`: .processes/steps/{{stepCategory}}/
@@ -34,7 +61,7 @@ Create a new process step file named {{stepName}} in the {{stepCategory}} catego
 - `stepTemplate`: .processes/steps/step-template.md
 - `stepsReadme`: .processes/steps/README.md
 
-## Process Flow
+### Process Flow (Detailed)
 
 ```mermaid
 flowchart TD
@@ -54,7 +81,7 @@ flowchart TD
     E --> F[End: Step Complete]
 ```
 
-## Steps
+### Steps
 
 - [ ] Step 1: Plan and design step
   - **Step**: `@framework-step:template/plan-and-design-step`
@@ -94,7 +121,7 @@ flowchart TD
       - Re-run validation until all checks pass
   - **Note**: Only proceed to Step 4 if all validation checks pass
 
-### Final Phase: Learning & Improvement
+#### Final Phase: Learning & Improvement
 
 - [ ] Step 4: Continuous Improvement & Learning
   - **Step**: `@framework-step:learning/continuous-improvement`
@@ -107,7 +134,7 @@ flowchart TD
   - **Iterative Workflow**: For each improvement: propose → investigate → implement → request approval → next
   - **Note**: User must approve each improvement before proceeding to the next one
 
-## Memory File
+### Memory File
 
 **Memory Location**: `./memory.md`
 
@@ -118,9 +145,8 @@ This process uses a unified memory file to track state and share information bet
 - **Step 3**: Step structure validation results (all checks: self-contained, sections, diagram, guidance, examples, pitfalls, naming, best practices)
 - **Step 4**: Continuous improvement analysis and implemented improvements
 
-## Errors & Notes
+### Errors & Notes
 <!-- Add any notes, warnings, or observations here during execution -->
 
-## Audit Log
+### Audit Log
 <!-- Automatically maintained by Process Manager -->
-

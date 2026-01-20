@@ -1,0 +1,61 @@
+{
+  "type": "step",
+  "name": "final-summary",
+  "category": "investigation",
+  "metadata": {
+    "title": "Final Summary",
+    "purposeAndUsage": "Provide a final comprehensive summary of an investigation that consolidates all previous steps into a clear, actionable conclusion. Use to conclude an investigation process.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Final summary document",
+    "artifacts": ["final-summary.md"],
+    "memoryUpdates": ["finalSummaryPath", "overallConclusion", "finalVerificationStatus", "recommendations"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    }
+  },
+  "summaryScenarios": [
+    {"scenario": "No issues found", "content": "Success message, verification passed"},
+    {"scenario": "Issues found, not fixed", "content": "Issues summary, recommendations"},
+    {"scenario": "Issues found and fixed", "content": "Fixes applied, verification status"}
+  ],
+  "summarySections": [
+    "Executive Summary",
+    "Investigation Scope",
+    "Files Reviewed",
+    "Findings Summary",
+    "Issues Found",
+    "Fixes Applied",
+    "Final Verification Status",
+    "Remaining Issues",
+    "Recommendations",
+    "Conclusion"
+  ],
+  "substeps": [
+    {"number": 1, "name": "Read All Previous Steps from Memory"},
+    {"number": 2, "name": "Read Any Report Files"},
+    {"number": 3, "name": "Compile Investigation Data"},
+    {"number": 4, "name": "Create Final Summary Document"},
+    {"number": 5, "name": "Present Summary to User"},
+    {"number": 6, "name": "Update Memory"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["memory.md", "findings-report.md (if exists)", "issues-list.json (if exists)", "fix-proposals.md (if exists)"],
+    "requiredTools": ["read_file", "write", "search_replace"]
+  },
+  "references": {
+    "relatedSteps": ["review-verify-document", "propose-fixes", "apply-changes"],
+    "usedInTemplates": ["review-and-verify"]
+  }
+}
+
+
+
+

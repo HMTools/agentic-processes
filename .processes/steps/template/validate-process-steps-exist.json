@@ -1,0 +1,47 @@
+{
+  "type": "step",
+  "name": "validate-process-steps-exist",
+  "category": "template",
+  "metadata": {
+    "title": "Validate Process-Steps Exist",
+    "purposeAndUsage": "Validate that all process-steps referenced in a template exist. Use when creating or reviewing templates.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Validation report of existing vs. missing process-steps",
+    "artifacts": [],
+    "memoryUpdates": ["validationResults", "missingStepsList"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "referenceFormat": {
+    "pattern": "@framework-step:category/step-name",
+    "location": ".processes/steps/category/step-name.md"
+  },
+  "substeps": [
+    {"number": 1, "name": "Read template file"},
+    {"number": 2, "name": "Extract step references"},
+    {"number": 3, "name": "Check step existence"},
+    {"number": 4, "name": "Create validation report"},
+    {"number": 5, "name": "List missing steps"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Template file to validate"],
+    "requiredTools": ["read_file", "grep", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": ["create-template-file", "validate-step-structure"],
+    "usedInTemplates": ["create-process-template"]
+  }
+}
+
+
+
+

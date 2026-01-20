@@ -1,0 +1,75 @@
+{
+  "type": "template",
+  "name": "memory-template",
+  "category": "utility",
+  "metadata": {
+    "title": "Process Memory Template",
+    "purposeAndUsage": "Template defining the structure for process memory files that track state and share information between steps. Used when creating memory files for process instances.",
+    "lastUpdated": "2026-01-19"
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["purpose", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["templateStructure", "usageGuidelines", "whatToInclude", "crossReferences", "bestPractices", "examples", "tips"]
+    }
+  },
+  "memorySections": [
+    {
+      "name": "Metadata",
+      "required": true,
+      "fields": ["process", "created", "lastUpdated", "currentStep"]
+    },
+    {
+      "name": "Step Section",
+      "required": true,
+      "repeatable": true,
+      "subsections": ["informationProduced", "decisionsMade", "filesModifiedCreated", "notes", "updated"]
+    },
+    {
+      "name": "Cross-References",
+      "required": false,
+      "purpose": "Quick lookup for common items",
+      "examples": ["apiEndpoints", "databaseChanges", "keyDecisions"]
+    },
+    {
+      "name": "Search Helpers",
+      "required": false,
+      "purpose": "Navigation aids by category"
+    }
+  ],
+  "contentGuidelines": {
+    "informationProduced": [
+      "Files created or modified",
+      "API endpoints defined",
+      "Database schema changes",
+      "Requirements identified",
+      "Technical designs created"
+    ],
+    "decisionsMade": [
+      "Technical approach choices",
+      "Architecture decisions",
+      "Library/framework selections",
+      "Design pattern choices"
+    ],
+    "notes": [
+      "Context for understanding work",
+      "References to previous steps",
+      "Constraints discovered",
+      "Future considerations"
+    ]
+  },
+  "relationship": {
+    "memoryFile": "What was produced (results)",
+    "logFile": "How it was produced (process)"
+  },
+  "references": {
+    "relatedFiles": ["log-template.md", "docs/process-management.md"],
+    "dependencies": []
+  }
+}
+
+
+
+

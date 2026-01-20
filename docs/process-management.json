@@ -1,0 +1,26 @@
+{
+  "type": "documentation",
+  "name": "process-management",
+  "metadata": {
+    "title": "Process Management Guide",
+    "purposeAndUsage": "Comprehensive guide to process management including creating, running, and improving processes.",
+    "lastUpdated": "2026-01-19"
+  },
+  "sections": [
+    {"name": "Overview", "description": "Introduction to process management"},
+    {"name": "Creating Processes", "description": "How to create new processes"},
+    {"name": "Running Processes", "description": "Executing and tracking process progress"},
+    {"name": "Memory Management", "description": "Using memory files for continuity"},
+    {"name": "Logging", "description": "Logging conventions and requirements"},
+    {"name": "Continuous Improvement", "description": "Learning from process execution"}
+  ],
+  "references": {
+    "relatedDocs": ["architecture", "getting-started", "examples"],
+    "templates": ["set-concept", "develop-user-story", "create-process-template"],
+    "prompts": ["process-new", "process-continue"]
+  }
+}
+
+
+
+

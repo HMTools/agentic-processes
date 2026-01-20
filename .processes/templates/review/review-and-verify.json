@@ -1,0 +1,114 @@
+{
+  "type": "template",
+  "name": "review-and-verify",
+  "category": "review",
+  "metadata": {
+    "title": "Review and Verify",
+    "purposeAndUsage": "Generic investigation and verification workflow for reviewing code, files, or any aspect of a codebase with iterative review-fix-verify cycles. Use when you need to systematically investigate and verify against criteria with optional fixes.",
+    "lastUpdated": "2026-01-19"
+  },
+  "parameters": {
+    "required": ["investigationScope", "verificationCriteria"],
+    "optional": ["targetFiles", "excludePatterns"],
+    "definitions": {
+      "investigationScope": {
+        "description": "What aspect to investigate",
+        "type": "string",
+        "example": "dead code references"
+      },
+      "verificationCriteria": {
+        "description": "Criteria to verify against",
+        "type": "string",
+        "example": "All file references must point to existing files"
+      },
+      "targetFiles": {
+        "description": "Specific files or patterns to review",
+        "type": "string",
+        "example": "**/*.cs, **/*.json"
+      },
+      "excludePatterns": {
+        "description": "Patterns to exclude from review",
+        "type": "string",
+        "example": "**/node_modules/**, **/bin/**"
+      }
+    }
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
+    }
+  },
+  "steps": [
+    {
+      "number": 1,
+      "name": "Understand context",
+      "stepRef": "@framework-step:planning/understand-context",
+      "output": "Context documentation"
+    },
+    {
+      "number": 2,
+      "name": "Identify files to review",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "output": "List of files in identified-files.json"
+    },
+    {
+      "number": 3,
+      "name": "Review, verify, and document",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "output": "Findings report, issues list"
+    },
+    {
+      "number": 4,
+      "name": "Propose fixes",
+      "stepRef": "@framework-step:investigation/propose-fixes",
+      "output": "Fix proposals",
+      "conditional": "Only if issues found"
+    },
+    {
+      "number": 5,
+      "name": "Apply approved changes",
+      "stepRef": "@framework-step:common/apply-changes",
+      "output": "Modified files, change report",
+      "conditional": "Only if fixes approved"
+    },
+    {
+      "number": 6,
+      "name": "Re-verify after changes",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "output": "Re-verification report",
+      "conditional": "Only after applying changes"
+    },
+    {
+      "number": 7,
+      "name": "Final summary",
+      "stepRef": "@framework-step:investigation/final-summary",
+      "output": "Final summary document"
+    },
+    {
+      "number": 8,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "output": "Improvements implemented"
+    }
+  ],
+  "references": {
+    "steps": [
+      "@framework-step:planning/understand-context",
+      "@framework-step:investigation/identify-files",
+      "@framework-step:investigation/review-verify-document",
+      "@framework-step:investigation/propose-fixes",
+      "@framework-step:common/apply-changes",
+      "@framework-step:investigation/final-summary",
+      "@framework-step:learning/continuous-improvement"
+    ],
+    "relatedTemplates": ["set-concept"],
+    "dependencies": []
+  }
+}
+
+
+
+

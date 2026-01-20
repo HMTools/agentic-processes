@@ -1,0 +1,47 @@
+{
+  "type": "step",
+  "name": "verify-test-passes",
+  "category": "testing",
+  "metadata": {
+    "title": "Verify Test Passes",
+    "purposeAndUsage": "Verify implemented fix resolves test failure. Use as final step in test fix process.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Test verification results and debug cleanup",
+    "artifacts": [],
+    "memoryUpdates": ["testResults", "finalStatus"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "results": [
+    {"result": "Pass", "action": "Clean up debug logging, document success"},
+    {"result": "Fail", "action": "Capture new failure, present user options"}
+  ],
+  "substeps": [
+    {"number": 1, "name": "Run the originally failing test"},
+    {"number": 2, "name": "Capture complete output"},
+    {"number": 3, "name": "Determine pass/fail"},
+    {"number": 4, "name": "Handle result (cleanup or present options)"},
+    {"number": 5, "name": "Document final status"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Previous step memory"],
+    "requiredTools": ["run_terminal_cmd", "search_replace", "read_file"]
+  },
+  "references": {
+    "relatedSteps": ["implement-integration-test-fix", "capture-test-failure"],
+    "usedInTemplates": ["integration-test-fix"]
+  }
+}
+
+
+
+

@@ -11,29 +11,54 @@ When to use: When an integration test is failing and needs systematic diagnosis 
 **Template**: integration-test-fix
 **Status**: Not Started
 
-## Current State
+## Description
+
+Systematic diagnosis and fix for failing integration tests. This template guides through capturing failure information, identifying root cause, determining fix type (test, code, or infrastructure), implementing the fix, and verifying the test passes.
+
+## Purpose & Usage
+
+Use this template when you need to:
+- Diagnose why an integration test is failing
+- Determine if the issue is in the test, the code, or the infrastructure
+- Implement a targeted fix based on root cause analysis
+- Verify the fix resolves the failure
+
+**Not suitable for**: Writing new integration tests (use `develop-user-story`), refactoring tests without failures, or unit test fixes.
+
+## Quick Reference
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `testName` | Yes | Name of the failing test method |
+| `testClass` | Yes | Class containing the test |
+| `testProject` | No | Test project name |
+| `failureDescription` | No | Description of the failure |
+
+**Process Flow (Simplified)**:
+1. Capture failure → 2. Identify root cause → 3. Make fix decision → 4. User approval → 5. Implement fix → 6. Verify passes → 7. Learn
+
+---
+
+## Agent Layer
+
+### Current State
 **Active Step**: Not started yet
 **Current Action**: Waiting to begin
 **Details**: Process will start when first step is initiated
 
-## Description
-Systematic fix for failing integration test {{testName}} in {{testClass}}. This process guides through diagnosing whether the test logic is incorrect or the underlying code has issues, then implements the appropriate fix and validates the result.
-
-{{failureDescription}}
-
-## Parameters
+### Parameters (Full)
 - `testName`: {{testName}}
 - `testClass`: {{testClass}}
 - `testProject`: {{testProject}}
 - `failureDescription`: {{failureDescription}}
 
-## Context
+### Context
 - `repository`: paycloud-wc-lending-partnerships
 - `testProject`: {{testProject}}
 - `testClass`: {{testClass}}
 - `testName`: {{testName}}
 
-## Process Flow
+### Process Flow (Detailed)
 
 ```mermaid
 graph TD
@@ -56,7 +81,7 @@ graph TD
     L -->|End Process| M[End - Further<br/>Investigation Needed]
 ```
 
-## Steps
+### Steps
 
 - [ ] Step 1: Capture Test Failure Information for {{testName}}
   - **Step**: `@framework-step:testing/capture-test-failure`
@@ -156,7 +181,20 @@ graph TD
         - **Option B**: Add more diagnostic information (return to Step 1)
         - **Option C**: End process (may need different approach or further investigation)
 
-## Memory File
+#### Final Phase: Learning & Improvement
+
+- [ ] Step 7: Continuous Improvement & Learning
+  - **Step**: `@framework-step:learning/continuous-improvement`
+  - **Description**: Analyze process log and implement improvements for future iterations
+  - **Context**:
+    - `processLogPath`: .user-processes/active/{process-name}/log.md
+    - `processName`: Fix Integration Test - {{testName}}
+    - `templateName`: integration-test-fix
+  - **Output**: Analysis report, implemented improvements, updated templates/steps
+  - **Iterative Workflow**: For each improvement: propose → investigate → implement → request approval → next
+  - **Note**: User must approve each improvement before proceeding to the next one
+
+### Memory File
 
 **Memory Location**: `./memory.md`
 
@@ -170,21 +208,8 @@ This process uses a unified memory file to maintain continuity across steps. Inf
 
 Files modified during the process are tracked in each step's "Files Modified/Created" section.
 
-### Final Phase: Learning & Improvement
-
-- [ ] Step 7: Continuous Improvement & Learning
-  - **Step**: `@framework-step:learning/continuous-improvement`
-  - **Description**: Analyze process log and implement improvements for future iterations
-  - **Context**:
-    - `processLogPath`: .user-processes/active/{process-name}/log.md
-    - `processName`: Fix Integration Test - {{testName}}
-    - `templateName`: integration-test-fix
-  - **Output**: Analysis report, implemented improvements, updated templates/steps
-  - **Iterative Workflow**: For each improvement: propose → investigate → implement → request approval → next
-  - **Note**: User must approve each improvement before proceeding to the next one
-
-## Errors & Notes
+### Errors & Notes
 <!-- Add any notes, warnings, or observations here during execution -->
 
-## Audit Log
+### Audit Log
 <!-- Automatically maintained by Process Manager -->

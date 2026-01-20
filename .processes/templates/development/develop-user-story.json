@@ -1,0 +1,111 @@
+{
+  "type": "template",
+  "name": "develop-user-story",
+  "category": "development",
+  "metadata": {
+    "title": "Develop User Story",
+    "purposeAndUsage": "End-to-end implementation of user stories from planning through testing. Use when implementing new features via user stories with systematic planning, implementation, unit tests, integration tests, and documentation.",
+    "lastUpdated": "2026-01-19"
+  },
+  "parameters": {
+    "required": ["userStoryTitle", "userStoryDescription", "acceptanceCriteria"],
+    "optional": [],
+    "definitions": {
+      "userStoryTitle": {
+        "description": "Title of the user story",
+        "type": "string",
+        "example": "Add Partner Notification System"
+      },
+      "userStoryDescription": {
+        "description": "Detailed description of the feature to implement",
+        "type": "string",
+        "example": "As a partner, I want to receive notifications when my application status changes"
+      },
+      "acceptanceCriteria": {
+        "description": "Criteria that must be met for the story to be considered complete",
+        "type": "string",
+        "example": "1. Notifications sent on status change. 2. Email and SMS supported. 3. Notification preferences configurable."
+      }
+    }
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["currentState", "parametersFull", "context", "acceptanceCriteria", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
+    }
+  },
+  "phases": [
+    {
+      "name": "Planning",
+      "steps": [1, 2, 3]
+    },
+    {
+      "name": "Implementation",
+      "steps": "dynamic",
+      "note": "Steps 4-N are derived from approved high-level plan"
+    },
+    {
+      "name": "Testing",
+      "steps": ["N+1", "N+2"]
+    },
+    {
+      "name": "Documentation",
+      "steps": ["N+3"]
+    },
+    {
+      "name": "Learning",
+      "steps": ["N+4"]
+    }
+  ],
+  "steps": [
+    {
+      "number": 1,
+      "name": "Create high-level plan",
+      "stepRef": "@framework-step:planning/create-high-level-plan",
+      "output": "High-level plan in plans/{user-story-name}/plan.md",
+      "approvalRequired": true
+    },
+    {
+      "number": 2,
+      "name": "Validate process-steps exist",
+      "stepRef": null,
+      "output": "Validation report of existing vs. missing process-steps",
+      "checkpoint": "Pause if missing steps"
+    },
+    {
+      "number": 3,
+      "name": "Create detailed step plans",
+      "stepRef": "@framework-step:planning/create-detailed-step-plans",
+      "output": "Detailed plan files",
+      "approvalRequired": true
+    }
+  ],
+  "dynamicSteps": {
+    "implementation": "Derived from approved high-level plan",
+    "unitTests": "@framework-step:testing/write-unit-tests-service",
+    "integrationTests": "@framework-step:testing/write-integration-tests-api",
+    "documentation": "@framework-step:documentation/update-documentation",
+    "continuousImprovement": "@framework-step:learning/continuous-improvement"
+  },
+  "references": {
+    "steps": [
+      "@framework-step:planning/create-high-level-plan",
+      "@framework-step:planning/create-detailed-step-plans",
+      "@framework-step:api/implement-controller-layer",
+      "@framework-step:service/implement-service-layer",
+      "@framework-step:data/implement-repository-layer",
+      "@framework-step:testing/write-unit-tests-service",
+      "@framework-step:testing/write-integration-tests-api",
+      "@framework-step:documentation/update-documentation",
+      "@framework-step:learning/continuous-improvement"
+    ],
+    "relatedTemplates": [],
+    "dependencies": []
+  }
+}
+
+
+
+

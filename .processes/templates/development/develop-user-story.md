@@ -10,28 +10,54 @@ When to use: Implementing new features via user stories with systematic planning
 **Template**: develop-user-story
 **Status**: Not Started
 
-## Current State
+## Description
+
+Implement a complete user story from initial planning through testing and documentation. This template provides a systematic approach to feature development with Q&A checkpoints, iterative planning, and comprehensive testing.
+
+## Purpose & Usage
+
+Use this template when you need to:
+- Implement a new feature based on user story requirements
+- Follow a structured development workflow with planning, implementation, and testing phases
+- Ensure comprehensive test coverage (unit and integration tests)
+- Create documentation for new features
+
+**Not suitable for**: Bug fixes, refactoring without new features, or documentation-only changes.
+
+## Quick Reference
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `userStoryTitle` | Yes | Title of the user story |
+| `userStoryDescription` | Yes | Detailed description of the feature |
+| `acceptanceCriteria` | Yes | Criteria that must be met for completion |
+
+**Process Flow (Simplified)**:
+1. Create high-level plan → 2. Validate process-steps → 3. Create detailed plans → 4-N. Implementation steps → N+1. Unit tests → N+2. Integration tests → N+3. Documentation → N+4. Learn
+
+---
+
+## Agent Layer
+
+### Current State
 **Active Step**: Not started yet
 **Current Action**: Waiting to begin
 **Details**: Process will start when first step is initiated
 
-## Description
-{{userStoryDescription}}
-
-## Parameters
+### Parameters (Full)
 - `userStoryTitle`: {{userStoryTitle}}
 - `userStoryDescription`: {{userStoryDescription}}
 - `acceptanceCriteria`: {{acceptanceCriteria}}
 
-## Context
+### Context
 - `repository`: paycloud-wc-lending-partnerships
 - `userStory`: {{userStoryTitle}}
 - `planDirectory`: plans/{user-story-name}/
 
-## Acceptance Criteria
+### Acceptance Criteria
 {{acceptanceCriteria}}
 
-## Process Flow
+### Process Flow (Detailed)
 
 ```mermaid
 flowchart TD
@@ -62,9 +88,9 @@ flowchart TD
     S --> T[End: Feature Complete]
 ```
 
-## Steps
+### Steps
 
-### Phase 1: Planning
+#### Phase 1: Planning
 
 - [ ] Step 1: Create high-level plan
   - **Step**: `@framework-step:planning/create-high-level-plan`
@@ -98,7 +124,7 @@ flowchart TD
     - User resumes process at Step 3 once all process-steps exist
   - **Note**: Only proceed to Step 3 if all required process-steps exist
   
-  ### Process-Step Correlation Guidelines
+  ##### Process-Step Correlation Guidelines
   
   When mapping implementation steps to process-step templates, use these decision criteria:
   
@@ -173,7 +199,7 @@ flowchart TD
   - **⚠️ APPROVAL CHECKPOINT - STOP AND WAIT**: User must explicitly approve all detailed plans before proceeding. Present all plans, ask "Do you approve? (approve/modify/reject)", and WAIT for user response. Do NOT proceed automatically.
   - **Note**: This step is complete only when user approves all detailed plans
 
-### Phase 2: Implementation
+#### Phase 2: Implementation
 
 **Note**: These implementation steps will be updated after the high-level plan (Step 1) is approved. The actual tasks from `plans/{user-story-name}/plan.md` will replace this placeholder section.
 
@@ -236,7 +262,7 @@ flowchart TD
     - Update flow documentation in `ai/docs/flows/` if new workflow introduced
   - **Output**: Updated documentation files
 
-### Final Phase: Learning & Improvement
+#### Final Phase: Learning & Improvement
 
 - [ ] Step N+4: Continuous Improvement & Learning
   - **Step**: `@framework-step:learning/continuous-improvement`
@@ -249,7 +275,7 @@ flowchart TD
   - **Iterative Workflow**: For each improvement: propose → investigate → implement → request approval → next
   - **Note**: User must approve each improvement before proceeding to the next one
 
-## Memory File
+### Memory File
 
 **Memory Location**: `./memory.md`
 
@@ -260,8 +286,8 @@ This process uses a unified memory file to track state and share information bet
 - **Step 3**: Detailed plans index with approval status
 - **Implementation Steps**: Execution state and completion tracking
 
-## Errors & Notes
+### Errors & Notes
 <!-- Add any notes, warnings, or observations here during execution -->
 
-## Audit Log
+### Audit Log
 <!-- Automatically maintained by Process Manager -->

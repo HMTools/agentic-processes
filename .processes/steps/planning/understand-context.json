@@ -1,0 +1,46 @@
+{
+  "type": "step",
+  "name": "understand-context",
+  "category": "planning",
+  "metadata": {
+    "title": "Understand Context",
+    "purposeAndUsage": "Fully understand the context, sources, and requirements for a task or process. Use at the beginning of any process to gather parameters, identify sources, understand requirements, and document constraints.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Context documentation in memory.md",
+    "artifacts": ["memory.md update"],
+    "memoryUpdates": ["parameters", "informationSources", "requirements", "successCriteria", "constraints"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    }
+  },
+  "substeps": [
+    {"number": 1, "name": "Gather Process Parameters"},
+    {"number": 2, "name": "Identify Information Sources"},
+    {"number": 3, "name": "Clarify Requirements"},
+    {"number": 4, "name": "Understand Success Criteria"},
+    {"number": 5, "name": "Document Constraints"},
+    {"number": 6, "name": "Verify Context Completeness"},
+    {"number": 7, "name": "Request Missing Information", "conditional": true},
+    {"number": 8, "name": "Document Context in Memory"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["process.md"],
+    "requiredTools": ["read_file", "codebase_search", "grep", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": [],
+    "usedInTemplates": ["set-concept", "review-and-verify", "develop-user-story"]
+  }
+}
+
+
+
+

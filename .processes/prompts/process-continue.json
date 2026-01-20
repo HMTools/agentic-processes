@@ -1,0 +1,53 @@
+{
+  "type": "prompt",
+  "name": "process-continue",
+  "metadata": {
+    "title": "Process Continue",
+    "purposeAndUsage": "Continue an existing process from where it was left off. Use to resume tracked work after a session break.",
+    "lastUpdated": "2026-01-19"
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "whenToUse", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["instructions", "mandatoryRequirements", "commandBehavior", "stateRestoration", "continuity", "errorHandling"]
+    }
+  },
+  "mandatoryRequirements": [
+    {
+      "name": "Always Use Process Templates",
+      "description": "Must work within existing process, never do work directly outside"
+    },
+    {
+      "name": "Log User Interactions",
+      "description": "Log every user interaction before making file changes"
+    }
+  ],
+  "commandBehavior": {
+    "steps": [
+      {"number": 1, "action": "Discover Active Processes"},
+      {"number": 2, "action": "Read Process State"},
+      {"number": 3, "action": "Read Memory File"},
+      {"number": 4, "action": "Summarize Current State"},
+      {"number": 5, "action": "Update Current State"},
+      {"number": 6, "action": "Proceed with Guidance"}
+    ]
+  },
+  "stateRestoration": {
+    "files": [
+      {"name": "process.md", "purpose": "Current step, progress, status"},
+      {"name": "memory.md", "purpose": "Information from previous steps, decisions, context"}
+    ],
+    "information": ["Current step", "Completed work", "Decisions made", "Files created", "Important notes"]
+  },
+  "references": {
+    "activeProcessLocation": ".user-processes/active/",
+    "knowledgeFile": "ai/knowledge/best-practices/ai-tooling/process-management.md",
+    "relatedPrompts": ["process-new"]
+  }
+}
+
+
+
+

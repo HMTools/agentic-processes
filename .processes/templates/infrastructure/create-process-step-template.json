@@ -1,0 +1,91 @@
+{
+  "type": "template",
+  "name": "create-process-step-template",
+  "category": "infrastructure",
+  "metadata": {
+    "title": "Create Process Step Template",
+    "purposeAndUsage": "End-to-end workflow for creating new process step files from requirements through validation. Use when you need to create a new reusable process step for the Agentic Process System.",
+    "lastUpdated": "2026-01-19"
+  },
+  "parameters": {
+    "required": ["stepName", "stepCategory", "stepPurpose", "useCases"],
+    "optional": ["exampleContext"],
+    "definitions": {
+      "stepName": {
+        "description": "Name of the step file (kebab-case)",
+        "type": "string",
+        "example": "validate-input-schema"
+      },
+      "stepCategory": {
+        "description": "Category folder for the step",
+        "type": "string",
+        "example": "planning",
+        "enum": ["planning", "investigation", "common", "api", "service", "data", "testing", "template", "documentation", "external-services", "learning"]
+      },
+      "stepPurpose": {
+        "description": "What the step accomplishes",
+        "type": "string",
+        "example": "Validates input data against defined JSON schema"
+      },
+      "useCases": {
+        "description": "Scenarios when this step should be used",
+        "type": "string",
+        "example": "Before processing user input, validating API request bodies"
+      },
+      "exampleContext": {
+        "description": "Example context values for testing the step",
+        "type": "object",
+        "example": {"inputPath": "data/input.json", "schemaPath": "schemas/input.schema.json"}
+      }
+    }
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
+    }
+  },
+  "steps": [
+    {
+      "number": 1,
+      "name": "Plan and design step",
+      "stepRef": "@framework-step:template/plan-and-design-step",
+      "output": "Requirements document, design artifacts, mermaid diagram",
+      "approvalRequired": true
+    },
+    {
+      "number": 2,
+      "name": "Create step file",
+      "stepRef": "@framework-step:template/create-step-file",
+      "output": "Complete step file with validation reports"
+    },
+    {
+      "number": 3,
+      "name": "Validate step structure",
+      "stepRef": "@framework-step:template/validate-step-structure",
+      "output": "Comprehensive validation report"
+    },
+    {
+      "number": 4,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "output": "Improvements implemented"
+    }
+  ],
+  "references": {
+    "steps": [
+      "@framework-step:template/plan-and-design-step",
+      "@framework-step:template/create-step-file",
+      "@framework-step:template/validate-step-structure",
+      "@framework-step:learning/continuous-improvement"
+    ],
+    "relatedTemplates": ["create-process-template"],
+    "dependencies": []
+  }
+}
+
+
+
+

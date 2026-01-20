@@ -1,0 +1,55 @@
+{
+  "type": "step",
+  "name": "write-integration-tests-api",
+  "category": "testing",
+  "metadata": {
+    "title": "Write Integration Tests",
+    "purposeAndUsage": "Create comprehensive integration tests that verify complete flows of system components working together. Use for API, subscriber, or job testing.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "End-to-end integration test files",
+    "artifacts": ["Tests/IntegrationTests/*.cs"],
+    "memoryUpdates": ["testFilesCreated", "scenariosCovered"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "stepMetadata", "contextParameters", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "triggerTypes": [
+    {"type": "HTTP request", "useCase": "API endpoint tests"},
+    {"type": "Kafka message", "useCase": "Subscriber tests"},
+    {"type": "Timer", "useCase": "Background job tests"}
+  ],
+  "contextParameters": {
+    "componentType": {"description": "Type of component being tested"},
+    "componentName": {"description": "Name of the component"},
+    "triggerMechanism": {"description": "How the flow is triggered"},
+    "scenariosToTest": {"description": "List of business scenarios"},
+    "externalServices": {"description": "External services to mock"}
+  },
+  "substeps": [
+    {"number": 1, "name": "Study Existing Test Patterns"},
+    {"number": 2, "name": "Set Up Test Infrastructure"},
+    {"number": 3, "name": "Create Test Class Structure"},
+    {"number": 4, "name": "Write Test Scenarios"},
+    {"number": 5, "name": "Verify and Run Tests"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Components to test"],
+    "requiredTools": ["read_file", "write", "codebase_search", "run_terminal_cmd"]
+  },
+  "references": {
+    "relatedSteps": ["implement-controller-layer", "write-unit-tests-service"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+
+
+
+

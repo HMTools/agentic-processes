@@ -1,0 +1,57 @@
+{
+  "type": "step",
+  "name": "write-unit-tests-service",
+  "category": "testing",
+  "metadata": {
+    "title": "Write Unit Tests for Service Layer",
+    "purposeAndUsage": "Create comprehensive unit tests for service layer with full (100%) code coverage. Use when implementing new services or adding test coverage.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Unit test files with full code coverage",
+    "artifacts": ["Tests/UnitTests/{ServiceName}Tests.cs"],
+    "memoryUpdates": ["testFilesCreated", "coveragePercentage", "testCountByCategory"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "stepMetadata", "guidance", "contextParameters", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "contextParameters": {
+    "serviceName": {"description": "Name of the service to test"},
+    "serviceNamespace": {"description": "Namespace of the service"},
+    "methodsToTest": {"description": "List of service methods needing coverage"},
+    "dependencies": {"description": "List of dependencies to mock"}
+  },
+  "testingGuidelines": {
+    "coverageTarget": "100%",
+    "namingPattern": "MethodName_Scenario_ExpectedResult",
+    "testPattern": "AAA (Arrange, Act, Assert)",
+    "helperCreation": "If mocking same method 3+ times"
+  },
+  "substeps": [
+    {"number": 1, "name": "Study Existing Test Patterns"},
+    {"number": 2, "name": "Read Target Service Code"},
+    {"number": 3, "name": "Identify All Code Paths"},
+    {"number": 4, "name": "Create Test Class Structure"},
+    {"number": 5, "name": "Write Setup Methods"},
+    {"number": 6, "name": "Write Tests for Each Method"},
+    {"number": 7, "name": "Verify Full Coverage"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "requiredFiles": ["Service implementation"],
+    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["implement-service-layer", "write-integration-tests-api"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+
+
+
+

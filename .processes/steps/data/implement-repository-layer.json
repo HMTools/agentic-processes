@@ -1,0 +1,50 @@
+{
+  "type": "step",
+  "name": "implement-repository-layer",
+  "category": "data",
+  "metadata": {
+    "title": "Implement Repository Layer",
+    "purposeAndUsage": "Implement data access layer using Repository pattern with MongoDB. Use when creating or modifying data access components.",
+    "lastUpdated": "2026-01-19"
+  },
+  "output": {
+    "description": "Repository interfaces, implementations, and MongoDB entity models",
+    "artifacts": ["Data/Repositories/Interfaces/*.cs", "Data/Repositories/{category}/*.cs", "Data/Entities/*.cs"],
+    "memoryUpdates": ["repositoryCreated", "operationsImplemented"]
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["requiredComponents", "stepMetadata", "contextParameters", "guidance", "flow", "substeps", "memoryFileUsage"]
+    }
+  },
+  "contextParameters": {
+    "entityName": {"description": "Name of the entity"},
+    "collectionName": {"description": "MongoDB collection name"},
+    "operations": {"description": "Operations to add/modify/remove"},
+    "category": {"description": "Repository category folder"},
+    "isNewRepository": {"description": "Whether creating new or modifying existing"}
+  },
+  "substeps": [
+    {"number": 1, "name": "Review Requirements and Study Patterns"},
+    {"number": 2, "name": "Create/Update MongoDB Entity Model", "conditional": true},
+    {"number": 3, "name": "Create/Update Repository Interface"},
+    {"number": 4, "name": "Implement Repository Class"},
+    {"number": 5, "name": "Register in Dependency Injection"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Domain models"],
+    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["implement-service-layer"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+
+
+
+

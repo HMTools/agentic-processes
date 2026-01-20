@@ -5,154 +5,96 @@ Purpose: Run the originally failing test to verify the fix works, and clean up t
 
 # Step: Verify Test Passes
 
-## Required Components
-
-- [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
-
 ## Description
 
-Execute the originally failing test to verify that the implemented fix resolves the issue. If the test passes, remove any temporary debug logging that was added during the diagnostic process and mark the fix as successful. If the test still fails, present the failure to the user and offer options to continue debugging or end the process.
+Execute the originally failing test to verify the fix works. If passed, clean up any temporary debug logging. If failed, present options to continue debugging.
 
-## Output
+## Purpose & Usage
+
+Use this step when you need to:
+- Verify implemented fix resolves the test failure
+- Clean up temporary debug code after successful fix
+- Handle continued failures with user options
+
+**Output**: Test verification results and cleanup of debug code.
+
+## Quick Reference
+
+| Result | Action |
+|--------|--------|
+| Pass | Clean up debug logging, document success |
+| Fail | Capture new failure, present user options |
+
+---
+
+## Agent Layer
+
+### Required Components
+
+- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
+
+### Output (Detailed)
 
 - Test execution results captured
-- Test pass/fail status determined
-- If passed: Temporary debug logging removed from all files
-- If passed: Success confirmation
-- If failed: New failure information captured
-- All results stored in current step section of memory.md
-- Final status documented
+- Pass/fail status determined
+- If passed: Debug logging removed, success confirmed
+- If failed: New failure captured, user options presented
 
-## Guidance
+### Guidance
 
 <!-- @include: _components/mandatory-logging.md -->
 
 **Specific Actions:**
-- Run the specific test that was originally failing
-- Capture complete test execution output
-- Determine if test passes or fails
-- **If test passes:**
-  - Remove all temporary debug logging added during diagnosis (marked with `// TODO: REMOVE - Added by agent for debugging`)
+- Run the specific test that was failing
+- Capture complete test output
+- Determine pass/fail status
+- **If passed:**
+  - Remove temporary debug logging (marked with `// TODO: REMOVE - Added by agent for debugging`)
   - Verify no debug artifacts remain
   - Document successful fix
-- **If test fails:**
+- **If failed:**
   - Capture new failure information
-  - Present failure to user
-  - Offer options: revise analysis, add more diagnostics, or end process
-  - Wait for user decision on next steps
-- Store all results in memory for reference
+  - Present to user
+  - Offer: revise analysis, add diagnostics, or end process
+  - Wait for user decision
 
 **Files/Folders:**
-- Read from: previous step section in memory.md, Files Modified/Created from previous step
-- Work in: `{{testProject}}` (default: `Tests/IntegrationTests`)
+- Read from: Previous step in memory.md
+- Work in: `{{testProject}}`
 - Test to run: `{{testClass}}.{{testName}}`
-- Files to clean: Any files with temporary debug logging (from Files Modified/Created from previous step)
+- Files to clean: Those with temporary debug logging
 
 **Tools:**
 - Run test: `dotnet test --filter "FullyQualifiedName~{{testClass}}.{{testName}}"`
-- Run with verbose output if needed: `dotnet test --filter "FullyQualifiedName~{{testClass}}.{{testName}}" --verbosity detailed`
-- Search for debug markers: `grep_search` or `semantic_search` for `// TODO: REMOVE - Added by agent for debugging`
-- Edit files to remove logging: `replace_string_in_file`
 
-**Best Practices:**
-- Run the exact same test that was originally failing
-- Capture full output for comparison with original failure
-- Be thorough when removing debug logging - check all modified files
-- Don't remove legitimate logging that was already in the codebase
-- Only remove logging marked with the specific debug comment
-- If test fails, provide clear information to help user decide next steps
-- Document the final outcome clearly
-
-## Memory File Usage
-
-**When to Use Memory Files:**
-- Always use memory file for this step to document validation results
-- Read from previous implementation notes to know what was changed
-- Write comprehensive validation results for process completion
-
-**Memory Files for This Step:**
-- **Read from**:
-  - previous step section in memory.md - Implementation details
-  - Files Modified/Created from previous step - Files that were modified (may contain debug logging)
-- **Write to**:
-  - current step section of memory.md - Store validation results including:
-    - Test execution command used
-    - Test pass/fail status
-    - Test output (relevant portions)
-    - If passed: Confirmation that debug logging was removed
-    - If passed: List of files cleaned
-    - If failed: New failure information
-    - If failed: Comparison with original failure
-    - If failed: User's decision on next steps
-    - Final outcome (success, retry with different approach, or investigation needed)
-
-## Flow
+### Flow
 
 ```mermaid
-graph TD
-    A[Read Implementation Notes] --> B[Run Original Test]
-    B --> C{Test Passes?}
-    C -->|Yes| D[Search for Debug Logging]
-    D --> E{Debug Logs Found?}
-    E -->|Yes| F[Remove Debug Logging]
-    E -->|No| G[Document Success]
-    F --> H[Verify Cleanup Complete]
-    H --> G
-    G --> I[Store Results]
-    I --> J[Complete - Success]
-    C -->|No| K[Capture New Failure]
-    K --> L[Compare with Original]
-    L --> M[Present to User]
-    M --> N{User Decision?}
-    N -->|Revise Analysis| O[Return to Step 2]
-    N -->|Add Diagnostics| P[Return to Step 1]
-    N -->|End Process| Q[Document Investigation Needed]
-    Q --> R[Store Results]
-    R --> S[Complete - Needs Investigation]
+flowchart TD
+    A[Start: Verify Test] --> B[Run Originally Failing Test]
+    B --> C{Test Result?}
+    C -->|Pass| D[Remove Debug Logging]
+    D --> E[Document Success]
+    E --> F[Complete: Fix Verified]
+    C -->|Fail| G[Capture New Failure]
+    G --> H[Present to User]
+    H --> I{User Decision?}
+    I -->|Revise| J[Return to Diagnosis]
+    I -->|End| K[Complete: Unresolved]
 ```
 
 ### Substeps
 
-- [ ] **Substep 1**: Read previous step section in memory.md and Files Modified/Created from previous step to understand what was implemented and which files were modified
-- [ ] **Substep 2**: Run the originally failing test: `dotnet test --filter "FullyQualifiedName~{{testClass}}.{{testName}}"`
-- [ ] **Substep 3**: Capture the complete test execution output
-- [ ] **Substep 4**: Determine if the test passed or failed
-- [ ] **Substep 5**: **If test PASSED**:
-  - [ ] 5a. Search all modified files for temporary debug logging markers: `// TODO: REMOVE - Added by agent for debugging`
-  - [ ] 5b. For each file with debug logging:
-    - Read the file to locate debug log statements
-    - Remove each debug log statement (including the marker comment)
-    - Ensure surrounding code remains intact
-    - Verify no debug artifacts remain
-  - [ ] 5c. Confirm all temporary logging has been removed
-  - [ ] 5d. Document successful fix and cleanup
-- [ ] **Substep 6**: **If test FAILED**:
-  - [ ] 6a. Capture the new failure information (error message, stack trace)
-  - [ ] 6b. Compare new failure with original failure from initial failure analysis from first step
-  - [ ] 6c. Present failure information to user with three options:
-    - **Option A**: Revise analysis (suggests fix may have been incorrect, return to Step 2)
-    - **Option B**: Add more diagnostics (suggests need more information, return to Step 1)
-    - **Option C**: End process (suggests further investigation needed outside this process)
-  - [ ] 6d. Wait for user decision
-  - [ ] 6e. Document user's decision and reason
-- [ ] **Substep 7**: Create current step section of memory.md with complete validation documentation:
-  - Test execution command and test name
-  - Test pass/fail status
-  - Test output (full or relevant excerpts)
-  - **If passed**:
-    - Confirmation of successful fix
-    - List of files where debug logging was removed
-    - Confirmation that cleanup is complete
-  - **If failed**:
-    - New failure details
-    - Comparison with original failure (same issue, different issue, progress made?)
-    - User's decision and next steps
-  - Final outcome status
+- [ ] **Substep 1**: Run the originally failing test
+- [ ] **Substep 2**: Capture complete output
+- [ ] **Substep 3**: Determine pass/fail
+- [ ] **Substep 4 (if pass)**: Remove temporary debug logging
+- [ ] **Substep 4 (if fail)**: Capture new failure, present options to user
+- [ ] **Substep 5**: Document final status
 
-**Notes:**
-- This is the final validation step - be thorough
-- Successful test pass means the fix worked
-- Debug logging cleanup is critical - don't skip it
-- If test fails, help user understand whether to iterate or stop
-- Document the outcome clearly for future reference
-- Consider running the test multiple times if it was previously intermittent
+### Memory File Usage
+
+**Read from**: Previous step - files modified
+**Write to**: Current step section in memory.md
+- Information Produced: Test results, final status
+- Decisions Made: Success/failure, next steps (if failed)
