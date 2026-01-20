@@ -72,9 +72,10 @@ Steps are modular, self-contained definitions with:
 ### 4. Process Instances
 
 Process instances are created from templates and contain:
-- Process file (`process.md`)
-- Memory file (`memory.md`)
-- Log file (`log.md`)
+- Process file (`process.md`) - Human-readable workflow definition
+- Process data (`process.json`) - Machine-readable state for tooling/UI
+- Memory file (`memory.md`) - Persistent information shared across steps
+- Log file (`log.md`) - Detailed execution log
 
 **Location**: `.user-processes/{state}/process-{name}-{YYYYMMDD}/`
 
@@ -82,6 +83,19 @@ Process instances are created from templates and contain:
 - `active/` - Currently running
 - `completed/` - Finished successfully
 - `failed/` - Encountered errors
+
+### 5. Process Instance JSON (`process.json`)
+
+Each process instance includes a `process.json` file that provides machine-readable state for external tooling, UIs, and programmatic access. This file is generated when a process is created and updated whenever the process state changes.
+
+**Type Definitions**: See `.processes/types/`
+
+**When Updated**:
+- Process creation (initial state)
+- Step started/completed
+- Status change (running → completed/failed)
+- Current action updates
+- Sub-process spawned/completed
 
 ## Data Flow
 
@@ -237,11 +251,17 @@ Audit log is automatically maintained:
 │   ├── service/
 │   ├── testing/
 │   └── ...
-└── prompts/                     # Process management prompts
+├── prompts/                     # Process management prompts
+└── types/                       # TypeScript type definitions
 
 # User Resources (.user-processes/)
 .user-processes/                 # User resources & process instances
 ├── active/                      # Running processes
+│   └── process-{name}-{date}/   # Individual process folder
+│       ├── process.md           # Human-readable workflow
+│       ├── process.json         # Machine-readable state
+│       ├── memory.md            # Cross-step information
+│       └── log.md               # Detailed execution log
 ├── completed/                   # Finished processes
 ├── failed/                      # Failed processes
 ├── templates/                   # User-defined templates
