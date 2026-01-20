@@ -46,6 +46,16 @@ Reference the process management knowledge file for complete instructions:
 - Suggest using `/process-new` to create a process from a template first
 - Never implement directly - always create a process first
 
+#### Do Not Use Built-in Todo System
+
+**CRITICAL RULE**: Do NOT use the built-in todo system (`todo_write` tool) when executing processes.
+
+- The process steps defined in `process.md` serve as your task tracking
+- Using external todos creates conflicts with approval checkpoints
+- Approval checkpoints require you to STOP and WAIT - external todos may override this
+
+**Process steps are your only task list** - do not create separate todos.
+
 #### Log User Interactions Immediately
 
 **Mandatory Workflow:**

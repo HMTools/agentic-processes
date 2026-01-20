@@ -47,6 +47,16 @@ Reference the process management knowledge file for complete instructions:
 - Do NOT automatically create a template
 - Do NOT proceed with any work
 
+#### Do Not Use Built-in Todo System
+
+**CRITICAL RULE**: Do NOT use the built-in todo system (`todo_write` tool) when executing processes.
+
+- The process steps defined in `process.md` serve as your task tracking
+- Using external todos creates conflicts with approval checkpoints
+- Approval checkpoints require you to STOP and WAIT - external todos may override this
+
+**Process steps are your only task list** - do not create separate todos.
+
 #### Always Create Process Instance
 
 **CRITICAL RULE**: The `/process-new` command MUST always create a process instance. **NEVER** create a plan, design document, or any other type of document instead.
