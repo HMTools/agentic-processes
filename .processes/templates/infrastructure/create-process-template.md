@@ -71,10 +71,10 @@ flowchart TD
     C2 --> C
     C1 -->|Yes| D[Step 3: Validate Process-Steps Exist]
     D --> D1{All Steps Exist?}
-    D1 -->|No| D2[PAUSE: User Creates Missing Steps]
-    D2 --> D3[User Resumes at Step 4]
+    D1 -->|No| D2[Spawn Sub-Process:<br/>create-process-step-template]
+    D2 --> D3[Wait for Sub-Process<br/>to Complete]
+    D3 --> D1
     D1 -->|Yes| E[Step 4: Continuous Improvement]
-    D3 --> E
     E --> F[End: Template Complete]
 ```
 

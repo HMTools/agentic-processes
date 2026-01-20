@@ -71,10 +71,10 @@ flowchart TD
     C -->|Yes| E[Update Implementation Steps]
     E --> F[Step 2: Validate Process-Steps]
     F --> G{All Steps Exist?}
-    G -->|No| H[PAUSE: User Creates Missing Steps]
-    H --> I[User Resumes at Step 3]
+    G -->|No| H[Spawn Sub-Process:<br/>create-process-step-template]
+    H --> H1[Wait for Sub-Process<br/>to Complete]
+    H1 --> G
     G -->|Yes| J[Step 3: Create Detailed Plans]
-    I --> J
     J --> K{All Plans Approved?}
     K -->|No| L[Revise Plans Based on Feedback]
     L --> J
