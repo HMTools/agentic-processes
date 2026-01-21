@@ -5,20 +5,129 @@
   "metadata": {
     "title": "Implement Service Layer",
     "purposeAndUsage": "Implement business logic in the service layer following SOLID principles and clean architecture patterns. Use when creating managers, calculators, validators, or other service components.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Service component files with interfaces and implementations",
     "artifacts": ["Service/Managers/Interfaces/*.cs", "Service/Managers/*.cs", "Contracts.Internal/Arguments/*.cs", "Contracts.Internal/Results/*.cs"],
     "memoryUpdates": ["serviceComponentsCreated", "interfaces", "implementations"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Service requirements defined",
+      "Domain models defined (if applicable)",
+      "Repository layer (if data access needed)",
+      "External service integrations (if applicable)"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "specificActions": [
+      "Parse Components List: Get component specifications from context parameters",
+      "Study Existing Patterns: Search for similar managers/calculators/validators in Service/ subdirectories",
+      "Create Service Interface: Define method signatures following discovered patterns",
+      "Create Service Implementation: Implement business logic with SOLID principles",
+      "Create Arguments/Results Models: Create in Contracts.Internal/ following naming patterns",
+      "Register in DI Container: Add service registration following existing patterns"
+    ],
+    "files": {
+      "read": ["Existing services for patterns", "Repository interfaces (if data access needed)"],
+      "create": [
+        "Service/Managers/Interfaces/I{Name}Manager.cs",
+        "Service/Managers/{Name}Manager.cs",
+        "Contracts.Internal/Arguments/{Operation}Arguments.cs",
+        "Contracts.Internal/Results/{Operation}Result.cs"
+      ],
+      "update": ["DI registration file"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "metadata", "contextParameters", "guidance", "flow", "substeps", "memoryFileUsage"]
+    "tools": [
+      "read_file - Read existing service patterns",
+      "write - Create service files",
+      "codebase_search - Find similar services",
+      "grep - Search for specific patterns"
+    ],
+    "bestPractices": [
+      "Search for similar managers/calculators/validators before creating",
+      "Check naming conventions in existing services",
+      "Review how existing services interact with repositories",
+      "Review patterns for calling external APIs",
+      "Check event publishing patterns (if using publishers)",
+      "Review data mapping approaches",
+      "Note reusable helper classes in Service/Utils/"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Parse Components and Study Patterns",
+      "description": "Parse component specifications and find existing patterns",
+      "actions": [
+        "Parse the components list from context parameters",
+        "For each component type, search for existing patterns",
+        "Document naming conventions and implementation patterns"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Create Service Interface",
+      "description": "Create interface in appropriate folder",
+      "actions": [
+        "Create interface in appropriate Service/Managers/Interfaces/ folder",
+        "Define method signatures following discovered patterns",
+        "Include documentation comments"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create Service Implementation",
+      "description": "Implement the service with business logic",
+      "actions": [
+        "Create implementation class",
+        "Inject required dependencies via constructor",
+        "Implement business logic for each operation",
+        "Apply SOLID principles",
+        "Add appropriate logging"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Create Arguments/Results Models",
+      "description": "Create data transfer models",
+      "actions": [
+        "Create argument models in Contracts.Internal/Arguments/",
+        "Create result models in Contracts.Internal/Results/",
+        "Follow existing naming patterns"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Register in Dependency Injection",
+      "description": "Register service in DI container",
+      "actions": [
+        "Add service registration to DI container",
+        "Follow existing registration patterns"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Verify Implementation",
+      "description": "Verify code compiles and follows patterns",
+      "actions": [
+        "Verify code compiles",
+        "Verify follows project patterns",
+        "Update memory with files created"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Parse components → Study patterns → For each: Create interface → Create implementation → Create models → Register in DI → Verify"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step (requirements, domain models)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Service components created, interfaces, implementations",
+      "Decisions Made: Pattern choices, naming decisions",
+      "Files Modified/Created: List of all service files"
+    ]
   },
   "componentTypes": [
     {"type": "Manager", "purpose": "Orchestrate business operations", "example": "UserManager"},
@@ -35,14 +144,6 @@
       "description": "List of service components to implement"
     }
   },
-  "substeps": [
-    {"number": 1, "name": "Parse Components and Study Patterns"},
-    {"number": 2, "name": "Create Service Interface"},
-    {"number": 3, "name": "Create Service Implementation"},
-    {"number": 4, "name": "Create Arguments/Results Models"},
-    {"number": 5, "name": "Register in Dependency Injection"},
-    {"number": 6, "name": "Verify Implementation"}
-  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
     "requiredFiles": [],
@@ -53,7 +154,3 @@
     "usedInTemplates": ["develop-user-story"]
   }
 }
-
-
-
-

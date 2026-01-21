@@ -17,7 +17,7 @@ This prompt guides the creation of a new process instance from an existing templ
 | Requirement | Description |
 |-------------|-------------|
 | Must use template | Never skip templates or work directly |
-| Must create instance | Always create process.md, memory.md, log.md |
+| Must create instance | Always create process.md, memory.json, log.json |
 | Must log interactions | Log user interactions before file changes |
 
 ---
@@ -64,8 +64,19 @@ Reference the process management knowledge file for complete instructions:
 **Process Instance Structure:**
 - Directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
 - `process.md` (with template placeholders substituted)
-- `memory.md` (initialized with template structure)
-- `log.md` (initialized with template structure and metadata)
+- `memory.json` (initialized with template structure)
+- `log.json` (initialized with template structure and metadata)
+
+### JSON-First Architecture
+
+**CRITICAL**: All templates and steps use a JSON-First Architecture:
+- **JSON files** (`.json`) contain all agent guidance, structured data, and machine-readable instructions
+- **MD files** (`.md`) contain user-friendly documentation only
+
+**When reading templates or steps:**
+1. **ALWAYS** read the `.json` file first for complete guidance
+2. The MD file provides user context but JSON has the authoritative instructions
+3. Use JSON data for: step sequences, parameters, substeps, guidance, tools, best practices
 
 ### Command Behavior
 
@@ -77,7 +88,8 @@ When `/process-new` is invoked:
 
 2. **List Available Templates**
    - Display templates from `.processes/templates/`
-   - Show purposes and required parameters
+   - **Read both `.json` and `.md` files** for each template
+   - Show purposes and required parameters from JSON
    - Help select appropriate template
    - **If no template fits**: Inform user and stop
 
@@ -89,13 +101,14 @@ When `/process-new` is invoked:
 4. **Resolve Step References**
    - Scan template for `@framework-step:category/step-name` references
    - Keep references as references (don't expand)
-   - Include brief description from step's Description section
+   - **Read step's `.json` file** for complete guidance when executing
+   - Include brief description from step's metadata
 
 5. **Create Process Instance** (MANDATORY)
    - Create process directory
    - Create `process.md` with substituted placeholders
-   - Initialize `memory.md` from template
-   - Initialize `log.md` from template
+   - Initialize `memory.json` from template
+   - Initialize `log.json` from template
    - Set status to "Running"
 
 6. **Start Process**
@@ -106,8 +119,8 @@ When `/process-new` is invoked:
 ### File Initialization
 
 1. **process.md**: All `{{placeholders}}` substituted, step references kept as references
-2. **memory.md**: Initialized from `.processes/templates/memory-template.md`
-3. **log.md**: Initialized from `.processes/templates/log-template.md` with metadata
+2. **memory.json**: Initialized from `.processes/templates/memory-template.md` (JSON schema)
+3. **log.json**: Initialized from `.processes/templates/log-template.md` (JSON schema)
 
 ### Step Reference Format
 
@@ -123,9 +136,9 @@ When `/process-new` is invoked:
 **Mandatory Workflow (once process is active):**
 ```
 User Makes Request → 
-IMMEDIATELY Log to log.md → 
+IMMEDIATELY Log to log.json → 
 Make File Changes → 
-Update log.md with changes
+Update log.json with changes
 ```
 
 **Log Format:**
@@ -146,12 +159,12 @@ When `/process-new` is invoked from within an active process (spawning a sub-pro
    - If spawning from a step, record parent process path
 
 2. **Create with Parent Reference**
-   - Set `parentProcess` in log.md metadata
-   - Set parent reference in memory.md Sub-Process State section
+   - Set `parentProcess` in log.json metadata
+   - Set parent reference in memory.json subProcessState section
    - Record "Spawned At Step" from parent context
 
 3. **Update Parent Process**
-   - Add new sub-process to parent's memory.md Child Sub-Processes table
+   - Add new sub-process to parent's memory.json childSubProcesses array
    - Set status to "running"
    - Record sync point from spawn instruction
 

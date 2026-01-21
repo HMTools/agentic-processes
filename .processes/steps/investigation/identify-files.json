@@ -5,20 +5,118 @@
   "metadata": {
     "title": "Identify Files",
     "purposeAndUsage": "Identify which files and directories need to be processed based on flexible criteria (patterns, scope descriptions, or both). Use when you need to create a comprehensive list of files for subsequent processing.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "File list and identification report",
-    "artifacts": ["identified-files.json"],
+    "artifacts": ["identified-files.json", "deep-search-tracking.json (for deep mode)"],
     "memoryUpdates": ["fileCount", "resultsJsonPath", "summary", "searchApproach", "exclusionsApplied"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": ["Context parameters from process.md or memory.json"],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below - workflow depends on search depth mode (simple or deep)",
+      "Simple mode: Agent decides search approach based on available parameters",
+      "Deep mode: Exhaustive search with tracking to ensure completeness"
+    ],
+    "files": {
+      "read": ["memory.json or process.md (context parameters)"],
+      "create": ["identified-files.json (results file)", "deep-search-tracking.json (for deep search mode, temporary)"],
+      "update": ["memory.json (current step section with reference to JSON files)", "log.json (actions taken, progress reporting)"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    "tools": [
+      "read_file - Read context parameters",
+      "glob_file_search - Find files matching patterns",
+      "list_dir - Explore directory structures",
+      "grep - Search file contents",
+      "codebase_search - Understand scope and identify targets",
+      "write - Create results JSON file"
+    ],
+    "bestPractices": [
+      "Apply exclusions during discovery when possible (more efficient)",
+      "Log progress periodically for large file sets (>1000 files)",
+      "Use simple search (default) for most cases - it's fast and efficient",
+      "Save results to separate JSON file to keep memory.json clean",
+      "For hidden directories (starting with .), glob_file_search may not find files - use list_dir as backup"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Read Context Parameters",
+      "description": "Read search parameters and determine search mode",
+      "actions": [
+        "Read filePatterns, scope, excludePatterns, searchDepth, includeMatchReason from context",
+        "Determine search mode: 'simple' (default) or 'deep'",
+        "Document parameters in log.json"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Handle Deep Search Mode",
+      "description": "Exhaustive search with tracking (if searchDepth = 'deep')",
+      "conditional": true,
+      "actions": [
+        "List all files recursively using list_dir",
+        "Create tracking JSON file to track progress",
+        "Iterate and check each file against criteria",
+        "Verify all files have been checked"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Handle Simple Search Mode",
+      "description": "Fast search using glob, grep, codebase_search (default mode)",
+      "conditional": true,
+      "actions": [
+        "Agent decides search approach based on available parameters",
+        "If patterns available: Use glob_file_search",
+        "If scope available: Use codebase_search + list_dir + grep",
+        "If both: Agent decides how to combine"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Apply Exclusion Patterns",
+      "description": "Filter out excluded files from results",
+      "actions": [
+        "Apply common exclusions (node_modules, .git, dist, build, bin, obj, etc.)",
+        "Apply custom exclusions from excludePatterns parameter",
+        "Log exclusions applied and files removed count"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Create File Identification Report",
+      "description": "Document the search results",
+      "actions": [
+        "Document search approach used",
+        "Include summary: total files found, excluded files count",
+        "Note any issues encountered"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Save Results to JSON File and Update Memory",
+      "description": "Save results and update memory reference",
+      "actions": [
+        "Save file list to identified-files.json",
+        "Format: array of paths (default) or array of {path, matchReason} objects",
+        "Write reference to memory.json with file count and path to JSON"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Read parameters → Choose search mode (simple/deep) → Execute search → Apply exclusions → Create report → Save results → Update memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section in memory.json or process.md - context parameters (filePatterns, scope, excludePatterns, searchDepth, includeMatchReason)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: File count, Path to results JSON file, Brief summary",
+      "Decisions Made: Search approach used, Search depth mode, Exclusion patterns applied"
+    ]
   },
   "searchModes": [
     {"mode": "simple", "default": true, "description": "Fast search using glob, grep, codebase_search"},
@@ -31,17 +129,9 @@
     "searchDepth": {"type": "string", "enum": ["simple", "deep"], "default": "simple"},
     "includeMatchReason": {"type": "boolean", "default": false}
   },
-  "substeps": [
-    {"number": 1, "name": "Read Context Parameters"},
-    {"number": 2, "name": "Handle Deep Search Mode", "conditional": true},
-    {"number": 3, "name": "Handle Simple Search Mode", "conditional": true},
-    {"number": 4, "name": "Apply Exclusion Patterns"},
-    {"number": 5, "name": "Create File Identification Report"},
-    {"number": 6, "name": "Save Results to JSON File and Update Memory"}
-  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.md or process.md"],
+    "requiredFiles": ["memory.json or process.md"],
     "requiredTools": ["read_file", "glob_file_search", "list_dir", "grep", "codebase_search", "write"]
   },
   "references": {
@@ -49,7 +139,3 @@
     "usedInTemplates": ["set-concept", "review-and-verify"]
   }
 }
-
-
-
-

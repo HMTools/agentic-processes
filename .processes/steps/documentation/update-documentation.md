@@ -140,9 +140,9 @@ Before writing documentation, use this decision tree to determine the scope and 
 - Use when documentation needs to track which flows/components were updated
 
 **Memory Files for This Step:**
-- **Read from**: previous implementation step in memory.md - What was implemented (files created, services added)
-- **Read from**: planning step section in memory.md - Feature overview and key requirements
-- **Write to**: current step section in memory.md (optional) - Track which docs were updated
+- **Read from**: previous implementation step in memory.json - What was implemented (files created, services added)
+- **Read from**: planning step section in memory.json - Feature overview and key requirements
+- **Write to**: current step section in memory.json (optional) - Track which docs were updated
 
 ## Flow
 

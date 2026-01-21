@@ -85,7 +85,7 @@ graph TD
   - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .user-processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.json
     - `processName`: {{processName}}
     - `templateName`: [template-name]
   - **Output**: Analysis report, implemented improvements, updated templates/steps
@@ -534,7 +534,7 @@ This step is mandatory and should be added before the "Errors & Notes" section:
   - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .user-processes/active/{process-name}/log.md
+    - `processLogPath`: .user-processes/active/{process-name}/log.json
     - `processName`: {{processName}}
     - `templateName`: [template-name]
   - **Output**: Analysis report, implemented improvements, updated templates/steps

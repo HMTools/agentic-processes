@@ -5,47 +5,165 @@
   "metadata": {
     "title": "Plan and Design Template",
     "purposeAndUsage": "Analyze requirements and design a new process template. Use before creating template files.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Complete template design including purpose, parameters, steps, and flow diagram",
     "artifacts": [],
     "memoryUpdates": ["purpose", "parameters", "stepBreakdown", "flowDiagram"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Clear understanding of the workflow to be templated",
+      "Knowledge of existing templates and steps"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: review requirements → check existing → purpose → use cases → check reusable steps → plan steps → identify parameters → design flow → create diagram",
+      "Before planning steps: Check existing generic steps in .processes/steps/planning/ and .processes/steps/common/",
+      "When planning steps: Prefer reusable step categories",
+      "When planning steps: Ensure each step represents actual work, not flow control",
+      "Use camelCase for parameter names: featureName, targetBranch"
+    ],
+    "files": {
+      "read": [".processes/templates/README.md", ".processes/steps/planning/", ".processes/steps/common/", "Existing templates for patterns"],
+      "create": [],
+      "update": ["memory.json (current step section with design details)"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    "tools": [
+      "read_file - Read existing templates and steps",
+      "list_dir - Explore existing templates and step categories",
+      "grep - Search for similar patterns"
+    ],
+    "bestPractices": [
+      "Check existing templates before creating new ones",
+      "Reuse existing steps where possible",
+      "Keep templates focused on a single workflow",
+      "Always include continuous improvement as final step",
+      "Use clear parameter naming with camelCase",
+      "Design steps to produce tangible outputs",
+      "Ensure flow diagram matches step sequence"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Review requirements",
+      "description": "Understand what workflow needs to be templated",
+      "actions": [
+        "Review the stated need for a new template",
+        "Identify the workflow to be standardized",
+        "Document expected outcomes"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Check existing templates",
+      "description": "Verify no similar template already exists",
+      "actions": [
+        "List existing templates",
+        "Search for similar workflows",
+        "Identify templates that could be extended vs creating new"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Write purpose statement",
+      "description": "Define clear purpose for the template",
+      "actions": [
+        "Write one-sentence purpose statement",
+        "Describe what workflow the template enables",
+        "Ensure purpose is specific and actionable"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Define use cases",
+      "description": "Document when to use this template",
+      "actions": [
+        "List scenarios where template applies",
+        "Define prerequisites or conditions",
+        "Identify target users"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Check existing reusable steps",
+      "description": "Identify steps that can be reused",
+      "actions": [
+        "Review .processes/steps/planning/ for planning steps",
+        "Review .processes/steps/common/ for utility steps",
+        "Review .processes/steps/investigation/ for analysis steps",
+        "List existing steps that fit the workflow"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Plan step breakdown",
+      "description": "Design the sequence of steps",
+      "actions": [
+        "Break workflow into logical stages",
+        "Assign steps to each stage (reuse existing or identify new)",
+        "Define expected output for each step",
+        "Ensure each step produces tangible work"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Identify parameters",
+      "description": "Define required and optional parameters",
+      "actions": [
+        "Identify values that must be provided by user (required)",
+        "Identify values that are helpful but optional",
+        "Use camelCase naming",
+        "Document parameter purposes"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Design process flow",
+      "description": "Map out the logical flow of the template",
+      "actions": [
+        "Design sequential flow of steps",
+        "Identify decision points and branches",
+        "Plan sync points if sub-processes involved"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Create mermaid diagram",
+      "description": "Create visual flowchart",
+      "actions": [
+        "Create mermaid flowchart syntax",
+        "Include all steps and decision points",
+        "Ensure diagram matches planned steps",
+        "Document design in memory"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Linear flow through all 9 substeps: requirements → existing check → purpose → use cases → reusable steps → step breakdown → parameters → flow design → diagram"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters and context",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Purpose statement, parameters list, step breakdown, flow diagram",
+      "Decisions Made: Step organization, parameter choices, reusable step selections"
+    ]
   },
   "parameterTypes": [
     {"type": "Required", "description": "Must be provided by user"},
     {"type": "Optional", "description": "Helpful but not mandatory"}
   ],
-  "substeps": [
-    {"number": 1, "name": "Review requirements"},
-    {"number": 2, "name": "Check existing templates"},
-    {"number": 3, "name": "Write purpose statement"},
-    {"number": 4, "name": "Define use cases"},
-    {"number": 5, "name": "Check existing reusable steps"},
-    {"number": 6, "name": "Plan step breakdown"},
-    {"number": 7, "name": "Identify parameters"},
-    {"number": 8, "name": "Design process flow"},
-    {"number": 9, "name": "Create mermaid diagram"}
-  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["template-template.md", "templates/README.md"],
-    "requiredTools": ["read_file", "list_dir"]
+    "requiredFiles": ["templates/README.md"],
+    "requiredTools": ["read_file", "list_dir", "grep"]
   },
   "references": {
     "relatedSteps": ["create-template-file", "validate-process-steps-exist"],
     "usedInTemplates": ["create-process-template"]
   }
 }
-
-
-
-

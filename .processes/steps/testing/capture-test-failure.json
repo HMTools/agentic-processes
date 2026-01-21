@@ -5,35 +5,129 @@
   "metadata": {
     "title": "Capture Test Failure",
     "purposeAndUsage": "Execute failing test and capture all relevant failure information. Use as first step when investigating test failures.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Complete failure information documented",
     "artifacts": [],
     "memoryUpdates": ["errorMessages", "stackTraces", "failurePoint"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": ["Failing test identified"],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Run the specific failing test in isolation",
+      "Capture complete error message and exception type",
+      "Record full stack trace",
+      "Check test initialization logs",
+      "Review console output and logging",
+      "Note infrastructure errors (Docker, database, queue)",
+      "Identify exact failure line",
+      "Check if failure is consistent or intermittent"
+    ],
+    "files": {
+      "read": ["Test class file", "Test output logs"],
+      "create": [],
+      "update": ["memory.json"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    "tools": [
+      "run_terminal_cmd - Run test: dotnet test --filter \"FullyQualifiedName~{testClass}.{testName}\"",
+      "run_terminal_cmd - Verbose: dotnet test --filter \"...\" --verbosity detailed",
+      "run_terminal_cmd - Docker logs: docker-compose logs",
+      "read_file - Read test class for context"
+    ],
+    "bestPractices": [
+      "Run test in isolation for clean output",
+      "Capture error message BEFORE stack trace",
+      "Check infrastructure errors separately",
+      "Determine if failure is intermittent"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Run failing test in isolation",
+      "description": "Execute the test to capture clean output",
+      "actions": [
+        "Run dotnet test with filter for specific test",
+        "Capture complete output"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Capture error message and exception",
+      "description": "Extract the exception type and message",
+      "actions": [
+        "Find exception type",
+        "Extract error message",
+        "Note any inner exceptions"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Record full stack trace",
+      "description": "Capture the complete stack trace",
+      "actions": [
+        "Record full stack trace",
+        "Note the top frames"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Check test initialization logs",
+      "description": "Review setup and teardown logs",
+      "actions": [
+        "Check test initialization logs",
+        "Review setup logs",
+        "Check teardown logs"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Note infrastructure errors",
+      "description": "Check for Docker, database, queue issues",
+      "actions": [
+        "Check Docker container status",
+        "Review database connectivity",
+        "Check message queue status"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Identify exact failure line",
+      "description": "Pinpoint where the test fails",
+      "actions": [
+        "Identify the exact line in test where failure occurs",
+        "Map to stack trace"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Store findings in memory",
+      "description": "Document all findings in memory.json",
+      "actions": [
+        "Write error messages to memory",
+        "Write stack traces to memory",
+        "Write failure point to memory"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Run test → Capture error → Record stack trace → Collect logs → Check infrastructure → Identify failure point → Store in memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters (test class, test name)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Error messages, stack traces, failure point",
+      "Decisions Made: Failure consistency (intermittent vs consistent)"
+    ]
   },
   "captureTypes": [
     {"type": "Error message", "capture": "Exception type and message"},
     {"type": "Stack trace", "capture": "Full trace showing failure point"},
     {"type": "Test logs", "capture": "Setup, execution, teardown logs"},
     {"type": "Infrastructure", "capture": "Docker, database, queue errors"}
-  ],
-  "substeps": [
-    {"number": 1, "name": "Run failing test in isolation"},
-    {"number": 2, "name": "Capture error message and exception"},
-    {"number": 3, "name": "Record full stack trace"},
-    {"number": 4, "name": "Check test initialization logs"},
-    {"number": 5, "name": "Note infrastructure errors"},
-    {"number": 6, "name": "Identify exact failure line"},
-    {"number": 7, "name": "Store findings in memory"}
   ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
@@ -45,7 +139,3 @@
     "usedInTemplates": ["integration-test-fix"]
   }
 }
-
-
-
-

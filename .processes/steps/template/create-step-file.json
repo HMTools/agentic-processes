@@ -5,52 +5,113 @@
   "metadata": {
     "title": "Create Step File",
     "purposeAndUsage": "Create a step file with all required sections following the layered documentation structure. Use when creating new process steps.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Complete step file with all sections",
     "artifacts": [".processes/steps/{category}/{step-name}.md", ".processes/steps/{category}/{step-name}.json"],
-    "memoryUpdates": ["stepFilePath", "validationResults"]
+    "memoryUpdates": ["stepFilePath", "jsonFilePath", "validationResults"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Step design completed (purpose, category, structure, flow diagram)",
+      "Category directory identified"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: create directory → write header → write user docs → write flow → create JSON → validate",
+      "Use kebab-case for filename: `.processes/steps/{category}/{step-name}.md`",
+      "MD file contains: Description, Purpose & Usage, Quick Reference, Flow diagram",
+      "JSON file contains: all guidance, substeps, tools, dependencies",
+      "Reference step-template.md for structure guidance"
+    ],
+    "files": {
+      "read": ["memory.json (step design from previous step)", ".processes/steps/step-template.md"],
+      "create": [".processes/steps/{category}/{step-name}.md", ".processes/steps/{category}/{step-name}.json"],
+      "update": ["memory.json (current step section with file paths and validation)"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
-    }
+    "tools": [
+      "write - Create step MD and JSON files",
+      "read_file - Read step-template.md for structure reference",
+      "list_dir - Verify category directory exists"
+    ],
+    "bestPractices": [
+      "Keep MD files user-focused: Description, Purpose & Usage, Quick Reference, Flow",
+      "Keep JSON files agent-focused: guidance, substeps, tools, dependencies",
+      "Use clear, actionable descriptions in substeps",
+      "Ensure flow diagram matches substeps",
+      "Validate all sections before completing"
+    ]
   },
-  "requiredSections": [
-    {"name": "Header comment", "required": true},
-    {"name": "Description", "required": true},
-    {"name": "Purpose & Usage", "required": true},
-    {"name": "Quick Reference", "required": true},
-    {"name": "Agent Layer", "required": true},
-    {"name": "Flow diagram", "required": true},
-    {"name": "Substeps", "required": true}
-  ],
   "substeps": [
-    {"number": 1, "name": "Create category directory if needed"},
-    {"number": 2, "name": "Write header comment block"},
-    {"number": 3, "name": "Write User Layer sections"},
-    {"number": 4, "name": "Write separator and Agent Layer header"},
-    {"number": 5, "name": "Write Agent Layer sections"},
-    {"number": 6, "name": "Write Flow diagram"},
-    {"number": 7, "name": "Write Substeps section"},
-    {"number": 8, "name": "Create JSON companion file"},
-    {"number": 9, "name": "Validate all sections"}
+    {
+      "number": 1,
+      "name": "Create category directory if needed",
+      "description": "Ensure the category directory exists in .processes/steps/",
+      "actions": [
+        "Check if .processes/steps/{category}/ exists",
+        "Create directory if it doesn't exist"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Write step MD file",
+      "description": "Create the user-facing MD file with all documentation sections",
+      "actions": [
+        "Create file: .processes/steps/{category}/{step-name}.md",
+        "Write Description section",
+        "Write Purpose & Usage section with output summary",
+        "Write Quick Reference table",
+        "Write Flow section with mermaid diagram"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create JSON companion file",
+      "description": "Create the agent-facing JSON file with complete guidance",
+      "actions": [
+        "Create file: .processes/steps/{category}/{step-name}.json",
+        "Include metadata: type, name, category, title, purposeAndUsage, lastUpdated",
+        "Include output: description, artifacts, memoryUpdates",
+        "Include guidance: prerequisites, mandatoryComponents, specificActions, files, tools, bestPractices",
+        "Include substeps: array with number, name, description, actions",
+        "Include flow: description of flow logic",
+        "Include memoryFileUsage: readFrom, writeTo, fields",
+        "Include dependencies: requiredComponents, requiredFiles, requiredTools",
+        "Include references: relatedSteps, usedInTemplates"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Validate all sections",
+      "description": "Verify both files are complete and consistent",
+      "actions": [
+        "Verify MD has all user-facing sections",
+        "Verify JSON has all agent-facing sections",
+        "Verify flow diagram in MD matches substeps in JSON",
+        "Document validation results in memory"
+      ]
+    }
   ],
+  "flow": {
+    "description": "Linear flow: create directory → write MD file → create JSON file → validate"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section (step design)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Step file path, JSON file path, validation results",
+      "Files Modified/Created: Step MD file, JSON companion file"
+    ]
+  },
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
     "requiredFiles": ["step-template.md"],
-    "requiredTools": ["write", "read_file"]
+    "requiredTools": ["write", "read_file", "list_dir"]
   },
   "references": {
     "relatedSteps": ["validate-step-structure", "plan-and-design-step"],
     "usedInTemplates": ["create-process-step-template"]
   }
 }
-
-
-
-

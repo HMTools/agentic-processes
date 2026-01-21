@@ -5,20 +5,107 @@
   "metadata": {
     "title": "Write Integration Tests",
     "purposeAndUsage": "Create comprehensive integration tests that verify complete flows of system components working together. Use for API, subscriber, or job testing.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "End-to-end integration test files",
     "artifacts": ["Tests/IntegrationTests/*.cs"],
     "memoryUpdates": ["testFilesCreated", "scenariosCovered"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Components implemented",
+      "Integration test infrastructure available"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Study Existing Test Patterns: Review similar integration tests; note mocking patterns and test data builders",
+      "Set Up Test Infrastructure: Configure test server or message consumer; set up WireMock for external services; configure test database",
+      "Create Test Class Structure: Create test class with appropriate base class; set up DI for tests; create setup and teardown methods",
+      "Write Test Scenarios: Happy path tests; validation failure tests; external service failure tests; edge case tests",
+      "Verify and Run Tests: Run all tests; verify database state assertions; verify mock interactions"
+    ],
+    "files": {
+      "read": ["Existing integration tests for patterns", "Components to test"],
+      "create": ["Tests/IntegrationTests/{Component}Tests.cs"],
+      "update": []
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "stepMetadata", "contextParameters", "guidance", "flow", "substeps", "memoryFileUsage"]
+    "tools": [
+      "read_file - Read existing test patterns",
+      "write - Create test files",
+      "codebase_search - Find similar tests",
+      "run_terminal_cmd - Run tests with dotnet test"
+    ],
+    "bestPractices": [
+      "Search for similar integration tests before writing",
+      "Review test infrastructure setup",
+      "Follow existing mocking patterns",
+      "Cover happy path, failures, and edge cases"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Study Existing Test Patterns",
+      "description": "Review similar integration tests in the codebase",
+      "actions": [
+        "Search for similar integration tests",
+        "Review test infrastructure setup",
+        "Note mocking patterns and test data builders"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Set Up Test Infrastructure",
+      "description": "Configure test server, mocks, and database",
+      "actions": [
+        "Configure test server or message consumer",
+        "Set up WireMock for external services",
+        "Configure test database"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create Test Class Structure",
+      "description": "Create test class with proper setup",
+      "actions": [
+        "Create test class with appropriate base class",
+        "Set up dependency injection for tests",
+        "Create setup and teardown methods"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Write Test Scenarios",
+      "description": "Implement tests for each scenario",
+      "actions": [
+        "Write happy path tests",
+        "Write validation failure tests",
+        "Write external service failure tests",
+        "Write edge case tests"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Verify and Run Tests",
+      "description": "Execute tests and verify results",
+      "actions": [
+        "Run all tests",
+        "Verify database state assertions",
+        "Verify mock interactions"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Study patterns → Set up infrastructure → Create class → Write scenarios → Run and verify"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step (components to test)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Test files created, scenarios covered",
+      "Files Modified/Created: Integration test files"
+    ]
   },
   "triggerTypes": [
     {"type": "HTTP request", "useCase": "API endpoint tests"},
@@ -32,13 +119,6 @@
     "scenariosToTest": {"description": "List of business scenarios"},
     "externalServices": {"description": "External services to mock"}
   },
-  "substeps": [
-    {"number": 1, "name": "Study Existing Test Patterns"},
-    {"number": 2, "name": "Set Up Test Infrastructure"},
-    {"number": 3, "name": "Create Test Class Structure"},
-    {"number": 4, "name": "Write Test Scenarios"},
-    {"number": 5, "name": "Verify and Run Tests"}
-  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
     "requiredFiles": ["Components to test"],
@@ -49,7 +129,3 @@
     "usedInTemplates": ["develop-user-story"]
   }
 }
-
-
-
-

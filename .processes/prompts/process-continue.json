@@ -37,7 +37,7 @@
   "stateRestoration": {
     "files": [
       {"name": "process.md", "purpose": "Current step, progress, status"},
-      {"name": "memory.md", "purpose": "Information from previous steps, decisions, context"}
+      {"name": "memory.json", "purpose": "Information from previous steps, decisions, context"}
     ],
     "information": ["Current step", "Completed work", "Decisions made", "Files created", "Important notes"]
   },

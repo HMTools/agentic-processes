@@ -53,17 +53,17 @@ flowchart TD
     Q --> R[Revise Affected Plans]
     R --> O
     P -->|Yes - Approved| S[Mark All Plans as Approved]
-    S --> T[Update current step section in memory.md]
+    S --> T[Update current step section in memory.json]
     T --> U[End: Ready for Implementation]
 ```
 
 ## Input
 - Path to approved high-level plan: `plans/{user-story-name}/plan.md`
-- Memory file: previous step section in memory.md containing plan directory and approval status
+- Memory file: previous step section in memory.json containing plan directory and approval status
 
 ## Output
 - Multiple detailed plan files: `plans/{user-story-name}/step-{n}-{step-name}.md`
-- Updated memory file: current step section in memory.md with index of all detailed plans
+- Updated memory file: current step section in memory.json with index of all detailed plans
 - Each detailed plan includes:
   - Overview and parent plan reference
   - Q&A section for missing step-specific information (if needed)
@@ -397,7 +397,7 @@ When user requests changes to any detailed plan:
 
 ### Approval States
 
-Track approval state in current step section in memory.md:
+Track approval state in current step section in memory.json:
 
 ```markdown
 # Detailed Plans Index
@@ -474,8 +474,8 @@ This step is complete when:
 - [ ] Plans presented to user in organized format for review
 - [ ] User feedback received and any requested changes incorporated
 - [ ] Revision cycle repeated until user explicitly approves all plans
-- [ ] All plans marked as "approved" in current step section in memory.md
-- [ ] Memory file current step section in memory.md updated with final approval status and timestamp
+- [ ] All plans marked as "approved" in current step section in memory.json
+- [ ] Memory file current step section in memory.json updated with final approval status and timestamp
 
 ## Notes
 

@@ -17,7 +17,7 @@ This prompt guides the continuation of an existing process by discovering active
 | Requirement | Description |
 |-------------|-------------|
 | Must have process | Never work outside a process |
-| Must restore state | Read process.md and memory.md |
+| Must restore state | Read process.md and memory.json |
 | Must log interactions | Log user interactions before file changes |
 
 ---
@@ -61,15 +61,15 @@ Reference the process management knowledge file for complete instructions:
 **Mandatory Workflow:**
 ```
 User Makes Request/Correction → 
-IMMEDIATELY Log to log.md (before any file changes) → 
+IMMEDIATELY Log to log.json (before any file changes) → 
 Make File Changes → 
-Update log.md with what was changed
+Update log.json with what was changed
 ```
 
 **Enforcement Checklist (MUST verify before ANY file modification):**
 - [ ] **Did the user make a request/correction?** → Log it immediately
 - [ ] **Am I about to modify a file?** → Check if I logged the user interaction first
-- [ ] **Did I just modify a file?** → Update log.md "Files Modified" section
+- [ ] **Did I just modify a file?** → Update log.json filesModified array
 
 **Log Format:**
 ```markdown
@@ -79,6 +79,17 @@ Update log.md with what was changed
    - **Agent Response**: {what changed in response}
    - **Timestamp**: {YYYY-MM-DD HH:mm:ss}
 ```
+
+### JSON-First Architecture
+
+**CRITICAL**: All templates and steps use a JSON-First Architecture:
+- **JSON files** (`.json`) contain all agent guidance, structured data, and machine-readable instructions
+- **MD files** (`.md`) contain user-friendly documentation only
+
+**When executing steps:**
+1. **ALWAYS** read the step's `.json` file for complete guidance
+2. JSON contains: substeps, specific actions, files to read/create/update, tools, best practices
+3. The MD file provides user context but JSON has the authoritative instructions
 
 ### Command Behavior
 
@@ -103,7 +114,7 @@ When `/process-continue` is invoked:
    - Review completed steps and identify next incomplete step
 
 3. **Read Memory File**
-   - Read `.user-processes/active/{process-folder}/memory.md`
+   - Read `.user-processes/active/{process-folder}/memory.json`
    - Summarize key information from previous steps
 
 4. **Summarize Current State**
@@ -119,7 +130,8 @@ When `/process-continue` is invoked:
    - Set active step to next incomplete step
 
 6. **Proceed with Guidance**
-   - Provide guidance on what needs to be done
+   - **Read the current step's `.json` file** for complete guidance
+   - Follow substeps, specific actions, and best practices from JSON
    - Reference relevant information from memory
    - All work must be done within process structure
    - Update process files as you work
@@ -127,7 +139,7 @@ When `/process-continue` is invoked:
 
 ### State Restoration
 
-The AI reads both `process.md` and `memory.md` to fully restore context:
+The AI reads both `process.md` and `memory.json` to fully restore context:
 - Current step and progress
 - Completed work
 - Decisions made
@@ -150,9 +162,9 @@ Ensure continuity by:
 When continuing a process that has sub-processes:
 
 1. **Read Sub-Process State from Memory**
-   - Read memory.md "Sub-Process State" section
-   - Check "Child Sub-Processes" table for status
-   - Sub-processes update this table when they complete (via notify-parent-complete)
+   - Read memory.json `subProcessState` section
+   - Check `childSubProcesses` array for status
+   - Sub-processes update this when they complete (via notify-parent-complete)
 
 2. **At Sync Points**
    - If current step is a sync point, check Child Sub-Processes status in memory

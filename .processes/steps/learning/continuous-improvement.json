@@ -5,20 +5,127 @@
   "metadata": {
     "title": "Continuous Improvement & Learning",
     "purposeAndUsage": "Analyze process execution log and implement improvements for future iterations. Use at the end of every process to learn from execution and improve templates/steps.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Analysis report and implemented improvements",
     "artifacts": ["updated templates", "updated steps", "updated documentation"],
     "memoryUpdates": ["improvementsIdentified", "improvementsImplemented", "improvementsDeferred", "summary"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": ["Process execution log (log.json) with user interactions"],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Read Process Log: Load log.json; parse all user interactions and change requests; identify patterns and recurring issues; note high iteration counts",
+      "Analyze for Improvements: Group similar user corrections; identify corrections that could be automated; find missing validations; detect documentation gaps",
+      "Prioritize Improvements: Rank by frequency, impact, and ease; focus on high frequency + high impact + easy to implement; limit to top 3-5",
+      "For Each Improvement: Propose to user (What, Why, Impact, Scope); investigate solution; implement change; request approval; document improvement",
+      "MANDATORY: Propose ALL improvements before completing; user must approve/reject each",
+      "Summarize All Improvements: List improvements made and skipped; provide recommendations"
+    ],
+    "files": {
+      "read": [".user-processes/active/{process-name}/log.json"],
+      "create": [],
+      "update": [
+        "Process templates in .processes/templates/",
+        "Process steps in .processes/steps/",
+        "Documentation in docs/"
+      ]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "improvementCategories", "filesFolders", "bestPractices", "memoryFileUsage", "successCriteria"]
+    "tools": [
+      "read_file - Read log.json and target files",
+      "write - Create or update files",
+      "search_replace - Make targeted updates"
+    ],
+    "bestPractices": [
+      "Propose all improvements: Before completing, ensure ALL identified improvements have been proposed",
+      "One at a time: Only implement one improvement at a time",
+      "Always get approval: User must approve before proceeding",
+      "Atomic changes: Keep each improvement focused and self-contained",
+      "No traceback: Don't reference the previous state in the improved version",
+      "Clean implementation: Make it look like it was always there"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Read Process Log",
+      "description": "Load and parse the process execution log",
+      "actions": [
+        "Load process log from .user-processes/active/{process-name}/log.json",
+        "Parse all user interactions and change requests",
+        "Identify patterns and recurring issues",
+        "Note high iteration counts on files or steps"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Analyze for Improvements",
+      "description": "Identify improvement opportunities from the log",
+      "actions": [
+        "Group similar user corrections",
+        "Identify steps with multiple iterations",
+        "Find documentation gaps",
+        "Detect repeated manual interventions"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Prioritize Improvements",
+      "description": "Rank improvements by frequency, impact, and ease",
+      "actions": [
+        "Score each improvement by: Frequency, Impact, Ease",
+        "Focus on high frequency + high impact + easy to implement",
+        "Limit to top 3-5 improvements"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Implement Each Improvement (Iteratively)",
+      "description": "For each prioritized improvement, propose, implement, and get approval",
+      "actions": [
+        "a. Propose Improvement: Present What, Why, Impact, Scope",
+        "b. Investigate Solution: Research approach, identify files to modify",
+        "c. Implement Change: Make modifications following conventions",
+        "d. Request User Approval: Show changes, ask for confirmation",
+        "e. Document Improvement: Update memory with what was improved"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Mandatory: Propose ALL Improvements",
+      "description": "Ensure all identified improvements are proposed to user",
+      "actions": [
+        "Checklist:",
+        "- Have all identified improvements been proposed?",
+        "- Has the user approved/rejected each?",
+        "- Have all approved improvements been implemented?",
+        "- Have all rejected improvements been documented with reasons?"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Summarize All Improvements",
+      "description": "Create final summary of all improvements",
+      "actions": [
+        "List all improvements made",
+        "List improvements skipped and why",
+        "Provide recommendations for future work"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Read log → Analyze for improvements → Prioritize → For each: propose → implement → approve → Next → Summarize all"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process log (log.json)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Improvements Identified: List with descriptions",
+      "Improvements Implemented: Each with Change, Files Modified, User Approval, Impact",
+      "Improvements Deferred: Each with Reason",
+      "Summary: Total identified, implemented, deferred"
+    ]
   },
   "improvementCategories": [
     {"name": "Automation Opportunities", "description": "User repeatedly asked for same type of change"},
@@ -37,9 +144,16 @@
     "steps": ["propose", "investigate", "implement", "approve", "document"],
     "approvalRequired": true
   },
+  "successCriteria": [
+    "Process log has been fully analyzed",
+    "All identified improvements have been either implemented or deferred",
+    "User has approved all implemented changes",
+    "Memory file documents all improvements and outcomes",
+    "No more high-priority improvements remain"
+  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["log.md"],
+    "requiredFiles": ["log.json"],
     "requiredTools": ["read_file", "write", "search_replace"]
   },
   "references": {
@@ -47,7 +161,3 @@
     "usedInTemplates": ["all templates (final step)"]
   }
 }
-
-
-
-

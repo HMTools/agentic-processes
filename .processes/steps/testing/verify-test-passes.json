@@ -5,31 +5,101 @@
   "metadata": {
     "title": "Verify Test Passes",
     "purposeAndUsage": "Verify implemented fix resolves test failure. Use as final step in test fix process.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Test verification results and debug cleanup",
     "artifacts": [],
     "memoryUpdates": ["testResults", "finalStatus"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": ["Implemented fix from previous step"],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Run the specific test that was failing",
+      "Capture complete test output",
+      "Determine pass/fail status",
+      "If passed: Remove temporary debug logging; verify no debug artifacts remain; document success",
+      "If failed: Capture new failure information; present to user; offer options (revise analysis, add diagnostics, end process); wait for user decision"
+    ],
+    "files": {
+      "read": ["memory.json (previous step)", "Files with debug logging"],
+      "create": [],
+      "update": ["Files to clean debug code from"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
+    "tools": [
+      "run_terminal_cmd - Run test: dotnet test --filter \"FullyQualifiedName~{testClass}.{testName}\"",
+      "search_replace - Remove debug logging",
+      "read_file - Read files for cleanup"
+    ],
+    "bestPractices": [
+      "Run the exact same test that was originally failing",
+      "Capture complete output for comparison",
+      "Remove debug logging marked with '// TODO: REMOVE - Added by agent for debugging'",
+      "If still failing, present options to user"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Run the originally failing test",
+      "description": "Execute the test to verify the fix",
+      "actions": [
+        "Run the specific test using dotnet test with filter",
+        "Capture complete output"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Capture complete output",
+      "description": "Record test execution results",
+      "actions": [
+        "Capture all test output",
+        "Note any warnings or errors"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Determine pass/fail",
+      "description": "Check if test passed or failed",
+      "actions": [
+        "Check test result status",
+        "Determine pass or fail"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Handle result (cleanup or present options)",
+      "description": "Take appropriate action based on result",
+      "actions": [
+        "If pass: Remove temporary debug logging; verify no debug artifacts remain",
+        "If fail: Capture new failure; present to user; offer options"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Document final status",
+      "description": "Record final outcome in memory",
+      "actions": [
+        "Document test results",
+        "Write final status to memory.json"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Run test → Capture output → Determine result → (Pass: cleanup) OR (Fail: present options) → Document status"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step - files modified",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Test results, final status",
+      "Decisions Made: Success/failure, next steps (if failed)"
+    ]
   },
   "results": [
     {"result": "Pass", "action": "Clean up debug logging, document success"},
     {"result": "Fail", "action": "Capture new failure, present user options"}
-  ],
-  "substeps": [
-    {"number": 1, "name": "Run the originally failing test"},
-    {"number": 2, "name": "Capture complete output"},
-    {"number": 3, "name": "Determine pass/fail"},
-    {"number": 4, "name": "Handle result (cleanup or present options)"},
-    {"number": 5, "name": "Document final status"}
   ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
@@ -41,7 +111,3 @@
     "usedInTemplates": ["integration-test-fix"]
   }
 }
-
-
-
-

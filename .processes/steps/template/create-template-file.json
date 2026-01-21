@@ -5,51 +5,131 @@
   "metadata": {
     "title": "Create Template File",
     "purposeAndUsage": "Create a template file with all required sections. Use when creating new process templates.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Complete template file with all sections",
-    "artifacts": [".processes/templates/{template-name}.md", ".processes/templates/{template-name}.json"],
-    "memoryUpdates": ["templateFilePath", "validationResults"]
+    "artifacts": [".processes/templates/{category}/{template-name}.md", ".processes/templates/{category}/{template-name}.json"],
+    "memoryUpdates": ["templateFilePath", "jsonFilePath", "validationResults"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Template design completed (purpose, parameters, steps, flow diagram)",
+      "All referenced steps exist or are identified for creation"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: create file → write user docs → write flow → write steps → create JSON → validate",
+      "Use kebab-case for filename: `.processes/templates/{category}/{template-name}.md`",
+      "MD file contains: Description, Purpose & Usage, Quick Reference, Flow diagram, Steps list",
+      "JSON file contains: metadata, parameters, steps with full context, guidance",
+      "Each step references framework-step: @framework-step:category/step-name"
+    ],
+    "files": {
+      "read": ["memory.json (template design from previous step)", ".processes/templates/template-template.md (if exists)"],
+      "create": [".processes/templates/{category}/{template-name}.md", ".processes/templates/{category}/{template-name}.json"],
+      "update": ["memory.json (current step section with file paths and validation)"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
-    }
+    "tools": [
+      "write - Create template MD and JSON files",
+      "read_file - Read template design from memory",
+      "list_dir - Verify directory structure"
+    ],
+    "bestPractices": [
+      "Always include continuous improvement as final step",
+      "Use @framework-step:category/step-name for all step references",
+      "Keep parameters section clear with required vs optional",
+      "Ensure flow diagram matches step sequence",
+      "Include memory file configuration"
+    ]
   },
-  "requiredSections": [
-    {"name": "Header comment", "required": true},
-    {"name": "Parameters", "required": true},
-    {"name": "Process Flow", "required": true},
-    {"name": "Steps", "required": true},
-    {"name": "Continuous Improvement", "required": true}
-  ],
   "substeps": [
-    {"number": 1, "name": "Create template file"},
-    {"number": 2, "name": "Write header comment"},
-    {"number": 3, "name": "Write User Layer sections"},
-    {"number": 4, "name": "Write separator and Agent Layer"},
-    {"number": 5, "name": "Write parameters section"},
-    {"number": 6, "name": "Write process flow diagram"},
-    {"number": 7, "name": "Write step definitions"},
-    {"number": 8, "name": "Add continuous improvement step"},
-    {"number": 9, "name": "Create JSON companion"},
-    {"number": 10, "name": "Validate all sections"}
+    {
+      "number": 1,
+      "name": "Create template file",
+      "description": "Create the MD file in the templates directory",
+      "actions": [
+        "Create category directory if needed",
+        "Create file: .processes/templates/{category}/{template-name}.md"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Write user documentation sections",
+      "description": "Write the user-facing documentation",
+      "actions": [
+        "Write header comment with template name and purpose",
+        "Write Description section",
+        "Write Purpose & Usage section",
+        "Write Quick Reference table with parameters"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Write flow diagram",
+      "description": "Add mermaid flowchart showing process flow",
+      "actions": [
+        "Write Process Flow section",
+        "Create mermaid flowchart matching planned steps",
+        "Include decision points and branches"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Write step definitions",
+      "description": "Document all steps with their references",
+      "actions": [
+        "Write Steps section",
+        "For each step: checkbox, description, step reference",
+        "Use format: - [ ] Step N: Description (@framework-step:category/step-name)",
+        "Include output for each step",
+        "Add continuous improvement as final step"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Create JSON companion file",
+      "description": "Create the agent-facing JSON with complete step definitions",
+      "actions": [
+        "Create file: .processes/templates/{category}/{template-name}.json",
+        "Include metadata: type, name, category, title, purposeAndUsage",
+        "Include parameters: required and optional arrays",
+        "Include steps array with full context for each step",
+        "Include guidance section",
+        "Include memoryFileUsage configuration"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Validate all sections",
+      "description": "Verify template is complete and valid",
+      "actions": [
+        "Verify all required sections present",
+        "Verify all step references are valid",
+        "Verify flow diagram matches steps",
+        "Document validation results"
+      ]
+    }
   ],
+  "flow": {
+    "description": "Linear flow: create file → write user docs → write flow → write steps → create JSON → validate"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section (template design)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Template file path, JSON file path, validation results",
+      "Files Modified/Created: Template MD file, JSON companion file"
+    ]
+  },
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["template-template.md"],
-    "requiredTools": ["write", "read_file"]
+    "requiredFiles": [],
+    "requiredTools": ["write", "read_file", "list_dir"]
   },
   "references": {
     "relatedSteps": ["plan-and-design-template", "validate-process-steps-exist"],
     "usedInTemplates": ["create-process-template"]
   }
 }
-
-
-
-

@@ -5,43 +5,201 @@
   "metadata": {
     "title": "Design Implementation Plan",
     "purposeAndUsage": "Design a comprehensive implementation plan for implementing or updating a concept across non-code files. Creates detailed change proposals for modifications and new file creation.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Implementation plan document with change proposals",
     "artifacts": ["implementation-plan.md"],
     "memoryUpdates": ["implementationPlanPath", "requestedState", "totalChangeProposals", "filesToModify", "filesToCreate", "approvalStatus", "approvedChangeIds"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Concept definition from previous step",
+      "Findings report with current state analysis",
+      "Process parameters (conceptDescription, requestedState, verificationCriteria)"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Read Context from Previous Steps: Read from memory.json (concept definition, findings, gaps); read from process.md (conceptDescription, requestedState, verificationCriteria); read the findings report to understand current state",
+      "Understand Requested State: If requestedState parameter provided, use as specification; if NOT provided, derive from concept description and characteristics; document requested state specification clearly",
+      "Analyze Existing State and Gaps: Review findings report from previous step; identify files that need modification vs. creation; map gaps to change proposals needed",
+      "Design Implementation Approach: Break down into logical steps; determine order of changes (dependencies); design verification approach",
+      "Create Change Proposals: For modifications (MOD-XXX): Change ID, file path, type, current/requested state, instructions, rationale; for new files (NEW-XXX): Change ID, file path, type, content specification, rationale",
+      "Present Plan and Get Approval: Present implementation-plan.md to user; explain approval options; wait for user response; log user interaction before processing"
+    ],
+    "files": {
+      "read": ["memory.json", "process.md", "findings report", "target files"],
+      "create": ["implementation-plan.md"],
+      "update": ["memory.json", "log.json"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps", "changeProposalFormat"]
-    }
+    "tools": [
+      "read_file - Read context from memory, process, findings, target files",
+      "write - Create implementation-plan.md",
+      "search_replace - Update memory.json and log.json"
+    ],
+    "bestPractices": [
+      "Be specific: Change proposals should be detailed enough for next step to apply without ambiguity",
+      "Consider dependencies: Order changes to avoid breaking things",
+      "Provide rationale: Explain why each change is needed",
+      "Keep proposals atomic: Each proposal should be self-contained",
+      "Use consistent IDs: Makes it easy for user to approve specific proposals"
+    ]
   },
   "substeps": [
-    {"number": 1, "name": "Read context from memory.md"},
-    {"number": 2, "name": "Read process parameters"},
-    {"number": 3, "name": "Read findings report"},
-    {"number": 4, "name": "Understand/derive requested state"},
-    {"number": 5, "name": "Analyze gaps and map to proposals"},
-    {"number": 6, "name": "Design implementation approach"},
-    {"number": 7, "name": "Create modification proposals"},
-    {"number": 8, "name": "Create new file proposals"},
-    {"number": 9, "name": "Create implementation-plan.md"},
-    {"number": 10, "name": "Present plan to user"},
-    {"number": 11, "name": "Process user response"},
-    {"number": 12, "name": "Update memory with approval status"}
+    {
+      "number": 1,
+      "name": "Read context from memory.json",
+      "description": "Read concept definition, findings, and gaps from memory",
+      "actions": [
+        "Read memory.json to get concept definition from previous step",
+        "Get findings report path",
+        "Understand gaps identified"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Read process parameters",
+      "description": "Extract conceptDescription, requestedState, verificationCriteria from process.md",
+      "actions": [
+        "Read process.md to get conceptDescription",
+        "Get requestedState parameter if provided",
+        "Get verificationCriteria parameter"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Read findings report",
+      "description": "Read findings report to understand current state",
+      "actions": [
+        "Read findings report file",
+        "Understand current state analysis",
+        "Note gaps and areas needing changes"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Understand/derive requested state",
+      "description": "Determine the target state for files after implementation",
+      "actions": [
+        "If requestedState parameter provided: Use as specification",
+        "If NOT provided: Derive from concept description and characteristics",
+        "Document requested state specification clearly"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Analyze gaps and map to proposals",
+      "description": "Map identified gaps to specific change proposals needed",
+      "actions": [
+        "Review gaps from findings report",
+        "Identify files that need modification",
+        "Identify files that need to be created",
+        "Map each gap to a change proposal"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Design implementation approach",
+      "description": "Design the overall approach for implementing changes",
+      "actions": [
+        "Break down into logical steps",
+        "Determine order of changes (dependencies)",
+        "Design verification approach"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Create modification proposals",
+      "description": "Create change proposals for existing file modifications",
+      "actions": [
+        "For each file needing modification, create a proposal with:",
+        "Change ID (MOD-XXX), file path, type: modification",
+        "Current state description",
+        "Requested state description",
+        "Detailed instructions for making the change",
+        "Rationale for why change is needed"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Create new file proposals",
+      "description": "Create change proposals for new files to be created",
+      "actions": [
+        "For each new file needed, create a proposal with:",
+        "Change ID (NEW-XXX), file path, type: new_file",
+        "Content specification (what should be in the file)",
+        "Rationale for why file is needed"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Create implementation-plan.md",
+      "description": "Create the implementation plan document",
+      "actions": [
+        "Create implementation-plan.md with all change proposals",
+        "Include requested state specification",
+        "Include implementation approach",
+        "Include verification approach"
+      ]
+    },
+    {
+      "number": 10,
+      "name": "Present plan to user",
+      "description": "Present implementation plan and explain approval options",
+      "actions": [
+        "Present implementation-plan.md to user",
+        "Explain approval options: approve all, approve specific IDs, request modifications, reject",
+        "Wait for user response"
+      ]
+    },
+    {
+      "number": 11,
+      "name": "Process user response",
+      "description": "Handle user's approval, modification request, or rejection",
+      "actions": [
+        "Log user interaction IMMEDIATELY before making any changes",
+        "If approved: Note which changes are approved (all or specific IDs)",
+        "If modification requested: Revise proposals and re-present",
+        "If rejected: Document rejection reason"
+      ]
+    },
+    {
+      "number": 12,
+      "name": "Update memory with approval status",
+      "description": "Update memory.json with plan summary and approval status",
+      "actions": [
+        "Write to memory.json current step section",
+        "Include: implementation plan path, total proposals, files to modify/create",
+        "Include: approval status, list of approved Change IDs"
+      ]
+    }
   ],
-  "changeProposalTypes": [
-    {"type": "modification", "prefix": "MOD"},
-    {"type": "new_file", "prefix": "NEW"}
-  ],
+  "flow": {
+    "description": "Read context → Read parameters → Read findings → Understand requested state → Analyze gaps → Design approach → Create proposals → Create plan document → Present for approval → Process response → Update memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous steps (concept definition, findings, gaps), process.md parameters",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Implementation plan path, Requested state specification, Total change proposals count, Files to modify/create lists",
+      "Decisions Made: Implementation approach, Change proposal priorities",
+      "Approval Status: Approved/Pending/Rejected, List of approved Change IDs"
+    ]
+  },
+  "changeProposalFormat": {
+    "modification": {
+      "prefix": "MOD",
+      "fields": ["File path", "Type: modification", "Current state", "Requested state", "Detailed instructions", "Rationale"]
+    },
+    "newFile": {
+      "prefix": "NEW",
+      "fields": ["File path", "Type: new_file", "Content specification", "Rationale"]
+    }
+  },
   "approvalRequired": true,
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.md", "process.md", "findings-report.md"],
+    "requiredFiles": ["memory.json", "process.md", "findings-report"],
     "requiredTools": ["read_file", "write", "search_replace"]
   },
   "references": {
@@ -49,7 +207,3 @@
     "usedInTemplates": ["set-concept"]
   }
 }
-
-
-
-

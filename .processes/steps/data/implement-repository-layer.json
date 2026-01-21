@@ -5,20 +5,112 @@
   "metadata": {
     "title": "Implement Repository Layer",
     "purposeAndUsage": "Implement data access layer using Repository pattern with MongoDB. Use when creating or modifying data access components.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Repository interfaces, implementations, and MongoDB entity models",
     "artifacts": ["Data/Repositories/Interfaces/*.cs", "Data/Repositories/{category}/*.cs", "Data/Entities/*.cs"],
     "memoryUpdates": ["repositoryCreated", "operationsImplemented"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Domain models defined",
+      "MongoDB collections designed"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Review Requirements: Understand entity and operations needed",
+      "Study Existing Patterns: Search for similar repositories in Data/Repositories/",
+      "Create/Update MongoDB Entity Model: Create entity class in Data/Entities/ (if new)",
+      "Create/Update Repository Interface: Define repository contract in Data/Repositories/Interfaces/",
+      "Implement Repository Class: Implement MongoDB operations in Data/Repositories/{category}/",
+      "Register in DI Container: Add repository registration"
+    ],
+    "files": {
+      "read": ["Existing repositories for patterns", "Domain models"],
+      "create": [
+        "Data/Entities/{Entity}.cs (if new)",
+        "Data/Repositories/Interfaces/I{Entity}Repository.cs",
+        "Data/Repositories/{category}/{Entity}Repository.cs"
+      ],
+      "update": ["DI registration file"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "stepMetadata", "contextParameters", "guidance", "flow", "substeps", "memoryFileUsage"]
+    "tools": [
+      "read_file - Read existing repository patterns",
+      "write - Create repository files",
+      "codebase_search - Find similar repositories",
+      "grep - Search for specific patterns"
+    ],
+    "bestPractices": [
+      "Search for similar repositories before creating",
+      "Review MongoDB entity patterns in Data/Entities/",
+      "Include async methods with CancellationToken support",
+      "Add error handling and logging"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Review Requirements and Study Patterns",
+      "description": "Understand entity structure and find existing patterns",
+      "actions": [
+        "Understand entity structure and required operations",
+        "Search for similar repositories in Data/Repositories/",
+        "Review MongoDB entity patterns in Data/Entities/"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Create/Update MongoDB Entity Model",
+      "description": "Create entity class if new repository",
+      "conditional": true,
+      "actions": [
+        "Create entity class in Data/Entities/",
+        "Map to MongoDB collection",
+        "Add appropriate attributes"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create/Update Repository Interface",
+      "description": "Define repository contract",
+      "actions": [
+        "Create interface in Data/Repositories/Interfaces/",
+        "Define method signatures for required operations",
+        "Include async methods with CancellationToken support"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Implement Repository Class",
+      "description": "Implement MongoDB operations",
+      "actions": [
+        "Create implementation in Data/Repositories/{category}/",
+        "Inject MongoDB client/database",
+        "Implement each operation using MongoDB driver",
+        "Add error handling and logging"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Register in Dependency Injection",
+      "description": "Register repository in DI container",
+      "actions": [
+        "Add repository registration to DI container",
+        "Follow existing registration patterns"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Review requirements → Study patterns → (Create entity if new) → Create/update interface → Implement repository → Register in DI"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step (domain models, requirements)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Repository created, operations implemented",
+      "Files Modified/Created: Entity model, interface, implementation"
+    ]
   },
   "contextParameters": {
     "entityName": {"description": "Name of the entity"},
@@ -27,13 +119,6 @@
     "category": {"description": "Repository category folder"},
     "isNewRepository": {"description": "Whether creating new or modifying existing"}
   },
-  "substeps": [
-    {"number": 1, "name": "Review Requirements and Study Patterns"},
-    {"number": 2, "name": "Create/Update MongoDB Entity Model", "conditional": true},
-    {"number": 3, "name": "Create/Update Repository Interface"},
-    {"number": 4, "name": "Implement Repository Class"},
-    {"number": 5, "name": "Register in Dependency Injection"}
-  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
     "requiredFiles": ["Domain models"],
@@ -44,7 +129,3 @@
     "usedInTemplates": ["develop-user-story"]
   }
 }
-
-
-
-

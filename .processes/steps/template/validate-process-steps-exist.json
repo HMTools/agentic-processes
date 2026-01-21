@@ -5,17 +5,122 @@
   "metadata": {
     "title": "Validate Process-Steps Exist",
     "purposeAndUsage": "Validate that all process-steps referenced in a template exist. Use when creating or reviewing templates.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Validation report of existing vs. missing process-steps",
-    "artifacts": ["spawnedSubProcesses"],
+    "artifacts": ["validation-report"],
     "memoryUpdates": ["validationResults", "missingStepsList", "spawnedSubProcesses"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Template file to validate exists",
+      "Template contains @framework-step references"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: read template → extract references → check existence → create report → handle missing",
+      "Reference format: @framework-step:category/step-name",
+      "Step file location: .processes/steps/{category}/{step-name}.md",
+      "If missing steps found: either spawn sub-processes or PAUSE for manual creation"
+    ],
+    "files": {
+      "read": ["Template file to validate", ".processes/steps/{category}/{step-name}.md for each reference"],
+      "create": [],
+      "update": ["memory.json (current step section with validation results)"]
+    },
+    "tools": [
+      "read_file - Read template and check step files",
+      "grep - Extract @framework-step references",
+      "list_dir - Verify step directories exist"
+    ],
+    "bestPractices": [
+      "Extract all @framework-step references systematically",
+      "Check both MD and JSON files exist for each step",
+      "Document all missing steps with their expected locations",
+      "Verify continuous improvement step exists",
+      "Provide clear report of validation results"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Read template file",
+      "description": "Load the template content for analysis",
+      "actions": [
+        "Read the template MD file",
+        "Read the template JSON file if exists",
+        "Document template being validated"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Extract step references",
+      "description": "Find all @framework-step references in the template",
+      "actions": [
+        "Search for @framework-step:category/step-name pattern",
+        "Create list of all referenced steps",
+        "Note the category and name for each reference"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Check step existence",
+      "description": "Verify each referenced step exists",
+      "actions": [
+        "For each reference, check .processes/steps/{category}/{step-name}.md exists",
+        "Also verify .processes/steps/{category}/{step-name}.json exists",
+        "Mark as valid if both files exist",
+        "Mark as missing if either file doesn't exist"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Create validation report",
+      "description": "Document validation results",
+      "actions": [
+        "List all valid step references",
+        "List all missing step references",
+        "Calculate validation summary (X of Y valid)"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "List missing steps",
+      "description": "Document missing steps with locations",
+      "actions": [
+        "For each missing step, document expected path",
+        "Document category and name",
+        "Suggest creation approach"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Handle missing steps",
+      "description": "Determine how to handle missing steps",
+      "actions": [
+        "Option A - Sub-Process: If autoSpawnMissing or user approves, spawn create-process-step-template sub-process for each missing step",
+        "Option B - PAUSE: If user prefers manual, PAUSE and list missing steps",
+        "Document decision in memory"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Linear flow: read template → extract references → check existence → create report → list missing → handle missing"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Template file path from previous step",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Validation results, missing steps list, spawned sub-processes (if any)",
+      "Decisions Made: How to handle missing steps"
+    ]
   },
   "parameters": {
     "required": [],
     "optional": ["autoSpawnMissing"],
-    "defaults": { "autoSpawnMissing": false }
+    "defaults": {"autoSpawnMissing": false}
   },
   "subProcessSupport": {
     "canSpawnSubProcesses": true,
@@ -23,26 +128,10 @@
     "forEach": "missingStep",
     "defaultSyncPoint": "immediate"
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
-    },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "flow", "substeps", "memoryFileUsage"]
-    }
-  },
   "referenceFormat": {
     "pattern": "@framework-step:category/step-name",
     "location": ".processes/steps/category/step-name.md"
   },
-  "substeps": [
-    {"number": 1, "name": "Read template file"},
-    {"number": 2, "name": "Extract step references"},
-    {"number": 3, "name": "Check step existence"},
-    {"number": 4, "name": "Create validation report"},
-    {"number": 5, "name": "List missing steps"},
-    {"number": 6, "name": "Handle missing steps", "options": ["spawn sub-processes", "PAUSE for manual"]}
-  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
     "requiredFiles": ["Template file to validate"],
@@ -53,7 +142,3 @@
     "usedInTemplates": ["create-process-template"]
   }
 }
-
-
-
-

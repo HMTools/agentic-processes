@@ -5,41 +5,145 @@
   "metadata": {
     "title": "Create High-Level Plan",
     "purposeAndUsage": "Generate a comprehensive task plan with complexity ratings, LLD, and Q&A for missing information. Use when starting a user story implementation.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "High-level plan document with LLD and complexity-rated steps",
     "artifacts": ["plans/{user-story-name}/plan.md"],
     "memoryUpdates": ["planDirectoryPath", "qaStatus", "implementationSteps", "processStepsValidation"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": ["User story context with title, description, and acceptance criteria"],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Gather Requirements: Extract user story title, description, and acceptance criteria; identify affected components (API, Service, Repository, etc.); understand the feature's purpose and goals",
+      "Identify Missing Information: Check for external APIs, infrastructure setup, third-party libraries, business rules, data structures; list assumptions needing user confirmation; create Q&A section with specific questions - do not proceed with LLD until answers provided",
+      "Wait for Q&A Answers (if needed): Present the plan with Q&A section to the user; wait for explicit answers to all questions; update the plan with provided information",
+      "Create Low Level Design (after Q&A resolved): Document current system design with diagrams; document proposed changes with diagrams; show data flow, component interactions, architectural patterns; include class diagrams, sequence diagrams as appropriate",
+      "Break Down into Major Steps: Identify all major implementation steps; typical pattern: API Layer → Service Layer → Repository Layer → Unit Tests → Integration Tests → Documentation; rate complexity for each step (1-9 scale); steps with complexity 7+ must be flagged for further breakdown",
+      "Identify Required Process-Steps: For each implementation step, determine which process-step will execute it; check if required process-steps exist; list any missing process-steps",
+      "Present Plan for Approval: Present complete plan to user; wait for approval before proceeding; IMMEDIATELY log user interaction"
+    ],
+    "files": {
+      "read": ["User story context from process.md"],
+      "create": ["plans/{user-story-name}/plan.md"],
+      "update": ["memory.json", "log.json"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    "tools": [
+      "read_file - Read user story context",
+      "codebase_search - Find relevant patterns",
+      "write - Create plan file",
+      "list_dir - Explore existing components"
+    ],
+    "bestPractices": [
+      "Never assume unspecified information - create Q&A section instead",
+      "Wait for Q&A answers before completing LLD",
+      "Flag complexity 7+ steps for further breakdown",
+      "Always log user interactions immediately"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Gather requirements from user story context",
+      "description": "Extract user story title, description, acceptance criteria and identify affected components",
+      "actions": [
+        "Extract user story title, description, and acceptance criteria",
+        "Identify affected components (API, Service, Repository, etc.)",
+        "Understand the feature's purpose and goals"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Identify missing information and create Q&A section",
+      "description": "Check for missing information and create Q&A section with specific questions",
+      "actions": [
+        "Check for: external APIs, infrastructure setup, third-party libraries, business rules, data structures",
+        "List any assumptions that need user confirmation",
+        "Create Q&A section with specific questions - do not proceed with LLD until answers provided"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Wait for Q&A answers",
+      "description": "Present plan with Q&A section and wait for user answers",
+      "conditional": true,
+      "actions": [
+        "Present the plan with Q&A section to the user",
+        "Wait for explicit answers to all questions",
+        "Update the plan with provided information"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Create Low Level Design with diagrams",
+      "description": "Document current and proposed system design with appropriate diagrams",
+      "actions": [
+        "Document current system design with diagrams",
+        "Document proposed changes with diagrams",
+        "Show data flow, component interactions, architectural patterns",
+        "Include class diagrams, sequence diagrams as appropriate"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Break down into complexity-rated steps",
+      "description": "Identify all major implementation steps and rate complexity",
+      "actions": [
+        "Identify all major implementation steps",
+        "Typical pattern: API Layer → Service Layer → Repository Layer → Unit Tests → Integration Tests → Documentation",
+        "Rate complexity for each step (1-9 scale)",
+        "Steps with complexity 7+ must be flagged for further breakdown"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Identify and validate required process-steps",
+      "description": "Map implementation steps to process-steps and check existence",
+      "actions": [
+        "For each implementation step, determine which process-step will execute it",
+        "Check if required process-steps exist in .processes/steps/",
+        "List any missing process-steps"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Present plan for approval",
+      "description": "Present complete plan to user and wait for approval",
+      "actions": [
+        "Present complete plan to user",
+        "Wait for approval before proceeding",
+        "IMMEDIATELY log user interaction"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Process approval response",
+      "description": "Handle user's approval, modification request, or rejection",
+      "actions": [
+        "If approved: Update process.md Implementation Steps section with actual tasks from approved plan",
+        "If modification requested: Revise plan based on feedback and re-present",
+        "If rejected: Document rejection reason and stop"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Gather requirements → Identify missing info → Q&A (if needed) → Create LLD → Break down steps → Identify process-steps → Present for approval → Process response"
+  },
+  "memoryFileUsage": {
+    "readFrom": "User story context from process.md",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Plan directory path, Q&A status, Implementation steps summary, Process-steps validation results",
+      "Decisions Made: Complexity ratings, Process-step mappings",
+      "Files Modified/Created: plans/{user-story-name}/plan.md"
+    ]
   },
   "complexityScale": {
     "low": {"range": "1-3", "description": "Straightforward implementation"},
     "medium": {"range": "4-6", "description": "Some complexity, well-defined approach"},
     "high": {"range": "7-9", "description": "Needs detailed breakdown, potential challenges"}
   },
-  "criticalRules": [
-    "Never assume unspecified information",
-    "Wait for Q&A answers before completing LLD",
-    "Flag complexity 7+ steps for further breakdown"
-  ],
-  "substeps": [
-    {"number": 1, "name": "Gather requirements from user story context"},
-    {"number": 2, "name": "Identify missing information and create Q&A section"},
-    {"number": 3, "name": "Wait for Q&A answers", "conditional": true},
-    {"number": 4, "name": "Create Low Level Design with diagrams"},
-    {"number": 5, "name": "Break down into complexity-rated steps"},
-    {"number": 6, "name": "Identify and validate required process-steps"},
-    {"number": 7, "name": "Present plan for approval"},
-    {"number": 8, "name": "Process approval response"}
-  ],
   "approvalRequired": true,
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
@@ -51,7 +155,3 @@
     "usedInTemplates": ["develop-user-story"]
   }
 }
-
-
-
-

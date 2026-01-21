@@ -40,8 +40,8 @@ import type { ProcessFiles } from './process-files';
  *   "steps": [...],
  *   "files": {
  *     "process": "process.md",
- *     "memory": "memory.md",
- *     "log": "log.md"
+ *     "memory": "memory.json",
+ *     "log": "log.json"
  *   }
  * }
  * ```

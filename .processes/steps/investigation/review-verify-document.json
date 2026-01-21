@@ -5,33 +5,134 @@
   "metadata": {
     "title": "Review, Verify, and Document",
     "purposeAndUsage": "Systematically review identified files for content relevant to the investigation scope, verify against criteria, identify issues, categorize them, and create comprehensive findings documentation.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Findings report and issues list",
     "artifacts": ["findings-report.md", "issues-list.json (if issues found)"],
     "memoryUpdates": ["findingsReportPath", "issuesListPath", "filesReviewed", "itemsVerified", "issuesFound", "countsByCategory", "countsBySeverity", "verificationStatus"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Identified files list from previous step",
+      "Investigation scope and verification criteria"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: read files → analyze content → verify against criteria → identify issues → categorize → document findings",
+      "Review files systematically - don't skip any identified files",
+      "For each file, extract all content relevant to investigation scope",
+      "Verify each relevant item against all applicable criteria",
+      "Document findings clearly with file paths and line numbers when applicable"
+    ],
+    "files": {
+      "read": [
+        "memory.json (previous step section: identified files list, JSON file reference)",
+        "memory.json (previous step section: investigationScope, verificationCriteria)",
+        "process.md (context parameters)",
+        "Files identified in previous step"
+      ],
+      "create": ["findings-report.md", "issues-list.json (if issues found)"],
+      "update": ["memory.json (current step section with all findings)", "log.json (actions taken, progress, files reviewed)"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
-    }
+    "tools": [
+      "read_file - Read memory.json, process.md, identified-files.json, each file for review",
+      "grep - Search for specific patterns or content in files",
+      "codebase_search - Understand context or find related content",
+      "write - Create report files",
+      "search_replace - Update memory.json"
+    ],
+    "bestPractices": [
+      "Review files systematically - don't skip any identified files",
+      "For each file, extract all content relevant to investigation scope",
+      "Verify each relevant item against all applicable criteria",
+      "Document findings clearly with file paths and line numbers when applicable",
+      "Categorize issues consistently: Missing, Incorrect, Violation, Incomplete, Format Error, Other",
+      "Assign severity levels consistently: Critical, High, Medium, Low",
+      "Create structured data (JSON) for issues to enable programmatic processing",
+      "Create human-readable reports (Markdown) for presentation",
+      "Log progress for large file sets (>50 files)",
+      "Save issues data to separate JSON file to keep memory.json clean"
+    ]
   },
   "substeps": [
-    {"number": 1, "name": "Read Context Parameters and File List"},
-    {"number": 2, "name": "Initialize Tracking Structures"},
-    {"number": 3, "name": "Review Each File Systematically"},
-    {"number": 4, "name": "Categorize and Assign Severity to Issues"},
-    {"number": 5, "name": "Create Findings Documentation"}
+    {
+      "number": 1,
+      "name": "Read Context Parameters and File List",
+      "description": "Read investigation scope, verification criteria, and identified files list",
+      "actions": [
+        "Read from memory.json previous step section: identified files list",
+        "Read from memory.json previous step section: investigationScope, verificationCriteria",
+        "Understand investigation scope: what content to look for in files",
+        "Understand verification criteria: what conditions must be met",
+        "Document context parameters in log.json"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Initialize Tracking Structures",
+      "description": "Create tracking structures for review progress and issue categorization",
+      "actions": [
+        "Create tracking structure for review progress",
+        "Initialize issue categorization structure with categories: Missing, Incorrect, Violation, Incomplete, Format Error, Other",
+        "Initialize severity levels: Critical, High, Medium, Low",
+        "Initialize counters (files reviewed, items verified, issues found)"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Review Each File Systematically",
+      "description": "Review each identified file, verify content against criteria, identify issues",
+      "actions": [
+        "For each file in the identified files list:",
+        "Log progress: 'Reviewing file X of Y: {file path}'",
+        "Read file content using read_file",
+        "Analyze file content for relevance to investigation scope",
+        "For each relevant item: document location, verify against criteria, create issue record if verification fails",
+        "Mark file as reviewed, increment counters",
+        "Log completion: 'Reviewed {count} files, verified {count} items, found {count} issues'"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Categorize and Assign Severity to Issues",
+      "description": "Categorize issues and assign severity levels",
+      "actions": [
+        "For each issue, determine category and severity",
+        "Count issues by category and severity",
+        "Log categorization results"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Create Findings Documentation",
+      "description": "Create findings report and issues list files",
+      "actions": [
+        "Create findings-report.md with: Executive Summary, Review Findings, Verification Results, Issues Found (if any)",
+        "If issues found, create issues-list.json with structured issue data",
+        "Write summary to memory.json",
+        "Document in log.json"
+      ]
+    }
   ],
+  "flow": {
+    "description": "Read context and files → Initialize tracking → Review each file → Categorize issues → Create documentation → Update memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section (identified files list, investigationScope, verificationCriteria), process.md",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Findings report path, Issues list path, Files reviewed count, Items verified count, Issues found count, Counts by category/severity, Verification status",
+      "Decisions Made: Issue categorization scheme, Severity levels assigned, Verification approach",
+      "Files Modified/Created: findings-report.md, issues-list.json (if issues)"
+    ]
+  },
   "issueCategories": ["Missing", "Incorrect", "Violation", "Incomplete", "Format Error", "Other"],
   "severityLevels": ["Critical", "High", "Medium", "Low"],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.md", "identified-files.json"],
+    "requiredFiles": ["memory.json", "identified-files.json"],
     "requiredTools": ["read_file", "grep", "codebase_search", "write", "search_replace"]
   },
   "references": {
@@ -39,7 +140,3 @@
     "usedInTemplates": ["set-concept", "review-and-verify"]
   }
 }
-
-
-
-

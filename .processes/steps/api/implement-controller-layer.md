@@ -1,8 +1,3 @@
-<!--
-Step: Implement Controller Layer
-Purpose: Implement ASP.NET Core API controllers with proper versioning, DTOs, validation, and authentication
--->
-
 # Step: Implement Controller Layer
 
 ## Description
@@ -29,35 +24,7 @@ Use this step when you need to:
 | ngv1 | Partner | External partner APIs |
 | Public | None | Public endpoints |
 
----
-
-## Agent Layer
-
-### Required Components
-
-- [mandatory-logging.md](../_components/mandatory-logging.md) - Logging guidelines
-- Project-specific API design and authentication patterns documentation
-
-### Metadata
-- **Prerequisites**: Understanding of required endpoints, authentication requirements, service layer contracts
-- **Outputs**: Controller class in `WebApi/Controllers/{category}/`, Request DTOs, Response DTOs, Mapping extensions
-
-### Guidance
-
-<!-- @include: _components/mandatory-logging.md -->
-
-**Specific Actions:**
-
-1. **Determine Endpoint Category** - Identify the appropriate controller category based on API consumers
-2. **Create Request DTOs** - Define input models in `Contracts/Requests/`
-3. **Create Response DTOs** - Define output models in `Contracts/Responses/`
-4. **Create Controller Class** - Implement controller with proper attributes and versioning
-5. **Implement Endpoints** - Add action methods with proper HTTP verbs and routing
-6. **Add Validation** - Add validation attributes to DTOs
-7. **Add Authentication/Authorization** - Apply appropriate security attributes
-8. **Create Mapping Extensions** - Add mappers between DTOs and service arguments/results
-
-### Flow
+## Flow
 
 ```mermaid
 flowchart TD
@@ -83,40 +50,3 @@ flowchart TD
     N --> O[Create Mapping Extensions]
     O --> P[Complete]
 ```
-
-### Substeps
-
-- [ ] **Substep 1: Determine Endpoint Category**
-  - Identify API consumers (internal, external, partners, public)
-  - Select appropriate controller folder and versioning
-
-- [ ] **Substep 2: Study Existing Patterns**
-  - Search for similar controllers in the category
-  - Review request/response DTO patterns
-  - Check mapping extension patterns
-
-- [ ] **Substep 3: Create Request/Response DTOs**
-  - Create request DTOs in `Contracts/Requests/`
-  - Create response DTOs in `Contracts/Responses/`
-  - Add validation attributes
-
-- [ ] **Substep 4: Create Controller Class**
-  - Create controller with proper naming and attributes
-  - Add route prefix and API version attributes
-  - Inject required services
-
-- [ ] **Substep 5: Implement Endpoints**
-  - Add action methods for each endpoint
-  - Apply HTTP verb attributes
-  - Add response type attributes
-  - Implement mapping and service calls
-
-- [ ] **Substep 6: Create Mapping Extensions**
-  - Create mapping methods for DTOs to service arguments
-  - Create mapping methods for service results to DTOs
-
-### Memory File Usage
-
-**Write to**: Current step section in memory.md
-- Information Produced: Endpoints created, DTOs, controller location
-- Files Modified/Created: Controller, DTOs, mapping extensions

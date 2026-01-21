@@ -5,31 +5,136 @@
   "metadata": {
     "title": "Apply Changes",
     "purposeAndUsage": "Apply all user-approved changes to relevant files based on approved change proposals. Use after changes have been proposed and approved to execute the modifications.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Modified files and change application report",
     "artifacts": ["changes-applied.md", "modified files"],
     "memoryUpdates": ["changeApplicationReportPath", "totalChangesApplied", "filesModified"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "Approved change proposals from previous step",
+      "Change proposals document with detailed instructions"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md", "mandatory-consultation.md"],
+    "specificActions": [
+      "Read approved change proposals from memory (IDs list and document path)",
+      "Read change proposals document to get detailed instructions",
+      "For each approved change: read target file, apply change, verify applied correctly",
+      "Create change application report documenting all changes",
+      "Update memory with results"
+    ],
+    "files": {
+      "read": [
+        "memory.json (previous step section: approved change IDs list, change proposals document path)",
+        "Change proposals document (path from memory.json reference)",
+        "Target files that need changes applied"
+      ],
+      "create": ["changes-applied.md (change application report)"],
+      "update": ["Files with approved changes applied", "memory.json (current step section with results)", "log.json (actions taken, progress)"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
-    }
+    "tools": [
+      "read_file - Read memory.json, change proposals document, target files",
+      "search_replace - Apply changes that modify existing content",
+      "write - Apply changes that create new files or replace content",
+      "read_file - Verify changes were applied correctly after modification"
+    ],
+    "bestPractices": [
+      "ALWAYS verify batch coverage first - ensure all identified files/categories are covered before starting",
+      "If batch coverage check fails, STOP and report the gap before proceeding",
+      "Read approved change proposals systematically - process each approved change ID",
+      "For each approved change, read the target file to understand current state before applying",
+      "Apply changes exactly as specified in the change instructions",
+      "Verify each change was applied correctly by reading the file after modification",
+      "Log progress for each change applied",
+      "Document all changes in the change application report"
+    ]
   },
   "substeps": [
-    {"number": 1, "name": "Read Approved Change Proposals from Memory"},
-    {"number": 2, "name": "Read Change Proposals Document"},
-    {"number": 3, "name": "Apply Each Approved Change"},
-    {"number": 4, "name": "Create Change Application Report"},
-    {"number": 5, "name": "Update Memory with Results"}
+    {
+      "number": 1,
+      "name": "Verify Batch Coverage",
+      "description": "Ensure all identified files are covered in the implementation plan before starting",
+      "actions": [
+        "Read identified-files list from memory (from identify-files step output)",
+        "Count files per category from identified-files (e.g., steps: 27, templates: 6)",
+        "Read implementation plan batch breakdown from memory or plan document",
+        "Compare category counts: verify all categories are listed in batch breakdown",
+        "If any category is missing or count mismatch: STOP and report gap to user",
+        "Log: 'Batch coverage verified: {categories} categories, {total} files covered'"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Read Approved Change Proposals from Memory",
+      "description": "Get approved change IDs and document path from memory",
+      "actions": [
+        "Read from memory.json previous step section: Approved change IDs list, Change proposals document path reference",
+        "Verify approved change IDs list is available and not empty",
+        "Log in log.json: 'Found {count} approved changes to apply'"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Read Change Proposals Document",
+      "description": "Extract detailed change instructions for each approved change",
+      "actions": [
+        "Read the change proposals document using the path from memory.json",
+        "For each approved change ID, extract: Change ID, location, current state, proposed change, instructions, rationale",
+        "Log: 'Read change proposals document, extracted details for {count} approved changes'"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Apply Each Approved Change",
+      "description": "Apply each change to target files and verify",
+      "actions": [
+        "For each approved change:",
+        "Log progress: 'Applying change {change ID} ({current} of {total})'",
+        "Read target file to understand current state and verify it matches proposal",
+        "Apply change using search_replace (modify) or write (create/replace)",
+        "Verify change was applied correctly by reading file after modification",
+        "Log: 'Applied change {change ID} to {file path}'"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Create Change Application Report",
+      "description": "Create report documenting all changes applied",
+      "actions": [
+        "Create changes-applied.md with: Header, Summary (total changes, files modified, status)",
+        "For each change: Change ID, file path, description, status",
+        "List of all files modified with change counts",
+        "Log: 'Created changes-applied.md report'"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Update Memory with Results",
+      "description": "Update memory with change application results",
+      "actions": [
+        "Write to memory.json: Change application report path, Total changes applied, List of files modified",
+        "Log completion: 'Step complete - {count} changes applied to {count} files'"
+      ]
+    }
   ],
+  "flow": {
+    "description": "Verify batch coverage → Read approved IDs from memory → Read proposals document → Apply each change → Verify each change → Create report → Update memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section (approved change IDs list, change proposals document path)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Change application report path, Total changes applied, List of files modified",
+      "Decisions Made: Any decisions during application",
+      "Files Modified/Created: List of all changed files, changes-applied.md",
+      "Notes: Issues encountered, observations"
+    ]
+  },
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md", "mandatory-consultation.md"],
-    "requiredFiles": ["memory.md", "change proposals document"],
+    "requiredFiles": ["memory.json", "change proposals document"],
     "requiredTools": ["read_file", "search_replace", "write"]
   },
   "references": {
@@ -37,7 +142,3 @@
     "usedInTemplates": ["set-concept", "review-and-verify"]
   }
 }
-
-
-
-

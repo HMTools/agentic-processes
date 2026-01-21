@@ -21,7 +21,7 @@
     },
     {
       "name": "Always Create Process Instance",
-      "description": "Must create process.md, memory.md, log.md - never a plan document"
+      "description": "Must create process.md, memory.json, log.json - never a plan document"
     },
     {
       "name": "Log User Interactions",
@@ -42,8 +42,8 @@
     "directory": ".user-processes/active/process-{name}-{YYYYMMDD}/",
     "files": [
       {"name": "process.md", "purpose": "Main process file with substituted placeholders"},
-      {"name": "memory.md", "purpose": "Track information across steps"},
-      {"name": "log.md", "purpose": "Detailed execution log"}
+      {"name": "memory.json", "purpose": "Track information across steps"},
+      {"name": "log.json", "purpose": "Detailed execution log"}
     ]
   },
   "subProcessSupport": {

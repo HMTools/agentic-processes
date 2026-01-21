@@ -5,20 +5,117 @@
   "metadata": {
     "title": "Final Summary",
     "purposeAndUsage": "Provide a final comprehensive summary of an investigation that consolidates all previous steps into a clear, actionable conclusion. Use to conclude an investigation process.",
-    "lastUpdated": "2026-01-19"
+    "lastUpdated": "2026-01-21"
   },
   "output": {
     "description": "Final summary document",
     "artifacts": ["final-summary.md"],
     "memoryUpdates": ["finalSummaryPath", "overallConclusion", "finalVerificationStatus", "recommendations"]
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
+  "guidance": {
+    "prerequisites": [
+      "All previous investigation steps completed",
+      "Data available in memory from previous steps"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Read all investigation data from previous steps in memory",
+      "Compile into organized sections",
+      "Create summary document",
+      "Present to user",
+      "Handle all scenarios: no issues, issues not fixed, issues fixed"
+    ],
+    "files": {
+      "read": [
+        "memory.json (all previous step sections)",
+        "process.md (context parameters if not in memory)",
+        "findings-report.md, issues-list.json, fix-proposals.md (if created)"
+      ],
+      "create": ["final-summary.md (comprehensive final summary document)"],
+      "update": ["memory.json (current step section with summary path and conclusion)", "log.json (actions taken, progress)"]
     },
-    "agentLayer": {
-      "sections": ["requiredComponents", "outputDetailed", "guidance", "memoryFileUsage", "flow", "substeps"]
+    "tools": [
+      "read_file - Read memory.json, process.md, report files",
+      "write - Create final-summary.md",
+      "search_replace - Update memory.json"
+    ],
+    "bestPractices": [
+      "Read systematically from all previous steps in memory.json",
+      "Gather complete information before compiling summary",
+      "Organize summary sections logically and clearly",
+      "Handle all scenarios gracefully",
+      "Ensure conclusion is clear and actionable"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Read All Previous Steps from Memory",
+      "description": "Gather all investigation data from previous steps",
+      "actions": [
+        "Read all step sections from memory.json",
+        "Gather: scope, files reviewed, findings, issues, fixes, verification status",
+        "Log: 'Gathered data from {count} previous steps'"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Read Any Report Files",
+      "description": "Read detailed reports if they exist",
+      "actions": [
+        "Read findings-report.md, issues-list.json, fix-proposals.md if they exist",
+        "Extract detailed information for summary"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Compile Investigation Data",
+      "description": "Organize information and determine overall status",
+      "actions": [
+        "Organize information by section",
+        "Determine overall status (no issues, issues found, issues fixed)",
+        "Prepare content for each summary section"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Create Final Summary Document",
+      "description": "Create comprehensive summary document with all sections",
+      "actions": [
+        "Create final-summary.md with sections:",
+        "Executive Summary, Investigation Scope, Files Reviewed, Findings Summary",
+        "Issues Found (if any), Fixes Applied (if any), Final Verification Status",
+        "Remaining Issues (if any), Recommendations (if any), Conclusion",
+        "Log: 'Created final-summary.md'"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Present Summary to User",
+      "description": "Present summary and highlight key findings",
+      "actions": [
+        "Present final-summary.md to user",
+        "Highlight key findings and conclusion"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Update Memory",
+      "description": "Update memory with summary path and conclusion",
+      "actions": [
+        "Write to memory.json: Final summary document path, Overall conclusion, Final verification status, Recommendations"
+      ]
     }
+  ],
+  "flow": {
+    "description": "Read all previous steps → Read report files → Compile data → Determine scenario → Create summary document → Present to user → Update memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "All previous step sections in memory.json (scope, files, findings, issues, fixes, verification)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Final summary document path, Overall conclusion, Final verification status, Recommendations"
+    ]
   },
   "summaryScenarios": [
     {"scenario": "No issues found", "content": "Success message, verification passed"},
@@ -37,17 +134,9 @@
     "Recommendations",
     "Conclusion"
   ],
-  "substeps": [
-    {"number": 1, "name": "Read All Previous Steps from Memory"},
-    {"number": 2, "name": "Read Any Report Files"},
-    {"number": 3, "name": "Compile Investigation Data"},
-    {"number": 4, "name": "Create Final Summary Document"},
-    {"number": 5, "name": "Present Summary to User"},
-    {"number": 6, "name": "Update Memory"}
-  ],
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.md", "findings-report.md (if exists)", "issues-list.json (if exists)", "fix-proposals.md (if exists)"],
+    "requiredFiles": ["memory.json", "findings-report.md (if exists)", "issues-list.json (if exists)", "fix-proposals.md (if exists)"],
     "requiredTools": ["read_file", "write", "search_replace"]
   },
   "references": {
@@ -55,7 +144,3 @@
     "usedInTemplates": ["review-and-verify"]
   }
 }
-
-
-
-
