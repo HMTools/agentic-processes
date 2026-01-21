@@ -18,6 +18,10 @@
       "Integration test infrastructure available"
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/testing/integration-testing-patterns.md",
+      ".user-processes/guidelines/testing/test-data-generation.md"
+    ],
     "specificActions": [
       "Study Existing Test Patterns: Review similar integration tests; note mocking patterns and test data builders",
       "Set Up Test Infrastructure: Configure test server or message consumer; set up WireMock for external services; configure test database",

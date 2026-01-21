@@ -19,6 +19,10 @@
       "Request/response contracts"
     ],
     "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/api-design/authentication-patterns.md",
+      ".user-processes/guidelines/implementation/error-handling.md"
+    ],
     "specificActions": [
       "Study Existing Patterns: Search for similar API clients, authentication patterns, HTTP client wrapper usage",
       "Create/Locate Contracts: Check if contracts already exist; create request/response DTOs if needed",

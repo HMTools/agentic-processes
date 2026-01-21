@@ -19,6 +19,11 @@
       "Service layer contracts (Arguments, Results)"
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/api-design/controller-patterns.md",
+      ".user-processes/guidelines/api-design/authentication-patterns.md",
+      ".user-processes/guidelines/api-design/api-versioning.md"
+    ],
     "specificActions": [
       "Determine Endpoint Category: Identify appropriate controller category based on API consumers",
       "Create Request DTOs: Define input models in Contracts/Requests/",

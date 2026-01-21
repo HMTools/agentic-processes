@@ -18,6 +18,9 @@
       "All referenced steps exist or are identified for creation"
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/docs/flow-documentation.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: create file → write user docs → write flow → write steps → create JSON → validate",

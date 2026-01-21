@@ -18,6 +18,10 @@
       "Business logic finalized"
     ],
     "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/testing/unit-testing-patterns.md",
+      ".user-processes/guidelines/testing/mocking-strategies.md"
+    ],
     "specificActions": [
       "Study Existing Test Patterns: Search for tests of similar services; review naming conventions, mocking patterns, helper classes",
       "Read Target Service Code: Read service implementation; identify public methods; identify dependencies to mock",

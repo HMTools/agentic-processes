@@ -15,6 +15,10 @@
   "guidance": {
     "prerequisites": ["Root cause analysis from previous step"],
     "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/testing/integration-testing-patterns.md",
+      ".user-processes/guidelines/testing/mocking-strategies.md"
+    ],
     "specificActions": [
       "Read previous step to understand what needs fixing",
       "Follow appropriate fix branch:",

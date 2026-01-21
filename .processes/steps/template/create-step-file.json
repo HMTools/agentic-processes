@@ -18,6 +18,9 @@
       "Category directory identified"
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/docs/flow-documentation.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: create directory → write header → write user docs → write flow → create JSON → validate",

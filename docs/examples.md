@@ -363,7 +363,7 @@ graph TD
 - Dependencies are enforced by Process Manager
 - Cannot skip or reorder steps
 
-## Best Practices from Examples
+## Guidelines from Examples
 
 1. **Be Specific**: Provide detailed parameters for better process creation
 2. **Use Memory**: Store important information for later steps

@@ -18,6 +18,10 @@
       "MongoDB collections designed"
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/data-access/repository-pattern.md",
+      ".user-processes/guidelines/data-access/mongodb-patterns.md"
+    ],
     "specificActions": [
       "Review Requirements: Understand entity and operations needed",
       "Study Existing Patterns: Search for similar repositories in Data/Repositories/",

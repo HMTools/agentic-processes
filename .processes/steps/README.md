@@ -24,7 +24,26 @@ Steps can reference shared components to reduce duplication and boilerplate. Com
 
 See [`_components/README.md`](_components/README.md) for complete component documentation.
 
-**Note**: Instead of a generic best practices component, steps should directly reference relevant project-specific best practices files in `.user-processes/guidelines/` (e.g., `code-conventions.md`, testing patterns, etc.) in the "Required Components" section.
+### User Guidelines in JSON Files
+
+Step JSON files include a `userGuidelines` field that references project-specific guidelines:
+
+```json
+{
+  "guidance": {
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/api-design/controller-patterns.md",
+      ".user-processes/guidelines/testing/unit-testing-patterns.md"
+    ],
+    ...
+  }
+}
+```
+
+Guidelines are stored in `.user-processes/guidelines/{category}/{topic}.md`. When executing steps, agents read these files if they exist to apply project-specific patterns and conventions.
+
+See [`.user-processes/guidelines/README.md`](../../.user-processes/guidelines/README.md) for the complete guidelines structure.
 
 ### Using Components in Steps
 

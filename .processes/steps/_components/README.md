@@ -26,13 +26,53 @@ A checklist for verifying existing patterns before implementing new components. 
 
 ## Guidelines Files
 
-Instead of a generic best practices component, steps should directly reference the relevant project-specific guidelines files in the "Required Components" section. Guidelines are stored in `.user-processes/guidelines/`. Common references include:
+Guidelines are project-specific patterns and conventions stored in `.user-processes/guidelines/`. They are organized by domain category:
 
-- `.user-processes/guidelines/code-conventions.md` - Code conventions
-- `.user-processes/guidelines/solid.md` - SOLID principles
-- `.user-processes/guidelines/testing-patterns.md` - Testing patterns
-- `.user-processes/guidelines/api-patterns.md` - API patterns
-- Other project-specific guidelines as needed
+```
+.user-processes/guidelines/
+├── api-design/           # Controller, auth, versioning patterns
+├── data-access/          # Repository, MongoDB, transactions
+├── implementation/       # Service layer, DI, error handling
+├── testing/              # Unit tests, integration tests, mocking
+├── planning/             # Task breakdown, estimation
+└── docs/                 # Flow documentation, diagrams
+```
+
+### How Guidelines Are Referenced
+
+Guidelines are referenced in step JSON files via the `userGuidelines` field:
+
+```json
+{
+  "guidance": {
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/api-design/controller-patterns.md",
+      ".user-processes/guidelines/api-design/authentication-patterns.md"
+    ],
+    ...
+  }
+}
+```
+
+### Agent Reading Requirements
+
+When executing a step, agents should:
+1. Read the `userGuidelines` array from the step JSON
+2. Load each guideline file that exists
+3. Apply the patterns and conventions from the guidelines
+4. Skip gracefully if a guideline file doesn't exist yet
+
+### Available Guideline Categories
+
+| Category | Files | Used By |
+|----------|-------|---------|
+| `api-design/` | controller-patterns, authentication-patterns, api-versioning | API steps |
+| `data-access/` | repository-pattern, mongodb-patterns, transaction-handling | Data steps |
+| `implementation/` | service-layer-patterns, dependency-injection, error-handling, logging-patterns | Service steps |
+| `testing/` | unit-testing-patterns, integration-testing-patterns, mocking-strategies, test-data-generation | Testing steps |
+| `planning/` | task-breakdown, complexity-estimation | Planning steps |
+| `docs/` | flow-documentation, mermaid-diagrams | Template steps |
 
 ## How to Use Components
 

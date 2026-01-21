@@ -339,7 +339,7 @@ Prompts are defined in `.github/prompts/`.
    - Examples
    - Common pitfalls
 
-### Best Practices
+### Guidelines
 
 - **Templates**: Keep focused and specific, use parameters for flexibility, reference existing steps, include flow diagrams, document when to use
 - **Steps**: Be self-contained, provide rich guidance, include examples, document common pitfalls, use flow diagrams for complex steps

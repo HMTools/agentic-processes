@@ -9,7 +9,7 @@
   "sections": [
     {"name": "Basic Examples", "description": "Simple examples to get started"},
     {"name": "Advanced Examples", "description": "Complex scenarios and patterns"},
-    {"name": "Best Practices", "description": "Recommended approaches"}
+    {"name": "Guidelines", "description": "Ways to adapt processes to your project"}
   ],
   "references": {
     "relatedDocs": ["getting-started", "process-management", "architecture"],
