@@ -16,8 +16,8 @@
     "prerequisites": ["Root cause analysis from previous step"],
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/testing/integration-testing-patterns.md",
-      ".user-processes/guidelines/testing/mocking-strategies.md"
+      ".user-processes/guidelines/testing/how-to-write-integration-tests.md",
+      ".user-processes/guidelines/testing/how-to-mock-dependencies.md"
     ],
     "specificActions": [
       "Read previous step to understand what needs fixing",

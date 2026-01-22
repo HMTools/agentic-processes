@@ -47,8 +47,8 @@ Guidelines are referenced in step JSON files via the `userGuidelines` field:
   "guidance": {
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/api-design/controller-patterns.md",
-      ".user-processes/guidelines/api-design/authentication-patterns.md"
+      ".user-processes/guidelines/api-design/how-to-implement-controllers.md",
+      ".user-processes/guidelines/api-design/how-to-handle-authentication.md"
     ],
     ...
   }
@@ -65,14 +65,14 @@ When executing a step, agents should:
 
 ### Available Guideline Categories
 
-| Category | Files | Used By |
-|----------|-------|---------|
-| `api-design/` | controller-patterns, authentication-patterns, api-versioning | API steps |
-| `data-access/` | repository-pattern, mongodb-patterns, transaction-handling | Data steps |
-| `implementation/` | service-layer-patterns, dependency-injection, error-handling, logging-patterns | Service steps |
-| `testing/` | unit-testing-patterns, integration-testing-patterns, mocking-strategies, test-data-generation | Testing steps |
-| `planning/` | task-breakdown, complexity-estimation | Planning steps |
-| `docs/` | flow-documentation, mermaid-diagrams | Template steps |
+| Category | Example Guidelines | Used By |
+|----------|-------------------|---------|
+| `api-design/` | how-to-implement-controllers, how-to-handle-authentication, how-to-version-apis | API steps |
+| `data-access/` | how-to-implement-repositories, how-to-use-mongodb | Data steps |
+| `implementation/` | how-to-implement-services, how-to-use-dependency-injection, how-to-handle-errors | Service steps |
+| `testing/` | how-to-write-unit-tests, how-to-write-integration-tests, how-to-mock-dependencies | Testing steps |
+| `planning/` | how-to-break-down-tasks, how-to-estimate-complexity | Planning steps |
+| `docs/` | how-to-document-flows | Template steps |
 
 ## How to Use Components
 

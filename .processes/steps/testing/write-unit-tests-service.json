@@ -19,8 +19,8 @@
     ],
     "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/testing/unit-testing-patterns.md",
-      ".user-processes/guidelines/testing/mocking-strategies.md"
+      ".user-processes/guidelines/testing/how-to-write-unit-tests.md",
+      ".user-processes/guidelines/testing/how-to-mock-dependencies.md"
     ],
     "specificActions": [
       "Study Existing Test Patterns: Search for tests of similar services; review naming conventions, mocking patterns, helper classes",

@@ -19,7 +19,7 @@
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/docs/flow-documentation.md"
+      ".user-processes/guidelines/docs/how-to-document-flows.md"
     ],
     "specificActions": [
       "Follow the substeps below in sequence",

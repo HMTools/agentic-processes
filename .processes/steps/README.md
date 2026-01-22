@@ -33,15 +33,15 @@ Step JSON files include a `userGuidelines` field that references project-specifi
   "guidance": {
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/api-design/controller-patterns.md",
-      ".user-processes/guidelines/testing/unit-testing-patterns.md"
+      ".user-processes/guidelines/api-design/how-to-implement-controllers.md",
+      ".user-processes/guidelines/testing/how-to-write-unit-tests.md"
     ],
     ...
   }
 }
 ```
 
-Guidelines are stored in `.user-processes/guidelines/{category}/{topic}.md`. When executing steps, agents read these files if they exist to apply project-specific patterns and conventions.
+Guidelines are stored in `.user-processes/guidelines/{category}/how-to-{action}.md`. They answer "How to do X?" questions with practical, action-oriented content. When executing steps, agents read these files if they exist to apply project-specific patterns.
 
 See [`.user-processes/guidelines/README.md`](../../.user-processes/guidelines/README.md) for the complete guidelines structure.
 

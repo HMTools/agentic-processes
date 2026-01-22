@@ -21,9 +21,9 @@
     ],
     "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/implementation/service-layer-patterns.md",
-      ".user-processes/guidelines/implementation/dependency-injection.md",
-      ".user-processes/guidelines/implementation/error-handling.md"
+      ".user-processes/guidelines/implementation/how-to-implement-services.md",
+      ".user-processes/guidelines/implementation/how-to-use-dependency-injection.md",
+      ".user-processes/guidelines/implementation/how-to-handle-errors.md"
     ],
     "specificActions": [
       "Parse Components List: Get component specifications from context parameters",

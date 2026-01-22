@@ -7,13 +7,10 @@ Purpose: [What this step accomplishes]
 
 ## Required Components
 
-[List all components and relevant best practices files that must be read alongside this step. Agents must read these files when reading this step.]
+[List all framework components that must be read alongside this step. Agents must read these files when reading this step. Note: User guidelines should be specified in the step's JSON file in the guidance.userGuidelines field.]
 
 - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
 - [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification (if step involves creating new implementations)
-- `.user-processes/guidelines/code-conventions.md` - Code conventions (if step involves coding)
-- `.user-processes/guidelines/solid.md` - SOLID principles (if step involves architecture)
-- [Add other relevant project-specific guidelines from .user-processes/guidelines/]
 
 ## Description
 

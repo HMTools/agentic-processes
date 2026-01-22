@@ -20,9 +20,9 @@
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/api-design/controller-patterns.md",
-      ".user-processes/guidelines/api-design/authentication-patterns.md",
-      ".user-processes/guidelines/api-design/api-versioning.md"
+      ".user-processes/guidelines/api-design/how-to-implement-controllers.md",
+      ".user-processes/guidelines/api-design/how-to-handle-authentication.md",
+      ".user-processes/guidelines/api-design/how-to-version-apis.md"
     ],
     "specificActions": [
       "Determine Endpoint Category: Identify appropriate controller category based on API consumers",

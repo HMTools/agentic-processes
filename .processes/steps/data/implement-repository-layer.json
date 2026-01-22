@@ -19,8 +19,8 @@
     ],
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/data-access/repository-pattern.md",
-      ".user-processes/guidelines/data-access/mongodb-patterns.md"
+      ".user-processes/guidelines/data-access/how-to-implement-repositories.md",
+      ".user-processes/guidelines/data-access/how-to-use-mongodb.md"
     ],
     "specificActions": [
       "Review Requirements: Understand entity and operations needed",

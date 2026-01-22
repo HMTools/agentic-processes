@@ -20,8 +20,8 @@
     ],
     "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/api-design/authentication-patterns.md",
-      ".user-processes/guidelines/implementation/error-handling.md"
+      ".user-processes/guidelines/api-design/how-to-handle-authentication.md",
+      ".user-processes/guidelines/implementation/how-to-handle-errors.md"
     ],
     "specificActions": [
       "Study Existing Patterns: Search for similar API clients, authentication patterns, HTTP client wrapper usage",
