@@ -5,7 +5,7 @@
   "metadata": {
     "title": "Continuous Improvement & Learning",
     "purposeAndUsage": "Analyze process execution log and implement improvements for future iterations. Use at the end of every process to learn from execution and improve templates/steps.",
-    "lastUpdated": "2026-01-21"
+    "lastUpdated": "2026-01-23"
   },
   "output": {
     "description": "Analysis report and implemented improvements",
@@ -19,9 +19,10 @@
       "Read Process Log: Load log.json; parse all user interactions and change requests; identify patterns and recurring issues; note high iteration counts",
       "Analyze for Improvements: Group similar user corrections; identify corrections that could be automated; find missing validations; detect documentation gaps",
       "Prioritize Improvements: Rank by frequency, impact, and ease; focus on high frequency + high impact + easy to implement; limit to top 3-5",
-      "For Each Improvement: Propose to user (What, Why, Impact, Scope); investigate solution; implement change; request approval; document improvement",
+      "For Each Improvement: Propose to user (What, Why, Impact, Scope); investigate solution; IMPLEMENT ACTUAL CHANGES to files; request approval; document improvement",
+      "CRITICAL: Improvements must be IMPLEMENTED, not just documented. This means actually modifying template files, step files, or guidance documents to prevent recurrence.",
       "MANDATORY: Propose ALL improvements before completing; user must approve/reject each",
-      "Summarize All Improvements: List improvements made and skipped; provide recommendations"
+      "Summarize All Improvements: List improvements made (with file paths modified) and skipped; provide recommendations"
     ],
     "files": {
       "read": [".user-processes/active/{process-name}/log.json"],
@@ -43,7 +44,9 @@
       "Always get approval: User must approve before proceeding",
       "Atomic changes: Keep each improvement focused and self-contained",
       "No traceback: Don't reference the previous state in the improved version",
-      "Clean implementation: Make it look like it was always there"
+      "Clean implementation: Make it look like it was always there",
+      "IMPLEMENT, don't just document: Every approved improvement must result in actual file modifications (templates, steps, docs) - documentation alone is NOT an improvement",
+      "Show the diff: After implementing, show what files were modified and what changed"
     ]
   },
   "substeps": [
@@ -82,13 +85,15 @@
     {
       "number": 4,
       "name": "Implement Each Improvement (Iteratively)",
-      "description": "For each prioritized improvement, propose, implement, and get approval",
+      "description": "For each prioritized improvement, propose, implement ACTUAL FILE CHANGES, and get approval",
       "actions": [
-        "a. Propose Improvement: Present What, Why, Impact, Scope",
-        "b. Investigate Solution: Research approach, identify files to modify",
-        "c. Implement Change: Make modifications following conventions",
-        "d. Request User Approval: Show changes, ask for confirmation",
-        "e. Document Improvement: Update memory with what was improved"
+        "a. Propose Improvement: Present What, Why, Impact, Scope, Target Files to modify",
+        "b. Get User Approval: Wait for user to approve/reject the proposed improvement",
+        "c. Investigate Solution: Research approach, identify exact files and sections to modify",
+        "d. Implement Change: ACTUALLY MODIFY the target files (templates, steps, docs) using write/search_replace tools",
+        "e. Show Changes: Present what files were modified and the specific changes made",
+        "f. Document Improvement: Update memory with file paths modified and change summary",
+        "CRITICAL: Step (d) must result in actual file modifications - documenting the problem without changing files is NOT implementing an improvement"
       ]
     },
     {

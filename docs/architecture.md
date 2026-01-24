@@ -74,8 +74,8 @@ Steps are modular, self-contained definitions with:
 Process instances are created from templates and contain:
 - Process file (`process.md`) - Human-readable workflow definition
 - Process data (`process.json`) - Machine-readable state for tooling/UI
-- Memory file (`memory.md`) - Persistent information shared across steps
-- Log file (`log.md`) - Detailed execution log
+- Memory file (`memory.json`) - Persistent information shared across steps
+- Log file (`log.json`) - Detailed execution log
 
 **Location**: `.user-processes/{state}/process-{name}-{YYYYMMDD}/`
 
@@ -159,7 +159,7 @@ Process state is maintained in `process.md`:
 
 ### Memory State
 
-Memory state is maintained in `memory.md`:
+Memory state is maintained in `memory.json`:
 
 ```markdown
 ## Step 1: Step Name
@@ -260,8 +260,8 @@ Audit log is automatically maintained:
 │   └── process-{name}-{date}/   # Individual process folder
 │       ├── process.md           # Human-readable workflow
 │       ├── process.json         # Machine-readable state
-│       ├── memory.md            # Cross-step information
-│       └── log.md               # Detailed execution log
+│       ├── memory.json            # Cross-step information
+│       └── log.json               # Detailed execution log
 ├── completed/                   # Finished processes
 ├── failed/                      # Failed processes
 ├── templates/                   # User-defined templates

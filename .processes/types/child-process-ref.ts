@@ -21,5 +21,8 @@ export interface ChildProcessRef {
   
   /** When the parent should wait for this child ("immediate", "step-N", or "end") */
   syncPoint: 'immediate' | string;
+  
+  /** Path to the child process folder (relative to project root) */
+  processPath: string;
 }
 

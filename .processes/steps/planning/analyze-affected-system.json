@@ -1,0 +1,260 @@
+{
+  "type": "step",
+  "name": "analyze-affected-system",
+  "category": "planning",
+  "metadata": {
+    "title": "Analyze Affected System",
+    "purposeAndUsage": "Analyze the current system (codebase AND gathered information) to identify affected components, dependencies, patterns, and impact areas for implementing a user story. Use before creating LLD to understand what needs to change.",
+    "lastUpdated": "2026-01-23"
+  },
+  "output": {
+    "description": "Structured impact assessment stored in memory",
+    "artifacts": [],
+    "memoryUpdates": [
+      "affectedComponents",
+      "externalSystemsImpact",
+      "packageDependencies",
+      "dependencies",
+      "existingPatterns",
+      "impactAreas",
+      "analysisNotes"
+    ]
+  },
+  "guidance": {
+    "prerequisites": [
+      "User story or feature description available",
+      "Access to the target codebase",
+      "Gathered information available from gather-relevant-information step"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: understand scope → review gathered info → validate sources → identify entry points → map components → analyze dependencies → find patterns → assess impact → document",
+      "Substep 3 is a validation checkpoint - if sources missing, exit and return to gather-relevant-information",
+      "Analyze both codebase AND gathered information from various sources",
+      "Sources include: codebase, external services, infrastructure, package dependencies (NuGet/NPM), documentation"
+    ],
+    "files": {
+      "read": [
+        "process.md (for user story context)",
+        "memory.json (gatheredInformation from previous step)",
+        "package.json, *.csproj, packages.config (package dependencies)"
+      ],
+      "create": [],
+      "update": ["memory.json (current step section with analysis results)"]
+    },
+    "tools": [
+      "read_file - Read process context, memory, package files",
+      "codebase_search - Find related code and patterns",
+      "grep - Search for specific patterns or references",
+      "list_dir - Explore directory structures"
+    ],
+    "bestPractices": [
+      "Always validate source coverage before deep analysis",
+      "Consider all source types: codebase, external services, infrastructure, packages, docs",
+      "Map both upstream (what calls) and downstream (what is called) dependencies",
+      "Include package dependencies (NuGet, NPM) in analysis",
+      "Categorize impacts by layer (API/service/data) and type (new/modify/extend)",
+      "Note cross-cutting concerns: security, logging, monitoring",
+      "Keep memory output structured and organized by category"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Understand user story scope",
+      "description": "Read user story and identify functionality being added/changed",
+      "actions": [
+        "Read process parameters",
+        "Understand what the feature does",
+        "Identify core functionality"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Review gathered information",
+      "description": "Analyze information collected in previous step (gather-relevant-information)",
+      "actions": [
+        "Read gatheredInformation from memory.json",
+        "Identify relevant external services/APIs from documentation",
+        "Note infrastructure components mentioned (databases, queues, caches)",
+        "Review wikis/markdown for system architecture context",
+        "List external touchpoints that may be affected"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Validate source coverage",
+      "description": "Check if critical sources are available for analysis",
+      "conditional": true,
+      "exitCondition": "If sources are missing, exit step and return to gather-relevant-information",
+      "actions": [
+        "Check if user story scope requires external service information - verify it's in gathered info",
+        "Check if infrastructure documentation is needed - verify it's available",
+        "Check if package/dependency info is accessible (package.json, *.csproj exist)",
+        "Identify any critical gaps that would prevent accurate analysis",
+        "If gaps found: document missing sources in memory, set returnToPreviousStep flag, exit step",
+        "If sources sufficient: continue to next substep"
+      ],
+      "gapCategories": [
+        "External service documentation missing",
+        "Infrastructure details missing",
+        "Package files not accessible",
+        "Architecture documentation missing",
+        "API specifications missing"
+      ],
+      "exitOutput": {
+        "missingSources": "Array of missing source categories with descriptions",
+        "returnToPreviousStep": true,
+        "returnToStep": "gather-relevant-information",
+        "reason": "Description of why sources are needed"
+      }
+    },
+    {
+      "number": 4,
+      "name": "Identify entry points",
+      "description": "Find where the change originates in our system",
+      "actions": [
+        "Identify API endpoints, UI components, jobs, or events that trigger the functionality"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Map affected components",
+      "description": "Trace through codebase AND external systems to find all affected areas",
+      "actions": [
+        "Use codebase_search to find related code",
+        "List controllers/services/repositories affected",
+        "Identify external services that need changes or new integrations",
+        "Note infrastructure components affected (DB schemas, queues, etc.)"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Analyze dependencies",
+      "description": "Map internal, external, AND package dependencies",
+      "actions": [
+        "Find what calls affected components (upstream - internal)",
+        "Find what affected components call (downstream - internal)",
+        "Identify external service dependencies (APIs we call)",
+        "Identify services that depend on us (APIs we expose)",
+        "Note infrastructure dependencies",
+        "Check package dependencies: read package.json, *.csproj, packages.config",
+        "Identify new packages needed (NuGet, NPM, etc.)",
+        "Identify existing packages that may need version updates",
+        "Note any package compatibility concerns"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Find existing patterns",
+      "description": "Search for similar implementations in codebase and documentation",
+      "actions": [
+        "Identify how similar features are implemented",
+        "Note conventions and patterns to follow",
+        "Check gathered documentation for architectural patterns",
+        "Review how similar packages are used in the codebase"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Assess impact areas",
+      "description": "Categorize all impacts by area and type",
+      "actions": [
+        "Categorize codebase impact by layer (API/service/data)",
+        "Categorize by change type (new/modify/extend)",
+        "List external services impact (new integrations/changes)",
+        "List infrastructure impact (DB changes, new queues, etc.)",
+        "List package dependency impact (new packages, version updates, removals)",
+        "List documentation needing updates (wikis, READMEs, API docs)",
+        "Note cross-cutting concerns (security, logging, monitoring)"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Document findings",
+      "description": "Write comprehensive analysis to memory",
+      "actions": [
+        "Structure findings in memory.json",
+        "Include: affectedComponents, externalSystemsImpact, packageDependencies, dependencies, existingPatterns, impactAreas",
+        "Organize impactAreas by category: codebase, externalServices, infrastructure, packages, documentation"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Linear flow with conditional exit at substep 3. Substeps 1-2 gather context, substep 3 validates sources (exit if missing), substeps 4-8 perform analysis, substep 9 documents findings."
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section (gatheredInformation from gather-relevant-information)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: affectedComponents, externalSystemsImpact, packageDependencies, dependencies, existingPatterns, impactAreas, analysisNotes",
+      "Decisions Made: Component selection, dependency categorization, pattern identification",
+      "Notes: Cross-cutting concerns, risks, assumptions"
+    ]
+  },
+  "outputStructure": {
+    "affectedComponents": {
+      "description": "Codebase components needing changes",
+      "structure": ["Array of component names/paths with change description"]
+    },
+    "externalSystemsImpact": {
+      "description": "External services, APIs, infrastructure affected",
+      "structure": ["Array of external system names with impact description"]
+    },
+    "packageDependencies": {
+      "description": "New/updated packages needed",
+      "structure": {
+        "new": ["Packages to add"],
+        "update": ["Packages needing version updates"],
+        "remove": ["Packages to remove"]
+      }
+    },
+    "dependencies": {
+      "description": "Internal + external dependency mapping",
+      "structure": {
+        "upstream": ["Components/services that call affected code"],
+        "downstream": ["Components/services called by affected code"],
+        "external": ["External APIs and services"],
+        "infrastructure": ["DB, queues, caches, etc."]
+      }
+    },
+    "existingPatterns": {
+      "description": "Conventions from code and documentation",
+      "structure": ["Array of patterns with examples"]
+    },
+    "impactAreas": {
+      "description": "Categorized impacts",
+      "structure": {
+        "codebase": {
+          "api": ["API layer changes"],
+          "service": ["Service layer changes"],
+          "data": ["Data layer changes"]
+        },
+        "externalServices": ["External service impacts"],
+        "infrastructure": ["Infrastructure changes"],
+        "packages": {
+          "new": ["New packages"],
+          "update": ["Package updates"],
+          "remove": ["Package removals"]
+        },
+        "documentation": ["Docs needing updates"]
+      }
+    }
+  },
+  "feedbackLoop": {
+    "condition": "Sources missing at substep 3",
+    "returnToStep": "gather-relevant-information",
+    "description": "If analysis reveals information gaps, return to gather-relevant-information to collect missing data"
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["memory.json"],
+    "requiredTools": ["read_file", "codebase_search", "grep", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": ["gather-relevant-information", "create-low-level-design"],
+    "usedInTemplates": ["low-level-design-user-story"]
+  }
+}
+

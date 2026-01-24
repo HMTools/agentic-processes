@@ -5,12 +5,12 @@
   "metadata": {
     "title": "Plan and Design Step",
     "purposeAndUsage": "Analyze requirements and design a new process step. Use before creating step files.",
-    "lastUpdated": "2026-01-21"
+    "lastUpdated": "2026-01-24"
   },
   "output": {
     "description": "Complete step design including purpose, structure, and flow diagram",
-    "artifacts": [],
-    "memoryUpdates": ["purpose", "category", "structurePlan", "flowDiagram", "substepsPlan"]
+    "artifacts": ["step-design.md"],
+    "memoryUpdates": ["purpose", "category", "structurePlan", "flowDiagram", "substepsPlan", "designDocument"]
   },
   "guidance": {
     "prerequisites": [
@@ -28,13 +28,14 @@
     ],
     "files": {
       "read": [".processes/steps/README.md", ".processes/steps/step-template.md", "Existing steps in relevant category"],
-      "create": [],
+      "create": ["step-design.md (readable design document in process folder)"],
       "update": ["memory.json (current step section with design details)"]
     },
     "tools": [
       "read_file - Read existing steps and README",
       "list_dir - Explore existing step categories",
-      "grep - Search for similar patterns in existing steps"
+      "grep - Search for similar patterns in existing steps",
+      "write - Create step-design.md document"
     ],
     "bestPractices": [
       "Check existing steps before creating new ones",
@@ -125,13 +126,23 @@
       "actions": [
         "Break down step into logical substeps",
         "Write clear descriptions for each",
-        "Define specific actions for each substep",
-        "Document plan in memory"
+        "Define specific actions for each substep"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Create step-design.md",
+      "description": "Create a readable markdown document with the complete step design",
+      "actions": [
+        "Create step-design.md in the process folder",
+        "Include: Overview, Purpose, Use Cases, Prerequisites, Output, Flow Diagram, Substeps, Decisions Made",
+        "This document is easier to review than memory.json",
+        "Update memory.json with reference to design document"
       ]
     }
   ],
   "flow": {
-    "description": "Linear flow through all 8 substeps: requirements → existing check → category → purpose → use cases → structure → flow → substeps"
+    "description": "Linear flow through all 9 substeps: requirements → existing check → category → purpose → use cases → structure → flow → substeps → create design document"
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters and context",

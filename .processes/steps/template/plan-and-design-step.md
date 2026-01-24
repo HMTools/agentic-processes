@@ -12,7 +12,7 @@ Use this step when you need to:
 - Design step structure and flow
 - Determine appropriate category
 
-**Output**: Complete step design including purpose, structure plan, and flow diagram.
+**Output**: Complete step design including purpose, structure plan, flow diagram, and `step-design.md` document.
 
 ## Quick Reference
 
@@ -40,5 +40,6 @@ flowchart TD
     F --> G[Plan Step Structure]
     G --> H[Design Flow Diagram]
     H --> I[Plan Substeps]
-    I --> J[Complete: Step Designed]
+    I --> K[Create step-design.md]
+    K --> J[Complete: Step Designed]
 ```

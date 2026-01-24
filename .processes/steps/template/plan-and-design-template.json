@@ -43,8 +43,79 @@
       "Always include continuous improvement as final step",
       "Use clear parameter naming with camelCase",
       "Design steps to produce tangible outputs",
-      "Ensure flow diagram matches step sequence"
-    ]
+      "Ensure flow diagram matches step sequence",
+      "Consider guideline-based steps for team flexibility (see guidelineBasedStepPattern)",
+      "Embed Q&A within steps, not as standalone steps - use qa-session component (see qaAsSubstepPattern)",
+      "Design feedback loops for iterative processes - allow returning to gather more info (see feedbackLoopsPattern)"
+    ],
+    "guidelineBasedStepPattern": {
+      "description": "Use guideline-based steps when teams need flexibility in how they perform a step",
+      "whenToUse": [
+        "Data collection varies by team (e.g., Jira vs docs vs interviews)",
+        "Teams have different tools or formats (e.g., diagram types, LLD formats)",
+        "Methods differ across organizations (e.g., testing approaches, review processes)",
+        "Step requires domain-specific knowledge that varies"
+      ],
+      "howToImplement": [
+        "Mark the step as guideline-based in the template",
+        "Step JSON references a guideline file that teams customize",
+        "Provide sensible defaults in the step itself",
+        "Teams override via .guidelines/ folder"
+      ],
+      "examples": [
+        "Get parameters from external systems (Jira, Azure DevOps, docs)",
+        "Gather information from various sources",
+        "Create design documents (different formats per team)",
+        "Run tests (different frameworks/approaches)"
+      ]
+    },
+    "qaAsSubstepPattern": {
+      "description": "Embed Q&A within steps rather than creating standalone Q&A steps",
+      "rationale": "Q&A naturally occurs during multiple steps - a standalone Q&A step is artificial and creates unnecessary process overhead",
+      "pattern": "substep",
+      "sharedComponent": ".processes/steps/_components/qa-session.md",
+      "whenToUse": [
+        "Information gaps are discovered during step execution",
+        "User clarification is needed before proceeding",
+        "Assumptions need confirmation"
+      ],
+      "howToImplement": [
+        "Do NOT create a standalone Q&A step in the template",
+        "Instead, add Q&A as a substep within relevant steps",
+        "Reference the shared component: .processes/steps/_components/qa-session.md",
+        "Steps that commonly need Q&A: context understanding, information gathering, design creation"
+      ],
+      "stepJsonExample": {
+        "substeps": [
+          {"number": 1, "name": "Main action", "description": "..."},
+          {"number": 2, "name": "Q&A Session (if needed)", "description": "Use qa-session component to gather missing information", "component": ".processes/steps/_components/qa-session.md", "conditional": true}
+        ]
+      },
+      "antiPattern": "Creating a dedicated 'Q&A Step' or 'Answer Open Questions' step in the template flow"
+    },
+    "feedbackLoopsPattern": {
+      "description": "Design process flows that can loop back to earlier steps when additional information or work is needed",
+      "rationale": "During analysis or creation phases, gaps are often discovered that require returning to information gathering. Rigid linear flows force workarounds or incomplete work.",
+      "whenToUse": [
+        "Analysis steps may reveal missing information",
+        "Creation/design steps may need additional context",
+        "Validation steps may require corrections in earlier outputs",
+        "Iterative refinement is expected"
+      ],
+      "howToImplement": [
+        "Identify steps that commonly discover information gaps (analysis, design, creation)",
+        "Add conditional return paths to information gathering steps",
+        "In mermaid diagram: add decision diamonds with 'Need more info?' branches",
+        "Document the feedback loop trigger conditions in step descriptions"
+      ],
+      "mermaidExample": "graph TD\n    A[Gather Info] --> B[Analyze]\n    B --> C{Info Complete?}\n    C -->|No| A\n    C -->|Yes| D[Create Design]\n    D --> E{Gaps Found?}\n    E -->|Yes| A\n    E -->|No| F[Done]",
+      "commonFeedbackPoints": [
+        {"from": "Analysis step", "to": "Information gathering", "trigger": "Missing context or data discovered"},
+        {"from": "Design/creation step", "to": "Information gathering", "trigger": "Cannot proceed without additional details"},
+        {"from": "Validation step", "to": "Creation step", "trigger": "Issues found that need fixing"}
+      ],
+      "antiPattern": "Forcing strictly linear flows where steps cannot revisit earlier work when needed"
+    }
   },
   "substeps": [
     {
@@ -106,7 +177,8 @@
         "Break workflow into logical stages",
         "Assign steps to each stage (reuse existing or identify new)",
         "Define expected output for each step",
-        "Ensure each step produces tangible work"
+        "Ensure each step produces tangible work",
+        "For each step, ask: 'Would teams benefit from flexibility here?' If yes, consider guideline-based approach (see guidelineBasedStepPattern)"
       ]
     },
     {
@@ -127,7 +199,8 @@
       "actions": [
         "Design sequential flow of steps",
         "Identify decision points and branches",
-        "Plan sync points if sub-processes involved"
+        "Plan sync points if sub-processes involved",
+        "Consider feedback loops: Can analysis/creation steps return to gather more info? (see feedbackLoopsPattern)"
       ]
     },
     {

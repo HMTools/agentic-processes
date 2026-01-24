@@ -6,10 +6,11 @@ This document provides essential guidelines for working with the Agentic Process
 
 1. [Mandatory Logging Workflow](#mandatory-logging-workflow)
 2. [Process State Management](#process-state-management)
-3. [File Modification Guidelines](#file-modification-guidelines)
-4. [User Interaction Handling](#user-interaction-handling)
-5. [Sub-Processes](#sub-processes)
-6. [Design Principles](#design-principles)
+3. [Approval Checkpoints](#approval-checkpoints)
+4. [File Modification Guidelines](#file-modification-guidelines)
+5. [User Interaction Handling](#user-interaction-handling)
+6. [Sub-Processes](#sub-processes)
+7. [Design Principles](#design-principles)
 
 ---
 
@@ -21,9 +22,9 @@ This document provides essential guidelines for working with the Agentic Process
 
 ```
 User Makes Request/Correction → 
-IMMEDIATELY Log to log.md (before any file changes) → 
+IMMEDIATELY Log to log.json (before any file changes) → 
 Make File Changes → 
-Update log.md with what was changed
+Update log.json with what was changed
 ```
 
 ### Enforcement Checklist
@@ -32,7 +33,7 @@ Before making ANY file changes in response to user input, verify:
 
 - [ ] **Did the user make a request/correction?** → Log it immediately
 - [ ] **Am I about to modify a file?** → Check if I logged the user interaction first
-- [ ] **Did I just modify a file?** → Update log.md with the change details
+- [ ] **Did I just modify a file?** → Update log.json with the change details
 
 **If user interaction not logged → STOP and log it first**
 
@@ -88,18 +89,43 @@ The `process.md` file's "Current State" section must be updated:
 
 ### Memory File Updates
 
-The `memory.md` file must be updated:
+The `memory.json` file must be updated:
 - **At the start of each step**: Initialize step section
 - **As work progresses**: Document information produced, decisions made, files modified
 - **When step completes**: Finalize step section with all outputs
 
 ### Log File Updates
 
-The `log.md` file must be updated:
+The `log.json` file must be updated:
 - **At step start**: Log timestamp and planned actions
 - **During step**: Log each user interaction immediately (see [Mandatory Logging Workflow](#mandatory-logging-workflow))
 - **As work progresses**: Log actions taken, agent reasoning, problems encountered
 - **At step end**: Log completion time, summary, and observations
+
+---
+
+## Approval Checkpoints
+
+### Checking for Required Approvals
+
+Before completing ANY step, check if approval is required:
+
+1. **Check process.json** - Look for `"approvalRequired": true` on the current step
+2. **Check process.md** - Look for "Approval Required: Yes" in step description
+3. **If approval required**:
+   - Present deliverables to user
+   - Explicitly ask: "Do you approve? (approve/modify/reject)"
+   - **WAIT** - Do NOT proceed until user responds
+   - Log user response in log.json
+   - Only proceed if user approves
+
+### Workflow Checklist (Before Completing Step)
+
+- [ ] Check if step has `approvalRequired: true`
+- [ ] If yes: Stop and request approval
+- [ ] Wait for explicit user approval
+- [ ] Log approval in log.json
+- [ ] Then proceed to next step
 
 ---
 
@@ -116,17 +142,17 @@ The `log.md` file must be updated:
 
 3. **Update process state** (if in active process)
    - Update `process.md` Current State section
-   - Update `memory.md` with planned changes
-   - Log action in `log.md`
+   - Update `memory.json` with planned changes
+   - Log action in `log.json`
 
 ### After Modifying Any File
 
-1. **Update log.md**
+1. **Update log.json**
    - Add file to "Files Modified" section
    - Document what changed
    - Increment iteration count if file was modified multiple times
 
-2. **Update memory.md**
+2. **Update memory.json**
    - Add file to "Files Modified/Created" section
    - Document what was produced
 
@@ -160,11 +186,11 @@ The `log.md` file must be updated:
 When a user corrects something:
 
 1. **STOP** what you're doing
-2. **Log the correction** in `log.md` under current step's "User Interactions"
+2. **Log the correction** in `log.json` under current step's "User Interactions"
 3. **Understand the correction** - what needs to change and why
 4. **Make the change**
-5. **Update log.md** with what was changed
-6. **Update memory.md** with the file modification
+5. **Update log.json** with what was changed
+6. **Update memory.json** with the file modification
 7. **Continue** with the corrected approach
 
 ### Never Skip Logging
@@ -305,7 +331,7 @@ For notifications and status updates, prefer push over pull:
 
 ### For Continuous Improvement
 
-The Continuous Improvement step analyzes `log.md` to:
+The Continuous Improvement step analyzes `log.json` to:
 - Identify patterns in user corrections
 - Find opportunities to automate repetitive fixes
 - Improve templates and steps based on actual usage
@@ -330,41 +356,51 @@ Accurate logging enables:
 When user makes a request:
 
 ```
-[ ] 1. Log user interaction in log.md (User Interactions section)
+[ ] 1. Log user interaction in log.json (User Interactions section)
 [ ] 2. Update process.md Current State (if needed)
 [ ] 3. Make necessary file changes
-[ ] 4. Update log.md (Files Modified section)
-[ ] 5. Update memory.md (Files Modified/Created section)
+[ ] 4. Update log.json (Files Modified section)
+[ ] 5. Update memory.json (Files Modified/Created section)
 [ ] 6. Continue with work
 ```
 
 ### Log File Structure
 
-```markdown
-## Step N: Step Name
-
-### Timestamp
-- **Started**: YYYY-MM-DD HH:mm:ss
-- **Completed**: YYYY-MM-DD HH:mm:ss
-
-### Actions Taken
-1. Action description
-2. Another action
-
-### Agent Reasoning
-- Why decisions were made
-- Context considered
-
-### User Interactions
-1. **User Request**: {request}
-   - **Reason**: {why}
-   - **Agent Response**: {what changed}
-   - **Timestamp**: YYYY-MM-DD HH:mm:ss
-
-### Files Modified
-- path/to/file.md
-  - **Changes**: Description
-  - **Iterations**: 1
+```json
+{
+  "steps": {
+    "step1": {
+      "name": "Step Name",
+      "timestamp": {
+        "started": "2026-01-22T10:00:00Z",
+        "completed": "2026-01-22T10:30:00Z"
+      },
+      "actionsTaken": [
+        "Action description",
+        "Another action"
+      ],
+      "agentReasoning": [
+        "Why decisions were made",
+        "Context considered"
+      ],
+      "userInteractions": [
+        {
+          "userRequest": "What the user asked",
+          "reason": "Why the change was needed",
+          "agentResponse": "What was changed in response",
+          "timestamp": "2026-01-22T10:15:00Z"
+        }
+      ],
+      "filesModified": [
+        {
+          "path": "path/to/file.md",
+          "changes": "Description",
+          "iterations": 1
+        }
+      ]
+    }
+  }
+}
 ```
 
 ---

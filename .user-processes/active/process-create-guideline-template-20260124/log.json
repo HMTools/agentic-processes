@@ -1,0 +1,50 @@
+{
+  "processName": "Create create-guideline Template",
+  "metadata": {
+    "processId": "process-create-guideline-template-20260124",
+    "template": "create-process-template",
+    "started": "2026-01-24T12:00:00Z",
+    "completed": null,
+    "parentProcess": null,
+    "subProcesses": []
+  },
+  "steps": {
+    "step1": {
+      "name": "Plan and design template",
+      "timestamp": {
+        "started": "2026-01-24T12:05:00Z",
+        "completed": null
+      },
+      "actionsTaken": [
+        "Reviewed template requirements - creating a guideline creation template",
+        "Checked existing templates in .processes/templates/ for patterns",
+        "Explored .user-processes/guidelines/ structure - found categories exist but are empty",
+        "Read guidelines README to understand format (how-to-{action}.md, simple practical content)",
+        "Analyzed create-process-step-template for infrastructure template patterns"
+      ],
+      "agentReasoning": [
+        "Guidelines are simpler than templates/steps - they are just practical 'How to' documents",
+        "Template should be lightweight since guidelines don't have complex structure",
+        "Categories already exist: api-design, data-access, docs, implementation, planning, testing",
+        "No new steps needed - can use existing planning and learning steps"
+      ],
+      "userInteractions": [],
+      "problemsEncountered": [],
+      "filesModified": [],
+      "decisionsMade": [],
+      "performanceNotes": []
+    }
+  },
+  "processWideObservations": {
+    "patternsDetected": [],
+    "userFeedbackSummary": [],
+    "efficiencyMetrics": {
+      "stepsCompleted": 0,
+      "totalUserCorrections": 0,
+      "filesModified": 0,
+      "stepsRequiringMultipleIterations": 0
+    },
+    "recommendationsForFuture": []
+  }
+}
+

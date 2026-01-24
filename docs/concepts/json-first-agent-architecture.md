@@ -110,7 +110,7 @@ Complete schema containing everything the agent needs:
     "steps": ["Step1", "Step2", "Decision", "Step3"]
   },
   "memoryFileUsage": {
-    "writeTo": "Current step section in memory.md",
+    "writeTo": "Current step section in memory.json",
     "fields": ["Information Produced", "Files Modified/Created", "Decisions Made"]
   },
   "dependencies": {
@@ -437,7 +437,7 @@ flowchart TB
     }
   ],
   "memoryFileUsage": {
-    "writeTo": "Current step section in memory.md",
+    "writeTo": "Current step section in memory.json",
     "fields": ["Information Produced", "Files Modified/Created"]
   }
 }
@@ -487,6 +487,6 @@ flowchart TD
 ## Notes
 
 - The `_components/` folder files are referenced by steps but don't follow the same dual-file pattern - they may need separate consideration
-- Process instance files (`process.md`, `memory.md`, `log.md` in `.user-processes/`) follow a different pattern and are not part of this migration
+- Process instance files (`process.md`, `memory.json`, `log.json` in `.user-processes/`) follow a different pattern and are not part of this migration
 - The templates for memory and log files (`memory-template.md`, `log-template.md`) should be kept as MD-only since they're used to initialize process instances
 

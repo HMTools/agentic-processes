@@ -1,0 +1,117 @@
+{
+  "type": "template",
+  "name": "low-level-design-user-story",
+  "category": "development",
+  "metadata": {
+    "title": "Low-Level Design for User Story",
+    "purposeAndUsage": "Create standalone low-level design (LLD) document for user stories that serves as foundational technical specification for subsequent SDLC phases including code development, test planning, and documentation.",
+    "lastUpdated": "2026-01-23"
+  },
+  "parameters": {
+    "required": ["userStoryId"],
+    "optional": [],
+    "definitions": {
+      "userStoryId": {
+        "description": "ID/reference of the user story",
+        "type": "string",
+        "example": "US-1234, PROJ-567, GH-89"
+      }
+    }
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference", "processFlow", "stepsSummary"]
+    },
+    "agentLayer": {
+      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
+    }
+  },
+  "steps": [
+    {
+      "number": 1,
+      "name": "Get User Story Parameters",
+      "stepRef": "@framework-step:planning/get-user-story-parameters",
+      "output": "User story details: title, description, acceptance criteria",
+      "guideline": true,
+      "approvalRequired": false,
+      "guidelineDescription": "Teams use their preferred method to collect user story details from userStoryId: Jira, Azure DevOps, manual entry, requirements docs, etc."
+    },
+    {
+      "number": 2,
+      "name": "Understand User Story Context",
+      "stepRef": "@framework-step:planning/understand-context",
+      "output": "Context documentation with requirements, scope, success criteria",
+      "guideline": false,
+      "approvalRequired": true
+    },
+    {
+      "number": 3,
+      "name": "Gather Relevant Information",
+      "stepRef": "@framework-step:planning/gather-relevant-information",
+      "output": "Collected information from various sources",
+      "guideline": true,
+      "approvalRequired": false,
+      "guidelineDescription": "Teams use their preferred method to gather information: architecture docs, API specs, wiki pages, SME interviews, existing code patterns, etc."
+    },
+    {
+      "number": 4,
+      "name": "Analyze Current System",
+      "stepRef": "@framework-step:planning/analyze-affected-system",
+      "output": "System analysis report, affected components map, dependencies",
+      "feedbackLoop": {
+        "condition": "Need more information",
+        "returnToStep": 3,
+        "description": "If analysis reveals information gaps, return to Step 3 to gather additional data"
+      }
+    },
+    {
+      "number": 5,
+      "name": "Create Low-Level Design Document",
+      "stepRef": "@framework-step:planning/create-low-level-design",
+      "output": "Complete LLD document at plans/{user-story-name}/lld.md",
+      "guideline": true,
+      "approvalRequired": true,
+      "guidelineDescription": "Teams use their preferred LLD format: diagram types, sections, tools, level of detail, etc.",
+      "feedbackLoop": {
+        "condition": "Need more information",
+        "returnToStep": 3,
+        "description": "If design creation reveals information gaps, return to Step 3 to gather additional data"
+      }
+    },
+    {
+      "number": 6,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "output": "Process improvements implemented",
+      "approvalRequired": true
+    }
+  ],
+  "qAPattern": {
+    "description": "Each step handles its own Q&A as needed - no standalone Q&A step",
+    "workflow": "When questions arise: identify open questions → present to user → wait for answers → continue with step"
+  },
+  "keyOutput": {
+    "artifact": "plans/{user-story-name}/lld.md",
+    "contents": [
+      "Overview and scope",
+      "Current system analysis",
+      "Proposed design (architecture, data flow, class/sequence diagrams)",
+      "Technical specifications (API contracts, DB changes, config)",
+      "Dependencies and risks",
+      "Test considerations"
+    ]
+  },
+  "references": {
+    "steps": [
+      "@framework-step:planning/get-user-story-parameters",
+      "@framework-step:planning/understand-context",
+      "@framework-step:planning/gather-relevant-information",
+      "@framework-step:planning/analyze-affected-system",
+      "@framework-step:planning/create-low-level-design",
+      "@framework-step:learning/continuous-improvement"
+    ],
+    "relatedTemplates": ["develop-user-story"],
+    "dependencies": []
+  }
+}
+

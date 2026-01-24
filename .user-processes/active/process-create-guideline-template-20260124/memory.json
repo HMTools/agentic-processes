@@ -1,0 +1,27 @@
+{
+  "processName": "Create create-guideline Template",
+  "metadata": {
+    "processId": "process-create-guideline-template-20260124",
+    "created": "2026-01-24T12:00:00Z",
+    "lastUpdated": "2026-01-24T12:00:00Z",
+    "currentStep": 1
+  },
+  "parameters": {
+    "templateName": "create-guideline",
+    "templatePurpose": "Create missing guideline documents for process framework steps",
+    "useCases": "When a process step or template references a guideline that doesn't exist, or when establishing new best practices/conventions for the framework"
+  },
+  "subProcessState": {
+    "parent": null,
+    "spawnedAtStep": null,
+    "childSubProcesses": [],
+    "nextSyncPoint": null,
+    "pendingSubProcesses": []
+  },
+  "steps": {},
+  "crossReferences": {
+    "keyDecisions": [],
+    "filesModified": []
+  }
+}
+

@@ -24,6 +24,13 @@ A checklist for verifying existing patterns before implementing new components. 
 
 **Usage**: Include this component in steps that involve creating new implementations (services, tests, API clients, etc.).
 
+### qa-session.md
+A structured workflow for gathering missing information from users through Q&A sessions. Includes question formatting, logging, and outcome handling.
+
+**Usage**: Include this component in steps that may need to gather information from users when gaps are identified. Particularly useful for planning and analysis steps.
+
+**TypeScript types**: See `.processes/types/qa-session.ts` for `QAQuestion`, `QAAnswer`, `QASessionLog`, `QASessionMemory`, and `QAConfig` types.
+
 ## Guidelines Files
 
 Guidelines are project-specific patterns and conventions stored in `.user-processes/guidelines/`. They are organized by domain category:

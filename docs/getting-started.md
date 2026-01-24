@@ -80,7 +80,7 @@ The main process file contains:
 - Errors & notes section
 - Audit log
 
-### Memory File (`memory.md`)
+### Memory File (`memory.json`)
 
 Stores information shared across steps:
 - Information produced in each step
@@ -88,7 +88,7 @@ Stores information shared across steps:
 - Files created/modified
 - Notes and context
 
-### Log File (`log.md`)
+### Log File (`log.json`)
 
 Automatically maintained execution log:
 - Detailed action history

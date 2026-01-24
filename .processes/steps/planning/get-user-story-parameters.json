@@ -1,0 +1,141 @@
+{
+  "type": "step",
+  "name": "get-user-story-parameters",
+  "category": "planning",
+  "metadata": {
+    "title": "Get User Story Parameters",
+    "purposeAndUsage": "Collect user story details (title, description, acceptance criteria) from a userStoryId using the team's configured guideline-based approach. Supports various sources: Jira, Azure DevOps, GitHub, manual entry, or requirements documents.",
+    "lastUpdated": "2026-01-22"
+  },
+  "output": {
+    "description": "User story details stored in memory",
+    "artifacts": [],
+    "memoryUpdates": ["userStory.title", "userStory.description", "userStory.acceptanceCriteria", "userStory.source", "userStory.additionalContext"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "userStoryId parameter available from process",
+      "Process context established"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/planning/how-to-get-user-story-parameters.md"
+    ],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: check guideline → execute guideline or manual entry → validate → request missing → store in memory",
+      "This step uses guideline-based pattern: teams configure their preferred method",
+      "Guideline path: .user-processes/guidelines/planning/how-to-get-user-story-parameters.md",
+      "If no guideline exists, prompt user for manual entry in structured format",
+      "Required fields: title, description, acceptanceCriteria, source"
+    ],
+    "files": {
+      "read": [
+        "process.md (for userStoryId parameter)",
+        ".user-processes/guidelines/planning/how-to-get-user-story-parameters.md (if exists)"
+      ],
+      "create": [],
+      "update": ["memory.json (current step section with userStory details)"]
+    },
+    "tools": [
+      "read_file - Read guideline file if exists",
+      "list_dir - Check if guideline file exists"
+    ],
+    "bestPractices": [
+      "Always check for team guideline first before prompting for manual entry",
+      "Validate all required fields before completing",
+      "Document the source method used (guideline vs manual)",
+      "Be specific when requesting missing information",
+      "Accept various formats for acceptance criteria (bullets, numbered, prose)"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Check for user guideline",
+      "description": "Look for team's guideline file that defines how to collect user story parameters",
+      "actions": [
+        "Check if .user-processes/guidelines/planning/how-to-get-user-story-parameters.md exists",
+        "Note whether guideline is available for use"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Execute guideline or request manual entry",
+      "description": "Get user story details using the available method",
+      "actions": [
+        "If guideline exists: read and execute instructions from guideline file",
+        "If no guideline: prompt user to provide details in structured format",
+        "For manual entry, request: 1) Title, 2) Description (as-a-user statement preferred), 3) Acceptance Criteria (list format), 4) Source reference",
+        "Accept user story ID and ask user to provide the details associated with it"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Validate required fields",
+      "description": "Ensure all required information is present",
+      "actions": [
+        "Check that title is provided and non-empty",
+        "Check that description is provided and non-empty",
+        "Check that acceptanceCriteria has at least one item",
+        "Check that source is documented",
+        "Note any missing fields"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Request missing information",
+      "description": "If validation fails, ask for missing data",
+      "conditional": true,
+      "actions": [
+        "Present specific questions for each missing field",
+        "Format: 'Please provide [field]: [explanation of what's needed]'",
+        "Wait for user response",
+        "Update collected information with answers",
+        "Re-validate until all required fields present"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Store in memory",
+      "description": "Save collected user story information to memory.json",
+      "actions": [
+        "Write userStory object to current step's informationProduced section",
+        "Include: title, description, acceptanceCriteria (as array), source",
+        "Include additionalContext if any was provided",
+        "Document source method used (guideline name or 'manual entry')"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Check guideline → execute or manual → validate → (conditional: request missing) → store. Substep 4 is conditional - only if validation in substep 3 fails."
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters (userStoryId)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: userStory object with title, description, acceptanceCriteria, source, additionalContext",
+      "Decisions Made: Source method used (guideline vs manual)",
+      "Notes: Any clarifications or additional context gathered"
+    ]
+  },
+  "manualEntryTemplate": {
+    "prompt": "Please provide the following user story details for {{userStoryId}}:",
+    "fields": [
+      "**Title**: The user story title/summary",
+      "**Description**: Full description, ideally in 'As a [user], I want [goal], so that [benefit]' format",
+      "**Acceptance Criteria**: List of criteria that define when the story is complete",
+      "**Source**: Where this information comes from (e.g., 'Jira ticket', 'requirements doc', 'user provided')"
+    ]
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": [],
+    "requiredTools": ["read_file", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": ["understand-context"],
+    "usedInTemplates": ["low-level-design-user-story"]
+  }
+}
+
