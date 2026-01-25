@@ -17,7 +17,7 @@ This prompt guides the continuation of an existing process by discovering active
 | Requirement | Description |
 |-------------|-------------|
 | Must have process | Never work outside a process |
-| Must restore state | Read process.md and memory.json |
+| Must restore state | Read process.json, process.md and memory.json |
 | Must log interactions | Log user interactions before file changes |
 
 ---
@@ -109,8 +109,8 @@ When `/process-continue` is invoked:
    - If only one process exists, proceed directly
 
 2. **Read Process State**
-   - Read `.user-processes/active/{process-folder}/process.md`
-   - Check **Current State** section
+   - Read `.user-processes/active/{process-folder}/process.json` (primary state)
+   - Read `.user-processes/active/{process-folder}/process.md` (user documentation)
    - Review completed steps and identify next incomplete step
 
 3. **Read Memory File**
@@ -139,7 +139,7 @@ When `/process-continue` is invoked:
 
 ### State Restoration
 
-The AI reads both `process.md` and `memory.json` to fully restore context:
+The AI reads `process.json`, `process.md` and `memory.json` to fully restore context:
 - Current step and progress
 - Completed work
 - Decisions made

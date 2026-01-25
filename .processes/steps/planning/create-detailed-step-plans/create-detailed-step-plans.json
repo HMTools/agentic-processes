@@ -1,0 +1,218 @@
+{
+  "type": "step",
+  "name": "create-detailed-step-plans",
+  "category": "planning",
+  "metadata": {
+    "title": "Create Detailed Step Plans",
+    "purposeAndUsage": "Generate detailed implementation plans for each step in an approved high-level plan. Breaks down high-level steps into actionable sub-steps, identifies missing information through Q&A, creates step-specific Low Level Designs, and links each plan to a process-step.",
+    "lastUpdated": "2026-01-24"
+  },
+  "output": {
+    "description": "Detailed plan files for each high-level step",
+    "artifacts": ["plans/{user-story-name}/step-{n}-{step-name}.md"],
+    "memoryUpdates": ["detailedPlansIndex", "approvalStatus", "approvalTimestamp"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "High-level plan approved (from create-high-level-plan step)",
+      "All required process-steps exist in .processes/steps/ library"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [],
+    "specificActions": [
+      "Load High-Level Plan: Read approved high-level plan from plans/{user-story-name}/plan.md",
+      "For Each Step: Create detailed plan file, analyze requirements, add Q&A if needed, create LLD, link to process-step, break into sub-steps",
+      "Q&A Section: Add when step-specific technical details are missing (API contracts, database details, configuration, business logic)",
+      "Low Level Design: Create component overview, architecture diagram, files to create/modify, key classes/interfaces, data flow, error handling, dependencies",
+      "Link Process Step: Use format @step:category/step-name, verify step exists",
+      "Present for Approval: Show all plans organized, with summary and approval request",
+      "Handle Revisions: If changes requested, revise affected plans and re-present",
+      "Complete When Approved: Exit only when user explicitly approves all plans"
+    ],
+    "files": {
+      "read": [
+        "plans/{user-story-name}/plan.md (approved high-level plan)",
+        "memory.json (previous step section with plan directory)",
+        ".processes/steps/{category}/{step-name}/ (to verify process-steps exist)"
+      ],
+      "create": ["plans/{user-story-name}/step-{n}-{step-name}.md (one per high-level step)"],
+      "update": ["memory.json (current step section with plans index and approval status)"]
+    },
+    "tools": [
+      "read_file - Read high-level plan and memory",
+      "list_dir - Verify process-steps exist",
+      "write - Create detailed plan files",
+      "search_replace - Update memory.json"
+    ],
+    "bestPractices": [
+      "Never assume technical details - add Q&A if step-specific info is missing",
+      "Be specific in Q&A questions - ask about concrete implementation details",
+      "Wait for Q&A answers before creating LLD",
+      "Verify linked process-step exists before referencing",
+      "Keep sub-step complexity < 7",
+      "This step is self-contained - includes creation, Q&A, revision, and approval workflow"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Load High-Level Plan",
+      "description": "Read the approved high-level plan from previous step",
+      "actions": [
+        "Read memory.json to get high-level plan path",
+        "Read the approved plan.md file",
+        "Extract list of steps to create detailed plans for"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Create Detailed Plan for Each Step",
+      "description": "For each step in the high-level plan, create a detailed plan file",
+      "actions": [
+        "Create file: step-{n}-{step-name}.md",
+        "Add Overview and Parent Plan reference",
+        "Analyze if step-specific information is missing",
+        "If missing: Add Q&A section with specific questions",
+        "If Q&A added: Wait for user to answer before proceeding"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create Step-Specific Low Level Design",
+      "description": "After Q&A resolved, create the technical design for each step",
+      "actions": [
+        "Create Component Overview (no code)",
+        "Create Architecture Diagram (mermaid)",
+        "List Files to Create/Modify",
+        "Document Key Classes/Interfaces",
+        "Describe Data Flow and Error Handling",
+        "List Dependencies"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Link to Process Step",
+      "description": "Link each detailed plan to the process-step that will execute it",
+      "actions": [
+        "Identify appropriate process-step (e.g., @step:api/implement-controller-layer)",
+        "Verify process-step exists in .processes/steps/",
+        "Add Linked Process Step section with reference and description",
+        "If process-step doesn't exist: Flag for creation before proceeding"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Break Down into Sub-Steps",
+      "description": "Break each step into actionable implementation sub-steps",
+      "actions": [
+        "Create numbered sub-steps ({n}.1, {n}.2, etc.)",
+        "Add complexity rating to each sub-step (keep < 7)",
+        "Include details and expected output for each",
+        "Add Testing Considerations and Success Criteria sections"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Present Plans for Approval",
+      "description": "Present all detailed plans to user in organized format",
+      "actions": [
+        "List all plans with: file, linked process-step, complexity, sub-steps count, Q&A status",
+        "Show summary: total plans, total sub-steps, total complexity",
+        "Request approval: 'approved' to proceed, or specify changes needed"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Handle Revisions",
+      "description": "If user requests changes, revise and re-present",
+      "conditional": true,
+      "actions": [
+        "Identify affected plans from user feedback",
+        "Make requested changes to plan files",
+        "Add revision note with description of changes",
+        "Re-present revised plans to user",
+        "Repeat until user approves all plans"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Finalize Approval",
+      "description": "Record approval and update memory",
+      "actions": [
+        "Mark all plans as Approved in memory.json",
+        "Record approval timestamp",
+        "Update current step section with plans index"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Load plan → For each step: create file → Q&A if needed → create LLD → link process-step → sub-steps → Present all → Handle revisions → Finalize approval"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section (high-level plan path, approval status)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Detailed plans index (step, file, process-step, status, approval date)",
+      "Decisions Made: Process-step selections, complexity ratings",
+      "Approval Status: In Progress / Approved",
+      "Approval Timestamp: When all plans were approved"
+    ]
+  },
+  "qaGuidance": {
+    "whenToAdd": "When step-specific technical details are missing that are necessary for implementation",
+    "categories": [
+      {"name": "API Contracts", "examples": "endpoint paths, request/response schemas, query parameters, headers"},
+      {"name": "Database Details", "examples": "collection names, field names and types, indexes, document structure"},
+      {"name": "Configuration", "examples": "environment variables, connection strings, API keys, feature flags"},
+      {"name": "Business Logic", "examples": "calculation formulas, validation rules, error handling, edge cases"},
+      {"name": "External Services", "examples": "integration endpoints, authentication methods, retry policies"},
+      {"name": "Technical Implementation", "examples": "library versions, code patterns, naming conventions"}
+    ],
+    "format": "Checkbox list with Question, Context (why needed), and Answer placeholder"
+  },
+  "processStepLinking": {
+    "format": "@step:category/step-name",
+    "validation": "Verify step exists in .processes/steps/{category}/{step-name}/",
+    "examples": [
+      "@step:api/implement-controller-layer",
+      "@step:service/implement-service-layer",
+      "@step:data/implement-repository-layer"
+    ]
+  },
+  "approvalWorkflow": {
+    "approvalRequired": true,
+    "approvalTriggers": ["approved", "approve all", "LGTM"],
+    "revisionLoop": "If changes requested, revise affected plans and re-present until approved",
+    "exitCriteria": [
+      "All detailed plans exist and are complete",
+      "All Q&A questions answered",
+      "All user-requested revisions incorporated",
+      "User explicitly approves all plans",
+      "Memory file updated with Approved status and timestamp"
+    ]
+  },
+  "detailedPlanTemplate": {
+    "sections": [
+      "Overview",
+      "Parent Plan reference",
+      "Q&A (if needed)",
+      "Low Level Design (Component Overview, Architecture Diagram, Files, Classes/Interfaces, Data Flow, Error Handling, Dependencies)",
+      "Linked Process Step",
+      "Implementation Steps (sub-steps with complexity)",
+      "Testing Considerations",
+      "Success Criteria"
+    ],
+    "namingPattern": "step-{n}-{step-name}.md",
+    "location": "plans/{user-story-name}/"
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Approved high-level plan (plan.md)", "Process-steps in .processes/steps/"],
+    "requiredTools": ["read_file", "list_dir", "write", "search_replace"]
+  },
+  "references": {
+    "relatedSteps": ["create-high-level-plan", "implement-controller-layer", "implement-service-layer", "implement-repository-layer"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+

@@ -17,7 +17,7 @@ This prompt guides the creation of a new process instance from an existing templ
 | Requirement | Description |
 |-------------|-------------|
 | Must use template | Never skip templates or work directly |
-| Must create instance | Always create process.md, memory.json, log.json |
+| Must create instance | Always create process.json, process.md, memory.json, log.json |
 | Must log interactions | Log user interactions before file changes |
 
 ---
@@ -63,9 +63,10 @@ Reference the process management knowledge file for complete instructions:
 
 **Process Instance Structure:**
 - Directory: `.user-processes/active/process-{name}-{YYYYMMDD}/`
-- `process.md` (with template placeholders substituted)
-- `memory.json` (initialized with template structure)
-- `log.json` (initialized with template structure and metadata)
+- `process.json` (primary state file - status, steps, current state)
+- `process.md` (user-readable documentation with template placeholders substituted)
+- `memory.json` (step information and cross-references)
+- `log.json` (execution history and user interactions)
 
 ### JSON-First Architecture
 
@@ -118,9 +119,10 @@ When `/process-new` is invoked:
 
 ### File Initialization
 
-1. **process.md**: All `{{placeholders}}` substituted, step references kept as references
-2. **memory.json**: Initialized from `.processes/templates/memory-template.md` (JSON schema)
-3. **log.json**: Initialized from `.processes/templates/log-template.md` (JSON schema)
+1. **process.json**: Primary state (id, status, parameters, steps array, currentState)
+2. **process.md**: All `{{placeholders}}` substituted, step references kept as references
+3. **memory.json**: Initialized from `.processes/templates/memory-template.md` (JSON schema)
+4. **log.json**: Initialized from `.processes/templates/log-template.md` (JSON schema)
 
 ### Step Reference Format
 

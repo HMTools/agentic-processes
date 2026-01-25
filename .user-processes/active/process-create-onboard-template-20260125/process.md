@@ -1,7 +1,7 @@
-# Process: Create create-guideline Template
+# Process: Create onboard Template
 
 **Template**: create-process-template  
-**Status**: Completed ✅
+**Status**: Running
 
 ## Description
 
@@ -20,9 +20,9 @@ Use this template when you need to:
 
 | Parameter | Value |
 |-----------|-------|
-| `templateName` | create-guideline |
-| `templatePurpose` | Create missing guideline documents for process framework steps |
-| `useCases` | When a process step or template references a guideline that doesn't exist, or when establishing new best practices/conventions for the framework |
+| `templateName` | onboard |
+| `templatePurpose` | Onboarding when starting to work with the framework, specifically for identifying and creating missing guidelines that are referenced by process steps |
+| `useCases` | When a user project starts using the framework and needs to populate missing guidelines, or when expanding to new areas that require new guidelines to be created |
 
 ## Process Flow
 
@@ -46,27 +46,25 @@ flowchart TD
 
 ## Steps
 
-- [x] **Step 1: Plan and design template** ✅
+- [ ] **Step 1: Plan and design template** ⏳ AWAITING APPROVAL
   - **Step**: `@framework-step:template/plan-and-design-template`
   - **Description**: Gather requirements, design template structure, create flow diagram
-  - **Output**: `template-design-summary.md` ✅
-  - **Approval Required**: Yes - **APPROVED**
+  - **Output**: [`template-design-summary.md`](./template-design-summary.md) ✅
+  - **Approval Required**: Yes - **PENDING**
 
-- [x] **Step 2: Create template file** ✅
+- [ ] **Step 2: Create template file**
   - **Step**: `@framework-step:template/create-template-file`
   - **Description**: Create the actual template files (.md and .json)
-  - **Output**: 
-    - `.processes/templates/infrastructure/create-guideline.md` ✅
-    - `.processes/templates/infrastructure/create-guideline.json` ✅
+  - **Output**: Complete template file with validation reports
 
-- [x] **Step 3: Validate process-steps exist** ✅
+- [ ] **Step 3: Validate process-steps exist**
   - **Step**: `@framework-step:template/validate-process-steps-exist`
   - **Description**: Verify all referenced steps exist, spawn sub-processes for missing ones
-  - **Output**: Validation report ✅
-  - **Sub-Processes Completed**: Both `create-guideline-file` and `link-guideline-to-steps` steps created
+  - **Output**: Validation report
 
-- [x] **Step 4: Continuous Improvement** ✅
+- [ ] **Step 4: Continuous Improvement**
   - **Step**: `@framework-step:learning/continuous-improvement`
   - **Description**: Review process, identify improvements, update templates
-  - **Output**: 2 improvements implemented, 1 deferred
+  - **Output**: Improvements implemented
+
 

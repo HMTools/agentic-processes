@@ -1,0 +1,99 @@
+{
+  "type": "template",
+  "name": "create-guideline",
+  "category": "infrastructure",
+  "metadata": {
+    "title": "Create Guideline",
+    "purposeAndUsage": "Create guideline documents that answer 'How to do X?' questions with practical, action-oriented content. Use when a process step references a missing guideline, or when establishing new best practices for the framework.",
+    "lastUpdated": "2026-01-24"
+  },
+  "parameters": {
+    "required": ["guidelineName", "guidelineCategory", "guidelinePurpose"],
+    "optional": ["relatedSteps", "triggeringContext"],
+    "definitions": {
+      "guidelineName": {
+        "description": "Name of the action (kebab-case, without 'how-to-' prefix)",
+        "type": "string",
+        "example": "implement-controllers"
+      },
+      "guidelineCategory": {
+        "description": "Category folder for the guideline. Use existing category if it fits, or create new if needed.",
+        "type": "string",
+        "example": "api-design",
+        "existingCategories": ["api-design", "data-access", "docs", "implementation", "planning", "testing"]
+      },
+      "guidelinePurpose": {
+        "description": "The 'How to' question this guideline answers",
+        "type": "string",
+        "example": "How to implement API controllers following project conventions"
+      },
+      "relatedSteps": {
+        "description": "Steps that will reference this guideline",
+        "type": "array",
+        "example": ["api/implement-controller-layer"]
+      },
+      "triggeringContext": {
+        "description": "What triggered the need for this guideline",
+        "type": "string",
+        "example": "Step api/implement-controller-layer referenced missing guideline"
+      }
+    }
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference"]
+    },
+    "agentLayer": {
+      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile"]
+    }
+  },
+  "steps": [
+    {
+      "number": 1,
+      "name": "Understand context",
+      "stepRef": "@framework-step:planning/understand-context",
+      "output": "Context documented in memory.json",
+      "approvalRequired": false
+    },
+    {
+      "number": 2,
+      "name": "Create guideline file",
+      "stepRef": "@framework-step:guideline/create-guideline-file",
+      "output": "Complete guideline file",
+      "approvalRequired": true
+    },
+    {
+      "number": 3,
+      "name": "Link guideline to steps",
+      "stepRef": "@framework-step:guideline/link-guideline-to-steps",
+      "output": "Updated step files",
+      "optional": true
+    },
+    {
+      "number": 4,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "output": "Improvements implemented"
+    }
+  ],
+  "references": {
+    "steps": [
+      "@framework-step:planning/understand-context",
+      "@framework-step:guideline/create-guideline-file",
+      "@framework-step:guideline/link-guideline-to-steps",
+      "@framework-step:learning/continuous-improvement"
+    ],
+    "relatedTemplates": ["create-process-step-template"],
+    "dependencies": []
+  },
+  "guidelineFormat": {
+    "filename": "how-to-{guidelineName}.md",
+    "location": ".user-processes/guidelines/{guidelineCategory}/",
+    "structure": {
+      "title": "# How to {Action}",
+      "content": "Practical steps and examples to answer the 'How to' question",
+      "sections": ["numbered steps", "examples", "code snippets (if applicable)", "tips/notes (optional)"]
+    }
+  }
+}
+

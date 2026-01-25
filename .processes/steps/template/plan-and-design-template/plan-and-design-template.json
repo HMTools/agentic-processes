@@ -1,0 +1,243 @@
+{
+  "type": "step",
+  "name": "plan-and-design-template",
+  "category": "template",
+  "metadata": {
+    "title": "Plan and Design Template",
+    "purposeAndUsage": "Analyze requirements and design a new process template. Use before creating template files.",
+    "lastUpdated": "2026-01-21"
+  },
+  "output": {
+    "description": "Complete template design including purpose, parameters, steps, and flow diagram",
+    "artifacts": [],
+    "memoryUpdates": ["purpose", "parameters", "stepBreakdown", "flowDiagram"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Clear understanding of the workflow to be templated",
+      "Knowledge of existing templates and steps"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: review requirements → check existing → purpose → use cases → check reusable steps → plan steps → identify parameters → design flow → create diagram",
+      "Before planning steps: Check existing generic steps in .processes/steps/planning/ and .processes/steps/common/",
+      "When planning steps: Prefer reusable step categories",
+      "When planning steps: Ensure each step represents actual work, not flow control",
+      "Use camelCase for parameter names: featureName, targetBranch"
+    ],
+    "files": {
+      "read": [".processes/templates/README.md", ".processes/steps/planning/", ".processes/steps/common/", "Existing templates for patterns"],
+      "create": [],
+      "update": ["memory.json (current step section with design details)"]
+    },
+    "tools": [
+      "read_file - Read existing templates and steps",
+      "list_dir - Explore existing templates and step categories",
+      "grep - Search for similar patterns"
+    ],
+    "bestPractices": [
+      "Check existing templates before creating new ones",
+      "Reuse existing steps where possible",
+      "Keep templates focused on a single workflow",
+      "Always include continuous improvement as final step",
+      "Use clear parameter naming with camelCase",
+      "Design steps to produce tangible outputs",
+      "Ensure flow diagram matches step sequence",
+      "Consider guideline-based steps for team flexibility (see guidelineBasedStepPattern)",
+      "Embed Q&A within steps, not as standalone steps - use qa-session component (see qaAsSubstepPattern)",
+      "Design feedback loops for iterative processes - allow returning to gather more info (see feedbackLoopsPattern)"
+    ],
+    "guidelineBasedStepPattern": {
+      "description": "Use guideline-based steps when teams need flexibility in how they perform a step",
+      "whenToUse": [
+        "Data collection varies by team (e.g., Jira vs docs vs interviews)",
+        "Teams have different tools or formats (e.g., diagram types, LLD formats)",
+        "Methods differ across organizations (e.g., testing approaches, review processes)",
+        "Step requires domain-specific knowledge that varies"
+      ],
+      "howToImplement": [
+        "Mark the step as guideline-based in the template",
+        "Step JSON references a guideline file that teams customize",
+        "Provide sensible defaults in the step itself",
+        "Teams override via .guidelines/ folder"
+      ],
+      "examples": [
+        "Get parameters from external systems (Jira, Azure DevOps, docs)",
+        "Gather information from various sources",
+        "Create design documents (different formats per team)",
+        "Run tests (different frameworks/approaches)"
+      ]
+    },
+    "qaAsSubstepPattern": {
+      "description": "Embed Q&A within steps rather than creating standalone Q&A steps",
+      "rationale": "Q&A naturally occurs during multiple steps - a standalone Q&A step is artificial and creates unnecessary process overhead",
+      "pattern": "substep",
+      "sharedComponent": ".processes/steps/_components/qa-session.md",
+      "whenToUse": [
+        "Information gaps are discovered during step execution",
+        "User clarification is needed before proceeding",
+        "Assumptions need confirmation"
+      ],
+      "howToImplement": [
+        "Do NOT create a standalone Q&A step in the template",
+        "Instead, add Q&A as a substep within relevant steps",
+        "Reference the shared component: .processes/steps/_components/qa-session.md",
+        "Steps that commonly need Q&A: context understanding, information gathering, design creation"
+      ],
+      "stepJsonExample": {
+        "substeps": [
+          {"number": 1, "name": "Main action", "description": "..."},
+          {"number": 2, "name": "Q&A Session (if needed)", "description": "Use qa-session component to gather missing information", "component": ".processes/steps/_components/qa-session.md", "conditional": true}
+        ]
+      },
+      "antiPattern": "Creating a dedicated 'Q&A Step' or 'Answer Open Questions' step in the template flow"
+    },
+    "feedbackLoopsPattern": {
+      "description": "Design process flows that can loop back to earlier steps when additional information or work is needed",
+      "rationale": "During analysis or creation phases, gaps are often discovered that require returning to information gathering. Rigid linear flows force workarounds or incomplete work.",
+      "whenToUse": [
+        "Analysis steps may reveal missing information",
+        "Creation/design steps may need additional context",
+        "Validation steps may require corrections in earlier outputs",
+        "Iterative refinement is expected"
+      ],
+      "howToImplement": [
+        "Identify steps that commonly discover information gaps (analysis, design, creation)",
+        "Add conditional return paths to information gathering steps",
+        "In mermaid diagram: add decision diamonds with 'Need more info?' branches",
+        "Document the feedback loop trigger conditions in step descriptions"
+      ],
+      "mermaidExample": "graph TD\n    A[Gather Info] --> B[Analyze]\n    B --> C{Info Complete?}\n    C -->|No| A\n    C -->|Yes| D[Create Design]\n    D --> E{Gaps Found?}\n    E -->|Yes| A\n    E -->|No| F[Done]",
+      "commonFeedbackPoints": [
+        {"from": "Analysis step", "to": "Information gathering", "trigger": "Missing context or data discovered"},
+        {"from": "Design/creation step", "to": "Information gathering", "trigger": "Cannot proceed without additional details"},
+        {"from": "Validation step", "to": "Creation step", "trigger": "Issues found that need fixing"}
+      ],
+      "antiPattern": "Forcing strictly linear flows where steps cannot revisit earlier work when needed"
+    }
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Review requirements",
+      "description": "Understand what workflow needs to be templated",
+      "actions": [
+        "Review the stated need for a new template",
+        "Identify the workflow to be standardized",
+        "Document expected outcomes"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Check existing templates",
+      "description": "Verify no similar template already exists",
+      "actions": [
+        "List existing templates",
+        "Search for similar workflows",
+        "Identify templates that could be extended vs creating new"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Write purpose statement",
+      "description": "Define clear purpose for the template",
+      "actions": [
+        "Write one-sentence purpose statement",
+        "Describe what workflow the template enables",
+        "Ensure purpose is specific and actionable"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Define use cases",
+      "description": "Document when to use this template",
+      "actions": [
+        "List scenarios where template applies",
+        "Define prerequisites or conditions",
+        "Identify target users"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Check existing reusable steps",
+      "description": "Identify steps that can be reused",
+      "actions": [
+        "Review .processes/steps/planning/ for planning steps",
+        "Review .processes/steps/common/ for utility steps",
+        "Review .processes/steps/investigation/ for analysis steps",
+        "List existing steps that fit the workflow"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Plan step breakdown",
+      "description": "Design the sequence of steps",
+      "actions": [
+        "Break workflow into logical stages",
+        "Assign steps to each stage (reuse existing or identify new)",
+        "Define expected output for each step",
+        "Ensure each step produces tangible work",
+        "Identify which steps need user approval before proceeding (mark with approvalRequired: true)",
+        "For each step, ask: 'Would teams benefit from flexibility here?' If yes, consider guideline-based approach (see guidelineBasedStepPattern)"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Identify parameters",
+      "description": "Define required and optional parameters",
+      "actions": [
+        "Identify values that must be provided by user (required)",
+        "Identify values that are helpful but optional",
+        "Use camelCase naming",
+        "Document parameter purposes"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Design process flow",
+      "description": "Map out the logical flow of the template",
+      "actions": [
+        "Design sequential flow of steps",
+        "Identify decision points and branches",
+        "Plan sync points if sub-processes involved",
+        "Consider feedback loops: Can analysis/creation steps return to gather more info? (see feedbackLoopsPattern)"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Create mermaid diagram",
+      "description": "Create visual flowchart",
+      "actions": [
+        "Create mermaid flowchart syntax",
+        "Include all steps and decision points",
+        "Ensure diagram matches planned steps",
+        "Document design in memory"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Linear flow through all 9 substeps: requirements → existing check → purpose → use cases → reusable steps → step breakdown → parameters → flow design → diagram"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters and context",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Purpose statement, parameters list, step breakdown, flow diagram",
+      "Decisions Made: Step organization, parameter choices, reusable step selections"
+    ]
+  },
+  "parameterTypes": [
+    {"type": "Required", "description": "Must be provided by user"},
+    {"type": "Optional", "description": "Helpful but not mandatory"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["templates/README.md"],
+    "requiredTools": ["read_file", "list_dir", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["create-template-file", "validate-process-steps-exist"],
+    "usedInTemplates": ["create-process-template"]
+  }
+}

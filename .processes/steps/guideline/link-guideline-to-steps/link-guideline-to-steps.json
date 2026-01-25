@@ -1,0 +1,129 @@
+{
+  "type": "step",
+  "name": "link-guideline-to-steps",
+  "category": "guideline",
+  "metadata": {
+    "title": "Link Guideline to Steps",
+    "purposeAndUsage": "Update step JSON files to add a newly created guideline to their userGuidelines array. Use after creating a guideline that should be referenced by existing steps.",
+    "lastUpdated": "2026-01-24"
+  },
+  "output": {
+    "description": "Updated step JSON files with new userGuidelines entries",
+    "artifacts": ["Updated .processes/steps/{category}/{step-name}.json files"],
+    "memoryUpdates": ["stepsUpdated", "stepsSkipped", "guidelineLinked", "qaSession"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Guideline file must exist (created in previous step)",
+      "Guideline file path known (stored in memory.json)"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md", "qa-session.md"],
+    "userGuidelines": [],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: get guideline info → scan steps → analyze content → Q&A confirm → update files → verify",
+      "Use Q&A Session component to confirm which steps to link",
+      "Always preserve existing userGuidelines entries (append only)",
+      "Skip steps that already reference the guideline (idempotent)",
+      "Use consistent path format (forward slashes, relative to project root)"
+    ],
+    "files": {
+      "read": [
+        "memory.json (guideline path from previous step)",
+        ".processes/steps/**/*.json (all step JSON files for analysis)"
+      ],
+      "update": [
+        "Step JSON files that user confirms",
+        "memory.json (current step section)",
+        "log.json"
+      ]
+    },
+    "tools": [
+      "read_file - Read memory and step JSON files for content analysis",
+      "list_dir - List all step categories and files",
+      "grep - Search step content for keyword matches",
+      "search_replace - Update JSON files with new guideline references"
+    ],
+    "bestPractices": [
+      "Validate guideline file exists before adding references",
+      "Skip steps that already reference the guideline",
+      "Preserve JSON formatting when updating files",
+      "Document which steps were/weren't updated and why",
+      "Provide clear reasoning for why each step is considered relevant"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Get guideline info from memory",
+      "description": "Retrieve the guideline file path and context from previous step",
+      "actions": [
+        "Read memory.json to get guidelineFilePath from previous step",
+        "Verify the guideline file exists at the path",
+        "Extract guideline purpose and topic for relevance matching",
+        "Check if relatedSteps parameter was provided"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Identify target steps",
+      "description": "Analyze step JSON files to find relevant steps, then confirm with user",
+      "actions": [
+        "Scan all step JSON files in .processes/steps/ (all categories)",
+        "Read and analyze each step's content to determine relevance:",
+        "- Check metadata.purposeAndUsage - does it relate to the guideline topic?",
+        "- Check guidance.specificActions - would this guideline help?",
+        "- Check substeps descriptions - do they involve tasks the guideline addresses?",
+        "Compile list of relevant steps with reasoning for each",
+        "If relatedSteps parameter provided, include those as additional suggestions",
+        "Use Q&A Session component to present discovered steps and get user confirmation"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Update step JSON files",
+      "description": "Add the guideline path to confirmed steps' userGuidelines array",
+      "actions": [
+        "For each confirmed step:",
+        "- Read the step JSON file",
+        "- Check if guidance.userGuidelines array exists (create if missing)",
+        "- Check if guideline path already present (skip if yes)",
+        "- Append the guideline path to the array",
+        "- Write the updated JSON file",
+        "Track which files were modified vs skipped"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Verify and document",
+      "description": "Verify updates were applied correctly and document changes",
+      "actions": [
+        "For each modified file, verify the guideline is in userGuidelines",
+        "Update memory.json with: stepsUpdated, stepsSkipped, guidelineLinked",
+        "Log the changes in log.json"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Linear flow with Q&A decision point: get guideline info → scan and analyze steps → Q&A confirm targets → update files → verify and document"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step section - guidelineFilePath, guidelinePurpose",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: stepsUpdated (array of paths), stepsSkipped (with reasons)",
+      "guidelineLinked: Path to the guideline that was added",
+      "qaSession: Steps discovered vs confirmed"
+    ]
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md", "qa-session.md"],
+    "requiredFiles": ["Step JSON files in .processes/steps/"],
+    "requiredTools": ["read_file", "list_dir", "grep", "search_replace"]
+  },
+  "references": {
+    "relatedSteps": ["create-guideline-file"],
+    "usedInTemplates": ["create-guideline"]
+  }
+}
+

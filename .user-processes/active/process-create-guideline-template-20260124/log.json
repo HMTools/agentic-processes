@@ -4,7 +4,7 @@
     "processId": "process-create-guideline-template-20260124",
     "template": "create-process-template",
     "started": "2026-01-24T12:00:00Z",
-    "completed": null,
+    "completed": "2026-01-24T16:00:00Z",
     "parentProcess": null,
     "subProcesses": []
   },
@@ -13,7 +13,7 @@
       "name": "Plan and design template",
       "timestamp": {
         "started": "2026-01-24T12:05:00Z",
-        "completed": null
+        "completed": "2026-01-24T12:35:00Z"
       },
       "actionsTaken": [
         "Reviewed template requirements - creating a guideline creation template",
@@ -28,23 +28,274 @@
         "Categories already exist: api-design, data-access, docs, implementation, planning, testing",
         "No new steps needed - can use existing planning and learning steps"
       ],
-      "userInteractions": [],
+      "userInteractions": [
+        {
+          "userRequest": "Use existing understand-context step instead of custom step 1",
+          "reason": "Reuse existing steps where possible - understand-context already handles gathering parameters, sources, requirements",
+          "agentResponse": "Updated design to use @framework-step:planning/understand-context for Step 1",
+          "timestamp": "2026-01-24T12:15:00Z"
+        },
+        {
+          "userRequest": "guidelineCategory should not be restricted to existing categories - can create new ones",
+          "reason": "Flexibility - users may need categories that don't exist yet",
+          "agentResponse": "Changed guidelineCategory from enum to string, updated validation to allow new categories",
+          "timestamp": "2026-01-24T12:20:00Z"
+        },
+        {
+          "userRequest": "Can step 3 be done with existing steps?",
+          "reason": "Exploring step reuse options",
+          "agentResponse": "Checked apply-changes and update-documentation - neither fits. Presented 3 options: A) merge into step 2, B) remove entirely, C) keep separate. User chose C - keep as separate optional step.",
+          "timestamp": "2026-01-24T12:25:00Z"
+        },
+        {
+          "userRequest": "Where is the approval of the created guideline?",
+          "reason": "Missing approval checkpoint for guideline content",
+          "agentResponse": "Added approval requirement to Step 2 (Create guideline file) - user must approve guideline content before linking to steps",
+          "timestamp": "2026-01-24T12:30:00Z"
+        }
+      ],
       "problemsEncountered": [],
       "filesModified": [],
       "decisionsMade": [],
       "performanceNotes": []
+    },
+    "step2": {
+      "name": "Create template file",
+      "timestamp": {
+        "started": "2026-01-24T12:35:00Z",
+        "completed": "2026-01-24T12:40:00Z"
+      },
+      "actionsTaken": [
+        "Read create-template-file step guidance",
+        "Read create-process-step-template.md for reference pattern",
+        "Created create-guideline.md with all required sections",
+        "Created create-guideline.json with metadata, parameters, steps, and guidance"
+      ],
+      "agentReasoning": [
+        "Followed existing template patterns from create-process-step-template",
+        "Referenced new steps for guideline-specific actions (create-guideline-file, link-guideline-to-steps)",
+        "Included guidelineFormat section in JSON to document expected guideline structure"
+      ],
+      "userInteractions": [],
+      "problemsEncountered": [],
+      "filesModified": [
+        {
+          "path": ".processes/templates/infrastructure/create-guideline.md",
+          "changes": "Created template markdown file with description, purpose, quick reference, flow diagram, and steps",
+          "iterations": 1
+        },
+        {
+          "path": ".processes/templates/infrastructure/create-guideline.json",
+          "changes": "Created template JSON file with metadata, parameters, steps array, and guidelineFormat",
+          "iterations": 1
+        }
+      ],
+      "decisionsMade": [
+        "Created two new step references: guideline/create-guideline-file and guideline/link-guideline-to-steps",
+        "These steps need to be created in Step 3 validation"
+      ],
+      "performanceNotes": []
+    },
+    "step3": {
+      "name": "Validate process-steps exist",
+      "timestamp": {
+        "started": "2026-01-24T13:00:00Z",
+        "completed": "2026-01-24T15:30:00Z"
+      },
+      "actionsTaken": [
+        "Read template files to extract @framework-step references",
+        "Checked existence of all 4 referenced steps",
+        "Identified 2 valid steps: planning/understand-context, learning/continuous-improvement",
+        "Identified 2 missing steps: guideline/create-guideline-file, guideline/link-guideline-to-steps",
+        "Created validation report in memory.json"
+      ],
+      "agentReasoning": [
+        "Followed validate-process-steps-exist step guidance",
+        "Checked both .md and .json files for each step"
+      ],
+      "userInteractions": [
+        {
+          "userRequest": "Why don't you have a process.json? It's a critical bug",
+          "reason": "UI file watcher expects process.json but only process.md exists",
+          "agentResponse": "Confirmed bug - process.json is required by UI but was not created. Creating process.json now.",
+          "timestamp": "2026-01-24T13:05:00Z"
+        }
+      ],
+      "problemsEncountered": [
+        {
+          "problem": "Missing process.json file in process folder",
+          "impact": "UI cannot detect or display this process",
+          "resolution": "Creating process.json file with proper ProcessInstance structure"
+        }
+      ],
+      "filesModified": [
+        {
+          "path": ".user-processes/active/process-create-guideline-template-20260124/process.json",
+          "changes": "Created missing process.json file with ProcessInstance structure for UI compatibility",
+          "iterations": 1
+        },
+        {
+          "path": ".processes/steps/guideline/",
+          "changes": "Created guideline category directory for new steps",
+          "iterations": 1
+        },
+        {
+          "path": ".user-processes/active/process-create-guideline-file-step-20260124/",
+          "changes": "Created sub-process directory with process.json, process.md, memory.json, log.json",
+          "iterations": 1
+        },
+        {
+          "path": ".user-processes/active/process-link-guideline-to-steps-step-20260124/",
+          "changes": "Created sub-process directory with process.json, process.md, memory.json, log.json",
+          "iterations": 1
+        }
+      ],
+      "decisionsMade": [
+        "process.json is required by the UI file watcher but was not created during process initialization",
+        "This is a bug in the process-new workflow that should be fixed in continuous improvement",
+        "Spawned 2 sub-processes with immediate sync point to create missing steps"
+      ],
+      "performanceNotes": [
+        "Bug detected by user - process.json should be auto-generated on process creation"
+      ]
+    },
+    "step4": {
+      "name": "Continuous Improvement",
+      "timestamp": {
+        "started": "2026-01-24T15:35:00Z",
+        "completed": "2026-01-24T16:00:00Z"
+      },
+      "actionsTaken": [
+        "Analyzed process log for improvement opportunities",
+        "Identified 3 potential improvements",
+        "Prioritized missing process.json as #1 (critical bug)"
+      ],
+      "agentReasoning": [
+        "process.json missing is highest priority - reported as critical bug by user",
+        "UI cannot display processes without process.json file"
+      ],
+      "userInteractions": [
+        {
+          "userRequest": "Proceed with implementing improvement #1 (missing process.json)",
+          "reason": "User approved implementing the process.json fix",
+          "agentResponse": "Investigating process-new workflow to find where to add process.json creation",
+          "timestamp": "2026-01-24T15:35:00Z"
+        },
+        {
+          "userRequest": "Revert - solution was over-engineered. Suggest simpler way.",
+          "reason": "Created unnecessary template file (193 lines) when simpler fix would suffice",
+          "agentResponse": "Reverted all changes. Proposing simpler alternatives.",
+          "timestamp": "2026-01-24T15:45:00Z"
+        },
+        {
+          "userRequest": "process.json is not only for UI - it should be the main file the process system works with",
+          "reason": "Clarifying architecture: process.json is the authoritative state file, not just a UI helper",
+          "agentResponse": "Updating fix to position process.json as primary state file",
+          "timestamp": "2026-01-24T15:47:00Z"
+        }
+      ],
+      "problemsEncountered": [],
+      "filesModified": [
+        {
+          "path": ".processes/prompts/process-new.md",
+          "changes": "Added process.json as primary state file in Quick Reference, Process Instance Structure, and File Initialization",
+          "iterations": 2
+        },
+        {
+          "path": ".processes/prompts/process-continue.md",
+          "changes": "Updated to read process.json as primary state file in 3 locations",
+          "iterations": 1
+        },
+        {
+          "path": ".processes/steps/template/plan-and-design-template.json",
+          "changes": "Added action to identify approval checkpoints in substep 6",
+          "iterations": 1
+        }
+      ],
+      "decisionsMade": [
+        "Created process-instance-template.md following same pattern as memory-template.md and log-template.md",
+        "Added process.json as FIRST file in creation order since UI depends on it"
+      ],
+      "performanceNotes": []
+    },
+    "postCompletion": {
+      "name": "Post-Completion Bug Fixes",
+      "timestamp": {
+        "started": "2026-01-25T10:00:00Z",
+        "completed": "2026-01-25T10:05:00Z"
+      },
+      "actionsTaken": [
+        "Fixed JSON syntax error in memory.json - step2/step3/step4 were incorrectly placed outside 'steps' object",
+        "Fixed same structural issue in log.json"
+      ],
+      "agentReasoning": [
+        "JSON parser failed at position 9768 because step2 was at root level instead of inside steps object",
+        "Both memory.json and log.json had identical structural issues"
+      ],
+      "userInteractions": [
+        {
+          "userRequest": "Error reading memory.json: SyntaxError: Unexpected non-whitespace character after JSON at position 9768",
+          "reason": "UI file watcher could not parse memory.json due to malformed JSON structure",
+          "agentResponse": "Identified that step2, step3, step4 were placed outside the 'steps' object. Rewrote memory.json with correct structure.",
+          "timestamp": "2026-01-25T10:00:00Z"
+        },
+        {
+          "userRequest": "Why didn't you log to logs.json? This is a critical bug that you didn't log it",
+          "reason": "Mandatory logging requirement was violated - user interactions must be logged BEFORE making file changes",
+          "agentResponse": "Correct - violated mandatory logging workflow. Updating log.json now with the user interaction and fix.",
+          "timestamp": "2026-01-25T10:05:00Z"
+        }
+      ],
+      "problemsEncountered": [
+        {
+          "problem": "JSON syntax error in memory.json",
+          "rootCause": "step2, step3, step4 were placed at root level instead of inside 'steps' object",
+          "solution": "Rewrote memory.json with correct nested structure",
+          "prevention": "Validate JSON structure before writing files; ensure all step entries are inside 'steps' object"
+        },
+        {
+          "problem": "Mandatory logging violated - did not log user interaction before fixing file",
+          "rootCause": "Agent proceeded to fix file without first logging the user request",
+          "solution": "Updated log.json with full interaction record",
+          "prevention": "ALWAYS follow mandatory workflow: User Request → Log to log.json → Make Changes → Update log with results"
+        }
+      ],
+      "filesModified": [
+        {
+          "path": ".user-processes/active/process-create-guideline-template-20260124/memory.json",
+          "changes": "Fixed JSON structure - moved step2, step3, step4 inside 'steps' object",
+          "iterations": 1
+        },
+        {
+          "path": ".user-processes/active/process-create-guideline-template-20260124/log.json",
+          "changes": "Fixed JSON structure and added postCompletion section with user interactions",
+          "iterations": 1
+        }
+      ],
+      "decisionsMade": [
+        "Added postCompletion section to log bugs found after process was marked complete"
+      ],
+      "performanceNotes": []
     }
   },
   "processWideObservations": {
-    "patternsDetected": [],
-    "userFeedbackSummary": [],
+    "patternsDetected": [
+      "JSON structural errors from improper nesting of step objects"
+    ],
+    "userFeedbackSummary": [
+      "Critical: Mandatory logging must happen BEFORE file changes",
+      "Critical: JSON files must be validated before writing"
+    ],
     "efficiencyMetrics": {
-      "stepsCompleted": 0,
-      "totalUserCorrections": 0,
-      "filesModified": 0,
-      "stepsRequiringMultipleIterations": 0
+      "stepsCompleted": 4,
+      "totalUserCorrections": 6,
+      "filesModified": 8,
+      "stepsRequiringMultipleIterations": 2
     },
-    "recommendationsForFuture": []
+    "recommendationsForFuture": [
+      "Validate JSON structure before writing any .json file",
+      "Never skip mandatory logging workflow - log user requests immediately",
+      "Add postCompletion section pattern for tracking bugs found after process completes"
+    ]
   }
 }
-

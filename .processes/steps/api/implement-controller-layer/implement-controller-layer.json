@@ -1,0 +1,150 @@
+{
+  "type": "step",
+  "name": "implement-controller-layer",
+  "category": "api",
+  "metadata": {
+    "title": "Implement Controller Layer",
+    "purposeAndUsage": "Implement ASP.NET Core API controllers with proper versioning, DTOs, validation, and authentication. Use when creating new API endpoints.",
+    "lastUpdated": "2026-01-21"
+  },
+  "output": {
+    "description": "Controller class, request/response DTOs, mapping extensions",
+    "artifacts": ["WebApi/Controllers/{category}/*.cs", "Contracts/Requests/*.cs", "Contracts/Responses/*.cs", "WebApi/Mapping/*.cs"],
+    "memoryUpdates": ["endpointsCreated", "dtosCreated", "controllerLocation"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Understanding of required endpoints",
+      "Authentication requirements",
+      "Service layer contracts (Arguments, Results)"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/api-design/how-to-implement-controllers.md",
+      ".user-processes/guidelines/api-design/how-to-handle-authentication.md",
+      ".user-processes/guidelines/api-design/how-to-version-apis.md"
+    ],
+    "specificActions": [
+      "Determine Endpoint Category: Identify appropriate controller category based on API consumers",
+      "Create Request DTOs: Define input models in Contracts/Requests/",
+      "Create Response DTOs: Define output models in Contracts/Responses/",
+      "Create Controller Class: Implement controller with proper attributes and versioning",
+      "Implement Endpoints: Add action methods with proper HTTP verbs and routing",
+      "Add Validation: Add validation attributes to DTOs",
+      "Add Authentication/Authorization: Apply appropriate security attributes",
+      "Create Mapping Extensions: Add mappers between DTOs and service arguments/results"
+    ],
+    "files": {
+      "read": ["Service layer contracts", "Existing controllers for patterns"],
+      "create": [
+        "WebApi/Controllers/{category}/*Controller.cs",
+        "Contracts/Requests/*Request.cs",
+        "Contracts/Responses/*Response.cs",
+        "WebApi/Mapping/*MappingExtensions.cs"
+      ],
+      "update": []
+    },
+    "tools": [
+      "read_file - Read service contracts and existing patterns",
+      "write - Create controller and DTO files",
+      "codebase_search - Find similar controllers",
+      "grep - Search for specific patterns"
+    ],
+    "bestPractices": [
+      "Follow existing controller patterns in the category",
+      "Use proper HTTP verbs and status codes",
+      "Add validation attributes to all DTO properties",
+      "Include Swagger documentation attributes",
+      "Use async/await for all service calls"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Determine Endpoint Category",
+      "description": "Identify the appropriate controller category based on API consumers",
+      "actions": [
+        "Identify API consumers (internal, external, partners, public)",
+        "Select appropriate controller folder and versioning"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Study Existing Patterns",
+      "description": "Review existing patterns in the codebase",
+      "actions": [
+        "Search for similar controllers in the category",
+        "Review request/response DTO patterns",
+        "Check mapping extension patterns"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create Request/Response DTOs",
+      "description": "Create data transfer objects for the endpoints",
+      "actions": [
+        "Create request DTOs in Contracts/Requests/",
+        "Create response DTOs in Contracts/Responses/",
+        "Add validation attributes"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Create Controller Class",
+      "description": "Create the controller with proper setup",
+      "actions": [
+        "Create controller with proper naming and attributes",
+        "Add route prefix and API version attributes",
+        "Inject required services"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Implement Endpoints",
+      "description": "Add action methods for each endpoint",
+      "actions": [
+        "Add action methods for each endpoint",
+        "Apply HTTP verb attributes",
+        "Add response type attributes",
+        "Implement mapping and service calls"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Create Mapping Extensions",
+      "description": "Create mapping methods between DTOs and service types",
+      "actions": [
+        "Create mapping methods for DTOs to service arguments",
+        "Create mapping methods for service results to DTOs"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Determine category → Study patterns → Create DTOs → Create controller → Implement endpoints → Create mappings"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step (requirements, service contracts)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Endpoints created, DTOs, controller location",
+      "Files Modified/Created: Controller, DTOs, mapping extensions"
+    ]
+  },
+  "endpointCategories": [
+    {"category": "v1", "auth": "Standard", "useCase": "Standard API endpoints"},
+    {"category": "External", "auth": "MyAccount", "useCase": "External user-facing endpoints"},
+    {"category": "Internal", "auth": "Service", "useCase": "Internal service communication"},
+    {"category": "ngv1", "auth": "Partner", "useCase": "External partner APIs"},
+    {"category": "Public", "auth": "None", "useCase": "Public endpoints"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["Service layer contracts (Arguments, Results)"],
+    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["implement-service-layer", "write-integration-tests-api"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+

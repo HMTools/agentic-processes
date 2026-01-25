@@ -1,0 +1,215 @@
+{
+  "processName": "Set Dedicated Folder Structure Concept",
+  "metadata": {
+    "processId": "process-dedicated-folder-structure-20260124",
+    "created": "2026-01-24T14:00:00.000Z",
+    "lastUpdated": "2026-01-24T14:45:00.000Z",
+    "currentStep": 7
+  },
+  "subProcessState": {
+    "parent": null,
+    "spawnedAtStep": null,
+    "childSubProcesses": [],
+    "nextSyncPoint": null,
+    "pendingSubProcesses": []
+  },
+  "steps": {
+    "step1": {
+      "name": "Understand concept",
+      "status": "completed",
+      "informationProduced": {
+        "conceptName": "Dedicated Folder Structure",
+        "conceptDescription": "Each step and process template should have a dedicated folder containing its MD and JSON files",
+        "currentStructure": {
+          "steps": {
+            "location": ".processes/steps/",
+            "categories": ["_components", "api", "common", "data", "documentation", "external-services", "guideline", "investigation", "learning", "planning", "service", "template", "testing"],
+            "pattern": "category/step-name.md + step-name.json (files loose in category folder)"
+          },
+          "templates": {
+            "location": ".processes/templates/",
+            "categories": ["development", "infrastructure", "review", "testing"],
+            "rootFiles": ["log-template.md", "log-template.json", "memory-template.md", "memory-template.json", "README.md"],
+            "pattern": "category/template-name.md + template-name.json (files loose in category folder)"
+          }
+        },
+        "requestedStructure": {
+          "pattern": "category/item-name/item-name.md + item-name.json (dedicated folder per item)",
+          "example": ".processes/steps/planning/understand-context/understand-context.md"
+        }
+      },
+      "decisionsMade": [
+        "Exclude _components folder from restructuring (contains shared components, not steps)",
+        "Exclude root-level template files (log-template, memory-template, README) from restructuring",
+        "Maintain existing category structure, only add folder level per item"
+      ],
+      "filesModifiedCreated": [],
+      "notes": [
+        "Category folders remain unchanged, only adding a folder layer for each step/template",
+        "References using @framework-step:category/step-name format may need updating if path changes"
+      ],
+      "updated": "2026-01-24T14:05:00.000Z"
+    },
+    "step2": {
+      "name": "Identify target files",
+      "status": "completed",
+      "informationProduced": {
+        "totalItems": 42,
+        "steps": 34,
+        "templates": 8,
+        "anomalies": 1,
+        "resultsFile": "identified-files.json"
+      },
+      "decisionsMade": [
+        "Excluded _components folder (shared components)",
+        "Excluded root template files (log-template, memory-template, README)",
+        "Excluded root step files (README, step-template)",
+        "Flagged create-detailed-step-plans.md as anomaly (no JSON pair)"
+      ],
+      "filesModifiedCreated": [
+        "identified-files.json"
+      ],
+      "notes": [
+        "34 steps across 12 categories need dedicated folders",
+        "8 templates across 4 categories need dedicated folders",
+        "1 anomaly: create-detailed-step-plans.md has no JSON file"
+      ],
+      "updated": "2026-01-24T14:10:00.000Z"
+    },
+    "step3": {
+      "name": "Analyze existing state",
+      "status": "completed",
+      "informationProduced": {
+        "findingsReportPath": "findings-report.md",
+        "itemsInOldStructure": 42,
+        "itemsInNewStructure": 0,
+        "gapPercentage": "100%",
+        "anomalies": 1
+      },
+      "decisionsMade": [
+        "All 42 items need migration (none already in new structure)",
+        "Include anomaly file in migration but flag for review",
+        "Batch changes by category for easier management"
+      ],
+      "filesModifiedCreated": [
+        "findings-report.md"
+      ],
+      "notes": [
+        "Reference format @framework-step:category/step-name should remain valid after restructuring",
+        "Need to verify reference resolution after migration"
+      ],
+      "updated": "2026-01-24T14:15:00.000Z"
+    },
+    "step4": {
+      "name": "Design implementation plan",
+      "status": "awaiting-approval",
+      "informationProduced": {
+        "implementationPlanPath": "implementation-plan.md",
+        "totalChangeProposals": 43,
+        "totalBatches": 16,
+        "filesToMove": 86
+      },
+      "decisionsMade": [
+        "Batch changes by category for manageable application",
+        "Include anomaly file (MOV-022) in migration"
+      ],
+      "filesModifiedCreated": [
+        "implementation-plan.md"
+      ],
+      "approvalStatus": "approved",
+      "approvedChangeIds": ["ALL"],
+      "notes": [
+        "Awaiting user approval to proceed with changes"
+      ],
+      "updated": "2026-01-24T14:20:00.000Z"
+    },
+    "step5": {
+      "name": "Apply changes",
+      "status": "completed",
+      "informationProduced": {
+        "changesAppliedReportPath": "changes-applied.md",
+        "totalChangesApplied": 43,
+        "totalFilesMoved": 86,
+        "stepsMoved": 35,
+        "templatesMoved": 8
+      },
+      "decisionsMade": [
+        "Used PowerShell terminal commands for efficient batch processing",
+        "All 43 items moved to dedicated folders successfully"
+      ],
+      "filesModifiedCreated": [
+        "changes-applied.md",
+        "86 files moved to dedicated folders"
+      ],
+      "notes": [
+        "All operations completed with exit code 0",
+        "Anomaly file (create-detailed-step-plans.md) moved without issues"
+      ],
+      "updated": "2026-01-24T14:35:00.000Z"
+    },
+    "step6": {
+      "name": "Verify implementation",
+      "status": "completed",
+      "informationProduced": {
+        "verificationReportPath": "verification-report.md",
+        "stepsVerified": 35,
+        "templatesVerified": 8,
+        "verificationStatus": "passed"
+      },
+      "decisionsMade": [
+        "All 43 items verified in new structure",
+        "Excluded items confirmed unchanged"
+      ],
+      "filesModifiedCreated": [
+        "verification-report.md"
+      ],
+      "notes": [
+        "100% verification success",
+        "All files accessible in new locations"
+      ],
+      "updated": "2026-01-24T14:40:00.000Z"
+    },
+    "step7": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "informationProduced": {
+        "improvementsIdentified": 2,
+        "improvementsImplemented": 1,
+        "improvementsDeferred": 1
+      },
+      "improvementsImplemented": [
+        {
+          "improvement": "Created missing JSON file for create-detailed-step-plans step",
+          "reason": "Step had MD file without corresponding JSON, violating JSON-First Architecture",
+          "filesModified": [".processes/steps/planning/create-detailed-step-plans/create-detailed-step-plans.json"],
+          "impact": "Step now follows the standard pattern with both MD and JSON files"
+        }
+      ],
+      "improvementsDeferred": [
+        {
+          "improvement": "Document batch operations pattern in apply-changes step",
+          "reason": "Low priority - process worked well without it",
+          "recommendation": "Consider adding to best practices in future"
+        }
+      ],
+      "decisionsMade": [
+        "Implemented improvement 2 (missing JSON file) as requested by user",
+        "Deferred improvement 1 (batch operations documentation)"
+      ],
+      "filesModifiedCreated": [
+        ".processes/steps/planning/create-detailed-step-plans/create-detailed-step-plans.json"
+      ],
+      "notes": [],
+      "updated": "2026-01-24T14:45:00.000Z"
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [
+      "Step 1: Exclude _components from restructuring",
+      "Step 1: Exclude root-level template files",
+      "Step 1: Maintain category structure"
+    ],
+    "filesModified": []
+  }
+}
+

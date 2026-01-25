@@ -71,22 +71,22 @@ guidelines/
 
 | Category | Steps Reviewed | Can Reuse |
 |----------|----------------|-----------|
-| `planning/` | gather-relevant-information, understand-context | Yes - for planning phase |
-| `learning/` | continuous-improvement | Yes - mandatory final step |
-| `template/` | plan-and-design-template | Partially - too complex for guidelines |
+| `planning/` | gather-relevant-information, understand-context | ✅ **understand-context** for Step 1 |
+| `learning/` | continuous-improvement | ✅ Yes - mandatory final step |
+| `template/` | plan-and-design-template | No - too complex for guidelines |
 
-**Decision**: Guidelines are simple enough that custom lightweight steps may be better than reusing complex template steps. However, continuous-improvement is mandatory.
+**Decision**: Use `understand-context` for Step 1 - it already handles gathering parameters, identifying sources, and clarifying requirements. This promotes reuse and consistency.
 
 ---
 
 ## 6. Step Breakdown
 
-| Step | Name | Description | Output | Reuses |
-|------|------|-------------|--------|--------|
-| 1 | Plan guideline content | Identify what the guideline should cover | Content outline, examples to include | New (lightweight) |
-| 2 | Create guideline file | Write the guideline markdown file | Complete guideline file | New |
-| 3 | Link guideline to steps (optional) | Update step JSON files to reference the guideline | Updated step files | New |
-| 4 | Continuous Improvement | Review process and identify improvements | Improvements implemented | `@framework-step:learning/continuous-improvement` |
+| Step | Name | Description | Output | Reuses | Approval |
+|------|------|-------------|--------|--------|----------|
+| 1 | Understand context | Gather parameters, identify sources, clarify requirements | Context documented in memory | `@framework-step:planning/understand-context` | No |
+| 2 | Create guideline file | Write the guideline markdown file | Complete guideline file | New | **Yes** |
+| 3 | Link guideline to steps (optional) | Update step JSON files to reference the guideline | Updated step files | New | No |
+| 4 | Continuous Improvement | Review process and identify improvements | Improvements implemented | `@framework-step:learning/continuous-improvement` | No |
 
 ---
 
@@ -97,7 +97,7 @@ guidelines/
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
 | `guidelineName` | string | Name of the action (without "how-to-" prefix) | `implement-controllers` |
-| `guidelineCategory` | enum | Category folder for the guideline | `api-design` |
+| `guidelineCategory` | string | Category folder for the guideline (existing or new) | `api-design` |
 | `guidelinePurpose` | string | The "How to" question this guideline answers | `How to implement API controllers following project conventions` |
 
 ### Optional Parameters
@@ -109,7 +109,7 @@ guidelines/
 
 ### Parameter Validation
 
-- `guidelineCategory` must be one of: `api-design`, `data-access`, `docs`, `implementation`, `planning`, `testing`
+- `guidelineCategory`: Use existing category if it fits (`api-design`, `data-access`, `docs`, `implementation`, `planning`, `testing`), or create a new category folder if needed
 - `guidelineName` should be kebab-case without "how-to-" prefix
 
 ---
@@ -122,8 +122,8 @@ guidelines/
 - **Feedback loop**: Can return to planning if content gaps discovered
 
 ### Decision Points
-- After Step 2: Does the guideline need to be linked to steps?
-- After Step 3: Are there more guidelines needed?
+- After Step 2: **Approval checkpoint** - Is the guideline content correct?
+- After Step 2 (approved): Does the guideline need to be linked to steps?
 
 ---
 
@@ -131,16 +131,19 @@ guidelines/
 
 ```mermaid
 flowchart TD
-    A[Start: Guideline Need Identified] --> B[Step 1: Plan Guideline Content]
-    B --> C{Content Complete?}
-    C -->|No| D[Gather More Info]
+    A[Start: Guideline Need Identified] --> B[Step 1: Understand Context]
+    B --> C{Context Complete?}
+    C -->|No| D[Request Missing Info]
     D --> B
     C -->|Yes| E[Step 2: Create Guideline File]
-    E --> F{Link to Steps?}
-    F -->|Yes| G[Step 3: Link Guideline to Steps]
-    F -->|No| H[Step 4: Continuous Improvement]
-    G --> H
-    H --> I[End: Guideline Complete]
+    E --> F{Guideline Approved?}
+    F -->|No| G[Revise Guideline]
+    G --> E
+    F -->|Yes| H{Link to Steps?}
+    H -->|Yes| I[Step 3: Link Guideline to Steps]
+    H -->|No| J[Step 4: Continuous Improvement]
+    I --> J
+    J --> K[End: Guideline Complete]
 ```
 
 ---
@@ -158,10 +161,11 @@ flowchart TD
 
 ### Key Design Decisions
 
-1. **Lightweight approach**: Guidelines are simpler than templates/steps, so this process is deliberately minimal
-2. **Optional linking step**: Not all guidelines need immediate linking to steps
-3. **Flexible categories**: Uses existing guideline category structure
-4. **Feedback loop**: Allows returning to gather more info during planning
+1. **Reuse existing steps**: Uses `understand-context` for Step 1 and `continuous-improvement` for Step 4
+2. **Lightweight approach**: Guidelines are simpler than templates/steps, so this process is deliberately minimal
+3. **Optional linking step**: Not all guidelines need immediate linking to steps
+4. **Flexible categories**: Uses existing guideline category structure
+5. **Feedback loop**: `understand-context` already handles missing info requests
 
 ---
 

@@ -1,0 +1,155 @@
+{
+  "type": "step",
+  "name": "implement-api-client",
+  "category": "external-services",
+  "metadata": {
+    "title": "Implement External API Client",
+    "purposeAndUsage": "Implement a complete external API client including contracts, settings, interface, and implementation. Use when integrating with external HTTP APIs.",
+    "lastUpdated": "2026-01-21"
+  },
+  "output": {
+    "description": "Complete API client with contracts, settings, interface, implementation",
+    "artifacts": ["ExternalServices/*/Contracts/*.cs", "ExternalServices/*/Settings/*.cs", "ExternalServices/*/I*Client.cs", "ExternalServices/*/*Client.cs"],
+    "memoryUpdates": ["apiClientCreated", "endpointsImplemented"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "API documentation",
+      "Authentication requirements",
+      "Request/response contracts"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "userGuidelines": [
+      ".user-processes/guidelines/api-design/how-to-handle-authentication.md",
+      ".user-processes/guidelines/implementation/how-to-handle-errors.md"
+    ],
+    "specificActions": [
+      "Study Existing Patterns: Search for similar API clients, authentication patterns, HTTP client wrapper usage",
+      "Create/Locate Contracts: Check if contracts already exist; create request/response DTOs if needed",
+      "Create Settings Class: Create settings with configuration properties; register in configuration binding",
+      "Create Client Interface: Define interface with async methods and CancellationToken support",
+      "Implement Client Class: Implement using HTTP client wrapper; add authentication handling; add error handling and logging",
+      "Register in DI Container: Add client registration; configure HTTP client settings"
+    ],
+    "files": {
+      "read": ["Existing API clients for patterns", "API documentation"],
+      "create": [
+        "ExternalServices/{Api}/Contracts/*Request.cs",
+        "ExternalServices/{Api}/Contracts/*Response.cs",
+        "ExternalServices/{Api}/Settings/{Api}Settings.cs",
+        "ExternalServices/{Api}/I{Api}Client.cs",
+        "ExternalServices/{Api}/{Api}Client.cs"
+      ],
+      "update": ["DI registration file", "Configuration binding"]
+    },
+    "tools": [
+      "read_file - Read existing API client patterns",
+      "write - Create client files",
+      "codebase_search - Find similar API clients",
+      "grep - Search for specific patterns"
+    ],
+    "bestPractices": [
+      "Search for similar contract models in ExternalServices/*/Contracts/",
+      "Search for similar API integrations in ExternalServices/",
+      "Identify authentication patterns used",
+      "Review HTTP client wrapper usage",
+      "Check settings configuration patterns",
+      "Include async methods with CancellationToken support"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Study Existing Patterns",
+      "description": "Research existing API client patterns in the codebase",
+      "actions": [
+        "Search for similar API clients",
+        "Review authentication patterns",
+        "Check HTTP client wrapper usage"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Create/Locate Contracts",
+      "description": "Create or find existing request/response DTOs",
+      "actions": [
+        "Check if contracts already exist",
+        "Create request/response DTOs if needed",
+        "Follow existing naming conventions"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create Settings Class",
+      "description": "Create configuration settings class",
+      "actions": [
+        "Create settings class with configuration properties",
+        "Register in configuration binding"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Create Client Interface",
+      "description": "Define the client interface",
+      "actions": [
+        "Define interface with methods for each endpoint",
+        "Include async methods with CancellationToken support"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Implement Client Class",
+      "description": "Implement the API client",
+      "actions": [
+        "Create implementation using HTTP client wrapper",
+        "Add authentication header handling",
+        "Implement each endpoint method",
+        "Add error handling and logging"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Register in DI Container",
+      "description": "Register client in dependency injection",
+      "actions": [
+        "Add client registration",
+        "Configure HTTP client settings"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Study patterns → Create/locate contracts → Create settings → Create interface → Implement client → Register in DI"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Previous step (API requirements, authentication details)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: API client created, endpoints implemented",
+      "Files Modified/Created: Contracts, settings, interface, implementation"
+    ]
+  },
+  "authenticationPatterns": [
+    {"pattern": "Apigee", "useCase": "Enterprise API gateway"},
+    {"pattern": "ApiKey", "useCase": "Simple key authentication"},
+    {"pattern": "OAuth", "useCase": "OAuth 2.0 flows"},
+    {"pattern": "BearerToken", "useCase": "JWT/Bearer tokens"},
+    {"pattern": "Custom", "useCase": "Custom authentication"}
+  ],
+  "contextParameters": {
+    "apiName": {"required": true, "description": "Name of the external API"},
+    "serviceLocation": {"required": true, "description": "Path for API client"},
+    "authenticationPattern": {"required": true, "description": "Type of authentication"},
+    "endpoints": {"required": true, "description": "List of endpoints to implement"},
+    "settingsProperties": {"required": true, "description": "Configuration properties needed"}
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "requiredFiles": ["API documentation"],
+    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["implement-service-layer"],
+    "usedInTemplates": ["develop-user-story"]
+  }
+}
+

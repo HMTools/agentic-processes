@@ -1,0 +1,125 @@
+{
+  "type": "step",
+  "name": "spawn-sub-process",
+  "category": "common",
+  "metadata": {
+    "title": "Spawn Sub-Process",
+    "purposeAndUsage": "Create a sub-process from within a parent process with proper parent-child linking and sync point configuration.",
+    "lastUpdated": "2026-01-21"
+  },
+  "parameters": {
+    "required": ["template", "parameters"],
+    "optional": ["syncPoint"],
+    "defaults": {
+      "syncPoint": "immediate"
+    },
+    "definitions": {
+      "template": {
+        "description": "Template to use for the sub-process",
+        "type": "string",
+        "example": "create-process-step-template"
+      },
+      "parameters": {
+        "description": "Parameters to pass to the sub-process",
+        "type": "object",
+        "example": { "stepName": "my-step", "category": "common" }
+      },
+      "syncPoint": {
+        "description": "When parent waits for sub-process completion",
+        "type": "string",
+        "enum": ["immediate", "step-N", "end"],
+        "default": "immediate"
+      }
+    }
+  },
+  "output": {
+    "description": "Sub-process created with parent reference, parent memory updated",
+    "artifacts": ["sub-process directory", "parent memory update"]
+  },
+  "guidance": {
+    "prerequisites": ["Parent process must be active"],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Determine Sub-Process Configuration: Identify template to use; gather parameters for the sub-process; determine sync point (when parent should wait)",
+      "Create Sub-Process: Use /process-new with the specified template; pass parent process path as context; sub-process memory will have parent reference",
+      "Update Parent Memory: Add entry to parent's 'Child Sub-Processes' table in memory.json with name, template, status=running, spawned at step, sync point",
+      "Handle Sync Point: If 'immediate', wait for sub-process to complete before continuing; if deferred ('step-N' or 'end'), continue parent process"
+    ],
+    "files": {
+      "read": ["Parent process.md", "Parent memory.json"],
+      "create": ["Sub-process directory and files"],
+      "update": ["Parent memory.json (add child reference)"]
+    },
+    "tools": [
+      "read_file - Read parent process state",
+      "write - Create sub-process files",
+      "search_replace - Update parent memory"
+    ],
+    "bestPractices": [
+      "Use 'immediate' sync for delegation (need result before continuing)",
+      "Use deferred sync for parallel work",
+      "Always record sync point so process-continue knows when to wait",
+      "Sub-process naming: include parent step number for traceability"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Determine sub-process template and parameters",
+      "description": "Identify what template and parameters to use",
+      "actions": [
+        "Identify template to use based on context",
+        "Gather parameters needed for the sub-process"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Determine sync point",
+      "description": "Decide when parent should wait for completion",
+      "actions": [
+        "Determine sync point: 'immediate' (wait now), 'step-N' (wait at step N), or 'end' (wait at process end)"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Create sub-process with parent context",
+      "description": "Create the sub-process using process-new",
+      "actions": [
+        "Use /process-new with the specified template",
+        "Pass parent process path as context",
+        "Sub-process memory will have parent reference set"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Update parent memory with child reference",
+      "description": "Add sub-process to parent's tracking table",
+      "actions": [
+        "Add entry to parent's 'Child Sub-Processes' table:",
+        "| {name} | {template} | running | Step {N} | {syncPoint} |"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Handle sync point (immediate wait or continue)",
+      "description": "Either wait for completion or continue based on sync point",
+      "actions": [
+        "If syncPoint is 'immediate': Wait for sub-process to complete before continuing",
+        "If syncPoint is deferred: Continue parent process, check completion at sync point later"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Determine template/params → Determine sync point → Create sub-process → Update parent memory → Handle sync (wait or continue)"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Parent memory.json (to add child reference)",
+    "writeTo": "Parent memory.json (add to Child Sub-Processes table), Sub-process memory.json (set parent reference)",
+    "fields": []
+  },
+  "references": {
+    "relatedSteps": ["notify-parent-complete"],
+    "usedInTemplates": ["create-process-template", "develop-user-story"]
+  }
+}
+

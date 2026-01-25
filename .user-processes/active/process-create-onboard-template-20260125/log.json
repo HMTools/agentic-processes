@@ -1,0 +1,67 @@
+{
+  "processName": "Create onboard Template",
+  "metadata": {
+    "processId": "process-create-onboard-template-20260125",
+    "template": "create-process-template",
+    "started": "2026-01-25T10:00:00Z",
+    "completed": null,
+    "parentProcess": null,
+    "subProcesses": []
+  },
+  "steps": {
+    "step1": {
+      "name": "Plan and design template",
+      "timestamp": {
+        "started": "2026-01-25T10:00:00Z",
+        "completed": null
+      },
+      "actionsTaken": [
+        "Read create-process-template JSON for complete guidance",
+        "Read plan-and-design-template step JSON for substep guidance",
+        "Analyzed user requirements for 'onboard' template focusing on missing guidelines",
+        "Scanned .processes/steps/ directory for userGuidelines references using grep",
+        "Identified 16 missing guidelines across 6 categories",
+        "Reviewed existing reusable steps in planning/, common/, investigation/",
+        "Selected understand-context and continuous-improvement as reusable steps",
+        "Designed 3 new steps specific to onboard workflow",
+        "Created process flow diagram with approval checkpoint",
+        "Documented complete design in template-design-summary.md"
+      ],
+      "agentReasoning": [
+        "Chose to reuse existing steps where possible (understand-context, continuous-improvement) to maintain consistency",
+        "Decided on batch processing for guidelines rather than spawning all at once to manage complexity",
+        "Added approval checkpoint at prioritization step to give user control over which guidelines to create",
+        "Used immediate sync for sub-processes since guidelines should be created sequentially",
+        "Created dedicated 'onboard' category for new steps since they're specific to this workflow"
+      ],
+      "userInteractions": [],
+      "problemsEncountered": [],
+      "filesModified": [
+        {
+          "path": ".user-processes/active/process-create-onboard-template-20260125/template-design-summary.md",
+          "changes": "Created complete template design document",
+          "iterations": 1
+        }
+      ],
+      "decisionsMade": [
+        "Template category: infrastructure (alongside create-guideline, create-process-template)",
+        "Parameters: projectName (required), scope (optional), priorityCategories (optional)",
+        "5 steps total: 2 reused, 3 new",
+        "Sub-processes use immediate sync",
+        "Approval required at step 3 (prioritize-guidelines)"
+      ],
+      "performanceNotes": []
+    }
+  },
+  "processWideObservations": {
+    "patternsDetected": [],
+    "userFeedbackSummary": [],
+    "efficiencyMetrics": {
+      "stepsCompleted": 0,
+      "totalUserCorrections": 0,
+      "filesModified": 1,
+      "stepsRequiringMultipleIterations": 0
+    },
+    "recommendationsForFuture": []
+  }
+}

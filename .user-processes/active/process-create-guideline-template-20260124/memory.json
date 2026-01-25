@@ -3,8 +3,8 @@
   "metadata": {
     "processId": "process-create-guideline-template-20260124",
     "created": "2026-01-24T12:00:00Z",
-    "lastUpdated": "2026-01-24T12:00:00Z",
-    "currentStep": 1
+    "lastUpdated": "2026-01-24T15:40:00Z",
+    "currentStep": 4
   },
   "parameters": {
     "templateName": "create-guideline",
@@ -14,14 +14,247 @@
   "subProcessState": {
     "parent": null,
     "spawnedAtStep": null,
-    "childSubProcesses": [],
-    "nextSyncPoint": null,
+    "childSubProcesses": [
+      {
+        "id": "process-create-guideline-file-step-20260124",
+        "name": "Create create-guideline-file Step",
+        "template": "create-process-step-template",
+        "status": "completed",
+        "spawnedAtStep": 3,
+        "syncPoint": "immediate",
+        "processPath": ".user-processes/active/process-create-guideline-file-step-20260124",
+        "completedAt": "2026-01-24T14:00:00Z",
+        "output": {
+          "stepCreated": ".processes/steps/guideline/create-guideline-file.md/.json",
+          "improvementsImplemented": 2
+        }
+      },
+      {
+        "id": "process-link-guideline-to-steps-step-20260124",
+        "name": "Create link-guideline-to-steps Step",
+        "template": "create-process-step-template",
+        "status": "completed",
+        "spawnedAtStep": 3,
+        "syncPoint": "immediate",
+        "processPath": ".user-processes/active/process-link-guideline-to-steps-step-20260124",
+        "completedAt": "2026-01-24T15:10:00Z",
+        "output": {
+          "stepCreated": ".processes/steps/guideline/link-guideline-to-steps.md/.json",
+          "improvementsImplemented": 0
+        }
+      }
+    ],
+    "nextSyncPoint": "step-3",
     "pendingSubProcesses": []
   },
-  "steps": {},
+  "steps": {
+    "step1": {
+      "name": "Plan and design template",
+      "status": "completed",
+      "informationProduced": {
+        "purpose": "Create reusable guideline documents that provide practical 'How to' guidance for process framework steps",
+        "targetLocation": ".user-processes/guidelines/{category}/how-to-{guidelineName}.md",
+        "parameters": {
+          "required": ["guidelineName", "guidelineCategory", "guidelinePurpose"],
+          "optional": ["relatedSteps", "triggeringContext"]
+        },
+        "existingCategories": ["api-design", "data-access", "docs", "implementation", "planning", "testing"],
+        "categoryNote": "Can use existing category or create new one if none fits",
+        "stepBreakdown": [
+          {"step": 1, "name": "Understand context", "reuses": "@framework-step:planning/understand-context"},
+          {"step": 2, "name": "Create guideline file", "approvalRequired": true},
+          {"step": 3, "name": "Link guideline to steps", "optional": true},
+          {"step": 4, "name": "Continuous Improvement", "reuses": "@framework-step:learning/continuous-improvement"}
+        ]
+      },
+      "decisionsMade": [
+        "Reuse understand-context step for Step 1 instead of custom planning step",
+        "Keep template lightweight - guidelines are simpler than templates/steps",
+        "Make step linking optional - not all guidelines need immediate linking",
+        "Use existing guideline category structure"
+      ],
+      "filesModifiedCreated": [
+        "template-design-summary.md"
+      ],
+      "notes": [
+        "Guidelines directory structure already exists but categories are empty",
+        "Guidelines format is simple: how-to-{action}.md with practical steps"
+      ],
+      "updated": "2026-01-24T12:10:00Z"
+    },
+    "step2": {
+      "name": "Create template file",
+      "status": "completed",
+      "informationProduced": {
+        "templateFilePath": ".processes/templates/infrastructure/create-guideline.md",
+        "jsonFilePath": ".processes/templates/infrastructure/create-guideline.json",
+        "validationResults": "All required sections present"
+      },
+      "decisionsMade": [
+        "Used existing understand-context step for Step 1",
+        "Created new step references for guideline-specific steps (create-guideline-file, link-guideline-to-steps)",
+        "Included guidelineFormat section in JSON for clarity"
+      ],
+      "filesModifiedCreated": [
+        ".processes/templates/infrastructure/create-guideline.md",
+        ".processes/templates/infrastructure/create-guideline.json"
+      ],
+      "notes": [
+        "Template references two new steps that need to be created: guideline/create-guideline-file and guideline/link-guideline-to-steps"
+      ],
+      "updated": "2026-01-24T12:40:00Z"
+    },
+    "step3": {
+      "name": "Validate process-steps exist",
+      "status": "completed",
+      "informationProduced": {
+        "validationResults": {
+          "totalSteps": 4,
+          "validSteps": 2,
+          "missingSteps": 2,
+          "validationPercentage": "50%"
+        },
+        "validSteps": [
+          {
+            "ref": "@framework-step:planning/understand-context",
+            "path": ".processes/steps/planning/understand-context.md/.json",
+            "status": "exists"
+          },
+          {
+            "ref": "@framework-step:learning/continuous-improvement",
+            "path": ".processes/steps/learning/continuous-improvement.md/.json",
+            "status": "exists"
+          }
+        ],
+        "missingSteps": [
+          {
+            "ref": "@framework-step:guideline/create-guideline-file",
+            "expectedPath": ".processes/steps/guideline/create-guideline-file.md/.json",
+            "purpose": "Write the guideline markdown file with practical steps and examples"
+          },
+          {
+            "ref": "@framework-step:guideline/link-guideline-to-steps",
+            "expectedPath": ".processes/steps/guideline/link-guideline-to-steps.md/.json",
+            "purpose": "Update step JSON files to reference the new guideline"
+          }
+        ]
+      },
+      "decisionsMade": [
+        "Spawned 2 sub-processes to create missing steps instead of manual creation",
+        "Both sub-processes use create-process-step-template with immediate sync point"
+      ],
+      "filesModifiedCreated": [
+        ".processes/steps/guideline/ (directory created)",
+        ".user-processes/active/process-create-guideline-file-step-20260124/ (sub-process)",
+        ".user-processes/active/process-link-guideline-to-steps-step-20260124/ (sub-process)"
+      ],
+      "notes": [
+        "Created guideline category directory in .processes/steps/",
+        "Sub-processes need to complete before parent can continue"
+      ],
+      "spawnedSubProcesses": [
+        {
+          "id": "process-create-guideline-file-step-20260124",
+          "stepRef": "@framework-step:guideline/create-guideline-file"
+        },
+        {
+          "id": "process-link-guideline-to-steps-step-20260124",
+          "stepRef": "@framework-step:guideline/link-guideline-to-steps"
+        }
+      ],
+      "updated": "2026-01-24T15:30:00Z"
+    },
+    "step4": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "informationProduced": {
+        "improvementsIdentified": [
+          {
+            "id": 1,
+            "name": "Missing process.json on process creation",
+            "frequency": 1,
+            "impact": "HIGH",
+            "ease": "Medium",
+            "priority": 1
+          },
+          {
+            "id": 2,
+            "name": "Better step reuse guidance in planning",
+            "frequency": 2,
+            "impact": "Medium",
+            "ease": "Easy",
+            "priority": 2
+          },
+          {
+            "id": 3,
+            "name": "Document approval checkpoints explicitly",
+            "frequency": 1,
+            "impact": "Medium",
+            "ease": "Easy",
+            "priority": 3
+          }
+        ],
+        "improvementsImplemented": [
+          {
+            "id": 1,
+            "name": "Missing process.json on process creation",
+            "filesModified": [
+              ".processes/prompts/process-new.md",
+              ".processes/prompts/process-continue.md"
+            ],
+            "userApproval": "Approved",
+            "impact": "process.json is now documented as primary state file in both prompts"
+          },
+          {
+            "id": 3,
+            "name": "Document approval checkpoints explicitly",
+            "filesModified": [
+              ".processes/steps/template/plan-and-design-template.json"
+            ],
+            "userApproval": "Approved",
+            "impact": "Step planning now includes explicit reminder to identify approval checkpoints"
+          }
+        ],
+        "improvementsDeferred": [
+          {
+            "id": 2,
+            "name": "Better step reuse guidance in planning",
+            "reason": "Normal design feedback, not a gap in the process"
+          }
+        ],
+        "summary": {
+          "totalIdentified": 3,
+          "implemented": 2,
+          "deferred": 1
+        }
+      },
+      "decisionsMade": [
+        "Created process-instance-template.md following same pattern as memory-template.md",
+        "Added process.json as first required file in process-new.md"
+      ],
+      "filesModifiedCreated": [
+        ".processes/prompts/process-new.md",
+        ".processes/prompts/process-continue.md",
+        ".processes/steps/template/plan-and-design-template.json"
+      ],
+      "notes": [],
+      "updated": "2026-01-24T15:40:00Z"
+    }
+  },
   "crossReferences": {
-    "keyDecisions": [],
-    "filesModified": []
+    "keyDecisions": [
+      "Step 1: Lightweight template - guidelines simpler than templates/steps",
+      "Step 1: Optional step linking - not all guidelines need immediate linking",
+      "Step 1: Use existing category structure",
+      "Step 4: process.json must be created on process-new for UI compatibility"
+    ],
+    "filesModified": [
+      "template-design-summary.md",
+      ".processes/templates/infrastructure/create-guideline.md",
+      ".processes/templates/infrastructure/create-guideline.json",
+      ".processes/prompts/process-new.md",
+      ".processes/prompts/process-continue.md",
+      ".processes/steps/template/plan-and-design-template.json"
+    ]
   }
 }
-

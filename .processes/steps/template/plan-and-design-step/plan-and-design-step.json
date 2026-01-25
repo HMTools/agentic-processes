@@ -1,0 +1,176 @@
+{
+  "type": "step",
+  "name": "plan-and-design-step",
+  "category": "template",
+  "metadata": {
+    "title": "Plan and Design Step",
+    "purposeAndUsage": "Analyze requirements and design a new process step. Use before creating step files.",
+    "lastUpdated": "2026-01-24"
+  },
+  "output": {
+    "description": "Complete step design including purpose, structure, and flow diagram",
+    "artifacts": ["step-design.md"],
+    "memoryUpdates": ["purpose", "category", "structurePlan", "flowDiagram", "substepsPlan", "designDocument"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Clear understanding of what the step should accomplish",
+      "Knowledge of existing steps to avoid duplication"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: review requirements → check existing → determine category → write purpose → define use cases → plan structure → design flow → plan substeps",
+      "Emphasize simplicity: avoid over-engineering, keep designs focused",
+      "Use generic step references: reference 'previous step' not specific numbers",
+      "Steps only produce outputs: don't include flow control logic in steps",
+      "Check .processes/steps/README.md for available categories"
+    ],
+    "files": {
+      "read": [".processes/steps/README.md", ".processes/steps/step-template.md", "Existing steps in relevant category"],
+      "create": ["step-design.md (readable design document in process folder)"],
+      "update": ["memory.json (current step section with design details)"]
+    },
+    "tools": [
+      "read_file - Read existing steps and README",
+      "list_dir - Explore existing step categories",
+      "grep - Search for similar patterns in existing steps",
+      "write - Create step-design.md document"
+    ],
+    "bestPractices": [
+      "Check existing steps before creating new ones",
+      "Keep steps self-contained and focused",
+      "Design for reusability across templates",
+      "Use clear, actionable substep descriptions",
+      "Ensure flow diagram accurately represents substeps",
+      "Agents make individual tool calls sequentially",
+      "Consolidate related operations into single substeps",
+      "Prefer unified flows over multiple branches"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Review requirements",
+      "description": "Understand what the new step should accomplish",
+      "actions": [
+        "Review the stated need for a new step",
+        "Identify the specific problem or task it solves",
+        "Document the expected behavior"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Check existing steps",
+      "description": "Verify no similar step already exists",
+      "actions": [
+        "List existing steps in relevant categories",
+        "Search for similar functionality",
+        "Identify steps that could be extended vs creating new"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Determine category",
+      "description": "Select the appropriate category for the step",
+      "actions": [
+        "Review categories: api, service, data, template, testing, planning, learning, investigation, common",
+        "Select category based on step purpose",
+        "Document rationale for category choice"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Write purpose statement",
+      "description": "Define clear purpose for the step",
+      "actions": [
+        "Write one-sentence purpose statement",
+        "Describe what the step does (not how)",
+        "Ensure purpose is specific and measurable"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Define use cases",
+      "description": "Document when to use this step",
+      "actions": [
+        "List scenarios where step applies",
+        "Define prerequisites or conditions",
+        "Identify which templates might use this step"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Plan step structure",
+      "description": "Design the sections and content",
+      "actions": [
+        "Plan user documentation sections",
+        "Plan guidance content (specific actions, tools, files)",
+        "Define expected output and memory updates",
+        "Check .processes/steps/_components/ for applicable shared components (qa-session, mandatory-logging, etc.)"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Design flow diagram",
+      "description": "Create mermaid flowchart for the step",
+      "actions": [
+        "Design logical flow of operations",
+        "Create mermaid flowchart syntax",
+        "Ensure flow covers all substeps"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Plan substeps",
+      "description": "Define actionable substeps with descriptions",
+      "actions": [
+        "Break down step into logical substeps",
+        "Write clear descriptions for each",
+        "Define specific actions for each substep"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Create step-design.md",
+      "description": "Create a readable markdown document with the complete step design",
+      "actions": [
+        "Create step-design.md in the process folder",
+        "Include: Overview, Purpose, Use Cases, Prerequisites, Output, Flow Diagram, Substeps, Decisions Made",
+        "This document is easier to review than memory.json",
+        "Update memory.json with reference to design document"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Linear flow through all 9 substeps: requirements → existing check → category → purpose → use cases → structure → flow → substeps → create design document"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters and context",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: Purpose statement, category, structure plan, flow diagram, substeps plan",
+      "Decisions Made: Category selection, design choices"
+    ]
+  },
+  "categories": [
+    {"category": "api", "useCase": "Controller/endpoint steps"},
+    {"category": "service", "useCase": "Business logic steps"},
+    {"category": "data", "useCase": "Repository/database steps"},
+    {"category": "template", "useCase": "Template creation steps"},
+    {"category": "testing", "useCase": "Test-related steps"},
+    {"category": "planning", "useCase": "Planning/design steps"},
+    {"category": "investigation", "useCase": "Research and analysis steps"},
+    {"category": "common", "useCase": "Cross-cutting utility steps"},
+    {"category": "learning", "useCase": "Improvement steps"}
+  ],
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["step-template.md", "steps/README.md"],
+    "requiredTools": ["read_file", "list_dir", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["create-step-file", "validate-step-structure"],
+    "usedInTemplates": ["create-process-step-template"]
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "type": "process-instance",
+  "id": "process-dedicated-folder-structure-20260124",
+  "name": "Set Dedicated Folder Structure Concept",
+  "metadata": {
+    "template": "set-concept",
+    "templateCategory": "infrastructure",
+    "created": "2026-01-24T14:00:00.000Z",
+    "lastUpdated": "2026-01-24T14:00:00.000Z",
+    "projectPath": "C:/Projects/HM/agentic-processes",
+    "processPath": ".user-processes/active/process-dedicated-folder-structure-20260124"
+  },
+  "status": "completed",
+  "parameters": {
+    "conceptName": "Dedicated Folder Structure",
+    "conceptDescription": "Each step and process template should have a dedicated folder containing its MD and JSON files, rather than having them loose in the category folder. This improves organization by grouping related files together.",
+    "targetFiles": ".processes/steps/ and .processes/templates/",
+    "existingState": "Steps and templates have their MD and JSON files stored directly in category folders (e.g., .processes/steps/planning/understand-context.md and .processes/steps/planning/understand-context.json)",
+    "requestedState": "Each step and template should have its own dedicated folder (e.g., .processes/steps/planning/understand-context/understand-context.md and .processes/steps/planning/understand-context/understand-context.json)"
+  },
+  "currentState": {
+    "activeStepNumber": 7,
+    "activeStepName": "Continuous Improvement",
+    "currentAction": "Complete",
+    "details": "Process completed successfully"
+  },
+  "steps": [
+    {
+      "number": 1,
+      "name": "Understand concept",
+      "stepRef": "@framework-step:planning/understand-context",
+      "status": "completed",
+      "approvalRequired": false,
+      "output": "Context documentation"
+    },
+    {
+      "number": 2,
+      "name": "Identify target files",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "status": "completed",
+      "approvalRequired": false,
+      "output": "List of target files in identified-files.json"
+    },
+    {
+      "number": 3,
+      "name": "Analyze existing state",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "status": "completed",
+      "approvalRequired": false,
+      "output": "Findings report"
+    },
+    {
+      "number": 4,
+      "name": "Design implementation plan",
+      "stepRef": "@framework-step:planning/design-implementation-plan",
+      "status": "completed",
+      "approvalRequired": true,
+      "output": "Implementation plan with change proposals"
+    },
+    {
+      "number": 5,
+      "name": "Apply changes",
+      "stepRef": "@framework-step:common/apply-changes",
+      "status": "completed",
+      "approvalRequired": false,
+      "output": "Modified and newly created files"
+    },
+    {
+      "number": 6,
+      "name": "Verify implementation",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "status": "completed",
+      "approvalRequired": false,
+      "output": "Verification report"
+    },
+    {
+      "number": 7,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "status": "completed",
+      "approvalRequired": true,
+      "output": "Improvements implemented"
+    }
+  ],
+  "subProcessState": {
+    "parentProcess": null,
+    "childProcesses": [],
+    "nextSyncPoint": null
+  },
+  "files": {
+    "process": "process.md",
+    "memory": "memory.json",
+    "log": "log.json"
+  }
+}
+

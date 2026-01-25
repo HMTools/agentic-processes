@@ -1,0 +1,80 @@
+{
+  "processName": "Create onboard Template",
+  "metadata": {
+    "processId": "process-create-onboard-template-20260125",
+    "created": "2026-01-25T10:00:00Z",
+    "lastUpdated": "2026-01-25T10:15:00Z",
+    "currentStep": 1
+  },
+  "subProcessState": {
+    "parent": null,
+    "spawnedAtStep": null,
+    "childSubProcesses": [],
+    "nextSyncPoint": null,
+    "pendingSubProcesses": []
+  },
+  "steps": {
+    "step1": {
+      "name": "Plan and design template",
+      "status": "pending_approval",
+      "informationProduced": {
+        "templateName": "onboard",
+        "templateCategory": "infrastructure",
+        "purpose": "Systematic onboarding for projects starting with the Agentic Process Framework, specifically identifying and creating missing guidelines referenced by process steps",
+        "parameters": {
+          "required": ["projectName"],
+          "optional": ["scope", "priorityCategories"]
+        },
+        "stepBreakdown": [
+          {"number": 1, "name": "Understand context", "ref": "@framework-step:planning/understand-context", "exists": true},
+          {"number": 2, "name": "Scan for missing guidelines", "ref": "@framework-step:onboard/scan-missing-guidelines", "exists": false},
+          {"number": 3, "name": "Prioritize and select guidelines", "ref": "@framework-step:onboard/prioritize-guidelines", "exists": false, "approvalRequired": true},
+          {"number": 4, "name": "Create guidelines (batch)", "ref": "@framework-step:onboard/create-guidelines-batch", "exists": false},
+          {"number": 5, "name": "Continuous Improvement", "ref": "@framework-step:learning/continuous-improvement", "exists": true}
+        ],
+        "missingGuidelinesAnalysis": {
+          "total": 16,
+          "byCategory": {
+            "api-design": ["how-to-implement-controllers", "how-to-handle-authentication", "how-to-version-apis"],
+            "data-access": ["how-to-implement-repositories", "how-to-use-mongodb"],
+            "docs": ["how-to-document-flows"],
+            "implementation": ["how-to-implement-services", "how-to-use-dependency-injection", "how-to-handle-errors"],
+            "planning": ["how-to-write-low-level-design", "how-to-gather-relevant-information", "how-to-get-user-story-parameters"],
+            "testing": ["how-to-write-integration-tests", "how-to-generate-test-data", "how-to-mock-dependencies", "how-to-write-unit-tests"]
+          }
+        },
+        "newStepsNeeded": [
+          "onboard/scan-missing-guidelines",
+          "onboard/prioritize-guidelines", 
+          "onboard/create-guidelines-batch"
+        ]
+      },
+      "decisionsMade": [
+        "Reuse existing understand-context step for context gathering",
+        "Reuse existing continuous-improvement step as final step",
+        "Create 3 new steps specific to the onboard workflow",
+        "Use immediate sync for sub-process spawning to avoid complexity",
+        "User approval checkpoint at prioritization step"
+      ],
+      "filesModifiedCreated": [
+        "template-design-summary.md"
+      ],
+      "notes": [
+        "All guideline folders exist but are empty",
+        "16 guidelines are referenced by framework steps but don't exist",
+        "Design follows guideline-based step pattern recommendation"
+      ],
+      "updated": "2026-01-25T10:15:00Z"
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [
+      "Step 1: Reuse understand-context and continuous-improvement steps",
+      "Step 1: Create 3 new onboard-specific steps",
+      "Step 1: Approval checkpoint at prioritization step"
+    ],
+    "filesModified": [
+      "template-design-summary.md"
+    ]
+  }
+}
