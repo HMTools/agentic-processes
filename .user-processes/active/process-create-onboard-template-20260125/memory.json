@@ -3,8 +3,9 @@
   "metadata": {
     "processId": "process-create-onboard-template-20260125",
     "created": "2026-01-25T10:00:00Z",
-    "lastUpdated": "2026-01-25T10:15:00Z",
-    "currentStep": 1
+    "lastUpdated": "2026-01-25T11:00:00Z",
+    "currentStep": 4,
+    "status": "completed"
   },
   "subProcessState": {
     "parent": null,
@@ -16,21 +17,19 @@
   "steps": {
     "step1": {
       "name": "Plan and design template",
-      "status": "pending_approval",
+      "status": "completed",
       "informationProduced": {
         "templateName": "onboard",
         "templateCategory": "infrastructure",
         "purpose": "Systematic onboarding for projects starting with the Agentic Process Framework, specifically identifying and creating missing guidelines referenced by process steps",
         "parameters": {
-          "required": ["projectName"],
-          "optional": ["scope", "priorityCategories"]
+          "required": [],
+          "optional": []
         },
         "stepBreakdown": [
-          {"number": 1, "name": "Understand context", "ref": "@framework-step:planning/understand-context", "exists": true},
-          {"number": 2, "name": "Scan for missing guidelines", "ref": "@framework-step:onboard/scan-missing-guidelines", "exists": false},
-          {"number": 3, "name": "Prioritize and select guidelines", "ref": "@framework-step:onboard/prioritize-guidelines", "exists": false, "approvalRequired": true},
-          {"number": 4, "name": "Create guidelines (batch)", "ref": "@framework-step:onboard/create-guidelines-batch", "exists": false},
-          {"number": 5, "name": "Continuous Improvement", "ref": "@framework-step:learning/continuous-improvement", "exists": true}
+          {"number": 1, "name": "Identify missing guidelines", "ref": "@framework-step:investigation/identify-files", "exists": true, "approvalRequired": true},
+          {"number": 2, "name": "Create guidelines (batch)", "ref": "spawns create-guideline sub-processes", "exists": true},
+          {"number": 3, "name": "Continuous Improvement", "ref": "@framework-step:learning/continuous-improvement", "exists": true}
         ],
         "missingGuidelinesAnalysis": {
           "total": 16,
@@ -43,38 +42,110 @@
             "testing": ["how-to-write-integration-tests", "how-to-generate-test-data", "how-to-mock-dependencies", "how-to-write-unit-tests"]
           }
         },
-        "newStepsNeeded": [
-          "onboard/scan-missing-guidelines",
-          "onboard/prioritize-guidelines", 
-          "onboard/create-guidelines-batch"
-        ]
+        "newStepsNeeded": [],
+        "stepReuseAchieved": "100%"
       },
       "decisionsMade": [
-        "Reuse existing understand-context step for context gathering",
-        "Reuse existing continuous-improvement step as final step",
-        "Create 3 new steps specific to the onboard workflow",
-        "Use immediate sync for sub-process spawning to avoid complexity",
-        "User approval checkpoint at prioritization step"
+        "Use identify-files step directly for scanning (user suggestion)",
+        "Removed understand-context step - not needed for auto-scan",
+        "Removed prioritize-guidelines as standalone step - approval happens at Step 1 output",
+        "100% step reuse - no new steps needed",
+        "No parameters needed - template auto-scans framework",
+        "Immediate sync for sub-process spawning"
       ],
       "filesModifiedCreated": [
         "template-design-summary.md"
       ],
       "notes": [
-        "All guideline folders exist but are empty",
-        "16 guidelines are referenced by framework steps but don't exist",
-        "Design follows guideline-based step pattern recommendation"
+        "User pushed for maximum step reuse",
+        "Simplified from 5 steps (2 reused, 3 new) to 3 steps (all reused)",
+        "identify-files can handle the scan using grep for userGuidelines patterns"
       ],
-      "updated": "2026-01-25T10:15:00Z"
+      "updated": "2026-01-25T10:45:00Z"
+    },
+    "step2": {
+      "name": "Create template file",
+      "status": "completed",
+      "informationProduced": {
+        "templateFilePath": ".processes/templates/infrastructure/onboard/onboard.md",
+        "jsonFilePath": ".processes/templates/infrastructure/onboard/onboard.json"
+      },
+      "decisionsMade": [
+        "Used spawn-sub-process step reference for Step 2 batch creation",
+        "Included step-specific context in JSON for identify-files configuration",
+        "Added 'How It Works' section to MD for user clarity"
+      ],
+      "filesModifiedCreated": [
+        ".processes/templates/infrastructure/onboard/onboard.md",
+        ".processes/templates/infrastructure/onboard/onboard.json"
+      ],
+      "notes": [],
+      "updated": "2026-01-25T10:50:00Z"
+    },
+    "step3": {
+      "name": "Validate process-steps exist",
+      "status": "completed",
+      "informationProduced": {
+        "validationResults": {
+          "totalReferences": 3,
+          "existing": 3,
+          "missing": 0
+        },
+        "stepsValidated": [
+          {"ref": "@framework-step:investigation/identify-files", "exists": true},
+          {"ref": "@framework-step:common/spawn-sub-process", "exists": true},
+          {"ref": "@framework-step:learning/continuous-improvement", "exists": true}
+        ]
+      },
+      "decisionsMade": [
+        "No sub-processes needed - all steps exist"
+      ],
+      "filesModifiedCreated": [],
+      "notes": [
+        "100% step reuse approach meant all steps already exist"
+      ],
+      "updated": "2026-01-25T10:52:00Z"
+    },
+    "step4": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "informationProduced": {
+        "improvementsIdentified": 1,
+        "improvementsImplemented": 1,
+        "improvementsDeferred": 0
+      },
+      "improvements": [
+        {
+          "name": "Step Reuse First guidance",
+          "reason": "4 user corrections during Step 1 all related to step reuse - agent didn't explore reuse early enough",
+          "change": "Added 'STEP REUSE FIRST' to bestPractices and reinforced in substep 6",
+          "filesModified": [".processes/steps/template/plan-and-design-template/plan-and-design-template.json"],
+          "approved": true
+        }
+      ],
+      "decisionsMade": [
+        "Single improvement sufficient - all user corrections related to same root cause"
+      ],
+      "filesModifiedCreated": [
+        ".processes/steps/template/plan-and-design-template/plan-and-design-template.json"
+      ],
+      "notes": [],
+      "updated": "2026-01-25T11:00:00Z"
     }
   },
   "crossReferences": {
     "keyDecisions": [
-      "Step 1: Reuse understand-context and continuous-improvement steps",
-      "Step 1: Create 3 new onboard-specific steps",
-      "Step 1: Approval checkpoint at prioritization step"
+      "Step 1: Use identify-files directly for scanning instead of new scan-missing-guidelines step",
+      "Step 1: 100% step reuse achieved - no new steps needed",
+      "Step 1: Approval checkpoint at Step 1 output review",
+      "Step 2: Template files created at .processes/templates/infrastructure/onboard/",
+      "Step 4: Implemented 'Step Reuse First' improvement to plan-and-design-template step"
     ],
     "filesModified": [
-      "template-design-summary.md"
+      "template-design-summary.md",
+      ".processes/templates/infrastructure/onboard/onboard.md",
+      ".processes/templates/infrastructure/onboard/onboard.json",
+      ".processes/steps/template/plan-and-design-template/plan-and-design-template.json"
     ]
   }
 }

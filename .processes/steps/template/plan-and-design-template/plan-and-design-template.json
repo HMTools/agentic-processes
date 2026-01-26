@@ -5,7 +5,7 @@
   "metadata": {
     "title": "Plan and Design Template",
     "purposeAndUsage": "Analyze requirements and design a new process template. Use before creating template files.",
-    "lastUpdated": "2026-01-21"
+    "lastUpdated": "2026-01-25"
   },
   "output": {
     "description": "Complete template design including purpose, parameters, steps, and flow diagram",
@@ -39,6 +39,7 @@
     "bestPractices": [
       "Check existing templates before creating new ones",
       "Reuse existing steps where possible",
+      "STEP REUSE FIRST: Before proposing ANY new step, explicitly search existing steps (planning/, common/, investigation/, learning/) to see if they can handle the use case with different parameters or scope. Only propose a new step after confirming no existing step can be adapted.",
       "Keep templates focused on a single workflow",
       "Always include continuous improvement as final step",
       "Use clear parameter naming with camelCase",
@@ -175,7 +176,8 @@
       "description": "Design the sequence of steps",
       "actions": [
         "Break workflow into logical stages",
-        "Assign steps to each stage (reuse existing or identify new)",
+        "FOR EACH STAGE: First search existing steps that could handle the requirement with different parameters/scope before proposing a new step",
+        "Assign steps to each stage (strongly prefer reusing existing steps)",
         "Define expected output for each step",
         "Ensure each step produces tangible work",
         "Identify which steps need user approval before proceeding (mark with approvalRequired: true)",

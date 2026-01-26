@@ -1,0 +1,111 @@
+{
+  "type": "template",
+  "name": "onboard",
+  "category": "infrastructure",
+  "metadata": {
+    "title": "Onboard to Agentic Process Framework",
+    "purposeAndUsage": "Systematically onboard a project to the Agentic Process Framework by identifying and creating all missing guidelines referenced by process steps. Use when first adopting the framework or when guideline folders are incomplete.",
+    "lastUpdated": "2026-01-25"
+  },
+  "parameters": {
+    "required": [],
+    "optional": [],
+    "definitions": {},
+    "notes": "This template has no parameters - it automatically scans the framework to identify all missing guidelines."
+  },
+  "structure": {
+    "userLayer": {
+      "sections": ["description", "purposeAndUsage", "quickReference", "howItWorks"]
+    },
+    "agentLayer": {
+      "sections": ["scanningLogic", "batchCreation", "steps", "memoryFile"]
+    }
+  },
+  "steps": [
+    {
+      "number": 1,
+      "name": "Identify missing guidelines",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "output": "identified-files.json with list of missing guidelines",
+      "approvalRequired": true,
+      "context": {
+        "scope": "Find all guideline files referenced in .processes/steps that don't exist in .user-processes/guidelines",
+        "searchApproach": "grep for userGuidelines in step JSON files, then check existence of each referenced path",
+        "outputFormat": "Array of {path, guidelineName, category, referencedBy} objects"
+      }
+    },
+    {
+      "number": 2,
+      "name": "Create guidelines (batch)",
+      "stepRef": "@framework-step:common/spawn-sub-process",
+      "output": "Created guideline files",
+      "subProcessConfig": {
+        "template": "create-guideline",
+        "sync": "immediate",
+        "iterateOver": "approved guidelines from Step 1",
+        "parameterMapping": {
+          "guidelineName": "from identified guideline",
+          "guidelineCategory": "from identified category",
+          "guidelinePurpose": "derived from step context that references it",
+          "relatedSteps": "steps that reference this guideline",
+          "triggeringContext": "Onboard process identified missing guideline"
+        }
+      }
+    },
+    {
+      "number": 3,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "output": "Improvements implemented"
+    }
+  ],
+  "guidance": {
+    "step1ScanningLogic": {
+      "description": "How to identify missing guidelines",
+      "actions": [
+        "Use grep to find all 'userGuidelines' references in .processes/steps/**/*.json",
+        "Parse each reference to extract the guideline path",
+        "Check if the file exists at the referenced path",
+        "Group missing guidelines by category",
+        "Present findings to user for approval"
+      ],
+      "grepPattern": "userGuidelines",
+      "searchPath": ".processes/steps/",
+      "guidelineBasePath": ".user-processes/guidelines/"
+    },
+    "step2BatchCreation": {
+      "description": "How to create guidelines in batch",
+      "actions": [
+        "Read approved guidelines list from Step 1 output",
+        "For each guideline, spawn create-guideline sub-process",
+        "Use immediate sync - wait for each to complete before next",
+        "Track progress in memory.json",
+        "Handle any failures gracefully - continue with remaining guidelines"
+      ]
+    }
+  },
+  "references": {
+    "steps": [
+      "@framework-step:investigation/identify-files",
+      "@framework-step:common/spawn-sub-process",
+      "@framework-step:learning/continuous-improvement"
+    ],
+    "relatedTemplates": ["create-guideline"],
+    "dependencies": []
+  },
+  "memoryFileUsage": {
+    "step1": {
+      "informationProduced": ["Total missing guidelines count", "Missing guidelines by category", "Path to identified-files.json"],
+      "decisionsMade": ["Search approach used", "Categories scanned"]
+    },
+    "step2": {
+      "informationProduced": ["Guidelines created count", "Sub-processes spawned"],
+      "decisionsMade": ["Order of guideline creation", "Any skipped guidelines"]
+    },
+    "step3": {
+      "informationProduced": ["Improvements identified", "Improvements implemented"],
+      "decisionsMade": ["Which improvements to apply"]
+    }
+  }
+}
+

@@ -2,45 +2,45 @@
   "id": "process-create-onboard-template-20260125",
   "name": "Create onboard Template",
   "template": "create-process-template",
-  "status": "Running",
+  "status": "Completed",
   "parameters": {
     "templateName": "onboard",
     "templatePurpose": "Onboarding when starting to work with the framework, specifically for identifying and creating missing guidelines that are referenced by process steps",
-    "useCases": "When a user project starts using the framework and needs to populate missing guidelines, or when expanding to new areas that require new guidelines to be created"
+    "useCases": "When a user project starts using the framework and needs to populate missing guidelines, or when expanding to new areas that require new guidelines to be created",
+    "onboardTemplateParameters": "None - template has no parameters"
   },
   "steps": [
     {
       "number": 1,
       "name": "Plan and design template",
       "stepRef": "@framework-step:template/plan-and-design-template",
-      "status": "in_progress",
+      "status": "completed",
       "approvalRequired": true
     },
     {
       "number": 2,
       "name": "Create template file",
       "stepRef": "@framework-step:template/create-template-file",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "number": 3,
       "name": "Validate process-steps exist",
       "stepRef": "@framework-step:template/validate-process-steps-exist",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "number": 4,
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
-      "status": "pending"
+      "status": "completed"
     }
   ],
   "currentState": {
-    "currentStep": 1,
-    "currentAction": "Planning and designing the onboard template",
+    "currentStep": 4,
+    "currentAction": "Process completed",
     "blockedBy": null
   },
   "created": "2026-01-25T10:00:00Z",
-  "lastUpdated": "2026-01-25T10:00:00Z"
+  "lastUpdated": "2026-01-25T11:00:00Z"
 }
-
