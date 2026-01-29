@@ -49,6 +49,12 @@
   },
   "steps": [
     {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "output": "Principles loaded and confirmed"
+    },
+    {
       "number": 1,
       "name": "Understand context",
       "stepRef": "@framework-step:planning/understand-context",
@@ -74,6 +80,12 @@
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
       "output": "Improvements implemented"
+    },
+    {
+      "number": 5,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "output": "Compliance report"
     }
   ],
   "references": {
@@ -81,7 +93,8 @@
       "@framework-step:planning/understand-context",
       "@framework-step:guideline/create-guideline-file",
       "@framework-step:guideline/link-guideline-to-steps",
-      "@framework-step:learning/continuous-improvement"
+      "@framework-step:learning/continuous-improvement",
+      "@framework-step:common/end-process-validation"
     ],
     "relatedTemplates": ["create-process-step-template"],
     "dependencies": []

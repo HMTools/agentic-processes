@@ -44,6 +44,15 @@
   },
   "substeps": [
     {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Recall the 5 Core Principles: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
       "number": 1,
       "name": "Gather Process Parameters",
       "description": "Read process.md to extract all parameters from the process context",
@@ -140,6 +149,16 @@
         "Include any decisions made during context gathering",
         "Note any assumptions or clarifications needed",
         "Document any Q&A questions and answers if applicable"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
   ],

@@ -11,3 +11,16 @@ Before continuing:
 
 **If user has not explicitly approved → STOP and wait for their response**
 
+**AGENT: Output this confirmation when reaching an approval checkpoint:**
+
+⏸️ APPROVAL CHECKPOINT REACHED
+
+Deliverables presented above. Awaiting your approval.
+
+Options:
+- "approve" - proceed to next step
+- "modify" - request changes  
+- "reject" - stop process
+
+I will NOT proceed until you respond.
+

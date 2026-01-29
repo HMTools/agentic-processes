@@ -51,6 +51,15 @@
   },
   "substeps": [
     {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Recall the 5 Core Principles: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
       "number": 1,
       "name": "Check for user guideline",
       "description": "Look for team's guideline file that defines how to collect user story parameters",
@@ -104,6 +113,16 @@
         "Include: title, description, acceptanceCriteria (as array), source",
         "Include additionalContext if any was provided",
         "Document source method used (guideline name or 'manual entry')"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
   ],

@@ -60,6 +60,12 @@
   ],
   "steps": [
     {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "output": "Principles loaded and confirmed"
+    },
+    {
       "number": 1,
       "name": "Capture test failure information",
       "stepRef": "@framework-step:testing/capture-test-failure",
@@ -101,6 +107,12 @@
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
       "output": "Improvements implemented"
+    },
+    {
+      "number": 8,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "output": "Compliance report"
     }
   ],
   "references": {
@@ -109,7 +121,8 @@
       "@framework-step:testing/diagnose-integration-test-failure",
       "@framework-step:testing/implement-integration-test-fix",
       "@framework-step:testing/verify-test-passes",
-      "@framework-step:learning/continuous-improvement"
+      "@framework-step:learning/continuous-improvement",
+      "@framework-step:common/end-process-validation"
     ],
     "relatedTemplates": [],
     "dependencies": []

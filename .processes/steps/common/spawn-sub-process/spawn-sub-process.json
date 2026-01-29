@@ -64,6 +64,15 @@
   },
   "substeps": [
     {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Recall the 5 Core Principles: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
       "number": 1,
       "name": "Determine sub-process template and parameters",
       "description": "Identify what template and parameters to use",
@@ -106,6 +115,16 @@
       "actions": [
         "If syncPoint is 'immediate': Wait for sub-process to complete before continuing",
         "If syncPoint is deferred: Continue parent process, check completion at sync point later"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
   ],

@@ -10,7 +10,7 @@
   "output": {
     "description": "Gathered information stored in memory organized by source type",
     "artifacts": [],
-    "memoryUpdates": ["gatheredInformation.sources", "gatheredInformation.documentation", "gatheredInformation.codePatterns", "gatheredInformation.specifications", "gatheredInformation.additionalContext"]
+    "memoryUpdates": ["gatheredInformation.sources", "gatheredInformation.documentation", "gatheredInformation.codePatterns", "gatheredInformation.specifications", "gatheredInformation.externalServiceContracts", "gatheredInformation.additionalContext"]
   },
   "guidance": {
     "prerequisites": [
@@ -55,6 +55,15 @@
   },
   "substeps": [
     {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Recall the 5 Core Principles: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
       "number": 1,
       "name": "Check for user guideline",
       "description": "Look for team's guideline file that defines how to gather relevant information",
@@ -98,48 +107,72 @@
     },
     {
       "number": 5,
+      "name": "Verify external service contracts",
+      "description": "For each external API dependency, verify you have complete contract information",
+      "actions": [
+        "List all external services the solution will interact with",
+        "For EACH external API, verify you have: endpoint URL/path, request contract, response contract, authentication method, error codes/responses",
+        "If any contract is missing: STOP and request from user (provide repo URL, add to workspace, or ask SME)",
+        "CRITICAL: Do NOT proceed with incomplete external service information - this causes design rework",
+        "Summarize findings under gatheredInformation.externalServiceContracts"
+      ]
+    },
+    {
+      "number": 6,
       "name": "Validate collected information",
       "description": "Ensure gathered information is sufficient for the intended purpose",
       "actions": [
         "Review all gathered information against the original need",
         "Check coverage: Are all required areas covered?",
+        "Verify external service contracts are complete (from substep 5)",
         "Identify any gaps or missing context",
         "Note questions that require SME input"
       ]
     },
     {
-      "number": 6,
+      "number": 7,
       "name": "Request missing information",
       "description": "If gaps exist, ask user for missing context",
       "conditional": true,
       "actions": [
         "Present specific questions for each gap identified",
         "Format: 'Please provide [information type]: [explanation of what's needed and why]'",
+        "For external services: offer options - (1) provide contract docs, (2) add service repo to workspace, (3) SME clarification",
         "Wait for user response",
         "Update gathered information with answers",
         "Re-validate until information is sufficient"
       ]
     },
     {
-      "number": 7,
+      "number": 8,
       "name": "Store in memory",
       "description": "Save gathered information organized by source type to memory.json",
       "actions": [
         "Write gatheredInformation object to current step's informationProduced section",
-        "Organize by: sources (list with type), documentation, codePatterns, specifications, additionalContext",
+        "Organize by: sources (list with type), documentation, codePatterns, specifications, externalServiceContracts, additionalContext",
         "Include source references for traceability",
         "Document any assumptions or limitations noted"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
   ],
   "flow": {
-    "description": "Check guideline → Identify sources → Collect from docs → Collect from code → Validate → (conditional: request missing) → Store. Substep 6 is conditional - only if validation in substep 5 identifies gaps."
+    "description": "Check guideline → Identify sources → Collect from docs → Collect from code → Verify external contracts → Validate → (conditional: request missing) → Store. Substep 7 is conditional - only if validation in substep 6 identifies gaps."
   },
   "memoryFileUsage": {
     "readFrom": "Process context and previous steps for what information to gather",
     "writeTo": "Current step section in memory.json",
     "fields": [
-      "Information Produced: gatheredInformation object with sources, documentation, codePatterns, specifications, additionalContext",
+      "Information Produced: gatheredInformation object with sources, documentation, codePatterns, specifications, externalServiceContracts, additionalContext",
       "Decisions Made: Source selection, what to include/exclude",
       "Notes: Gaps identified, SME questions, assumptions made"
     ]
@@ -148,6 +181,7 @@
     {"type": "documentation", "description": "Project docs, READMEs, architecture decisions, design docs"},
     {"type": "codePatterns", "description": "Existing implementations, conventions, patterns in codebase"},
     {"type": "specifications", "description": "API specs, requirements docs, contracts, schemas"},
+    {"type": "externalServiceContracts", "description": "External API endpoints, request/response contracts, auth methods, error codes"},
     {"type": "smeInput", "description": "Subject matter expert knowledge, clarifications, tribal knowledge"}
   ],
   "dependencies": {

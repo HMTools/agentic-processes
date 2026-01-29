@@ -23,6 +23,12 @@
   },
   "steps": [
     {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "output": "Principles loaded and confirmed"
+    },
+    {
       "number": 1,
       "name": "Identify missing guidelines",
       "stepRef": "@framework-step:investigation/identify-files",
@@ -57,6 +63,12 @@
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
       "output": "Improvements implemented"
+    },
+    {
+      "number": 4,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "output": "Compliance report"
     }
   ],
   "guidance": {

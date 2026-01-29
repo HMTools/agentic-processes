@@ -1,0 +1,122 @@
+{
+  "type": "step",
+  "name": "end-process-validation",
+  "category": "common",
+  "metadata": {
+    "title": "End Process Validation",
+    "purposeAndUsage": "MANDATORY final step for every process. Validates that all operating principles were followed throughout the process.",
+    "lastUpdated": "2026-01-26"
+  },
+  "output": {
+    "description": "Compliance report documenting adherence to operating principles",
+    "artifacts": ["compliance-report section in log.json"],
+    "memoryUpdates": ["complianceValidated", "violations"]
+  },
+  "guidance": {
+    "prerequisites": ["All process steps completed"],
+    "mandatoryComponents": [],
+    "specificActions": [
+      "Read log.json to review all user interactions logged during the process",
+      "Verify Principle 1 (LOG FIRST): Check that all user interactions were logged BEFORE responses",
+      "Verify Principle 2 (READ JSON): Check that step JSON files were read for guidance",
+      "Verify Principle 3 (STOP AT CHECKPOINTS): Check that approval checkpoints waited for user response",
+      "Verify Principle 4 (NO TODOS): Check that todo_write was not used during the process",
+      "Verify Principle 5 (VERIFY ACTIONS): Check that mandatory actions had output confirmations",
+      "Document any violations found",
+      "If violations found: Report to user before completing",
+      "If no violations: Output '✓ All operating principles followed - process compliant'"
+    ],
+    "files": {
+      "read": ["log.json", "memory.json"],
+      "create": [],
+      "update": ["log.json (compliance report section)"]
+    },
+    "tools": ["read_file"],
+    "bestPractices": [
+      "Be thorough - check every user interaction in the log",
+      "Report violations honestly - do not hide them",
+      "Violations should be documented for continuous improvement"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Read Process Log",
+      "description": "Read log.json to get full execution history",
+      "actions": [
+        "Read log.json completely",
+        "Note all user interactions recorded",
+        "Note all file modifications"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Check Principle 1: LOG FIRST",
+      "description": "Verify all user interactions were logged before responses",
+      "actions": [
+        "For each user interaction in the process:",
+        "Check: Was it logged to log.json?",
+        "Check: Was it logged BEFORE the response/file change?",
+        "Note any violations"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Check Principle 3: STOP AT CHECKPOINTS",
+      "description": "Verify approval checkpoints were handled correctly",
+      "actions": [
+        "For each step with approvalRequired: true:",
+        "Check: Did agent stop and wait for approval?",
+        "Check: Was approval logged before proceeding?",
+        "Note any violations"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Check Principle 4: NO TODOS",
+      "description": "Verify todo_write was not used",
+      "actions": [
+        "Review log for any todo_write tool usage",
+        "Note if external todos were created"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Generate Compliance Report",
+      "description": "Document compliance status and any violations",
+      "actions": [
+        "Create compliance report in log.json",
+        "List principles checked",
+        "List any violations found",
+        "If violations: Report to user",
+        "If clean: Output '✓ All operating principles followed'"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Read log → Check each principle → Document findings → Report"
+  },
+  "memoryFileUsage": {
+    "readFrom": "All previous steps in memory.json, full log.json",
+    "writeTo": "Final step section in memory.json",
+    "fields": ["complianceValidated: true/false", "violations: []", "timestamp"]
+  },
+  "isBookendStep": true,
+  "position": "last",
+  "complianceChecklist": [
+    {"principle": 1, "name": "LOG FIRST", "check": "All user interactions logged before responses"},
+    {"principle": 2, "name": "READ JSON", "check": "Step JSON files read for guidance"},
+    {"principle": 3, "name": "STOP AT CHECKPOINTS", "check": "Approval checkpoints waited for user"},
+    {"principle": 4, "name": "NO TODOS", "check": "todo_write not used during process"},
+    {"principle": 5, "name": "VERIFY ACTIONS", "check": "Mandatory actions had output confirmations"}
+  ],
+  "dependencies": {
+    "requiredComponents": [],
+    "requiredFiles": ["log.json", "memory.json"],
+    "requiredTools": ["read_file"]
+  },
+  "references": {
+    "relatedSteps": ["init-process-principles"],
+    "usedInTemplates": ["ALL process templates"]
+  }
+}

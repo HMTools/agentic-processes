@@ -1,19 +1,24 @@
-**⚠️ MANDATORY: Log User Interactions BEFORE Any File Changes**
+**⚠️ MANDATORY: Log User Interactions IMMEDIATELY**
 
-## Pre-Flight Checklist (MUST verify before ANY file operation)
+## Critical Timing Rule
 
-Before making ANY file changes in response to user input, STOP and verify:
+**Log FIRST, respond SECOND.** When a user sends ANY message (question, feedback, instruction, answer), your FIRST action must be to log it to `log.json`. Do NOT formulate or send your response until the interaction is logged.
 
-- [ ] **Step 1: Did the user make a request?** 
-  - If YES → You MUST log it to `log.json` FIRST
-  - If NO → Proceed (this is agent-initiated work)
+## Pre-Flight Checklist
 
-- [ ] **Step 2: Have I logged this request?**
-  - If NO → STOP. Log to `log.json` under current step's "userInteractions" section NOW
-  - If YES → Proceed to file changes
+**AGENT: Before responding to user input OR making file changes, STOP and verify:**
+
+- [ ] **Step 1: Did the user send a message?** 
+  - If YES → Log to `log.json` IMMEDIATELY
+  - **Output**: "✓ Logged user interaction to log.json"
+  
+- [ ] **Step 2: Have I logged this interaction?**
+  - If NO → STOP. Log NOW before proceeding
+  - If YES → Now you may respond and/or make file changes
 
 - [ ] **Step 3: After file changes complete**
-  - Update `log.json` with files modified in the "filesModified" array
+  - Update `log.json` filesModified array
+  - **Output**: "✓ Updated log.json with modified files"
 
 ## Logging Format
 
@@ -26,10 +31,27 @@ Before making ANY file changes in response to user input, STOP and verify:
 }
 ```
 
-## Critical Rule
+## Critical Rules
 
-**NEVER create or modify files in response to a user request without logging FIRST.**
+1. **NEVER respond to a user message without logging it FIRST.**
+2. **NEVER create or modify files in response to a user request without logging FIRST.**
 
-Violations of this rule result in incomplete audit trails and must be documented as critical incidents.
+Violations of these rules result in incomplete audit trails and must be documented as critical incidents.
+
+## Anti-Pattern: What NOT to Do
+
+❌ **WRONG** - Responding first, logging later (or not at all):
+```
+User: "Why didn't you request the API contract?"
+Agent: "I apologize, I should have..."  ← Response sent WITHOUT logging
+Agent: [later] Updates log.json         ← Too late! Context may be lost
+```
+
+✅ **CORRECT** - Log first, then respond:
+```
+User: "Why didn't you request the API contract?"
+Agent: [FIRST] Updates log.json with user feedback
+Agent: [THEN] "I apologize, I should have..."
+```
 
 **Reference**: See `docs/process-management.md` for complete logging guidelines.

@@ -68,6 +68,38 @@ Reference the process management knowledge file for complete instructions:
 - `memory.json` (step information and cross-references)
 - `log.json` (execution history and user interactions)
 
+### Multi-Workspace Architecture
+
+**CRITICAL RULE**: When multiple workspaces are open, distinguish between the **framework repo** and the **client repo**.
+
+#### Identifying Repositories
+
+| Repository Type | Identification | Contains |
+|-----------------|----------------|----------|
+| **Framework Repo** | Contains `.processes/templates/` and `.processes/steps/` | Templates, steps, prompts, framework code |
+| **Client Repo** | The repository being worked on (where user stories are implemented) | Application code, `.user-processes/` |
+
+#### Resource Location Rules
+
+| Resource | Source Repository | Path |
+|----------|-------------------|------|
+| Templates | Framework repo | `.processes/templates/` |
+| Steps | Framework repo | `.processes/steps/` |
+| Process instances | **Client repo** | `.user-processes/active/` |
+| Guidelines | **Client repo** | `.user-processes/guidelines/` |
+| User-defined templates | Client repo | `.user-processes/templates/` |
+| User-defined steps | Client repo | `.user-processes/steps/` |
+
+#### Detection Logic
+
+1. If multiple workspaces are open:
+   - The workspace containing `.processes/templates/` AND `.processes/steps/` is the **framework repo**
+   - The workspace being actively developed (where code changes happen) is the **client repo**
+2. If only one workspace is open:
+   - It serves as both framework and client repo
+
+**NEVER create process instances in the framework repo when a separate client repo is open.**
+
 ### JSON-First Architecture
 
 **CRITICAL**: All templates and steps use a JSON-First Architecture:

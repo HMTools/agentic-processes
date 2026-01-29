@@ -61,6 +61,15 @@
   },
   "substeps": [
     {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Recall the 5 Core Principles: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
       "number": 1,
       "name": "Understand user story scope",
       "description": "Read user story and identify functionality being added/changed",
@@ -172,6 +181,33 @@
     },
     {
       "number": 9,
+      "name": "Verify no blocking gaps discovered",
+      "description": "Final checkpoint to ensure analysis didn't reveal new information gaps",
+      "conditional": true,
+      "exitCondition": "If blocking gaps discovered during analysis (substeps 4-8), exit and return to gather-relevant-information",
+      "actions": [
+        "Review all 'risks' and 'notes' identified during substeps 4-8",
+        "For EACH risk noting 'needs verification' or 'availability unknown': this is a BLOCKING GAP",
+        "CRITICAL: Do NOT proceed if any risk identifies missing external service contracts, unknown API endpoints, or unverified integrations",
+        "If blocking gaps found: document gaps in memory, set returnToPreviousStep flag, exit step",
+        "If no blocking gaps: continue to document findings"
+      ],
+      "blockingGapExamples": [
+        "External API endpoint URL unknown",
+        "External service contract not available",
+        "Authentication method for external service unclear",
+        "Database schema changes need verification",
+        "Third-party service availability needs confirmation"
+      ],
+      "exitOutput": {
+        "blockingGaps": "Array of gaps discovered during analysis",
+        "returnToPreviousStep": true,
+        "returnToStep": "gather-relevant-information",
+        "reason": "Blocking gaps discovered during impact analysis require additional information gathering"
+      }
+    },
+    {
+      "number": 10,
       "name": "Document findings",
       "description": "Write comprehensive analysis to memory",
       "actions": [
@@ -179,10 +215,20 @@
         "Include: affectedComponents, externalSystemsImpact, packageDependencies, dependencies, existingPatterns, impactAreas",
         "Organize impactAreas by category: codebase, externalServices, infrastructure, packages, documentation"
       ]
+    },
+    {
+      "number": 11,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Output: '✓ Step completed in compliance with operating principles'"
+      ]
     }
   ],
   "flow": {
-    "description": "Linear flow with conditional exit at substep 3. Substeps 1-2 gather context, substep 3 validates sources (exit if missing), substeps 4-8 perform analysis, substep 9 documents findings."
+    "description": "Linear flow with conditional exits at substeps 3 and 9. Substeps 1-2 gather context, substep 3 validates sources (exit if missing), substeps 4-8 perform analysis, substep 9 verifies no blocking gaps discovered (exit if gaps found), substep 10 documents findings."
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section (gatheredInformation from gather-relevant-information)",
@@ -243,9 +289,9 @@
     }
   },
   "feedbackLoop": {
-    "condition": "Sources missing at substep 3",
+    "condition": "Sources missing at substep 3 OR blocking gaps discovered at substep 9",
     "returnToStep": "gather-relevant-information",
-    "description": "If analysis reveals information gaps, return to gather-relevant-information to collect missing data"
+    "description": "If analysis reveals information gaps (early check at substep 3) or discovers blocking gaps during analysis (final check at substep 9), return to gather-relevant-information to collect missing data. Do NOT proceed to LLD creation with unresolved gaps."
   },
   "dependencies": {
     "requiredComponents": ["mandatory-logging.md"],

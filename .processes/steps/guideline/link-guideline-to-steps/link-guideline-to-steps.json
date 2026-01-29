@@ -54,6 +54,15 @@
   },
   "substeps": [
     {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Recall the 5 Core Principles: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
       "number": 1,
       "name": "Get guideline info from memory",
       "description": "Retrieve the guideline file path and context from previous step",
@@ -101,6 +110,16 @@
         "For each modified file, verify the guideline is in userGuidelines",
         "Update memory.json with: stepsUpdated, stepsSkipped, guidelineLinked",
         "Log the changes in log.json"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
   ],

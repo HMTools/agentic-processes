@@ -61,6 +61,12 @@
   ],
   "steps": [
     {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "output": "Principles loaded and confirmed"
+    },
+    {
       "number": 1,
       "name": "Create high-level plan",
       "stepRef": "@framework-step:planning/create-high-level-plan",
@@ -93,7 +99,8 @@
     "unitTests": "@framework-step:testing/write-unit-tests-service",
     "integrationTests": "@framework-step:testing/write-integration-tests-api",
     "documentation": "@framework-step:documentation/update-documentation",
-    "continuousImprovement": "@framework-step:learning/continuous-improvement"
+    "continuousImprovement": "@framework-step:learning/continuous-improvement",
+    "endProcessValidation": "@framework-step:common/end-process-validation"
   },
   "references": {
     "steps": [

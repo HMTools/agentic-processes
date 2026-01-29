@@ -49,6 +49,12 @@
   },
   "steps": [
     {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "output": "Principles loaded and confirmed"
+    },
+    {
       "number": 1,
       "name": "Plan and design step",
       "stepRef": "@framework-step:template/plan-and-design-step",
@@ -72,6 +78,12 @@
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
       "output": "Improvements implemented"
+    },
+    {
+      "number": 5,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "output": "Compliance report"
     }
   ],
   "references": {
@@ -79,7 +91,8 @@
       "@framework-step:template/plan-and-design-step",
       "@framework-step:template/create-step-file",
       "@framework-step:template/validate-step-structure",
-      "@framework-step:learning/continuous-improvement"
+      "@framework-step:learning/continuous-improvement",
+      "@framework-step:common/end-process-validation"
     ],
     "relatedTemplates": ["create-process-template"],
     "dependencies": []

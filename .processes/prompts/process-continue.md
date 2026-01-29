@@ -24,6 +24,25 @@ This prompt guides the continuation of an existing process by discovering active
 
 ## Agent Layer
 
+### ⚠️ AGENT OPERATING PRINCIPLES
+
+These principles apply to ALL work in this process:
+
+1. **LOG FIRST, ACT SECOND** - Log every user interaction to log.json BEFORE responding or making changes
+   - Output: "✓ Logged to log.json"
+
+2. **READ JSON FOR GUIDANCE** - Step instructions live in .json files, not .md files
+
+3. **STOP AT CHECKPOINTS** - When approvalRequired: true, present deliverables and WAIT for user response
+   - Output: "⏸️ Awaiting approval"
+
+4. **NO EXTERNAL TODOS** - Process steps ARE your task list. Do NOT use todo_write during processes
+
+5. **VERIFY MANDATORY ACTIONS** - For MANDATORY/CRITICAL instructions, do action then confirm
+   - Output: "✓ [Action] completed"
+
+---
+
 ### Instructions
 
 Reference the process management knowledge file for complete instructions:

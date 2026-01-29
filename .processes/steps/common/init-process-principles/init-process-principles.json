@@ -1,0 +1,107 @@
+{
+  "type": "step",
+  "name": "init-process-principles",
+  "category": "common",
+  "metadata": {
+    "title": "Init Process Principles",
+    "purposeAndUsage": "MANDATORY first step for every process. Contains and confirms understanding of agent operating principles before any work begins.",
+    "lastUpdated": "2026-01-26"
+  },
+  "principles": [
+    {
+      "number": 1,
+      "name": "LOG FIRST, ACT SECOND",
+      "rule": "Log every user interaction to log.json BEFORE responding or making changes",
+      "verification": "Output '✓ Logged to log.json' before file changes"
+    },
+    {
+      "number": 2,
+      "name": "READ JSON FOR GUIDANCE",
+      "rule": "Step instructions live in .json files, not .md files",
+      "verification": null
+    },
+    {
+      "number": 3,
+      "name": "STOP AT CHECKPOINTS",
+      "rule": "When approvalRequired: true, present deliverables, ask for approval, WAIT",
+      "verification": "Output '⏸️ Awaiting approval' and stop"
+    },
+    {
+      "number": 4,
+      "name": "NO EXTERNAL TODOS",
+      "rule": "Process steps ARE your task list. Do NOT use todo_write during processes",
+      "verification": null
+    },
+    {
+      "number": 5,
+      "name": "VERIFY MANDATORY ACTIONS",
+      "rule": "For MANDATORY/CRITICAL instructions: do action, then output confirmation",
+      "verification": "Output '✓ [Action] completed'"
+    }
+  ],
+  "output": {
+    "description": "Confirmation that operating principles are loaded and understood",
+    "artifacts": [],
+    "memoryUpdates": ["principlesLoaded", "principlesConfirmed"]
+  },
+  "guidance": {
+    "prerequisites": [],
+    "mandatoryComponents": [],
+    "specificActions": [
+      "Read and internalize the 5 Core Principles defined in this step's 'principles' array",
+      "Output confirmation: '✓ Operating principles loaded and understood'",
+      "Update memory.json with principlesLoaded: true"
+    ],
+    "files": {
+      "read": [],
+      "create": [],
+      "update": ["memory.json"]
+    },
+    "tools": [],
+    "bestPractices": [
+      "This step MUST be completed before any other work",
+      "Do NOT skip or abbreviate this step",
+      "The principles apply to ALL subsequent steps in this process"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 1,
+      "name": "Internalize Operating Principles",
+      "description": "Read and understand the 5 Core Principles embedded in this step",
+      "actions": [
+        "Read the 'principles' array in this step definition",
+        "Understand each principle: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Confirm Understanding",
+      "description": "Output confirmation and update memory",
+      "actions": [
+        "Output: '✓ Operating principles loaded and understood'",
+        "List the 5 principles briefly to confirm understanding",
+        "Update memory.json: principlesLoaded: true, timestamp"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Read principles → Confirm understanding → Update memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": null,
+    "writeTo": "Step 0 section in memory.json",
+    "fields": ["principlesLoaded: true", "timestamp"]
+  },
+  "isBookendStep": true,
+  "position": "first",
+  "dependencies": {
+    "requiredComponents": [],
+    "requiredFiles": [],
+    "requiredTools": []
+  },
+  "references": {
+    "relatedSteps": ["end-process-validation"],
+    "usedInTemplates": ["ALL process templates"]
+  }
+}
