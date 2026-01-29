@@ -99,6 +99,15 @@ Update log.json with what was changed
    - **Timestamp**: {YYYY-MM-DD HH:mm:ss}
 ```
 
+### Subagent Delegation Model
+
+This framework uses Cursor subagents for context isolation:
+
+- **step-executor**: Executes individual process steps in isolated context
+- **process-spawner**: Creates new processes/sub-processes in isolated context
+
+The main agent orchestrates while subagents execute specialized work.
+
 ### JSON-First Architecture
 
 **CRITICAL**: All templates and steps use a JSON-First Architecture:
@@ -148,13 +157,19 @@ When `/process-continue` is invoked:
    - Update **Current State** to reflect resumption
    - Set active step to next incomplete step
 
-6. **Proceed with Guidance**
-   - **Read the current step's `.json` file** for complete guidance
-   - Follow substeps, specific actions, and best practices from JSON
-   - Reference relevant information from memory
-   - All work must be done within process structure
-   - Update process files as you work
-   - Offer to start working immediately
+6. **Proceed with Guidance via Step Delegation**
+   - **Delegate step execution** to the `step-executor` subagent
+   - Provide to subagent:
+     - Step's `.json` file path and content
+     - Current process context (process.json, memory.json relevant sections)
+     - Step number and any step-specific parameters
+   - **Wait for subagent completion** (foreground execution)
+   - **Process subagent results**:
+     - Verify step completed successfully
+     - Review memory/log updates made by subagent
+     - Handle any issues reported
+   - **Handle approval checkpoints**: If step has `approvalRequired: true`, the subagent will prepare deliverables and return; present to user and wait for approval
+   - After step completion, update process.json currentStep and offer to continue to next step
 
 ### State Restoration
 

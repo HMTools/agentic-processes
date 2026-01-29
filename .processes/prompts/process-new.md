@@ -184,26 +184,29 @@ Update log.json with changes
    - **Timestamp**: {YYYY-MM-DD HH:mm:ss}
 ```
 
-### Sub-Process Creation
+### Sub-Process Creation via Delegation
 
 When `/process-new` is invoked from within an active process (spawning a sub-process):
 
 1. **Detect Parent Context**
    - Check if there's an active parent process in context
-   - If spawning from a step, record parent process path
+   - If spawning from a step, record parent process path and step number
 
-2. **Create with Parent Reference**
-   - Set `parentProcess` in log.json metadata
-   - Set parent reference in memory.json subProcessState section
-   - Record "Spawned At Step" from parent context
+2. **Delegate to process-spawner Subagent**
+   - Invoke the `process-spawner` subagent with:
+     - Template path to use
+     - Process parameters (required and optional)
+     - Parent context: parent process path, spawn step number
+   - **Wait for subagent completion** (foreground execution)
 
-3. **Update Parent Process**
-   - Add new sub-process to parent's memory.json childSubProcesses array
-   - Set status to "running"
-   - Record sync point from spawn instruction
+3. **Process Subagent Results**
+   - Receive: process ID, directory path, status
+   - Verify process was created successfully
+   - If sub-process: verify parent memory was updated
 
-4. **Standard Creation**
-   - Continue with normal process creation flow
-   - Directory is standard: `.user-processes/active/process-{name}-{YYYYMMDD}/`
+4. **Return to Parent Flow**
+   - Report new process creation to user
+   - If sub-process: return control to parent process
+   - If standalone: offer to start the new process
 
-**Note**: Sub-processes are regular processes with parent-child references. They use the same directory structure and monitoring as any other process.
+**Note**: The `process-spawner` subagent handles all file creation and parent-child relationship setup internally.
