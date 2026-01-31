@@ -37,6 +37,12 @@
       "name": "VERIFY MANDATORY ACTIONS",
       "rule": "For MANDATORY/CRITICAL instructions: do action, then output confirmation",
       "verification": "Output '✓ [Action] completed'"
+    },
+    {
+      "number": 6,
+      "name": "USE SUBAGENTS FOR STEPS",
+      "rule": "Delegate step execution to step-executor subagent. Do NOT execute steps directly in the main conversation.",
+      "verification": "Each step must be executed via Task tool with subagent_type='step-executor'"
     }
   ],
   "output": {
@@ -48,7 +54,7 @@
     "prerequisites": [],
     "mandatoryComponents": [],
     "specificActions": [
-      "Read and internalize the 5 Core Principles defined in this step's 'principles' array",
+      "Read and internalize the 6 Core Principles defined in this step's 'principles' array",
       "Output confirmation: '✓ Operating principles loaded and understood'",
       "Update memory.json with principlesLoaded: true"
     ],
@@ -68,10 +74,10 @@
     {
       "number": 1,
       "name": "Internalize Operating Principles",
-      "description": "Read and understand the 5 Core Principles embedded in this step",
+      "description": "Read and understand the 6 Core Principles embedded in this step",
       "actions": [
         "Read the 'principles' array in this step definition",
-        "Understand each principle: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS"
+        "Understand each principle: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS, USE SUBAGENTS"
       ]
     },
     {
@@ -80,7 +86,7 @@
       "description": "Output confirmation and update memory",
       "actions": [
         "Output: '✓ Operating principles loaded and understood'",
-        "List the 5 principles briefly to confirm understanding",
+        "List the 6 principles briefly to confirm understanding",
         "Update memory.json: principlesLoaded: true, timestamp"
       ]
     }
@@ -93,8 +99,6 @@
     "writeTo": "Step 0 section in memory.json",
     "fields": ["principlesLoaded: true", "timestamp"]
   },
-  "isBookendStep": true,
-  "position": "first",
   "dependencies": {
     "requiredComponents": [],
     "requiredFiles": [],

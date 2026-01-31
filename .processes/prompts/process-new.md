@@ -149,6 +149,25 @@ When `/process-new` is invoked:
    - Highlight first step
    - Offer to begin immediately
 
+### Handling User Corrections at Approval Checkpoints
+
+**CRITICAL**: When a step has `approvalRequired: true` and the user provides **corrections or feedback** instead of simple approval:
+
+1. **Log the correction immediately** to log.json (LOG FIRST principle)
+2. **Delegate correction processing** to `step-executor` subagent with:
+   - The correction details from the user
+   - Current step context and artifacts to update
+   - Instruction to apply the correction and re-prepare deliverables
+3. **Wait for subagent completion** (foreground execution)
+4. **Present updated deliverables** for re-approval
+5. **Repeat** until user provides simple approval ("approved", "yes", etc.)
+
+**Why delegate corrections to subagent?**
+- Maintains context isolation (Principle 6: USE SUBAGENTS)
+- Subagent has full step context to properly update all artifacts
+- Main agent stays in orchestration role
+- Ensures consistency with how initial step execution works
+
 ### File Initialization
 
 1. **process.json**: Primary state (id, status, parameters, steps array, currentState)

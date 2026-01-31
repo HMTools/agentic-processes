@@ -1,0 +1,202 @@
+{
+  "metadata": {
+    "process": "process-completion-migration-20260129",
+    "template": "set-concept",
+    "created": "2026-01-29T16:27:00Z",
+    "lastUpdated": "2026-01-29T16:27:00Z",
+    "currentStep": 1
+  },
+  "subProcessState": {
+    "parentProcess": null,
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {
+    "0": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "informationProduced": {
+        "principlesLoaded": true,
+        "principles": ["LOG FIRST", "READ JSON", "STOP AT CHECKPOINTS", "NO TODOS", "VERIFY ACTIONS"]
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [],
+      "notes": "Operating principles internalized and confirmed",
+      "updated": "2026-01-29T16:29:00Z"
+    },
+    "1": {
+      "name": "Understand Concept",
+      "status": "completed",
+      "informationProduced": {
+        "parameters": {
+          "conceptName": "Process Completion and Directory Migration",
+          "conceptDescription": "Ensure completed processes move from active to completed directory",
+          "targetFiles": "end-process-validation step files, process prompts",
+          "existingState": "Processes stay in .user-processes/active after completion",
+          "requestedState": "Processes move to .user-processes/completed after successful validation"
+        },
+        "informationSources": [
+          ".processes/steps/common/end-process-validation/end-process-validation.json",
+          ".processes/steps/common/end-process-validation/end-process-validation.md",
+          ".processes/prompts/process-continue.md",
+          "README.md",
+          "docs/getting-started.md"
+        ],
+        "keyFindings": [
+          "Documentation already describes completed processes should be in .user-processes/completed/",
+          "end-process-validation step only validates compliance - no migration logic",
+          ".user-processes/completed/ and .user-processes/failed/ directories don't exist",
+          "No step currently handles directory migration"
+        ],
+        "requirements": [
+          "Move process directory from active to completed after successful validation",
+          "Update process.json status to 'completed'",
+          "Record completion timestamp in log.json"
+        ],
+        "successCriteria": [
+          "end-process-validation success triggers directory migration",
+          "Process status reflects 'completed'",
+          "Completion timestamp recorded"
+        ],
+        "constraints": [
+          "Framework-level change affecting .processes/steps/",
+          "Must work for all templates (common step)",
+          "Handle both parent and sub-processes",
+          "Create completed directory if not exists"
+        ]
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [],
+      "notes": "Documentation describes expected behavior but implementation is missing",
+      "updated": "2026-01-29T16:31:00Z"
+    },
+    "2": {
+      "name": "Identify Target Files",
+      "status": "completed",
+      "informationProduced": {
+        "fileCount": 7,
+        "primaryTargets": 2,
+        "resultsJsonPath": "./identified-files.json",
+        "summary": "2 files to modify (end-process-validation step), 5 reference files"
+      },
+      "decisionsMade": [
+        "Search approach: simple mode using glob and grep",
+        "Focus on end-process-validation step as primary target",
+        "Type definitions already support 'completed' status - no changes needed"
+      ],
+      "filesModifiedCreated": ["identified-files.json"],
+      "notes": "Type system already supports 'completed' status; only step files need modification",
+      "updated": "2026-01-29T16:33:00Z"
+    },
+    "3": {
+      "name": "Analyze Existing State",
+      "status": "completed",
+      "informationProduced": {
+        "findingsReportPath": "./findings-report.md",
+        "issuesListPath": "./issues-list.json",
+        "filesReviewed": 2,
+        "issuesFound": 3,
+        "countsBySeverity": {"critical": 2, "medium": 1},
+        "countsByCategory": {"missing": 3},
+        "verificationStatus": "FAILED - 3 of 5 criteria not met"
+      },
+      "decisionsMade": [
+        "All issues are in 'Missing' category - features need to be added",
+        "Two critical issues: status update and directory migration",
+        "One medium issue: completion timestamp"
+      ],
+      "filesModifiedCreated": ["findings-report.md", "issues-list.json"],
+      "notes": "Concept NOT already implemented - need to proceed with implementation plan",
+      "updated": "2026-01-29T16:35:00Z"
+    },
+    "4": {
+      "name": "Design Implementation Plan",
+      "status": "completed",
+      "informationProduced": {
+        "implementationPlanPath": "./implementation-plan.md",
+        "totalChangeProposals": 2,
+        "filesToModify": [
+          ".processes/steps/common/end-process-validation/end-process-validation.json",
+          ".processes/steps/common/end-process-validation/end-process-validation.md"
+        ],
+        "filesToCreate": [],
+        "approvalStatus": "approved",
+        "approvedChangeIds": ["MOD-001", "MOD-002"]
+      },
+      "decisionsMade": [
+        "Add completion substeps to existing end-process-validation step",
+        "Completion actions run after compliance validation passes",
+        "Three new substeps: status update, timestamp, directory migration"
+      ],
+      "filesModifiedCreated": ["implementation-plan.md"],
+      "notes": "All changes approved by user",
+      "updated": "2026-01-29T16:38:00Z"
+    },
+    "5": {
+      "name": "Apply Changes",
+      "status": "completed",
+      "informationProduced": {
+        "changeApplicationReportPath": "./changes-applied.md",
+        "totalChangesApplied": 2,
+        "filesModified": [
+          ".processes/steps/common/end-process-validation/end-process-validation.json",
+          ".processes/steps/common/end-process-validation/end-process-validation.md"
+        ]
+      },
+      "decisionsMade": [
+        "Applied all approved changes in order",
+        "Added 3 new substeps for process completion",
+        "Updated documentation with new flow diagram"
+      ],
+      "filesModifiedCreated": [
+        ".processes/steps/common/end-process-validation/end-process-validation.json",
+        ".processes/steps/common/end-process-validation/end-process-validation.md",
+        "changes-applied.md"
+      ],
+      "notes": "All changes verified after application",
+      "updated": "2026-01-29T16:40:00Z"
+    },
+    "6": {
+      "name": "Verify Implementation",
+      "status": "completed",
+      "informationProduced": {
+        "verificationReportPath": "./verification-report.md",
+        "verificationStatus": "PASSED",
+        "criteriaChecked": 5,
+        "criteriaPassed": 5
+      },
+      "decisionsMade": [
+        "All verification criteria met",
+        "Implementation matches requested state"
+      ],
+      "filesModifiedCreated": ["verification-report.md"],
+      "notes": "All 5 verification criteria passed",
+      "updated": "2026-01-29T16:42:00Z"
+    },
+    "7": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "informationProduced": {
+        "improvementsIdentified": 0,
+        "improvementsImplemented": 0,
+        "improvementsDeferred": 0,
+        "summary": "Process executed smoothly with no corrections needed"
+      },
+      "decisionsMade": [
+        "No improvements required - process ran efficiently",
+        "User customization (adding approval to Step 1) was valid preference, not process deficiency"
+      ],
+      "filesModifiedCreated": [],
+      "notes": "Clean execution with 3 user interactions, all standard approvals or valid customizations",
+      "updated": "2026-01-29T16:44:00Z"
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [],
+    "filesModified": [],
+    "filesCreated": []
+  },
+  "searchHelpers": {
+    "byCategory": {}
+  }
+}

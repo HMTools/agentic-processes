@@ -1,0 +1,87 @@
+{
+  "id": "process-completion-migration-20260129",
+  "template": "set-concept",
+  "templatePath": ".processes/templates/infrastructure/set-concept",
+  "status": "completed",
+  "created": "2026-01-29T16:27:00Z",
+  "lastUpdated": "2026-01-29T16:27:00Z",
+  "parameters": {
+    "conceptName": "Process Completion and Directory Migration",
+    "conceptDescription": "Ensure completed processes are moved from .user-processes/active to .user-processes/completed when they finish. The end-process-validation step (or a new dedicated step) should handle this migration automatically after successful validation.",
+    "targetFiles": ".processes/steps/common/end-process-validation/, .processes/prompts/process-continue.md, related process completion files",
+    "existingState": "Completed processes remain in .user-processes/active directory; no migration logic exists in any step",
+    "requestedState": "Completed processes automatically migrate to .user-processes/completed when end-process-validation succeeds",
+    "verificationCriteria": "end-process-validation step includes directory migration logic; processes move to completed directory after successful validation"
+  },
+  "currentState": {
+    "currentStep": 8,
+    "phase": "end-process-validation"
+  },
+  "steps": [
+    {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "status": "completed",
+      "completedAt": "2026-01-29T16:29:00Z"
+    },
+    {
+      "number": 1,
+      "name": "Understand concept",
+      "stepRef": "@framework-step:planning/understand-context",
+      "status": "completed",
+      "approvalRequired": true,
+      "completedAt": "2026-01-29T16:32:00Z"
+    },
+    {
+      "number": 2,
+      "name": "Identify target files",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "status": "completed",
+      "completedAt": "2026-01-29T16:33:00Z"
+    },
+    {
+      "number": 3,
+      "name": "Analyze existing state",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "status": "completed",
+      "completedAt": "2026-01-29T16:35:00Z"
+    },
+    {
+      "number": 4,
+      "name": "Design implementation plan",
+      "stepRef": "@framework-step:planning/design-implementation-plan",
+      "status": "completed",
+      "approvalRequired": true,
+      "completedAt": "2026-01-29T16:38:00Z"
+    },
+    {
+      "number": 5,
+      "name": "Apply changes",
+      "stepRef": "@framework-step:common/apply-changes",
+      "status": "completed",
+      "completedAt": "2026-01-29T16:40:00Z"
+    },
+    {
+      "number": 6,
+      "name": "Verify implementation",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "status": "completed",
+      "completedAt": "2026-01-29T16:42:00Z"
+    },
+    {
+      "number": 7,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "status": "completed",
+      "completedAt": "2026-01-29T16:44:00Z"
+    },
+    {
+      "number": 8,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "status": "completed",
+      "completedAt": "2026-01-29T16:45:00Z"
+    }
+  ]
+}

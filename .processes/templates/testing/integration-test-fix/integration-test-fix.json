@@ -33,14 +33,6 @@
       }
     }
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
-    },
-    "agentLayer": {
-      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
-    }
-  },
   "fixTypes": [
     {
       "type": "Test Issue",

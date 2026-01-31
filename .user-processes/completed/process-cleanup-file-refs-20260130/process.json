@@ -1,0 +1,78 @@
+{
+  "type": "process-instance",
+  "id": "process-cleanup-file-refs-20260130",
+  "template": "set-concept",
+  "status": "completed",
+  "parameters": {
+    "conceptName": "Cleanup File References on Process Completion",
+    "conceptDescription": "When a process is completed and moved to the completed directory, the tracking of relevant files that were used during active execution (crossReferences.filesModified, crossReferences.filesCreated, searchHelpers sections, and step-level filesModifiedCreated arrays in memory.json) should be cleared or minimized. This information is only useful during active process execution and is not needed once the process is archived.",
+    "targetFiles": ".processes/steps/common/end-process-validation/, .processes/templates/memory-template.json, .processes/types/memory-file.ts",
+    "existingState": "Completed processes retain all file tracking data including crossReferences (filesModified, filesCreated), searchHelpers (byCategory, byFileType), and each step's filesModifiedCreated arrays, making archived process folders larger than necessary",
+    "requestedState": "On process completion, substep 8 (Move to Completed Directory) deletes all artifact files and keeps only the three core files: process.json, memory.json, and log.json",
+    "verificationCriteria": "1. end-process-validation substep 8 includes file cleanup before move. 2. Completed process directories contain only process.json, memory.json, and log.json. 3. All essential history preserved in those three files."
+  },
+  "steps": [
+    {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "status": "completed"
+    },
+    {
+      "number": 1,
+      "name": "Understand concept",
+      "stepRef": "@framework-step:planning/understand-context",
+      "status": "completed",
+      "approvalRequired": true
+    },
+    {
+      "number": 2,
+      "name": "Identify target files",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "status": "completed"
+    },
+    {
+      "number": 3,
+      "name": "Analyze existing state",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "status": "completed"
+    },
+    {
+      "number": 4,
+      "name": "Design implementation plan",
+      "stepRef": "@framework-step:planning/design-implementation-plan",
+      "status": "completed",
+      "approvalRequired": true
+    },
+    {
+      "number": 5,
+      "name": "Apply changes",
+      "stepRef": "@framework-step:common/apply-changes",
+      "status": "completed"
+    },
+    {
+      "number": 6,
+      "name": "Verify implementation",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "status": "completed"
+    },
+    {
+      "number": 7,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "status": "completed"
+    },
+    {
+      "number": 8,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "status": "completed"
+    }
+  ],
+  "currentState": {
+    "currentStep": 8,
+    "activeStepName": "End Process Validation"
+  },
+  "created": "2026-01-30T06:55:00Z",
+  "lastUpdated": "2026-01-30T06:55:00Z"
+}

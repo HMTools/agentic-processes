@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "process": "process-completion-migration-20260129",
+    "template": "set-concept",
+    "started": "2026-01-29T16:27:00Z",
+    "completed": "2026-01-29T16:45:00Z",
+    "parentProcess": null,
+    "subProcesses": []
+  },
+  "executionMetrics": {
+    "totalSteps": 9,
+    "stepsCompleted": 9,
+    "currentStep": 8
+  },
+  "steps": {
+    "0": {
+      "userInteractions": [
+        {
+          "request": "Change 'Understand concept' step to require approval",
+          "reason": "User wants approval checkpoint at Step 1",
+          "agentResponse": "Updated process.json and process.md to add approvalRequired: true to Step 1",
+          "timestamp": "2026-01-29T16:28:00Z"
+        }
+      ]
+    },
+    "1": {
+      "userInteractions": [
+        {
+          "request": "Approval for Step 1 deliverables",
+          "reason": "Step 1 has approvalRequired: true",
+          "agentResponse": "User approved, proceeding to Step 2",
+          "timestamp": "2026-01-29T16:32:00Z"
+        }
+      ]
+    },
+    "4": {
+      "userInteractions": [
+        {
+          "request": "Approval for implementation plan (MOD-001, MOD-002)",
+          "reason": "Step 4 has approvalRequired: true",
+          "agentResponse": "User approved all changes, proceeding to Step 5 (Apply Changes)",
+          "timestamp": "2026-01-29T16:38:00Z"
+        }
+      ]
+    }
+  },
+  "processWideObservations": {
+    "patternsDetected": [],
+    "userFeedbackSummary": [],
+    "efficiencyMetrics": {},
+    "recommendationsForFuture": []
+  }
+}

@@ -39,14 +39,6 @@
       }
     }
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
-    },
-    "agentLayer": {
-      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile"]
-    }
-  },
   "steps": [
     {
       "number": 0,

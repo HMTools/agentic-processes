@@ -10,7 +10,7 @@
   "output": {
     "description": "Compliance report documenting adherence to operating principles",
     "artifacts": ["compliance-report section in log.json"],
-    "memoryUpdates": ["complianceValidated", "violations"]
+    "memoryUpdates": ["complianceValidated", "violations", "processCompleted", "completedTimestamp", "movedToDirectory"]
   },
   "guidance": {
     "prerequisites": ["All process steps completed"],
@@ -24,14 +24,17 @@
       "Verify Principle 5 (VERIFY ACTIONS): Check that mandatory actions had output confirmations",
       "Document any violations found",
       "If violations found: Report to user before completing",
-      "If no violations: Output '✓ All operating principles followed - process compliant'"
+      "If no violations: Output '✓ All operating principles followed - process compliant'",
+      "Update process.json status from 'running' to 'completed'",
+      "Set log.json metadata.completed to current ISO 8601 timestamp",
+      "Move process directory from .user-processes/active/ to .user-processes/completed/ (create completed/ if needed)"
     ],
     "files": {
       "read": ["log.json", "memory.json"],
       "create": [],
-      "update": ["log.json (compliance report section)"]
+      "update": ["log.json (compliance report section, completion timestamp)", "process.json (status to completed)"]
     },
-    "tools": ["read_file"],
+    "tools": ["read_file", "search_replace", "shell"],
     "bestPractices": [
       "Be thorough - check every user interaction in the log",
       "Report violations honestly - do not hide them",
@@ -88,32 +91,70 @@
         "Create compliance report in log.json",
         "List principles checked",
         "List any violations found",
-        "If violations: Report to user",
-        "If clean: Output '✓ All operating principles followed'"
+        "If violations: Report to user and STOP - do not proceed to completion steps",
+        "If clean: Output '✓ All operating principles followed' and proceed to completion steps"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Update Process Status",
+      "description": "Update process.json status to completed",
+      "actions": [
+        "Read process.json from the process directory",
+        "Update 'status' field from 'running' to 'completed'",
+        "Write updated process.json",
+        "Output: '✓ Process status updated to completed'"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Record Completion Timestamp",
+      "description": "Set completion timestamp in log.json",
+      "actions": [
+        "Read log.json from the process directory",
+        "Set metadata.completed to current ISO 8601 timestamp",
+        "Write updated log.json",
+        "Output: '✓ Completion timestamp recorded'"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Cleanup and Move to Completed Directory",
+      "description": "Delete artifact files keeping only essential files, then move process directory from active to completed",
+      "actions": [
+        "Determine current process directory path (should be in .user-processes/active/)",
+        "List all files in the process directory",
+        "Define allowlist of files to KEEP: [\"process.json\", \"memory.json\", \"log.json\"]",
+        "Delete all files NOT in the allowlist (*.md files, other *.json artifacts)",
+        "Verify only the three essential files remain in the directory",
+        "Output: '✓ Artifact files cleaned up - keeping only process.json, memory.json, log.json'",
+        "Check if .user-processes/completed/ directory exists; create it if not",
+        "Move entire process directory from .user-processes/active/{process-id}/ to .user-processes/completed/{process-id}/",
+        "Verify move was successful by checking new location exists",
+        "Output: '✓ Process moved to .user-processes/completed/{process-id}/'"
       ]
     }
   ],
   "flow": {
-    "description": "Read log → Check each principle → Document findings → Report"
+    "description": "Read log → Check each principle → Document findings → Report → If compliant: Update status → Record timestamp → Move to completed"
   },
   "memoryFileUsage": {
     "readFrom": "All previous steps in memory.json, full log.json",
     "writeTo": "Final step section in memory.json",
-    "fields": ["complianceValidated: true/false", "violations: []", "timestamp"]
+    "fields": ["complianceValidated: true/false", "violations: []", "timestamp", "processCompleted: true", "completedTimestamp", "movedToDirectory"]
   },
-  "isBookendStep": true,
-  "position": "last",
   "complianceChecklist": [
     {"principle": 1, "name": "LOG FIRST", "check": "All user interactions logged before responses"},
     {"principle": 2, "name": "READ JSON", "check": "Step JSON files read for guidance"},
     {"principle": 3, "name": "STOP AT CHECKPOINTS", "check": "Approval checkpoints waited for user"},
     {"principle": 4, "name": "NO TODOS", "check": "todo_write not used during process"},
-    {"principle": 5, "name": "VERIFY ACTIONS", "check": "Mandatory actions had output confirmations"}
+    {"principle": 5, "name": "VERIFY ACTIONS", "check": "Mandatory actions had output confirmations"},
+    {"principle": 6, "name": "USE SUBAGENTS", "check": "Steps executed via step-executor subagent, not directly"}
   ],
   "dependencies": {
     "requiredComponents": [],
     "requiredFiles": ["log.json", "memory.json"],
-    "requiredTools": ["read_file"]
+    "requiredTools": ["read_file", "search_replace", "shell"]
   },
   "references": {
     "relatedSteps": ["init-process-principles"],

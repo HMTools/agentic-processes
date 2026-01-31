@@ -7,14 +7,6 @@
     "purposeAndUsage": "Template defining the structure for process memory files that track state and share information between steps. Used when creating memory files for process instances.",
     "lastUpdated": "2026-01-19"
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["purpose", "quickReference"]
-    },
-    "agentLayer": {
-      "sections": ["templateStructure", "usageGuidelines", "whatToInclude", "crossReferences", "bestPractices", "examples", "tips"]
-    }
-  },
   "memorySections": [
     {
       "name": "Metadata",

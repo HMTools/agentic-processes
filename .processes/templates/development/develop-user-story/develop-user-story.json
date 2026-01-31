@@ -28,14 +28,6 @@
       }
     }
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
-    },
-    "agentLayer": {
-      "sections": ["currentState", "parametersFull", "context", "acceptanceCriteria", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
-    }
-  },
   "phases": [
     {
       "name": "Planning",

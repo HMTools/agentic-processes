@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "totalFiles": 60,
+    "stepsToValidate": 37,
+    "templatesToValidate": 9,
+    "utilityTemplates": 2,
+    "typeDefinitions": 12
+  },
+  "categories": {
+    "stepsToValidate": {
+      "description": "Step JSON files to validate against StepDefinition type",
+      "count": 37,
+      "files": [
+        ".processes/steps/api/implement-controller-layer/implement-controller-layer.json",
+        ".processes/steps/common/apply-changes/apply-changes.json",
+        ".processes/steps/common/end-process-validation/end-process-validation.json",
+        ".processes/steps/common/init-process-principles/init-process-principles.json",
+        ".processes/steps/common/notify-parent-complete/notify-parent-complete.json",
+        ".processes/steps/common/spawn-sub-process/spawn-sub-process.json",
+        ".processes/steps/data/implement-repository-layer/implement-repository-layer.json",
+        ".processes/steps/documentation/update-documentation/update-documentation.json",
+        ".processes/steps/external-services/implement-api-client/implement-api-client.json",
+        ".processes/steps/guideline/create-guideline-file/create-guideline-file.json",
+        ".processes/steps/guideline/link-guideline-to-steps/link-guideline-to-steps.json",
+        ".processes/steps/investigation/final-summary/final-summary.json",
+        ".processes/steps/investigation/identify-files/identify-files.json",
+        ".processes/steps/investigation/propose-fixes/propose-fixes.json",
+        ".processes/steps/investigation/review-verify-document/review-verify-document.json",
+        ".processes/steps/learning/continuous-improvement/continuous-improvement.json",
+        ".processes/steps/planning/analyze-affected-system/analyze-affected-system.json",
+        ".processes/steps/planning/create-detailed-step-plans/create-detailed-step-plans.json",
+        ".processes/steps/planning/create-high-level-plan/create-high-level-plan.json",
+        ".processes/steps/planning/create-low-level-design/create-low-level-design.json",
+        ".processes/steps/planning/design-implementation-plan/design-implementation-plan.json",
+        ".processes/steps/planning/gather-relevant-information/gather-relevant-information.json",
+        ".processes/steps/planning/get-user-story-parameters/get-user-story-parameters.json",
+        ".processes/steps/planning/understand-context/understand-context.json",
+        ".processes/steps/service/implement-service-layer/implement-service-layer.json",
+        ".processes/steps/template/create-step-file/create-step-file.json",
+        ".processes/steps/template/create-template-file/create-template-file.json",
+        ".processes/steps/template/plan-and-design-step/plan-and-design-step.json",
+        ".processes/steps/template/plan-and-design-template/plan-and-design-template.json",
+        ".processes/steps/template/validate-process-steps-exist/validate-process-steps-exist.json",
+        ".processes/steps/template/validate-step-structure/validate-step-structure.json",
+        ".processes/steps/testing/capture-test-failure/capture-test-failure.json",
+        ".processes/steps/testing/diagnose-integration-test-failure/diagnose-integration-test-failure.json",
+        ".processes/steps/testing/implement-integration-test-fix/implement-integration-test-fix.json",
+        ".processes/steps/testing/verify-test-passes/verify-test-passes.json",
+        ".processes/steps/testing/write-integration-tests-api/write-integration-tests-api.json",
+        ".processes/steps/testing/write-unit-tests-service/write-unit-tests-service.json"
+      ]
+    },
+    "templatesToValidate": {
+      "description": "Template JSON files to validate against TemplateDefinition type",
+      "count": 9,
+      "files": [
+        ".processes/templates/development/develop-user-story/develop-user-story.json",
+        ".processes/templates/development/low-level-design-user-story/low-level-design-user-story.json",
+        ".processes/templates/infrastructure/create-guideline/create-guideline.json",
+        ".processes/templates/infrastructure/create-process-step-template/create-process-step-template.json",
+        ".processes/templates/infrastructure/create-process-template/create-process-template.json",
+        ".processes/templates/infrastructure/onboard/onboard.json",
+        ".processes/templates/infrastructure/set-concept/set-concept.json",
+        ".processes/templates/review/review-and-verify/review-and-verify.json",
+        ".processes/templates/testing/integration-test-fix/integration-test-fix.json"
+      ]
+    },
+    "utilityTemplates": {
+      "description": "Utility templates that need new type definitions (MemoryTemplate, LogTemplate)",
+      "count": 2,
+      "files": [
+        ".processes/templates/memory-template.json",
+        ".processes/templates/log-template.json"
+      ]
+    },
+    "typeDefinitions": {
+      "description": "Existing TypeScript type definitions to review for completeness",
+      "count": 12,
+      "files": [
+        ".processes/types/step-definition.ts",
+        ".processes/types/template-definition.ts",
+        ".processes/types/process-instance.ts",
+        ".processes/types/process-step.ts",
+        ".processes/types/process-metadata.ts",
+        ".processes/types/process-current-state.ts",
+        ".processes/types/process-status.ts",
+        ".processes/types/process-files.ts",
+        ".processes/types/step-status.ts",
+        ".processes/types/sub-process-state.ts",
+        ".processes/types/child-process-ref.ts",
+        ".processes/types/qa-session.ts"
+      ]
+    }
+  },
+  "missingTypes": {
+    "description": "Types that need to be created",
+    "types": [
+      {
+        "name": "MemoryTemplate",
+        "purpose": "Schema for memory-template.json utility template",
+        "sourceFile": ".processes/templates/memory-template.json"
+      },
+      {
+        "name": "LogTemplate", 
+        "purpose": "Schema for log-template.json utility template",
+        "sourceFile": ".processes/templates/log-template.json"
+      },
+      {
+        "name": "MemoryFile",
+        "purpose": "Schema for memory.json files in process instances",
+        "exampleFile": ".user-processes/completed/process-completion-migration-20260129/memory.json"
+      },
+      {
+        "name": "LogFile",
+        "purpose": "Schema for log.json files in process instances",
+        "exampleFile": ".user-processes/completed/process-completion-migration-20260129/log.json"
+      }
+    ]
+  },
+  "exclusions": {
+    "description": "Files excluded from processing",
+    "patterns": [
+      ".processes/steps/_components/** - Component files have different structure",
+      ".processes/steps/README.md - Documentation only",
+      ".processes/steps/step-template.md - Template for creating new steps",
+      ".processes/templates/README.md - Documentation only"
+    ]
+  }
+}

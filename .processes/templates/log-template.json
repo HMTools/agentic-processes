@@ -7,14 +7,6 @@
     "purposeAndUsage": "Template defining the structure for detailed process log files that capture comprehensive information about process execution. Used when creating log files for process instances.",
     "lastUpdated": "2026-01-19"
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["purpose", "quickReference"]
-    },
-    "agentLayer": {
-      "sections": ["templateStructure", "whatToLog", "whatNotToLog", "loggingFrequency", "mandatoryWorkflow", "memoryRelationship", "exampleEntry", "tips", "improvementUsage"]
-    }
-  },
   "logSections": [
     {
       "name": "Metadata",

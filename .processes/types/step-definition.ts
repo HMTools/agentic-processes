@@ -108,5 +108,66 @@ export interface StepDefinition {
     /** Templates that use this step */
     usedInTemplates: string[];
   };
+
+  // ============================================
+  // Optional step-specific fields
+  // ============================================
+
+  /** Operating principles (for init-process-principles step) */
+  principles?: Array<{
+    number: number;
+    name: string;
+    rule: string;
+    verification: string | null;
+  }>;
+
+  /** Compliance checklist (for end-process-validation step) */
+  complianceChecklist?: Array<{
+    principle: number;
+    name: string;
+    check: string;
+  }>;
+
+  /** Step-specific parameters (for configurable steps like identify-files, spawn-sub-process) */
+  parameters?: {
+    required?: string[];
+    optional?: string[];
+    defaults?: Record<string, unknown>;
+    definitions?: Record<string, {
+      type: string;
+      description: string;
+      enum?: string[];
+      default?: string | boolean;
+      example?: unknown;
+    }>;
+  };
+
+  /** Search modes configuration (for identify-files step) */
+  searchModes?: Array<{
+    mode: string;
+    default: boolean;
+    description: string;
+  }>;
+
+  /** Capture types configuration (for capture-test-failure step) */
+  captureTypes?: Array<{
+    type: string;
+    capture: string;
+  }>;
+
+  /** Change proposal format specification (for design-implementation-plan step) */
+  changeProposalFormat?: {
+    modification: {
+      prefix: string;
+      fields: string[];
+    };
+    newFile: {
+      prefix: string;
+      fields: string[];
+    };
+  };
+
+  /** Whether this step requires approval when used standalone */
+  approvalRequired?: boolean;
 }
 

@@ -48,14 +48,6 @@
       }
     }
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference"]
-    },
-    "agentLayer": {
-      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
-    }
-  },
   "steps": [
     {
       "number": 0,
@@ -67,7 +59,8 @@
       "number": 1,
       "name": "Understand concept",
       "stepRef": "@framework-step:planning/understand-context",
-      "output": "Context documentation"
+      "output": "Context documentation",
+      "approvalRequired": true
     },
     {
       "number": 2,

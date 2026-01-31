@@ -4,7 +4,7 @@
 
 Load and confirm understanding of the agent operating principles before beginning any process work. This is a mandatory first step for all processes.
 
-## The 5 Core Principles
+## The 6 Core Principles
 
 ### 1. LOG FIRST, ACT SECOND
 Log every user interaction to `log.json` BEFORE responding or making changes.
@@ -23,6 +23,10 @@ Process steps ARE your task list. Do NOT use `todo_write` during processes.
 ### 5. VERIFY MANDATORY ACTIONS
 For MANDATORY/CRITICAL instructions: do action, then output confirmation.
 - **Verification**: Output "✓ [Action] completed"
+
+### 6. USE SUBAGENTS FOR STEPS
+Delegate step execution to `step-executor` subagent. Do NOT execute steps directly in the main conversation.
+- **Verification**: Each step must be executed via Task tool with `subagent_type='step-executor'`
 
 ## Quick Reference
 

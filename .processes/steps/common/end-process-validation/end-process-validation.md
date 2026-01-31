@@ -12,7 +12,7 @@ This step ensures that:
 - No external todos were created
 - Mandatory actions had output confirmations
 
-**Output**: Compliance report documenting adherence or violations.
+**Output**: Compliance report documenting adherence or violations, plus process completion (status update, directory migration).
 
 ## Quick Reference
 
@@ -20,7 +20,7 @@ This step ensures that:
 |--------|-------|
 | Position | Final step |
 | Mandatory | Yes - cannot be skipped |
-| Output | Compliance report or "✓ All operating principles followed" |
+| Output | Compliance report, status update, directory migration |
 
 ## Compliance Checklist
 
@@ -32,16 +32,31 @@ This step ensures that:
 | 4 | NO TODOS | todo_write not used during process |
 | 5 | VERIFY ACTIONS | Mandatory actions had confirmations |
 
+## Process Completion Actions
+
+After compliance validation passes, the following completion actions are performed:
+
+| Action | Description |
+|--------|-------------|
+| Status Update | `process.json` status set to "completed" |
+| Timestamp | `log.json` metadata.completed set to current time |
+| Artifact Cleanup | Delete all files except `process.json`, `memory.json`, `log.json` |
+| Directory Migration | Process moved from `.user-processes/active/` to `.user-processes/completed/` |
+
+**Note**: If violations are found, the process does NOT proceed to completion steps. Violations must be resolved first.
+
 ## Flow
 
 ```mermaid
 flowchart TD
-    A[Read Log] --> B[Check Principle 1]
-    B --> C[Check Principle 3]
-    C --> D[Check Principle 4]
-    D --> E{Violations?}
-    E -->|Yes| F[Report to User]
-    E -->|No| G[✓ Compliant]
-    F --> H[Document in Log]
-    G --> H
+    A[Read Log] --> B[Check Principles]
+    B --> C{Violations?}
+    C -->|Yes| D[Report to User]
+    C -->|No| E[✓ Compliant]
+    D --> F[STOP - Fix Violations]
+    E --> G[Update Status to Completed]
+    G --> H[Record Completion Timestamp]
+    H --> I[Cleanup Artifact Files]
+    I --> J[Move to Completed Directory]
+    J --> K[End]
 ```

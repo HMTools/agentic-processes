@@ -46,7 +46,9 @@
       "No traceback: Don't reference the previous state in the improved version",
       "Clean implementation: Make it look like it was always there",
       "IMPLEMENT, don't just document: Every approved improvement must result in actual file modifications (templates, steps, docs) - documentation alone is NOT an improvement",
-      "Show the diff: After implementing, show what files were modified and what changed"
+      "Show the diff: After implementing, show what files were modified and what changed",
+      "DEEP DIVE REQUIRED: Never propose a shallow fix - always trace actual execution and identify ALL affected files across the framework",
+      "VERIFY BEFORE PROPOSING: Confirm the target files were actually used in this process before proposing changes to them"
     ]
   },
   "substeps": [
@@ -72,13 +74,19 @@
     },
     {
       "number": 2,
-      "name": "Analyze for Improvements",
-      "description": "Identify improvement opportunities from the log",
+      "name": "Analyze for Improvements (with Deep Dive)",
+      "description": "Identify improvement opportunities from the log with thorough root cause analysis - do NOT propose shallow fixes",
       "actions": [
         "Group similar user corrections",
         "Identify steps with multiple iterations",
         "Find documentation gaps",
-        "Detect repeated manual interventions"
+        "Detect repeated manual interventions",
+        "TRACE ACTUAL EXECUTION: Review log.json to identify exactly which files were used during this process (which prompts, which steps, which templates)",
+        "IDENTIFY ALL AFFECTED FILES: For each improvement, find ALL files in the framework that could be affected - not just one obvious file",
+        "CHECK FRAMEWORK-WIDE IMPACT: Consider if the issue exists in multiple places (e.g., both process-new.md AND process-continue.md)",
+        "VERIFY FILE USAGE: Before proposing a fix to any file, confirm that file was actually relevant to this process execution",
+        "ROOT CAUSE ANALYSIS: Ask 'why did this happen?' at least 3 times to find the true root cause, not just the symptom",
+        "DOCUMENT REASONING: For each improvement, document: (1) What files were actually used, (2) What files need changes, (3) Why each file needs changes"
       ]
     },
     {
@@ -139,7 +147,7 @@
     }
   ],
   "flow": {
-    "description": "Read log → Analyze for improvements → Prioritize → For each: propose → implement → approve → Next → Summarize all"
+    "description": "Read log → Analyze for improvements (with deep dive: trace execution, find ALL affected files) → Prioritize → For each: propose → implement → approve → Next → Summarize all"
   },
   "memoryFileUsage": {
     "readFrom": "Process log (log.json)",

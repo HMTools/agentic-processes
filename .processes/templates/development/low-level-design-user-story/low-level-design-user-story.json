@@ -18,14 +18,6 @@
       }
     }
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference", "processFlow", "stepsSummary"]
-    },
-    "agentLayer": {
-      "sections": ["currentState", "parametersFull", "context", "processFlowDetailed", "steps", "memoryFile", "errorsNotes", "auditLog"]
-    }
-  },
   "steps": [
     {
       "number": 0,

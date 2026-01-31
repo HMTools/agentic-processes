@@ -13,14 +13,6 @@
     "definitions": {},
     "notes": "This template has no parameters - it automatically scans the framework to identify all missing guidelines."
   },
-  "structure": {
-    "userLayer": {
-      "sections": ["description", "purposeAndUsage", "quickReference", "howItWorks"]
-    },
-    "agentLayer": {
-      "sections": ["scanningLogic", "batchCreation", "steps", "memoryFile"]
-    }
-  },
   "steps": [
     {
       "number": 0,

@@ -1,0 +1,438 @@
+{
+  "metadata": {
+    "process": "process-cleanup-file-refs-20260130",
+    "template": "set-concept",
+    "created": "2026-01-30T06:55:00Z",
+    "lastUpdated": "2026-01-31T13:00:00Z",
+    "currentStep": 8
+  },
+  "subProcessState": {
+    "parentProcess": null,
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {
+    "0": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "timestamp": "2026-01-30T06:56:00Z",
+      "informationProduced": {
+        "principlesLoaded": true,
+        "principles": [
+          "LOG FIRST, ACT SECOND",
+          "READ JSON FOR GUIDANCE",
+          "STOP AT CHECKPOINTS",
+          "NO EXTERNAL TODOS",
+          "VERIFY MANDATORY ACTIONS",
+          "USE SUBAGENTS FOR STEPS"
+        ]
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [],
+      "notes": "Operating principles internalized and confirmed",
+      "updated": "2026-01-30T06:56:00Z"
+    },
+    "1": {
+      "name": "Understand Concept",
+      "status": "completed",
+      "timestamp": "2026-01-30T07:00:00Z",
+      "informationProduced": {
+        "parameters": {
+          "conceptName": "Cleanup File References on Process Completion",
+          "conceptDescription": "Clear file tracking sections from memory.json when process moves to completed directory",
+          "targetFiles": ".processes/steps/common/end-process-validation/, .processes/templates/memory-template.json, .processes/types/memory-file.ts"
+        },
+        "informationSources": [
+          ".processes/steps/common/end-process-validation/end-process-validation.json",
+          ".processes/templates/memory-template.json",
+          ".processes/types/memory-file.ts",
+          ".user-processes/completed/process-completion-migration-20260129/memory.json",
+          ".user-processes/completed/process-strongly-typed-json-schema-20260129/memory.json"
+        ],
+        "fileTrackingSections": {
+          "processLevel": {
+            "crossReferences.filesModified": "string[] - Files modified during process",
+            "crossReferences.filesCreated": "string[] - Files created during process",
+            "crossReferences.schemaFiles": "string[] (optional) - Domain-specific file lists",
+            "crossReferences.targetFiles": "string[] (optional) - Domain-specific file lists",
+            "searchHelpers.byCategory": "Record<string, string[]> - Files organized by category",
+            "searchHelpers.byFileType": "Record<string, string[]> - Files organized by type"
+          },
+          "stepLevel": {
+            "steps[N].filesModifiedCreated": "string[] - Files modified/created during each step"
+          }
+        },
+        "currentEndProcessValidationFlow": [
+          "Substeps 1-5: Compliance checking (principles verification)",
+          "Substep 6: Update Process Status to 'completed'",
+          "Substep 7: Record Completion Timestamp",
+          "Substep 8: Move to Completed Directory",
+          "NOTE: No cleanup substep exists - file tracking retained as-is"
+        ],
+        "preserveOnCompletion": [
+          "metadata - process info, template, dates, currentStep",
+          "subProcessState - relationships for traceability",
+          "steps[N].name - step identification",
+          "steps[N].status - completion status",
+          "steps[N].timestamp/updated - timing info",
+          "steps[N].informationProduced - actual work outputs",
+          "steps[N].decisionsMade - important decisions",
+          "steps[N].notes - contextual notes",
+          "crossReferences.keyDecisions - important decisions"
+        ],
+        "deleteOnCompletion": [
+          "process.md - user-readable documentation",
+          "findings-report.md - step artifacts",
+          "implementation-plan.md - step artifacts",
+          "changes-applied.md - step artifacts",
+          "verification-report.md - step artifacts",
+          "identified-files.json - step artifacts",
+          "issues-list.json - step artifacts",
+          "step1-context.md - step artifacts",
+          "Any other files created during process execution"
+        ],
+        "keepOnCompletion": [
+          "process.json - primary state file with all metadata, parameters, and step statuses",
+          "memory.json - step information, decisions, and cross-references",
+          "log.json - execution history, user interactions, compliance report"
+        ],
+        "requirements": [
+          "Modify substep 8 in end-process-validation.json to delete artifact files before moving",
+          "Keep only process.json, memory.json, log.json",
+          "Delete all other files (*.md, other *.json artifacts)",
+          "Update documentation in end-process-validation.md"
+        ],
+        "successCriteria": [
+          "end-process-validation substep 8 includes file cleanup before move",
+          "Completed process directories contain only process.json, memory.json, log.json",
+          "All essential history preserved in those three files"
+        ],
+        "constraints": [
+          "Framework-level change affecting .processes/steps/common/",
+          "Cleanup is part of substep 8, not a separate substep",
+          "Must happen before move to completed directory"
+        ],
+        "detailedContextPath": "./step1-context.md"
+      },
+      "decisionsMade": [
+        "Delete all artifact files on completion, not just clear memory sections",
+        "Keep only process.json, memory.json, log.json - these contain all essential history",
+        "Integrate cleanup into substep 8 (Move to Completed Directory), not a separate substep",
+        "User correction: broader scope than initially understood"
+      ],
+      "filesModifiedCreated": ["memory.json", "log.json", "step1-context.md"],
+      "notes": "Context gathered and documented. Awaiting user approval before proceeding.",
+      "updated": "2026-01-30T07:00:00Z"
+    },
+    "2": {
+      "name": "Identify Target Files",
+      "status": "completed",
+      "timestamp": "2026-01-31T08:00:00Z",
+      "informationProduced": {
+        "identifiedFilesPath": "./identified-files.json",
+        "fileCount": 2,
+        "searchApproach": "simple - direct identification based on Step 1 findings",
+        "files": [
+          {
+            "path": ".processes/steps/common/end-process-validation/end-process-validation.json",
+            "action": "modify",
+            "reason": "Add file cleanup actions to substep 8"
+          },
+          {
+            "path": ".processes/steps/common/end-process-validation/end-process-validation.md",
+            "action": "modify",
+            "reason": "Update documentation for new cleanup behavior"
+          }
+        ],
+        "exclusionsApplied": "None - targeted search based on Step 1 analysis"
+      },
+      "decisionsMade": [
+        "Only 2 files need modification - JSON for implementation, MD for documentation",
+        "No new files need to be created - modification to existing substep 8",
+        "Simple search mode used - files already identified in Step 1 context"
+      ],
+      "filesModifiedCreated": ["identified-files.json", "memory.json", "log.json"],
+      "notes": "File identification complete. Both JSON and MD files in end-process-validation step need modification.",
+      "updated": "2026-01-31T08:00:00Z"
+    },
+    "3": {
+      "name": "Analyze Existing State",
+      "status": "completed",
+      "timestamp": "2026-01-31T09:00:00Z",
+      "informationProduced": {
+        "findingsReportPath": "./findings-report.md",
+        "filesReviewed": 2,
+        "currentSubstep8": {
+          "name": "Move to Completed Directory",
+          "description": "Move process directory from active to completed",
+          "actionsCount": 5,
+          "hasCleanup": false,
+          "currentBehavior": "Moves entire directory with all files intact"
+        },
+        "changesRequired": {
+          "json": {
+            "renameSubstep": "Cleanup and Move to Completed Directory",
+            "addActions": [
+              "List all files in the process directory",
+              "Identify files to KEEP: process.json, memory.json, log.json",
+              "Delete all other files in the directory",
+              "Verify only the three essential files remain",
+              "Output cleanup confirmation"
+            ],
+            "updateDescription": true
+          },
+          "md": {
+            "addToTable": "Artifact Cleanup action",
+            "updateFlowDiagram": "Add cleanup step before move"
+          }
+        },
+        "filesToKeep": ["process.json", "memory.json", "log.json"],
+        "filesToDelete": [
+          "process.md",
+          "findings-report.md",
+          "implementation-plan.md",
+          "changes-applied.md",
+          "verification-report.md",
+          "identified-files.json",
+          "issues-list.json",
+          "step*-context.md",
+          "Any other artifacts"
+        ],
+        "constraints": [
+          "Cleanup must happen BEFORE directory move",
+          "Use allowlist for files to keep (safer than blocklist)",
+          "Cross-platform compatible file deletion",
+          "Log cleanup actions for audit trail"
+        ],
+        "verificationStatus": "complete"
+      },
+      "decisionsMade": [
+        "Rename substep 8 to reflect combined cleanup+move responsibility",
+        "Add 4 new actions at beginning for cleanup before existing move actions",
+        "Use explicit allowlist (keep 3 files) rather than blocklist approach",
+        "Add cleanup confirmation output after verification"
+      ],
+      "filesModifiedCreated": ["findings-report.md", "memory.json", "log.json"],
+      "notes": "Analysis complete. Substep 8 needs modification to add cleanup before move. Clear specification of what to keep vs delete.",
+      "updated": "2026-01-31T09:00:00Z"
+    },
+    "4": {
+      "name": "Design Implementation Plan",
+      "status": "completed",
+      "timestamp": "2026-01-31T10:00:00Z",
+      "informationProduced": {
+        "implementationPlanPath": "./implementation-plan.md",
+        "requestedState": "On process completion: delete all artifact files, keep only process.json, memory.json, log.json, then move to completed directory",
+        "totalChangeProposals": 2,
+        "filesToModify": [
+          ".processes/steps/common/end-process-validation/end-process-validation.json",
+          ".processes/steps/common/end-process-validation/end-process-validation.md"
+        ],
+        "filesToCreate": [],
+        "changeProposals": {
+          "MOD-001": {
+            "file": "end-process-validation.json",
+            "type": "modification",
+            "section": "substeps[7] (substep number 8)",
+            "changes": [
+              "Rename substep to 'Cleanup and Move to Completed Directory'",
+              "Update description to include cleanup responsibility",
+              "Add 5 new cleanup actions at beginning of actions array",
+              "Keep 5 existing move actions after cleanup"
+            ]
+          },
+          "MOD-002": {
+            "file": "end-process-validation.md",
+            "type": "modification",
+            "sections": ["Process Completion Actions table", "Flow diagram"],
+            "changes": [
+              "Add 'Artifact Cleanup' row to table",
+              "Add cleanup node to flow diagram between timestamp and move"
+            ]
+          }
+        },
+        "approvalStatus": "approved",
+        "approvedChangeIds": ["MOD-001", "MOD-002"]
+      },
+      "decisionsMade": [
+        "Two change proposals (MOD-001, MOD-002) sufficient - no new files needed",
+        "JSON change (MOD-001) should be applied before MD change (MOD-002)",
+        "Use allowlist approach with explicit 3-file list in JSON actions",
+        "10 total actions in substep 8: 5 cleanup + 5 move"
+      ],
+      "filesModifiedCreated": ["implementation-plan.md", "memory.json", "log.json"],
+      "notes": "Implementation plan ready for user approval. Two modification proposals designed with exact before/after specifications.",
+      "updated": "2026-01-31T10:00:00Z"
+    },
+    "5": {
+      "name": "Apply Changes",
+      "status": "completed",
+      "timestamp": "2026-01-31T11:00:00Z",
+      "informationProduced": {
+        "changeApplicationReportPath": "./changes-applied.md",
+        "totalChangesApplied": 2,
+        "filesModified": [
+          ".processes/steps/common/end-process-validation/end-process-validation.json",
+          ".processes/steps/common/end-process-validation/end-process-validation.md"
+        ],
+        "changeResults": {
+          "MOD-001": {
+            "status": "applied",
+            "file": "end-process-validation.json",
+            "changes": "Substep 8 renamed and expanded with cleanup actions"
+          },
+          "MOD-002": {
+            "status": "applied",
+            "file": "end-process-validation.md",
+            "changes": "Table row added, flow diagram updated"
+          }
+        },
+        "verificationStatus": "verified"
+      },
+      "decisionsMade": [
+        "Applied MOD-001 before MOD-002 as planned",
+        "Verified each change by reading files after modification"
+      ],
+      "filesModifiedCreated": [
+        ".processes/steps/common/end-process-validation/end-process-validation.json",
+        ".processes/steps/common/end-process-validation/end-process-validation.md",
+        "changes-applied.md",
+        "memory.json",
+        "log.json"
+      ],
+      "notes": "Both approved changes applied successfully. Changes verified by reading modified files.",
+      "updated": "2026-01-31T11:00:00Z"
+    },
+    "6": {
+      "name": "Verify Implementation",
+      "status": "completed",
+      "timestamp": "2026-01-31T12:00:00Z",
+      "informationProduced": {
+        "verificationReportPath": "./verification-report.md",
+        "overallStatus": "PASSED",
+        "filesVerified": 2,
+        "criteriaChecked": [
+          {
+            "criterion": "Substep 8 includes file cleanup before move",
+            "status": "PASSED",
+            "details": "All 4 cleanup actions present: list files, define allowlist, delete non-allowlist, verify 3 files"
+          },
+          {
+            "criterion": "Allowlist correctly specifies three files",
+            "status": "PASSED",
+            "details": "Allowlist is [\"process.json\", \"memory.json\", \"log.json\"]"
+          },
+          {
+            "criterion": "Documentation reflects cleanup behavior",
+            "status": "PASSED",
+            "details": "Table row 'Artifact Cleanup' added, flow diagram shows cleanup between timestamp and move"
+          },
+          {
+            "criterion": "JSON is valid",
+            "status": "PASSED",
+            "details": "File successfully parsed"
+          },
+          {
+            "criterion": "MD documentation matches JSON implementation",
+            "status": "PASSED",
+            "details": "Documentation correctly maps substeps 6-8 to completion actions"
+          }
+        ],
+        "implementationComplete": true
+      },
+      "decisionsMade": [
+        "All verification criteria passed - implementation is correct",
+        "No issues found requiring remediation"
+      ],
+      "filesModifiedCreated": ["verification-report.md", "memory.json", "log.json"],
+      "notes": "Implementation verified successfully. Substep 8 now correctly cleans up artifact files before moving to completed directory.",
+      "updated": "2026-01-31T12:00:00Z"
+    },
+    "8": {
+      "name": "End Process Validation",
+      "status": "completed",
+      "timestamp": "2026-01-31T13:00:00Z",
+      "informationProduced": {
+        "complianceValidated": true,
+        "violations": [],
+        "principlesChecked": 6,
+        "allPrinciplesFollowed": true,
+        "processCompleted": true,
+        "completedTimestamp": "2026-01-31T13:00:00Z",
+        "artifactsDeleted": [
+          "changes-applied.md",
+          "findings-report.md",
+          "identified-files.json",
+          "implementation-plan.md",
+          "process.md",
+          "step1-context.md",
+          "verification-report.md"
+        ],
+        "filesRetained": ["process.json", "memory.json", "log.json"],
+        "movedToDirectory": ".user-processes/completed/process-cleanup-file-refs-20260130/"
+      },
+      "decisionsMade": [
+        "All 6 operating principles validated as compliant",
+        "Process approved for completion and archival"
+      ],
+      "filesModifiedCreated": ["process.json", "memory.json", "log.json"],
+      "notes": "Process completed successfully. All artifact files cleaned up, directory moved to completed.",
+      "updated": "2026-01-31T13:00:00Z"
+    },
+    "7": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "timestamp": "2026-01-30T07:20:00Z",
+      "informationProduced": {
+        "improvementsIdentified": 2,
+        "improvementsImplemented": 2,
+        "improvementsDeferred": 0,
+        "improvements": [
+          {
+            "id": "IMP-001",
+            "severity": "CRITICAL",
+            "description": "User corrections at approval checkpoints should be delegated to step-executor subagent",
+            "rootCause": "process-new.md and process-continue.md lacked guidance for handling corrections at approval checkpoints",
+            "filesModified": [
+              ".processes/prompts/process-new.md",
+              ".processes/prompts/process-continue.md"
+            ],
+            "status": "implemented"
+          },
+          {
+            "id": "IMP-002",
+            "severity": "CRITICAL",
+            "description": "Continuous improvement step does not do deep dive analysis",
+            "rootCause": "continuous-improvement.json lacked mandatory deep dive substep requiring tracing actual execution and finding ALL affected files",
+            "filesModified": [
+              ".processes/steps/learning/continuous-improvement/continuous-improvement.json"
+            ],
+            "status": "implemented"
+          }
+        ]
+      },
+      "decisionsMade": [
+        "Both CRITICAL improvements implemented immediately",
+        "IMP-001: Added correction handling guidance to BOTH process-new.md and process-continue.md",
+        "IMP-002: Added mandatory 'Deep Dive Analysis' substep 2.5 to continuous-improvement.json"
+      ],
+      "filesModifiedCreated": [
+        ".processes/prompts/process-new.md",
+        ".processes/prompts/process-continue.md",
+        ".processes/steps/learning/continuous-improvement/continuous-improvement.json",
+        "memory.json",
+        "log.json"
+      ],
+      "notes": "Both CRITICAL improvements implemented. Deep dive analysis now mandatory for future continuous improvement steps.",
+      "updated": "2026-01-30T07:20:00Z"
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [],
+    "filesModified": [],
+    "filesCreated": []
+  },
+  "searchHelpers": {
+    "byCategory": {}
+  }
+}

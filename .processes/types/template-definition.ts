@@ -41,30 +41,36 @@ export interface TemplateDefinition {
       /** Parameter type (string, number, etc.) */
       type: string;
       /** Example value */
-      example: string;
+      example: string | object;
     }>;
+    /** Additional notes about parameters */
+    notes?: string;
+    /** Default values for parameters */
+    defaults?: Record<string, unknown>;
   };
 
-  /** Process phases for organization */
-  phases: Array<{
+  /** Process phases for organization (optional) */
+  phases?: Array<{
     /** Phase name (e.g., "Planning", "Implementation") */
     name: string;
     /** Description of what this phase accomplishes */
-    description: string;
+    description?: string;
     /** Step numbers in this phase, or "dynamic" for generated steps */
     steps: number[] | string;
+    /** Additional notes about this phase */
+    note?: string;
   }>;
 
   /** Complete step definitions with full agent guidance */
   steps: Array<{
-    /** Step number (1-based) */
+    /** Step number (0-based, where 0 is typically init-process-principles) */
     number: number;
     /** Step name */
     name: string;
     /** Reference to step definition (e.g., "@framework-step:planning/understand-context") */
     stepRef: string | null;
     /** Full description of what this step does in this template's context */
-    description: string;
+    description?: string;
     /** Context variables passed to the step */
     context?: Record<string, string>;
     /** Expected output from this step */
@@ -77,6 +83,24 @@ export interface TemplateDefinition {
     qnaCheckpoint?: string;
     /** Additional notes */
     notes?: string;
+    /** Conditional execution description */
+    conditional?: string;
+    /** Sub-process triggering configuration */
+    subProcessTrigger?: {
+      condition: string;
+      template: string;
+      forEach?: string;
+      syncPoint: string;
+    };
+    /** Sub-process configuration */
+    subProcessConfig?: {
+      template: string;
+      sync: string;
+      iterateOver?: string;
+      parameterMapping?: Record<string, string>;
+    };
+    /** Fallback behavior */
+    fallback?: string;
   }>;
 
   /** Dynamic step generation rules (if applicable) */
@@ -106,5 +130,18 @@ export interface TemplateDefinition {
     /** Dependencies */
     dependencies: string[];
   };
+
+  /** Template-specific guidance for agent execution */
+  guidance?: Record<string, {
+    description?: string;
+    actions?: string[];
+    [key: string]: unknown;
+  }>;
+
+  /** Per-step memory file usage (alternative to memoryFileStructure) */
+  memoryFileUsage?: Record<string, {
+    informationProduced?: string[];
+    decisionsMade?: string[];
+  }>;
 }
 

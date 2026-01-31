@@ -41,6 +41,9 @@ These principles apply to ALL work in this process:
 5. **VERIFY MANDATORY ACTIONS** - For MANDATORY/CRITICAL instructions, do action then confirm
    - Output: "✓ [Action] completed"
 
+6. **USE SUBAGENTS FOR STEPS** - Delegate step execution to step-executor subagent. Do NOT execute steps directly.
+   - Each step must be executed via Task tool with subagent_type='step-executor'
+
 ---
 
 ### Instructions
@@ -169,6 +172,15 @@ When `/process-continue` is invoked:
      - Review memory/log updates made by subagent
      - Handle any issues reported
    - **Handle approval checkpoints**: If step has `approvalRequired: true`, the subagent will prepare deliverables and return; present to user and wait for approval
+   - **Handle user corrections at approval**: If user provides corrections/feedback instead of simple approval:
+     1. Log the correction to log.json immediately (LOG FIRST principle)
+     2. **Delegate correction processing** to `step-executor` subagent with:
+        - The correction details from user
+        - Current step context and artifacts to update
+        - Instruction to apply correction and re-prepare deliverables
+     3. Wait for subagent to complete correction processing
+     4. Present updated deliverables for re-approval
+     5. Repeat until user provides simple approval ("approved", "yes", etc.)
    - After step completion, update process.json currentStep and offer to continue to next step
 
 ### State Restoration
