@@ -1,0 +1,115 @@
+{
+  "type": "process-instance",
+  "id": "set-flagged-improvement-analysis-20260131",
+  "name": "Set Flagged Improvement Analysis Concept",
+  "metadata": {
+    "template": "set-concept",
+    "templateCategory": "infrastructure",
+    "created": "2026-01-31T18:17:00.000Z",
+    "lastUpdated": "2026-01-31T18:52:00.000Z",
+    "projectPath": "c:/Projects/HM/agentic-processes",
+    "processPath": ".user-processes/active/process-set-flagged-improvement-analysis-20260131"
+  },
+  "status": "completed",
+  "parameters": {
+    "conceptName": "Comprehensive Log Analysis for Continuous Improvement",
+    "conceptDescription": "The continuous improvement step should analyze and take into account the ENTIRE log.json - all steps, all user interactions, all problems encountered, all decisions made - to search for ALL places where improvements can be identified. The forImprovementStep and potentialImprovement fields are additional markers that flag specific entries for review, but they should be part of a comprehensive analysis, not the only things analyzed.",
+    "targetFiles": ".processes/steps/learning/continuous-improvement/",
+    "existingState": "Need to verify current coverage - the step may not be analyzing all sections of the log comprehensively",
+    "requestedState": "The continuous improvement step performs comprehensive analysis of ALL log sections (steps, userInteractions, problemsEncountered, decisionsMade, etc.) while also utilizing forImprovementStep/potentialImprovement markers as additional signals",
+    "verificationCriteria": "The continuous-improvement.json step file contains explicit instructions to analyze ALL log sections comprehensively, including using forImprovementStep and potentialImprovement fields as priority markers"
+  },
+  "currentState": {
+    "activeStepId": null,
+    "activeStepName": null,
+    "actionSummary": "Process completed",
+    "actionDetails": "All 8 steps completed. Comprehensive log analysis concept successfully implemented in continuous-improvement.json."
+  },
+  "steps": [
+    {
+      "id": "step-0",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "startedAt": "2026-01-31T18:17:00.000Z",
+      "completedAt": "2026-01-31T18:18:00.000Z"
+    },
+    {
+      "id": "step-1",
+      "number": 1,
+      "name": "Understand concept",
+      "status": "completed",
+      "stepRef": "@framework-step:planning/understand-context",
+      "approvalRequired": true,
+      "approved": true,
+      "startedAt": "2026-01-31T18:20:00.000Z",
+      "completedAt": "2026-01-31T18:25:00.000Z"
+    },
+    {
+      "id": "step-2",
+      "number": 2,
+      "name": "Identify target files",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "startedAt": "2026-01-31T18:30:00.000Z",
+      "completedAt": "2026-01-31T18:30:00.000Z"
+    },
+    {
+      "id": "step-3",
+      "number": 3,
+      "name": "Analyze existing state",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "startedAt": "2026-01-31T18:31:00.000Z",
+      "completedAt": "2026-01-31T18:35:00.000Z"
+    },
+    {
+      "id": "step-4",
+      "number": 4,
+      "name": "Design implementation plan",
+      "status": "completed",
+      "stepRef": "@framework-step:planning/design-implementation-plan",
+      "approvalRequired": true,
+      "approved": true,
+      "startedAt": "2026-01-31T18:40:00.000Z",
+      "completedAt": "2026-01-31T18:45:00.000Z"
+    },
+    {
+      "id": "step-5",
+      "number": 5,
+      "name": "Apply changes",
+      "status": "completed",
+      "stepRef": "@framework-step:common/apply-changes",
+      "startedAt": "2026-01-31T18:50:00.000Z",
+      "completedAt": "2026-01-31T18:52:00.000Z"
+    },
+    {
+      "id": "step-6",
+      "number": 6,
+      "name": "Verify implementation",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "startedAt": "2026-01-31T18:55:00.000Z",
+      "completedAt": "2026-01-31T18:58:00.000Z"
+    },
+    {
+      "id": "step-7",
+      "number": 7,
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "startedAt": "2026-01-31T19:00:00.000Z",
+      "completedAt": "2026-01-31T19:05:00.000Z"
+    },
+    {
+      "id": "step-8",
+      "number": 8,
+      "name": "End Process Validation",
+      "status": "completed",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "startedAt": "2026-01-31T19:10:00.000Z",
+      "completedAt": "2026-01-31T19:12:00.000Z"
+    }
+  ]
+}

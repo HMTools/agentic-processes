@@ -63,13 +63,26 @@
     },
     {
       "number": 1,
-      "name": "Read Process Log",
-      "description": "Load and parse the process execution log",
+      "name": "Read Process Log (Comprehensive Analysis)",
+      "description": "Load and comprehensively parse ALL sections of the process execution log",
       "actions": [
         "Load process log from .user-processes/active/{process-name}/log.json",
-        "Parse all user interactions and change requests",
-        "Identify patterns and recurring issues",
-        "Note high iteration counts on files or steps"
+        "COMPREHENSIVE ANALYSIS - Analyze ALL of the following log sections:",
+        "- steps[].userInteractions: Every user interaction, request, correction, and feedback",
+        "- steps[].problemsEncountered: Issues that occurred during each step",
+        "- steps[].decisionsMade: Choices the agent made that could be questioned or improved",
+        "- steps[].agentReasoning: Logic behind actions (may reveal flawed assumptions)",
+        "- steps[].actionsTaken: Full action history (may reveal inefficiencies)",
+        "- steps[].filesModified: File modification patterns and iteration counts",
+        "PRIORITY EXTRACTION - Identify and prioritize flagged entries:",
+        "- Find ALL userInteractions where forImprovementStep: true - these are explicitly flagged for review",
+        "- Extract ALL potentialImprovement values - these are user-provided improvement suggestions",
+        "- Create a priority list of flagged items to analyze first",
+        "PROCESS-WIDE OBSERVATIONS - Review aggregated insights:",
+        "- processWideObservations.patternsDetected: Cross-step patterns already identified",
+        "- processWideObservations.userFeedbackSummary: Aggregated user feedback",
+        "- processWideObservations.recommendationsForFuture: Prior recommendations to action",
+        "- processWideObservations.efficiencyMetrics: Performance data for trend analysis"
       ]
     },
     {
@@ -77,6 +90,15 @@
       "name": "Analyze for Improvements (with Deep Dive)",
       "description": "Identify improvement opportunities from the log with thorough root cause analysis - do NOT propose shallow fixes",
       "actions": [
+        "ANALYZE FLAGGED ITEMS FIRST: Start with entries from priority list (forImprovementStep: true and potentialImprovement values)",
+        "SECTION-SPECIFIC ANALYSIS:",
+        "- From problemsEncountered: Identify recurring problems, systemic issues, preventable errors",
+        "- From decisionsMade: Question choices, identify alternatives, spot questionable patterns",
+        "- From agentReasoning: Find flawed logic, incorrect assumptions, misunderstandings",
+        "- From actionsTaken: Spot inefficiencies, redundant actions, unnecessary steps",
+        "- From userInteractions: Group corrections, identify repeated manual interventions",
+        "- From filesModified: Note high iteration counts, identify files needing frequent rework",
+        "- From processWideObservations: Review pre-aggregated patterns and recommendations",
         "Group similar user corrections",
         "Identify steps with multiple iterations",
         "Find documentation gaps",
