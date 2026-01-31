@@ -1,5 +1,5 @@
 /**
- * Schema for log.json files in process instances (.user-processes/**/log.json)
+ * Schema for log.json files in process instances (.user-processes/[id]/log.json)
  * 
  * Captures detailed execution history, user interactions, and process-wide observations.
  */

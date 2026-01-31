@@ -1,5 +1,5 @@
 /**
- * Schema for step definition files (.processes/steps/**/*.json)
+ * Schema for step definition files (.processes/steps/[id]/*.json)
  * 
  * Defines the enriched JSON structure for agent guidance in the JSON-First
  * Agent Architecture. This type represents the SOURCE OF TRUTH for step
@@ -7,7 +7,7 @@
  * 
  * Note: This is different from ProcessStep which tracks runtime state
  * of a step within a running process instance.
- */
+ **/
 export interface StepDefinition {
   /** Discriminator field - always "step" */
   type: 'step';

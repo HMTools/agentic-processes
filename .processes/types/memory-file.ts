@@ -1,10 +1,12 @@
 /**
- * Schema for memory.json files in process instances (.user-processes/**/memory.json)
+ * Schema for memory.json files in process instances (.user-processes/[id]/memory.json)
  * 
  * Tracks step information, decisions, and cross-references during process execution.
  */
 
-import type { ChildProcessRef } from './child-process-ref';
+import { ChildProcessRef } from ".";
+
+
 
 /**
  * Entry for a single step in the memory file

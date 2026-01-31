@@ -1,5 +1,5 @@
 /**
- * Schema for template definition files (.processes/templates/**/*.json)
+ * Schema for template definition files (.processes/templates/[id]/*.json)
  * 
  * Defines the enriched JSON structure for agent guidance in the JSON-First
  * Agent Architecture. This type represents the SOURCE OF TRUTH for template
@@ -8,6 +8,7 @@
  * Note: This is different from ProcessInstance which tracks runtime state
  * of a running process created from a template.
  */
+
 export interface TemplateDefinition {
   /** Discriminator field - always "template" */
   type: 'template';

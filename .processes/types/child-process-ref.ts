@@ -1,4 +1,4 @@
-import type { ProcessStatus } from './process-status';
+import { ProcessStatus } from "./process-status";
 
 /**
  * Reference to a child sub-process spawned by this process.
@@ -25,4 +25,3 @@ export interface ChildProcessRef {
   /** Path to the child process folder (relative to project root) */
   processPath: string;
 }
-
