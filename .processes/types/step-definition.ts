@@ -7,7 +7,10 @@
  * 
  * Note: This is different from ProcessStep which tracks runtime state
  * of a step within a running process instance.
- **/
+ */
+
+import { StepRef } from "./shared-types";
+
 export interface StepDefinition {
   /** Discriminator field - always "step" */
   type: 'step';
@@ -71,8 +74,8 @@ export interface StepDefinition {
     description: string;
     /** Specific actions to take in this substep */
     actions: string[];
-    /** Whether this substep is conditional (only executed in certain cases) */
-    conditional?: boolean;
+    /** Condition description - when provided, substep only runs if condition is met */
+    conditional?: string;
   }>;
 
   /** Flow information for documentation */
@@ -170,4 +173,3 @@ export interface StepDefinition {
   /** Whether this step requires approval when used standalone */
   approvalRequired?: boolean;
 }
-

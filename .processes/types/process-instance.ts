@@ -1,5 +1,6 @@
 import { ChildProcessRef } from "./child-process-ref";
-import { ProcessStatus } from "./process-status";
+import { ProcessStatus, StepStatus } from "./process-status";
+import { ProcessId, StepId, StepRef, ProcessPath, ISOTimestamp } from "./shared-types";
 
 /**
  * Complete process instance as stored in process.json.
@@ -12,7 +13,7 @@ import { ProcessStatus } from "./process-status";
  * ```json
  * {
  *   "type": "process-instance",
- *   "id": "process-user-auth-20260120-143022",
+ *   "id": "550e8400-e29b-41d4-a716-446655440000",
  *   "name": "User Authentication",
  *   "metadata": {
  *     "template": "develop-user-story",
@@ -20,7 +21,7 @@ import { ProcessStatus } from "./process-status";
  *     "created": "2026-01-20T14:30:22.000Z",
  *     "lastUpdated": "2026-01-20T15:45:00.000Z",
  *     "projectPath": "C:/Projects/MyApp",
- *     "processPath": ".user-processes/active/process-user-auth-20260120-143022"
+ *     "processPath": ".user-processes/active/process-550e8400"
  *   },
  *   "status": "running",
  *   "parameters": {
@@ -28,17 +29,12 @@ import { ProcessStatus } from "./process-status";
  *     "userStoryDescription": "Implement login functionality"
  *   },
  *   "currentState": {
- *     "activeStepNumber": 3,
+ *     "activeStepId": "a1b2c3d4-...",
  *     "activeStepName": "Create detailed step plans",
- *     "currentAction": "Generating implementation plan",
- *     "details": "Analyzing high-level plan to create detailed steps"
+ *     "actionSummary": "Generating implementation plan",
+ *     "actionDetails": "Analyzing high-level plan to create detailed steps"
  *   },
- *   "steps": [...],
- *   "files": {
- *     "process": "process.md",
- *     "memory": "memory.json",
- *     "log": "log.json"
- *   }
+ *   "steps": [...]
  * }
  * ```
  */
@@ -46,8 +42,8 @@ export interface ProcessInstance {
   /** Discriminator field - always "process-instance" */
   type: 'process-instance';
   
-  /** Unique identifier for this process instance (e.g., "process-user-auth-20260120-143022") */
-  id: string;
+  /** Unique identifier for this process instance (UUID) */
+  id: ProcessId;
   
   /** Human-readable name of the process */
   name: string;
@@ -69,9 +65,6 @@ export interface ProcessInstance {
   
   /** Sub-process relationship information (optional, only present if process has parent or children) */
   subProcessState?: SubProcessState;
-  
-  /** References to the markdown files that make up this process */
-  files: ProcessFiles;
 }
 
 /**
@@ -85,40 +78,43 @@ export interface ProcessMetadata {
   templateCategory: string;
   
   /** ISO 8601 timestamp when the process was created */
-  created: string;
+  created: ISOTimestamp;
   
   /** ISO 8601 timestamp when the process was last updated */
-  lastUpdated: string;
+  lastUpdated: ISOTimestamp;
   
   /** Absolute path to the project root directory */
   projectPath: string;
   
   /** Relative path to the process folder from project root */
-  processPath: string;
+  processPath: ProcessPath;
 }
 
 /**
  * Current state of the process execution.
  */
 export interface ProcessCurrentState {
-  /** Current step number (1-based index) */
-  activeStepNumber: number;
+  /** UUID of the currently active step */
+  activeStepId: StepId;
   
   /** Name of the current step */
   activeStepName: string;
   
-  /** Description of what is currently being worked on */
-  currentAction: string;
+  /** Brief summary of current action (for UI status bars) */
+  actionSummary: string;
   
-  /** Additional details about the current action */
-  details?: string;
+  /** Extended details about the current action (for tooltips/logs) */
+  actionDetails?: string;
 }
 
 /**
  * Represents an individual step within a process.
  */
 export interface ProcessStep {
-  /** Step number (1-based index) */
+  /** Unique identifier for this step (UUID) */
+  id: StepId;
+  
+  /** Step number (for ordering and display) */
   number: number;
   
   /** Human-readable name of the step */
@@ -127,17 +123,14 @@ export interface ProcessStep {
   /** Current status of this step */
   status: StepStatus;
   
-  /** Reference to the step definition (e.g., "@framework-step:planning/create-high-level-plan") */
-  stepRef?: string;
-  
-  /** Description of expected output from this step */
-  output?: string;
+  /** Reference to the step definition */
+  stepRef: StepRef;
   
   /** ISO 8601 timestamp when the step was started */
-  startedAt?: string;
+  startedAt?: ISOTimestamp;
   
   /** ISO 8601 timestamp when the step was completed */
-  completedAt?: string;
+  completedAt?: ISOTimestamp;
   
   /** Whether this step requires explicit user approval before proceeding */
   approvalRequired?: boolean;
@@ -150,17 +143,17 @@ export interface ProcessStep {
  * Reference to a parent process that spawned this sub-process.
  */
 export interface ParentProcessRef {
-  /** Unique identifier of the parent process */
-  id: string;
+  /** Unique identifier of the parent process (UUID) */
+  id: ProcessId;
   
   /** Human-readable name of the parent process */
   name: string;
   
   /** Path to the parent process folder (relative to project root) */
-  processPath: string;
+  processPath: ProcessPath;
   
-  /** Step number in the parent process to return to after this sub-process completes */
-  returnToStep: number;
+  /** Step ID in the parent process to return to after this sub-process completes */
+  returnToStep: StepId;
 }
 
 /**
@@ -173,27 +166,6 @@ export interface SubProcessState {
   /** List of child sub-processes spawned by this process */
   childProcesses: ChildProcessRef[];
   
-  /** Next sync point where parent will wait for children (if any) */
-  nextSyncPoint?: string;
+  /** Next sync point where parent will wait for children (StepId) */
+  nextSyncPoint?: StepId;
 }
-
-
-
-/**
- * References to the files that make up a process instance.
- */
-export interface ProcessFiles {
-  /** Relative path to process.md from process folder */
-  process: string;
-  
-  /** Relative path to memory.json from process folder */
-  memory: string;
-  
-  /** Relative path to log.json from process folder */
-  log: string;
-}
-
-/**
- * Status of an individual step within a process.
- */
-export type StepStatus = 'pending' | 'in_progress' | 'completed' | 'skipped';

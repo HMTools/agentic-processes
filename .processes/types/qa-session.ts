@@ -6,6 +6,8 @@
  * Stored in: log.json (qaSession) and memory.json (steps.stepN.qaSession)
  */
 
+import { ISOTimestamp, QuestionId } from "./shared-types";
+
 /**
  * Priority level for Q&A questions
  */
@@ -20,8 +22,8 @@ export type QASessionOutcome = 'all_answered' | 'partial' | 'deferred';
  * A single question in a Q&A session
  */
 export interface QAQuestion {
-  /** Unique identifier for the question (e.g., "Q1", "Q2") */
-  id: string;
+  /** Unique identifier for the question */
+  id: QuestionId;
   
   /** Topic or category of the question */
   topic: string;
@@ -35,7 +37,7 @@ export interface QAQuestion {
   /** Why this information is needed */
   context?: string;
   
-  /** Available options if this is a multiple-choice question */
+  /** Available options if this is a multiple-choice question (single-select by default) */
   options?: string[];
 }
 
@@ -44,13 +46,13 @@ export interface QAQuestion {
  */
 export interface QAAnswer {
   /** ID of the question being answered */
-  questionId: string;
+  questionId: QuestionId;
   
   /** The user's answer */
   answer: string;
   
   /** When the answer was received */
-  timestamp: string;
+  timestamp: ISOTimestamp;
 }
 
 /**
@@ -58,7 +60,7 @@ export interface QAAnswer {
  */
 export interface QASessionLog {
   /** When the Q&A session was initiated */
-  timestamp: string;
+  timestamp: ISOTimestamp;
   
   /** All questions that were asked */
   questionsAsked: QAQuestion[];
@@ -67,7 +69,7 @@ export interface QASessionLog {
   answersReceived: QAAnswer[];
   
   /** IDs of questions that were not answered */
-  unansweredQuestions: string[];
+  unansweredQuestions: QuestionId[];
   
   /** Overall outcome of the session */
   outcome: QASessionOutcome;
@@ -111,4 +113,3 @@ export interface QAConfig {
   /** Whether to allow proceeding with partial answers */
   allowPartialAnswers: boolean;
 }
-

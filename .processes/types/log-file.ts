@@ -4,20 +4,27 @@
  * Captures detailed execution history, user interactions, and process-wide observations.
  */
 
+import { ISOTimestamp, ProcessPath, StepId } from "./shared-types";
+
 /**
  * A single user interaction record
  */
 export interface UserInteraction {
   /** What the user requested */
   request: string;
+  
   /** Why the user made this request */
   reason: string;
+  
   /** How the agent responded */
   agentResponse: string;
+  
   /** When this interaction occurred (ISO 8601) */
-  timestamp: string;
+  timestamp: ISOTimestamp;
+  
   /** Flag indicating this should be reviewed in continuous improvement step */
   forImprovementStep?: boolean;
+  
   /** Potential improvement to consider based on this interaction */
   potentialImprovement?: string;
 }
@@ -26,20 +33,27 @@ export interface UserInteraction {
  * Log entry for a single step
  */
 export interface LogStepEntry {
+  /** Timestamp when step started (ISO 8601) - required */
+  timestamp: ISOTimestamp;
+  
   /** User interactions during this step */
   userInteractions?: UserInteraction[];
-  /** Timestamp when step started (ISO 8601) */
-  timestamp?: string;
+  
   /** Actions taken during this step */
   actionsTaken?: string[];
+  
   /** Agent reasoning during this step */
   agentReasoning?: string[];
+  
   /** Problems encountered during this step */
   problemsEncountered?: string[];
+  
   /** Files modified during this step */
   filesModified?: string[];
+  
   /** Decisions made during this step */
   decisionsMade?: string[];
+  
   /** Performance notes */
   performanceNotes?: string[];
 }
@@ -48,8 +62,8 @@ export interface LogStepEntry {
  * Complete log file structure for process instances
  */
 export interface LogFile {
-  /** Discriminator field (optional for backwards compatibility) */
-  type?: 'log-file';
+  /** Discriminator field - always "log-file" */
+  type: 'log-file';
   
   /** Process metadata */
   metadata: {
@@ -58,13 +72,13 @@ export interface LogFile {
     /** Template used to create this process */
     template: string;
     /** When process started (ISO 8601) */
-    started: string;
+    started: ISOTimestamp;
     /** When process completed (ISO 8601, null if still running) */
-    completed: string | null;
+    completed: ISOTimestamp | null;
     /** Parent process path (null if top-level process) */
-    parentProcess: string | null;
-    /** Sub-processes spawned from this process */
-    subProcesses: string[];
+    parentProcessPath: ProcessPath | null;
+    /** Paths to sub-processes spawned from this process */
+    subProcessPaths: ProcessPath[];
   };
   
   /** Execution metrics (optional) */
@@ -73,14 +87,14 @@ export interface LogFile {
     totalSteps: number;
     /** Steps completed so far */
     stepsCompleted: number;
-    /** Current step number */
-    currentStep: number;
+    /** Current step ID */
+    currentStep: StepId;
   };
   
-  /** Step-by-step log entries (keyed by step number as string) */
-  steps: Record<string, LogStepEntry>;
+  /** Step-by-step log entries (keyed by StepId) */
+  steps: Record<StepId, LogStepEntry>;
   
-  /** User interactions at process level (alternative location) */
+  /** User interactions at process level (for interactions outside step context) */
   userInteractions?: UserInteraction[];
   
   /** Process-wide observations for learning and improvement */

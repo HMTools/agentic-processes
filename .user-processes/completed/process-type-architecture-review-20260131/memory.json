@@ -1,0 +1,84 @@
+{
+  "type": "memory-file",
+  "metadata": {
+    "process": "process-type-architecture-review-20260131",
+    "template": "set-concept",
+    "created": "2026-01-31T11:40:00.000Z",
+    "lastUpdated": "2026-01-31T11:40:00.000Z",
+    "currentStep": 1
+  },
+  "subProcessState": {
+    "parentProcess": null,
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {
+    "0": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "timestamp": "2026-01-31T11:41:00.000Z",
+      "informationProduced": {
+        "principlesLoaded": true,
+        "principlesConfirmed": true
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [],
+      "notes": "6 Core Principles internalized: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS, USE SUBAGENTS"
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [],
+    "filesModified": [],
+    "filesCreated": [
+      "review-items.md",
+      ".processes/types/shared-types.ts",
+      ".processes/types/index.ts"
+    ],
+    "filesModified": [
+      ".processes/types/process-status.ts",
+      ".processes/types/child-process-ref.ts",
+      ".processes/types/process-instance.ts",
+      ".processes/types/memory-file.ts",
+      ".processes/types/log-file.ts",
+      ".processes/types/qa-session.ts",
+      ".processes/types/step-definition.ts",
+      ".processes/types/template-definition.ts"
+    ],
+    "targetFiles": [
+      ".processes/types/process-instance.ts",
+      ".processes/types/memory-file.ts",
+      ".processes/types/log-file.ts",
+      ".processes/types/child-process-ref.ts",
+      ".processes/types/process-status.ts",
+      ".processes/types/qa-session.ts",
+      ".processes/types/step-definition.ts",
+      ".processes/types/template-definition.ts"
+    ]
+  },
+  "searchHelpers": {
+    "byCategory": {
+      "types": [
+        ".processes/types/process-instance.ts",
+        ".processes/types/memory-file.ts",
+        ".processes/types/log-file.ts",
+        ".processes/types/child-process-ref.ts",
+        ".processes/types/process-status.ts",
+        ".processes/types/qa-session.ts",
+        ".processes/types/step-definition.ts",
+        ".processes/types/template-definition.ts"
+      ]
+    },
+    "byFileType": {
+      "typescript": [
+        ".processes/types/process-instance.ts",
+        ".processes/types/memory-file.ts",
+        ".processes/types/log-file.ts",
+        ".processes/types/child-process-ref.ts",
+        ".processes/types/process-status.ts",
+        ".processes/types/qa-session.ts",
+        ".processes/types/step-definition.ts",
+        ".processes/types/template-definition.ts"
+      ]
+    }
+  }
+}

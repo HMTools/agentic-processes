@@ -9,6 +9,8 @@
  * of a running process created from a template.
  */
 
+import { StepRef } from "./shared-types";
+
 export interface TemplateDefinition {
   /** Discriminator field - always "template" */
   type: 'template';
@@ -41,8 +43,8 @@ export interface TemplateDefinition {
       description: string;
       /** Parameter type (string, number, etc.) */
       type: string;
-      /** Example value */
-      example: string | object;
+      /** Example value (always as string for display) */
+      example: string;
     }>;
     /** Additional notes about parameters */
     notes?: string;
@@ -50,26 +52,14 @@ export interface TemplateDefinition {
     defaults?: Record<string, unknown>;
   };
 
-  /** Process phases for organization (optional) */
-  phases?: Array<{
-    /** Phase name (e.g., "Planning", "Implementation") */
-    name: string;
-    /** Description of what this phase accomplishes */
-    description?: string;
-    /** Step numbers in this phase, or "dynamic" for generated steps */
-    steps: number[] | string;
-    /** Additional notes about this phase */
-    note?: string;
-  }>;
-
   /** Complete step definitions with full agent guidance */
   steps: Array<{
     /** Step number (0-based, where 0 is typically init-process-principles) */
     number: number;
     /** Step name */
     name: string;
-    /** Reference to step definition (e.g., "@framework-step:planning/understand-context") */
-    stepRef: string | null;
+    /** Reference to step definition - required */
+    stepRef: StepRef;
     /** Full description of what this step does in this template's context */
     description?: string;
     /** Context variables passed to the step */
@@ -110,8 +100,8 @@ export interface TemplateDefinition {
     description: string;
     /** What the steps are derived from */
     derivedFrom: string;
-    /** Step references for common dynamic steps */
-    [key: string]: string;
+    /** Step references for dynamic steps, keyed by step type */
+    stepRefs?: Record<string, StepRef>;
   };
 
   /** Memory file structure for this template */
@@ -125,14 +115,14 @@ export interface TemplateDefinition {
   /** References to related resources */
   references: {
     /** Step references used by this template */
-    steps: string[];
+    steps: StepRef[];
     /** Related template names */
     relatedTemplates: string[];
     /** Dependencies */
     dependencies: string[];
   };
 
-  /** Template-specific guidance for agent execution */
+  /** Template-specific guidance for agent execution (per-step context) */
   guidance?: Record<string, {
     description?: string;
     actions?: string[];
@@ -145,4 +135,3 @@ export interface TemplateDefinition {
     decisionsMade?: string[];
   }>;
 }
-
