@@ -4,8 +4,7 @@
  * Tracks step information, decisions, and cross-references during process execution.
  */
 
-import { ChildProcessRef } from ".";
-
+import { ChildProcessRef } from "./child-process-ref";
 
 
 /**
