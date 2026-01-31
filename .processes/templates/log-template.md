@@ -32,25 +32,20 @@ When creating a new process instance, initialize `log.json` with this structure:
 
 ```json
 {
-  "processName": "{Process Name}",
+  "type": "log-file",
   "metadata": {
-    "processId": "{process-name-YYYYMMDD}",
-    "template": "{template-name}",
+    "process": "{process-name-YYYYMMDD}",
+    "template": "{template-category/template-name}",
     "started": "{ISO 8601 timestamp}",
     "completed": null,
-    "parentProcess": null,
-    "subProcesses": []
+    "parentProcessPath": null,
+    "subProcessPaths": []
   },
   "steps": {},
   "processWideObservations": {
     "patternsDetected": [],
     "userFeedbackSummary": [],
-    "efficiencyMetrics": {
-      "stepsCompleted": 0,
-      "totalUserCorrections": 0,
-      "filesModified": 0,
-      "stepsRequiringMultipleIterations": 0
-    },
+    "efficiencyMetrics": {},
     "recommendationsForFuture": []
   }
 }
@@ -58,17 +53,13 @@ When creating a new process instance, initialize `log.json` with this structure:
 
 ### Step Section Schema
 
-When logging a step, add/update its entry in `steps`:
+When logging a step, add/update its entry in `steps` (keyed by StepId UUID):
 
 ```json
 {
   "steps": {
-    "step1": {
-      "name": "{Step Name}",
-      "timestamp": {
-        "started": "{ISO 8601 timestamp}",
-        "completed": "{ISO 8601 timestamp or null}"
-      },
+    "{StepId UUID}": {
+      "timestamp": "{ISO 8601 timestamp}",
       "actionsTaken": [
         "Detailed description of action 1",
         "Detailed description of action 2"
@@ -80,26 +71,19 @@ When logging a step, add/update its entry in `steps`:
       ],
       "userInteractions": [
         {
-          "userRequest": "What the user asked to change",
+          "request": "What the user asked to change",
           "reason": "Why the change was needed",
           "agentResponse": "What was changed in response",
-          "timestamp": "{ISO 8601 timestamp}"
+          "timestamp": "{ISO 8601 timestamp}",
+          "forImprovementStep": false,
+          "potentialImprovement": null
         }
       ],
       "problemsEncountered": [
-        {
-          "problem": "Description of the issue",
-          "rootCause": "Analysis of what caused it",
-          "solution": "How it was resolved",
-          "prevention": "How to avoid this in future processes"
-        }
+        "Description of problem encountered and resolution"
       ],
       "filesModified": [
-        {
-          "path": "path/to/file.cs",
-          "changes": "Description of modifications made",
-          "iterations": 1
-        }
+        "path/to/file.cs"
       ],
       "decisionsMade": [
         "Technical decision with full rationale",
@@ -192,22 +176,18 @@ Document the "why" not just the "what":
 
 ```json
 {
-  "processName": "Implement User Authentication",
+  "type": "log-file",
   "metadata": {
-    "processId": "process-user-auth-20251206",
-    "template": "develop-user-story",
+    "process": "process-user-auth-20251206",
+    "template": "development/develop-user-story",
     "started": "2025-12-06T10:00:00Z",
     "completed": null,
-    "parentProcess": null,
-    "subProcesses": []
+    "parentProcessPath": null,
+    "subProcessPaths": []
   },
   "steps": {
-    "step3": {
-      "name": "Implement Service Layer",
-      "timestamp": {
-        "started": "2025-12-06T10:15:00Z",
-        "completed": "2025-12-06T11:30:00Z"
-      },
+    "c3d4e5f6-a7b8-9012-cdef-123456789012": {
+      "timestamp": "2025-12-06T10:15:00Z",
       "actionsTaken": [
         "Created IAuthService interface in Service/Managers/Interfaces/",
         "Implemented AuthService with JWT token generation",
@@ -221,42 +201,28 @@ Document the "why" not just the "what":
       ],
       "userInteractions": [
         {
-          "userRequest": "The token should expire in 2 hours, not 24",
+          "request": "The token should expire in 2 hours, not 24",
           "reason": "Security policy requires shorter session times for admin users",
           "agentResponse": "Updated TokenExpirationMinutes from 1440 to 120 in appsettings.json",
-          "timestamp": "2025-12-06T10:45:00Z"
+          "timestamp": "2025-12-06T10:45:00Z",
+          "forImprovementStep": false
         },
         {
-          "userRequest": "Add refresh token support",
+          "request": "Add refresh token support",
           "reason": "Users shouldn't have to re-login every 2 hours",
           "agentResponse": "Implemented RefreshToken method, added RefreshToken entity to database",
-          "timestamp": "2025-12-06T11:00:00Z"
+          "timestamp": "2025-12-06T11:00:00Z",
+          "forImprovementStep": true,
+          "potentialImprovement": "Consider adding refresh token support as standard in authentication templates"
         }
       ],
       "problemsEncountered": [
-        {
-          "problem": "JWT validation was failing in integration tests",
-          "rootCause": "Test environment was using different signing key than production config",
-          "solution": "Updated test setup to use consistent key from appsettings.Test.json",
-          "prevention": "Add validation in test base class to verify config consistency"
-        }
+        "JWT validation failing in integration tests - caused by different signing keys between test and prod config"
       ],
       "filesModified": [
-        {
-          "path": "Service/Managers/AuthService.cs",
-          "changes": "Implemented authentication logic with JWT generation and refresh token support",
-          "iterations": 3
-        },
-        {
-          "path": "Service/Managers/Interfaces/IAuthService.cs",
-          "changes": "Defined service contract",
-          "iterations": 2
-        },
-        {
-          "path": "appsettings.json",
-          "changes": "Updated TokenExpirationMinutes from 1440 to 120",
-          "iterations": 1
-        }
+        "Service/Managers/AuthService.cs",
+        "Service/Managers/Interfaces/IAuthService.cs",
+        "appsettings.json"
       ],
       "decisionsMade": [
         "Used refresh tokens stored in database rather than in-memory cache to support server restarts",
@@ -272,12 +238,7 @@ Document the "why" not just the "what":
   "processWideObservations": {
     "patternsDetected": [],
     "userFeedbackSummary": [],
-    "efficiencyMetrics": {
-      "stepsCompleted": 3,
-      "totalUserCorrections": 2,
-      "filesModified": 3,
-      "stepsRequiringMultipleIterations": 1
-    },
+    "efficiencyMetrics": {},
     "recommendationsForFuture": []
   }
 }

@@ -9,21 +9,28 @@
   },
   "memorySections": [
     {
+      "name": "Type Discriminator",
+      "required": true,
+      "fields": ["type"],
+      "note": "Always set to 'memory-file'"
+    },
+    {
       "name": "Metadata",
       "required": true,
-      "fields": ["process", "created", "lastUpdated", "currentStep"]
+      "fields": ["process", "template", "created", "lastUpdated", "currentStep"]
     },
     {
       "name": "Sub-Process State",
       "required": false,
       "purpose": "Track parent-child relationships and sync points",
-      "subsections": ["parentProcess", "childSubProcesses", "syncPoints"]
+      "subsections": ["parentProcessPath", "childSubProcesses", "syncPoints"]
     },
     {
       "name": "Step Section",
       "required": true,
       "repeatable": true,
-      "subsections": ["informationProduced", "decisionsMade", "filesModifiedCreated", "notes", "updated"]
+      "keyFormat": "StepId (UUID)",
+      "subsections": ["name", "status", "startedAt", "updatedAt", "informationProduced", "decisionsMade", "filesModifiedCreated", "notes"]
     },
     {
       "name": "Cross-References",

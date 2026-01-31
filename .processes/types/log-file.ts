@@ -7,6 +7,19 @@
 import { ISOTimestamp, ProcessPath, StepId } from "./shared-types";
 
 /**
+ * Timestamp structure for step entries that track both start and update times.
+ * Used as an alternative to simple ISOTimestamp when richer time tracking is needed.
+ */
+export interface StepTimestamp {
+  /** When the step started (ISO 8601) */
+  startedAt: ISOTimestamp;
+  /** When the step was last updated (ISO 8601) */
+  updatedAt?: ISOTimestamp;
+  /** When the step completed (ISO 8601) */
+  completedAt?: ISOTimestamp;
+}
+
+/**
  * A single user interaction record
  */
 export interface UserInteraction {
@@ -33,8 +46,12 @@ export interface UserInteraction {
  * Log entry for a single step
  */
 export interface LogStepEntry {
-  /** Timestamp when step started (ISO 8601) - required */
-  timestamp: ISOTimestamp;
+  /** 
+   * Timestamp for this step entry.
+   * Can be either a simple ISO 8601 string (when step started) or 
+   * a StepTimestamp object for richer time tracking.
+   */
+  timestamp: ISOTimestamp | StepTimestamp;
   
   /** User interactions during this step */
   userInteractions?: UserInteraction[];

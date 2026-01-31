@@ -74,8 +74,8 @@ export interface ProcessMetadata {
   /** Name of the template used to create this process (e.g., "develop-user-story") */
   template: string;
   
-  /** Category of the template (e.g., "development", "testing", "infrastructure") */
-  templateCategory: string;
+  /** Category of the template (e.g., "development", "testing", "infrastructure") - optional for backward compatibility */
+  templateCategory?: string;
   
   /** ISO 8601 timestamp when the process was created */
   created: ISOTimestamp;
@@ -83,11 +83,11 @@ export interface ProcessMetadata {
   /** ISO 8601 timestamp when the process was last updated */
   lastUpdated: ISOTimestamp;
   
-  /** Absolute path to the project root directory */
-  projectPath: string;
+  /** Absolute path to the project root directory - optional for backward compatibility */
+  projectPath?: string;
   
-  /** Relative path to the process folder from project root */
-  processPath: ProcessPath;
+  /** Relative path to the process folder from project root - optional for backward compatibility */
+  processPath?: ProcessPath;
 }
 
 /**

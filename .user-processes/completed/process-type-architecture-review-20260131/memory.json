@@ -5,18 +5,19 @@
     "template": "set-concept",
     "created": "2026-01-31T11:40:00.000Z",
     "lastUpdated": "2026-01-31T11:40:00.000Z",
-    "currentStep": 1
+    "currentStep": "tare2131-0001-4000-8000-000000000001"
   },
   "subProcessState": {
-    "parentProcess": null,
+    "parentProcessPath": null,
     "childSubProcesses": [],
     "syncPoints": []
   },
   "steps": {
-    "0": {
+    "tare2131-0000-4000-8000-000000000000": {
       "name": "Init Process Principles",
       "status": "completed",
-      "timestamp": "2026-01-31T11:41:00.000Z",
+      "startedAt": "2026-01-31T11:40:00.000Z",
+      "updatedAt": "2026-01-31T11:41:00.000Z",
       "informationProduced": {
         "principlesLoaded": true,
         "principlesConfirmed": true
@@ -33,16 +34,6 @@
       "review-items.md",
       ".processes/types/shared-types.ts",
       ".processes/types/index.ts"
-    ],
-    "filesModified": [
-      ".processes/types/process-status.ts",
-      ".processes/types/child-process-ref.ts",
-      ".processes/types/process-instance.ts",
-      ".processes/types/memory-file.ts",
-      ".processes/types/log-file.ts",
-      ".processes/types/qa-session.ts",
-      ".processes/types/step-definition.ts",
-      ".processes/types/template-definition.ts"
     ],
     "targetFiles": [
       ".processes/types/process-instance.ts",

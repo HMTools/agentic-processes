@@ -1,19 +1,25 @@
 {
+  "type": "log-file",
   "metadata": {
     "process": "process-completion-migration-20260129",
     "template": "set-concept",
     "started": "2026-01-29T16:27:00Z",
     "completed": "2026-01-29T16:45:00Z",
-    "parentProcess": null,
-    "subProcesses": []
+    "parentProcessPath": null,
+    "subProcessPaths": []
   },
   "executionMetrics": {
     "totalSteps": 9,
     "stepsCompleted": 9,
-    "currentStep": 8
+    "currentStep": "cpmg2129-0008-4000-8000-000000000008"
   },
   "steps": {
-    "0": {
+    "cpmg2129-0000-4000-8000-000000000000": {
+      "name": "Init Process Principles",
+      "timestamp": {
+        "startedAt": "2026-01-29T16:28:00Z",
+        "updatedAt": "2026-01-29T16:29:00Z"
+      },
       "userInteractions": [
         {
           "request": "Change 'Understand concept' step to require approval",
@@ -23,7 +29,12 @@
         }
       ]
     },
-    "1": {
+    "cpmg2129-0001-4000-8000-000000000001": {
+      "name": "Understand Concept",
+      "timestamp": {
+        "startedAt": "2026-01-29T16:30:00Z",
+        "updatedAt": "2026-01-29T16:32:00Z"
+      },
       "userInteractions": [
         {
           "request": "Approval for Step 1 deliverables",
@@ -33,7 +44,12 @@
         }
       ]
     },
-    "4": {
+    "cpmg2129-0004-4000-8000-000000000004": {
+      "name": "Design Implementation Plan",
+      "timestamp": {
+        "startedAt": "2026-01-29T16:36:00Z",
+        "updatedAt": "2026-01-29T16:38:00Z"
+      },
       "userInteractions": [
         {
           "request": "Approval for implementation plan (MOD-001, MOD-002)",

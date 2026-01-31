@@ -44,6 +44,9 @@ These principles apply to ALL work in this process:
 6. **USE SUBAGENTS FOR STEPS** - Delegate step execution to step-executor subagent. Do NOT execute steps directly.
    - Each step must be executed via Task tool with subagent_type='step-executor'
 
+7. **FOLLOW TYPE STRUCTURES** - All process files (process.json, memory.json, log.json) MUST conform to TypeScript type definitions in .processes/types/
+   - Validate at End-Step: type discriminators present, field names match types, step IDs use correct format
+
 ---
 
 ### Instructions
@@ -191,6 +194,23 @@ The AI reads `process.json`, `process.md` and `memory.json` to fully restore con
 - Decisions made
 - Files created
 - Important notes
+
+### Validation on Resume (Principle 7: FOLLOW TYPE STRUCTURES)
+
+**After reading process files, validate they conform to TypeScript types in `.processes/types/`:**
+
+| File | Type Definition | Key Requirements |
+|------|----------------|------------------|
+| `process.json` | `ProcessInstance` | `type: 'process-instance'`, `id`, `name`, `metadata`, `status`, `steps[]` with UUIDs |
+| `memory.json` | `MemoryFile` | `type: 'memory-file'`, `metadata.process`, `subProcessState.parentProcessPath` |
+| `log.json` | `LogFile` | `type: 'log-file'`, `metadata.parentProcessPath`, `metadata.subProcessPaths` |
+
+**Quick Validation Checklist:**
+- [ ] All files have correct `type` discriminator
+- [ ] Field names match types (e.g., `parentProcessPath` not `parentProcess`)
+- [ ] Step keys use UUID format
+
+**If structural issues found**: Report to user and offer to fix before continuing.
 
 ### Continuity
 

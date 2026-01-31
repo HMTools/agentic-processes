@@ -5,13 +5,13 @@
     "template": "set-concept",
     "started": "2026-01-31T11:40:00.000Z",
     "completed": "2026-01-31T12:40:00.000Z",
-    "parentProcess": null,
-    "subProcesses": []
+    "parentProcessPath": null,
+    "subProcessPaths": []
   },
   "executionMetrics": {
     "totalSteps": 9,
     "stepsCompleted": 0,
-    "currentStep": 0
+    "currentStep": "tare2131-0000-4000-8000-000000000000"
   },
   "steps": {},
   "userInteractions": [

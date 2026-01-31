@@ -4,47 +4,11 @@
   "category": "common",
   "metadata": {
     "title": "Init Process Principles",
-    "purposeAndUsage": "MANDATORY first step for every process. Contains and confirms understanding of agent operating principles before any work begins.",
-    "lastUpdated": "2026-01-26"
+    "purposeAndUsage": "MANDATORY first step for every process. Loads and confirms understanding of agent operating principles before any work begins.",
+    "lastUpdated": "2026-01-31"
   },
-  "principles": [
-    {
-      "number": 1,
-      "name": "LOG FIRST, ACT SECOND",
-      "rule": "Log every user interaction to log.json BEFORE responding or making changes",
-      "verification": "Output '✓ Logged to log.json' before file changes"
-    },
-    {
-      "number": 2,
-      "name": "READ JSON FOR GUIDANCE",
-      "rule": "Step instructions live in .json files, not .md files",
-      "verification": null
-    },
-    {
-      "number": 3,
-      "name": "STOP AT CHECKPOINTS",
-      "rule": "When approvalRequired: true, present deliverables, ask for approval, WAIT",
-      "verification": "Output '⏸️ Awaiting approval' and stop"
-    },
-    {
-      "number": 4,
-      "name": "NO EXTERNAL TODOS",
-      "rule": "Process steps ARE your task list. Do NOT use todo_write during processes",
-      "verification": null
-    },
-    {
-      "number": 5,
-      "name": "VERIFY MANDATORY ACTIONS",
-      "rule": "For MANDATORY/CRITICAL instructions: do action, then output confirmation",
-      "verification": "Output '✓ [Action] completed'"
-    },
-    {
-      "number": 6,
-      "name": "USE SUBAGENTS FOR STEPS",
-      "rule": "Delegate step execution to step-executor subagent. Do NOT execute steps directly in the main conversation.",
-      "verification": "Each step must be executed via Task tool with subagent_type='step-executor'"
-    }
-  ],
+  "principlesRef": "@component:operating-principles",
+  "principlesPath": ".processes/steps/_components/operating-principles.md",
   "output": {
     "description": "Confirmation that operating principles are loaded and understood",
     "artifacts": [],
@@ -52,14 +16,16 @@
   },
   "guidance": {
     "prerequisites": [],
-    "mandatoryComponents": [],
+    "mandatoryComponents": ["operating-principles.md"],
     "specificActions": [
-      "Read and internalize the 6 Core Principles defined in this step's 'principles' array",
+      "Read `.processes/steps/_components/operating-principles.md` to load the principles",
+      "Internalize all principles from the 'principles' array",
+      "Output each principle name and rule",
       "Output confirmation: '✓ Operating principles loaded and understood'",
       "Update memory.json with principlesLoaded: true"
     ],
     "files": {
-      "read": [],
+      "read": [".processes/steps/_components/operating-principles.md"],
       "create": [],
       "update": ["memory.json"]
     },
@@ -67,32 +33,42 @@
     "bestPractices": [
       "This step MUST be completed before any other work",
       "Do NOT skip or abbreviate this step",
-      "The principles apply to ALL subsequent steps in this process"
+      "The principles apply to ALL subsequent steps in this process",
+      "Always read the shared component - do NOT hardcode principle values"
     ]
   },
   "substeps": [
     {
       "number": 1,
-      "name": "Internalize Operating Principles",
-      "description": "Read and understand the 6 Core Principles embedded in this step",
+      "name": "Load Operating Principles",
+      "description": "Read the shared operating principles component",
       "actions": [
-        "Read the 'principles' array in this step definition",
-        "Understand each principle: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS, USE SUBAGENTS"
+        "Read `.processes/steps/_components/operating-principles.md`",
+        "Extract the 'principles' array from the component"
       ]
     },
     {
       "number": 2,
-      "name": "Confirm Understanding",
+      "name": "Output Principles",
+      "description": "Display each principle to confirm understanding",
+      "actions": [
+        "For each principle in the array:",
+        "Output: '{number}. {name}: {rule}'",
+        "This confirms the principles are loaded and understood"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Confirm and Update Memory",
       "description": "Output confirmation and update memory",
       "actions": [
         "Output: '✓ Operating principles loaded and understood'",
-        "List the 6 principles briefly to confirm understanding",
         "Update memory.json: principlesLoaded: true, timestamp"
       ]
     }
   ],
   "flow": {
-    "description": "Read principles → Confirm understanding → Update memory"
+    "description": "Read shared component → Output principles → Confirm understanding → Update memory"
   },
   "memoryFileUsage": {
     "readFrom": null,
@@ -100,12 +76,13 @@
     "fields": ["principlesLoaded: true", "timestamp"]
   },
   "dependencies": {
-    "requiredComponents": [],
+    "requiredComponents": [".processes/steps/_components/operating-principles.md"],
     "requiredFiles": [],
     "requiredTools": []
   },
   "references": {
     "relatedSteps": ["end-process-validation"],
-    "usedInTemplates": ["ALL process templates"]
+    "usedInTemplates": ["ALL process templates"],
+    "sharedComponent": ".processes/steps/_components/operating-principles.md"
   }
 }

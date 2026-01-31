@@ -9,14 +9,21 @@
   },
   "logSections": [
     {
+      "name": "Type Discriminator",
+      "required": true,
+      "fields": ["type"],
+      "note": "Always set to 'log-file'"
+    },
+    {
       "name": "Metadata",
       "required": true,
-      "fields": ["process", "template", "started", "completed", "parentProcess", "subProcesses"]
+      "fields": ["process", "template", "started", "completed", "parentProcessPath", "subProcessPaths"]
     },
     {
       "name": "Step Section",
       "required": true,
       "repeatable": true,
+      "keyFormat": "StepId (UUID)",
       "subsections": ["timestamp", "actionsTaken", "agentReasoning", "userInteractions", "problemsEncountered", "filesModified", "decisionsMade", "performanceNotes"]
     },
     {

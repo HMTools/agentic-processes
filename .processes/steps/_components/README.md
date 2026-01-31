@@ -31,6 +31,13 @@ A structured workflow for gathering missing information from users through Q&A s
 
 **TypeScript types**: See `.processes/types/qa-session.ts` for `QAQuestion`, `QAAnswer`, `QASessionLog`, `QASessionMemory`, and `QAConfig` types.
 
+### operating-principles.md
+The 7 agent operating principles that govern all process execution. Contains principle definitions, Init-Step and End-Step substep templates, and type validation requirements.
+
+**Usage**: Referenced by `init-process-principles` step to load principles at process start, and by all steps' Init-Step/End-Step substeps for principle confirmation and compliance checking.
+
+**TypeScript types**: See `.processes/types/` for process file type definitions referenced by Principle 7 (FOLLOW TYPE STRUCTURES).
+
 ## Guidelines Files
 
 Guidelines are project-specific patterns and conventions stored in `.user-processes/guidelines/`. They are organized by domain category:

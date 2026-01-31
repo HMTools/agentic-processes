@@ -1,19 +1,20 @@
 {
+  "type": "log-file",
   "processName": "Set Flagged Improvement Analysis Concept",
   "metadata": {
     "processId": "set-flagged-improvement-analysis-20260131",
     "template": "set-concept",
     "started": "2026-01-31T18:17:00.000Z",
     "completed": "2026-01-31T19:12:00.000Z",
-    "parentProcess": null,
-    "subProcesses": []
+    "parentProcessPath": null,
+    "subProcessPaths": []
   },
   "steps": {
-    "step0": {
+    "sfia2131-0000-4000-8000-000000000000": {
       "name": "Init Process Principles",
       "timestamp": {
-        "started": "2026-01-31T18:17:00.000Z",
-        "completed": "2026-01-31T18:18:00.000Z"
+        "startedAt": "2026-01-31T18:17:00.000Z",
+        "updatedAt": "2026-01-31T18:18:00.000Z"
       },
       "actionsTaken": [
         "Read init-process-principles.json step definition",
@@ -25,7 +26,7 @@
       ],
       "userInteractions": [
         {
-          "userRequest": "Start new set-concept process for ensuring continuous improvement step analyzes forImprovementStep and potentialImprovement fields",
+          "request": "Start new set-concept process for ensuring continuous improvement step analyzes forImprovementStep and potentialImprovement fields",
           "reason": "User wants to ensure the continuous improvement step explicitly searches and analyzes flagged improvement entries in log.json",
           "agentResponse": "Created process instance and initialized with operating principles",
           "timestamp": "2026-01-31T18:17:00.000Z"
@@ -56,11 +57,11 @@
       "decisionsMade": [],
       "performanceNotes": []
     },
-    "step1": {
+    "sfia2131-0001-4000-8000-000000000001": {
       "name": "Understand concept",
       "timestamp": {
-        "started": "2026-01-31T18:20:00.000Z",
-        "completed": "2026-01-31T18:25:00.000Z"
+        "startedAt": "2026-01-31T18:20:00.000Z",
+        "updatedAt": "2026-01-31T18:25:00.000Z"
       },
       "actionsTaken": [
         "Read understand-context.json step definition",
@@ -81,7 +82,7 @@
       ],
       "userInteractions": [
         {
-          "userRequest": "Correction: I got the concept wrong - user wants the OPPOSITE. The continuous improvement step should analyze and take into account ALL logs, searching for all places for improvements",
+          "request": "Correction: I got the concept wrong - user wants the OPPOSITE. The continuous improvement step should analyze and take into account ALL logs, searching for all places for improvements",
           "reason": "My initial understanding was to only search for forImprovementStep/potentialImprovement flags. User wants comprehensive analysis of ENTIRE log, with these fields being additional markers to include",
           "agentResponse": "Correcting understanding - concept is about COMPREHENSIVE log analysis, not just flag searching",
           "timestamp": "2026-01-31T18:22:00.000Z",
@@ -89,7 +90,7 @@
           "potentialImprovement": "When user provides a screenshot/context, carefully re-read to understand if they want to ADD usage of those fields or ENSURE they are part of broader analysis"
         },
         {
-          "userRequest": "Approved the corrected understanding of comprehensive log analysis concept",
+          "request": "Approved the corrected understanding of comprehensive log analysis concept",
           "reason": "User confirmed the corrected gap analysis showing missing coverage of log sections",
           "agentResponse": "Proceeding to Step 2: Identify target files",
           "timestamp": "2026-01-31T18:25:00.000Z"
@@ -99,11 +100,11 @@
       "decisionsMade": [],
       "performanceNotes": []
     },
-    "step2": {
+    "sfia2131-0002-4000-8000-000000000002": {
       "name": "Identify target files",
       "timestamp": {
-        "started": "2026-01-31T18:30:00.000Z",
-        "completed": "2026-01-31T18:30:00.000Z"
+        "startedAt": "2026-01-31T18:30:00.000Z",
+        "updatedAt": "2026-01-31T18:30:00.000Z"
       },
       "actionsTaken": [
         "Confirmed 5 Core Principles for this step",
@@ -133,11 +134,11 @@
       ],
       "performanceNotes": []
     },
-    "step3": {
+    "sfia2131-0003-4000-8000-000000000003": {
       "name": "Analyze existing state",
       "timestamp": {
-        "started": "2026-01-31T18:31:00.000Z",
-        "completed": "2026-01-31T18:35:00.000Z"
+        "startedAt": "2026-01-31T18:31:00.000Z",
+        "updatedAt": "2026-01-31T18:35:00.000Z"
       },
       "actionsTaken": [
         "Confirmed 5 Core Principles for this step",
@@ -175,11 +176,11 @@
       ],
       "performanceNotes": []
     },
-    "step4": {
+    "sfia2131-0004-4000-8000-000000000004": {
       "name": "Design implementation plan",
       "timestamp": {
-        "started": "2026-01-31T18:40:00.000Z",
-        "completed": "2026-01-31T18:45:00.000Z"
+        "startedAt": "2026-01-31T18:40:00.000Z",
+        "updatedAt": "2026-01-31T18:45:00.000Z"
       },
       "actionsTaken": [
         "Confirmed 5 Core Principles for this step",
@@ -205,7 +206,7 @@
       ],
       "userInteractions": [
         {
-          "userRequest": "Approve all - approved both MOD-001 and MOD-002 implementation proposals",
+          "request": "Approve all - approved both MOD-001 and MOD-002 implementation proposals",
           "reason": "User confirmed the implementation plan for comprehensive log analysis",
           "agentResponse": "Proceeding to Step 5: Apply changes",
           "timestamp": "2026-01-31T18:45:00.000Z"
@@ -225,11 +226,11 @@
       ],
       "performanceNotes": []
     },
-    "step5": {
+    "sfia2131-0005-4000-8000-000000000005": {
       "name": "Apply changes",
       "timestamp": {
-        "started": "2026-01-31T18:50:00.000Z",
-        "completed": "2026-01-31T18:52:00.000Z"
+        "startedAt": "2026-01-31T18:50:00.000Z",
+        "updatedAt": "2026-01-31T18:52:00.000Z"
       },
       "actionsTaken": [
         "Confirmed 5 Core Principles for this step",
@@ -262,11 +263,11 @@
         "Both modifications applied successfully in single iteration"
       ]
     },
-    "step7": {
+    "sfia2131-0007-4000-8000-000000000007": {
       "name": "Continuous Improvement",
       "timestamp": {
-        "started": "2026-01-31T19:00:00.000Z",
-        "completed": "2026-01-31T19:05:00.000Z"
+        "startedAt": "2026-01-31T19:00:00.000Z",
+        "updatedAt": "2026-01-31T19:05:00.000Z"
       },
       "actionsTaken": [
         "Confirmed 5 Core Principles for this step",
@@ -287,7 +288,7 @@
       ],
       "userInteractions": [
         {
-          "userRequest": "No - rejected the proposed improvement to add requirement scope interpretation guidance",
+          "request": "No - rejected the proposed improvement to add requirement scope interpretation guidance",
           "reason": "User decided not to implement this improvement",
           "agentResponse": "Improvement rejected, completing step without implementing changes",
           "timestamp": "2026-01-31T19:05:00.000Z"
@@ -300,11 +301,11 @@
       ],
       "performanceNotes": []
     },
-    "step6": {
+    "sfia2131-0006-4000-8000-000000000006": {
       "name": "Verify implementation",
       "timestamp": {
-        "started": "2026-01-31T18:55:00.000Z",
-        "completed": "2026-01-31T18:58:00.000Z"
+        "startedAt": "2026-01-31T18:55:00.000Z",
+        "updatedAt": "2026-01-31T18:58:00.000Z"
       },
       "actionsTaken": [
         "Confirmed 5 Core Principles for this step",
@@ -331,11 +332,11 @@
         "Verification completed in single pass - no issues found"
       ]
     },
-    "step8": {
+    "sfia2131-0008-4000-8000-000000000008": {
       "name": "End Process Validation",
       "timestamp": {
-        "started": "2026-01-31T19:10:00.000Z",
-        "completed": "2026-01-31T19:12:00.000Z"
+        "startedAt": "2026-01-31T19:10:00.000Z",
+        "updatedAt": "2026-01-31T19:12:00.000Z"
       },
       "actionsTaken": [
         "Read end-process-validation.json step definition",

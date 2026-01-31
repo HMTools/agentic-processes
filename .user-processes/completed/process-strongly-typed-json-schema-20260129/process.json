@@ -1,9 +1,13 @@
 {
+  "type": "process-instance",
   "id": "process-strongly-typed-json-schema-20260129",
-  "template": "infrastructure/set-concept",
+  "name": "Strongly Typed JSON Schema",
+  "metadata": {
+    "template": "infrastructure/set-concept",
+    "created": "2026-01-29T16:51:00Z",
+    "lastUpdated": "2026-01-29T16:51:00Z"
+  },
   "status": "completed",
-  "created": "2026-01-29T16:51:00Z",
-  "lastUpdated": "2026-01-29T16:51:00Z",
   "parameters": {
     "required": {
       "conceptName": "Strongly Typed JSON Schema",
@@ -18,75 +22,75 @@
     }
   },
   "currentState": {
-    "currentStep": 8,
-    "stepName": "End Process Validation",
-    "status": "completed"
+    "activeStepId": "stjs2129-0008-4000-8000-000000000008",
+    "activeStepName": "End Process Validation",
+    "actionSummary": "completed"
   },
   "steps": [
     {
+      "id": "stjs2129-0000-4000-8000-000000000000",
       "number": 0,
       "name": "Init Process Principles",
       "stepRef": "@framework-step:common/init-process-principles",
-      "status": "completed",
-      "output": "Principles loaded and confirmed"
+      "status": "completed"
     },
     {
+      "id": "stjs2129-0001-4000-8000-000000000001",
       "number": 1,
       "name": "Understand concept",
       "stepRef": "@framework-step:planning/understand-context",
       "status": "completed",
-      "approvalRequired": true,
-      "output": "Context documented - TypeScript types exist, focus on gap-filling and validation"
+      "approvalRequired": true
     },
     {
+      "id": "stjs2129-0002-4000-8000-000000000002",
       "number": 2,
       "name": "Identify target files",
       "stepRef": "@framework-step:investigation/identify-files",
-      "status": "completed",
-      "output": "60 files identified across 4 categories in identified-files.json"
+      "status": "completed"
     },
     {
+      "id": "stjs2129-0003-4000-8000-000000000003",
       "number": 3,
       "name": "Analyze existing state",
       "stepRef": "@framework-step:investigation/review-verify-document",
-      "status": "completed",
-      "output": "Findings report with 9 step extra fields, 4 template extra fields, 2 missing types"
+      "status": "completed"
     },
     {
+      "id": "stjs2129-0004-4000-8000-000000000004",
       "number": 4,
       "name": "Design implementation plan",
       "stepRef": "@framework-step:planning/design-implementation-plan",
       "status": "completed",
-      "approvalRequired": true,
-      "output": "7 change proposals approved (MOD-001-005, NEW-001-002)"
+      "approvalRequired": true
     },
     {
+      "id": "stjs2129-0005-4000-8000-000000000005",
       "number": 5,
       "name": "Apply changes",
       "stepRef": "@framework-step:common/apply-changes",
-      "status": "completed",
-      "output": "7 changes applied: 3 files created, 15 files modified"
+      "status": "completed"
     },
     {
+      "id": "stjs2129-0006-4000-8000-000000000006",
       "number": 6,
       "name": "Verify implementation",
       "stepRef": "@framework-step:investigation/review-verify-document",
-      "status": "completed",
-      "output": "PASSED - All 7 verification criteria met"
+      "status": "completed"
     },
     {
+      "id": "stjs2129-0007-4000-8000-000000000007",
       "number": 7,
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
-      "status": "completed",
-      "output": "1 improvement implemented: approval at Step 1 for set-concept template"
+      "status": "completed"
     },
     {
+      "id": "stjs2129-0008-4000-8000-000000000008",
       "number": 8,
       "name": "End Process Validation",
       "stepRef": "@framework-step:common/end-process-validation",
-      "status": "completed",
-      "output": "Completed with 1 violation (Principle 6 - subagents). Remediation applied."
+      "status": "completed"
     }
   ]
 }

@@ -85,18 +85,32 @@
     },
     {
       "number": 5,
+      "name": "Validate File Structure",
+      "description": "Verify process files conform to TypeScript type definitions",
+      "actions": [
+        "Validate process.json against ProcessInstance type: has 'type: process-instance', id (UUID), name, metadata, status, steps with UUIDs",
+        "Validate memory.json against MemoryFile type: has 'type: memory-file', metadata.process, metadata.template, subProcessState.parentProcessPath",
+        "Validate log.json against LogFile type: has 'type: log-file', metadata.process, metadata.parentProcessPath, metadata.subProcessPaths",
+        "Check field names match types exactly (e.g., parentProcessPath not parentProcess)",
+        "If structural issues found: Report and fix before proceeding",
+        "Output: '✓ Process files conform to TypeScript type definitions'"
+      ]
+    },
+    {
+      "number": 6,
       "name": "Generate Compliance Report",
       "description": "Document compliance status and any violations",
       "actions": [
         "Create compliance report in log.json",
         "List principles checked",
+        "List structural validation results",
         "List any violations found",
         "If violations: Report to user and STOP - do not proceed to completion steps",
         "If clean: Output '✓ All operating principles followed' and proceed to completion steps"
       ]
     },
     {
-      "number": 6,
+      "number": 7,
       "name": "Update Process Status",
       "description": "Update process.json status to completed",
       "actions": [
@@ -107,7 +121,7 @@
       ]
     },
     {
-      "number": 7,
+      "number": 8,
       "name": "Record Completion Timestamp",
       "description": "Set completion timestamp in log.json",
       "actions": [
@@ -118,7 +132,7 @@
       ]
     },
     {
-      "number": 8,
+      "number": 9,
       "name": "Cleanup and Move to Completed Directory",
       "description": "Delete artifact files keeping only essential files, then move process directory from active to completed",
       "actions": [
@@ -149,7 +163,8 @@
     {"principle": 3, "name": "STOP AT CHECKPOINTS", "check": "Approval checkpoints waited for user"},
     {"principle": 4, "name": "NO TODOS", "check": "todo_write not used during process"},
     {"principle": 5, "name": "VERIFY ACTIONS", "check": "Mandatory actions had output confirmations"},
-    {"principle": 6, "name": "USE SUBAGENTS", "check": "Steps executed via step-executor subagent, not directly"}
+    {"principle": 6, "name": "USE SUBAGENTS", "check": "Steps executed via step-executor subagent, not directly"},
+    {"principle": 7, "name": "TYPE COMPLIANCE", "check": "Process files conform to TypeScript type definitions in .processes/types/"}
   ],
   "dependencies": {
     "requiredComponents": [],

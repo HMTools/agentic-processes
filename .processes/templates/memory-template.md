@@ -31,38 +31,42 @@ When creating a new process instance, initialize `memory.json` with this structu
 
 ```json
 {
-  "processName": "{Process Name}",
+  "type": "memory-file",
   "metadata": {
-    "processId": "{process-name-YYYYMMDD}",
+    "process": "{process-name-YYYYMMDD}",
+    "template": "{template-category/template-name}",
     "created": "{ISO 8601 timestamp}",
     "lastUpdated": "{ISO 8601 timestamp}",
-    "currentStep": 1
+    "currentStep": "{StepId UUID}"
   },
   "subProcessState": {
-    "parent": null,
-    "spawnedAtStep": null,
+    "parentProcessPath": null,
     "childSubProcesses": [],
-    "nextSyncPoint": null,
-    "pendingSubProcesses": []
+    "syncPoints": []
   },
   "steps": {},
   "crossReferences": {
     "keyDecisions": [],
     "filesModified": []
+  },
+  "searchHelpers": {
+    "byCategory": {}
   }
 }
 ```
 
 ### Step Section Schema
 
-When a step is completed, add/update its entry in `steps`:
+When a step is completed, add/update its entry in `steps` (keyed by StepId UUID):
 
 ```json
 {
   "steps": {
-    "step1": {
+    "{StepId UUID}": {
       "name": "{Step Name}",
       "status": "completed",
+      "startedAt": "{ISO 8601 timestamp}",
+      "updatedAt": "{ISO 8601 timestamp}",
       "informationProduced": {
         "key": "value or nested object"
       },
@@ -74,11 +78,7 @@ When a step is completed, add/update its entry in `steps`:
         "path/to/file1.cs",
         "path/to/file2.cs"
       ],
-      "notes": [
-        "Additional context",
-        "References to previous steps"
-      ],
-      "updated": "{ISO 8601 timestamp}"
+      "notes": "Additional context and references to previous steps"
     }
   }
 }
@@ -91,19 +91,17 @@ For processes with parent-child relationships:
 ```json
 {
   "subProcessState": {
-    "parent": "{parent-process-path or null}",
-    "spawnedAtStep": 3,
+    "parentProcessPath": ".user-processes/active/parent-process-id",
     "childSubProcesses": [
       {
-        "name": "{sub-process-name}",
+        "processPath": ".user-processes/active/child-process-id",
         "template": "{template-name}",
         "status": "running",
-        "spawnedAt": "step3",
-        "syncPoint": "step5"
+        "spawnedAtStepId": "{StepId UUID}",
+        "syncPointStepId": "{StepId UUID}"
       }
     ],
-    "nextSyncPoint": 5,
-    "pendingSubProcesses": ["sub-process-name"]
+    "syncPoints": ["{StepId UUID}"]
   }
 }
 ```
@@ -181,24 +179,25 @@ Update crossReferences for quick lookup:
 
 ```json
 {
-  "processName": "Implement User Authentication",
+  "type": "memory-file",
   "metadata": {
-    "processId": "process-user-auth-20251206",
+    "process": "process-user-auth-20251206",
+    "template": "development/develop-user-story",
     "created": "2025-12-06T10:00:00Z",
     "lastUpdated": "2025-12-06T14:45:00Z",
-    "currentStep": 6
+    "currentStep": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
   },
   "subProcessState": {
-    "parent": null,
-    "spawnedAtStep": null,
+    "parentProcessPath": null,
     "childSubProcesses": [],
-    "nextSyncPoint": null,
-    "pendingSubProcesses": []
+    "syncPoints": []
   },
   "steps": {
-    "step1": {
+    "a1b2c3d4-e5f6-7890-abcd-ef1234567890": {
       "name": "Requirements Analysis",
       "status": "completed",
+      "startedAt": "2025-12-06T10:00:00Z",
+      "updatedAt": "2025-12-06T10:30:00Z",
       "informationProduced": {
         "authRequirements": "JWT-based with 15-min access tokens, 7-day refresh",
         "authorizationModel": "Role-based access control (RBAC)",
@@ -213,11 +212,7 @@ Update crossReferences for quick lookup:
       "filesModifiedCreated": [
         "plans/user-authentication/requirements.md"
       ],
-      "notes": [
-        "Must maintain backward compatibility with existing sessions",
-        "Dependency: User collection schema must be created first"
-      ],
-      "updated": "2025-12-06T10:30:00Z"
+      "notes": "Must maintain backward compatibility with existing sessions. Dependency: User collection schema must be created first."
     }
   },
   "crossReferences": {
@@ -227,6 +222,9 @@ Update crossReferences for quick lookup:
       "Step 1: MongoDB for refresh token storage"
     ],
     "filesModified": []
+  },
+  "searchHelpers": {
+    "byCategory": {}
   }
 }
 ```

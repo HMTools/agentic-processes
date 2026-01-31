@@ -1,11 +1,12 @@
 {
+  "type": "log-file",
   "metadata": {
     "process": "process-strongly-typed-json-schema-20260129",
     "template": "infrastructure/set-concept",
     "started": "2026-01-29T16:51:00Z",
     "completed": "2026-01-29T17:35:00Z",
-    "parentProcess": null,
-    "subProcesses": []
+    "parentProcessPath": null,
+    "subProcessPaths": []
   },
   "steps": {},
   "userInteractions": [

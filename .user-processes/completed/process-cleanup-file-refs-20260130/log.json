@@ -1,33 +1,37 @@
 {
+  "type": "log-file",
   "metadata": {
     "process": "process-cleanup-file-refs-20260130",
     "template": "set-concept",
     "started": "2026-01-30T06:55:00Z",
     "completed": "2026-01-31T13:00:00Z",
-    "parentProcess": null,
-    "subProcesses": []
+    "parentProcessPath": null,
+    "subProcessPaths": []
   },
   "steps": {
-    "1": {
+    "clfr2130-0001-4000-8000-000000000001": {
       "name": "Understand Concept",
-      "timestamp": "2026-01-30T06:58:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-30T06:57:00Z",
+        "updatedAt": "2026-01-30T06:58:00Z"
+      },
       "userInteractions": [
         {
           "request": "Correction: cleanup should be part of substep 8 (Move to Completed Directory), and we should keep only process.json, memory.json, and log.json files - delete all other artifacts",
           "reason": "Clarifying scope: not just clearing memory sections, but deleting artifact files created during process execution",
-          "response": "Updating concept understanding to reflect: 1) Integrate cleanup into substep 8, 2) Delete all files except process.json, memory.json, log.json",
+          "agentResponse": "Updating concept understanding to reflect: 1) Integrate cleanup into substep 8, 2) Delete all files except process.json, memory.json, log.json",
           "timestamp": "2026-01-30T06:58:00Z"
         },
         {
           "request": "CRITICAL IMPROVEMENT: When user requests fixes/corrections like the one above, they should also run in subagents",
           "reason": "Process compliance - Principle 6 (USE SUBAGENTS) should apply to correction handling, not just initial step execution",
-          "response": "Logged as CRITICAL improvement in processWideObservations.recommendationsForFuture",
+          "agentResponse": "Logged as CRITICAL improvement in processWideObservations.recommendationsForFuture",
           "timestamp": "2026-01-30T07:02:00Z"
         },
         {
           "request": "Approved Step 1 understanding",
           "reason": "User confirmed corrected concept understanding is correct",
-          "response": "Marking Step 1 complete, proceeding to Step 2",
+          "agentResponse": "Marking Step 1 complete, proceeding to Step 2",
           "timestamp": "2026-01-30T07:03:00Z"
         }
       ],
@@ -42,14 +46,17 @@
         "Delete all artifact files (*.md reports, additional *.json files)"
       ]
     },
-    "0": {
+    "clfr2130-0000-4000-8000-000000000000": {
       "name": "Init Process Principles",
-      "timestamp": "2026-01-30T06:56:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-30T06:55:00Z",
+        "updatedAt": "2026-01-30T06:56:00Z"
+      },
       "userInteractions": [
         {
           "request": "User confirmed to begin Step 0: Init Process Principles",
           "reason": "Start process execution",
-          "response": "Beginning step execution",
+          "agentResponse": "Beginning step execution",
           "timestamp": "2026-01-30T06:56:00Z"
         }
       ],
@@ -62,44 +69,17 @@
       "filesModified": ["memory.json", "process.json"],
       "decisionsMade": []
     },
-    "1": {
-      "name": "Understand Concept",
-      "timestamp": "2026-01-30T07:00:00Z",
-      "userInteractions": [
-        {
-          "request": "User requested execution of Step 1: Understand Concept",
-          "reason": "Continue process with context understanding",
-          "response": "Beginning step execution",
-          "timestamp": "2026-01-30T07:00:00Z"
-        }
-      ],
-      "actionsTaken": [
-        "Read understand-context.json step definition for guidance",
-        "Read process.md to extract process parameters",
-        "Read end-process-validation.json to understand current implementation",
-        "Read memory-template.json to understand memory file structure",
-        "Read memory-file.ts to understand TypeScript schema",
-        "Read completed process memory.json files to see current file tracking state",
-        "Identified all file tracking sections that should be cleared",
-        "Documented findings in context documentation",
-        "Updated memory.json with informationProduced",
-        "Updated log.json with actions taken"
-      ],
-      "filesModified": ["memory.json", "log.json", "step1-context.md"],
-      "decisionsMade": [
-        "File tracking useful during execution should be cleared on completion",
-        "keyDecisions array should be preserved (useful for historical reference)",
-        "Step-level informationProduced and decisionsMade should be preserved"
-      ]
-    },
-    "2": {
+    "clfr2130-0002-4000-8000-000000000002": {
       "name": "Identify Target Files",
-      "timestamp": "2026-01-31T08:00:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-31T07:55:00Z",
+        "updatedAt": "2026-01-31T08:00:00Z"
+      },
       "userInteractions": [
         {
           "request": "User requested execution of Step 2: Identify Target Files",
           "reason": "Identify files that need modification to implement cleanup concept",
-          "response": "Beginning step execution via step-executor subagent",
+          "agentResponse": "Beginning step execution via step-executor subagent",
           "timestamp": "2026-01-31T08:00:00Z"
         }
       ],
@@ -122,14 +102,17 @@
         "No new files need to be created - existing substep 8 will be modified"
       ]
     },
-    "3": {
+    "clfr2130-0003-4000-8000-000000000003": {
       "name": "Analyze Existing State",
-      "timestamp": "2026-01-31T09:00:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-31T08:55:00Z",
+        "updatedAt": "2026-01-31T09:00:00Z"
+      },
       "userInteractions": [
         {
           "request": "User requested execution of Step 3: Analyze Existing State",
           "reason": "Analyze target files to understand current implementation and plan changes",
-          "response": "Beginning step execution via step-executor subagent",
+          "agentResponse": "Beginning step execution via step-executor subagent",
           "timestamp": "2026-01-31T09:00:00Z"
         }
       ],
@@ -157,14 +140,17 @@
         "Update MD documentation to reflect new behavior"
       ]
     },
-    "4": {
+    "clfr2130-0004-4000-8000-000000000004": {
       "name": "Design Implementation Plan",
-      "timestamp": "2026-01-31T10:00:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-31T09:55:00Z",
+        "updatedAt": "2026-01-31T10:00:00Z"
+      },
       "userInteractions": [
         {
           "request": "User requested execution of Step 4: Design Implementation Plan",
           "reason": "Design specific changes for target files based on Step 3 analysis",
-          "response": "Beginning step execution via step-executor subagent",
+          "agentResponse": "Beginning step execution via step-executor subagent",
           "timestamp": "2026-01-31T10:00:00Z"
         }
       ],
@@ -195,14 +181,17 @@
         "Use explicit allowlist in action text for clarity"
       ]
     },
-    "5": {
+    "clfr2130-0005-4000-8000-000000000005": {
       "name": "Apply Changes",
-      "timestamp": "2026-01-31T11:00:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-31T10:55:00Z",
+        "updatedAt": "2026-01-31T11:00:00Z"
+      },
       "userInteractions": [
         {
           "request": "User requested execution of Step 5: Apply Changes with approved MOD-001 and MOD-002",
           "reason": "Apply user-approved changes to end-process-validation files",
-          "response": "Beginning step execution via step-executor subagent",
+          "agentResponse": "Beginning step execution via step-executor subagent",
           "timestamp": "2026-01-31T11:00:00Z"
         }
       ],
@@ -233,14 +222,17 @@
         "Verified each change by reading modified files"
       ]
     },
-    "8": {
+    "clfr2130-0008-4000-8000-000000000008": {
       "name": "End Process Validation",
-      "timestamp": "2026-01-31T13:00:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-31T12:55:00Z",
+        "updatedAt": "2026-01-31T13:00:00Z"
+      },
       "userInteractions": [
         {
           "request": "User requested execution of Step 8: End Process Validation",
           "reason": "Validate process compliance and complete the process",
-          "response": "Beginning final validation via step-executor subagent",
+          "agentResponse": "Beginning final validation via step-executor subagent",
           "timestamp": "2026-01-31T13:00:00Z"
         }
       ],
@@ -281,14 +273,17 @@
         "conclusion": "All operating principles followed - process compliant"
       }
     },
-    "6": {
+    "clfr2130-0006-4000-8000-000000000006": {
       "name": "Verify Implementation",
-      "timestamp": "2026-01-31T12:00:00Z",
+      "timestamp": {
+        "startedAt": "2026-01-31T11:55:00Z",
+        "updatedAt": "2026-01-31T12:00:00Z"
+      },
       "userInteractions": [
         {
           "request": "User requested execution of Step 6: Verify Implementation",
           "reason": "Verify changes applied in Step 5 meet all success criteria",
-          "response": "Beginning step execution via step-executor subagent",
+          "agentResponse": "Beginning step execution via step-executor subagent",
           "timestamp": "2026-01-31T12:00:00Z"
         }
       ],

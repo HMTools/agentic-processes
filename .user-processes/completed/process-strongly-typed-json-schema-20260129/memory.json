@@ -1,21 +1,23 @@
 {
+  "type": "memory-file",
   "metadata": {
     "process": "process-strongly-typed-json-schema-20260129",
     "template": "infrastructure/set-concept",
     "created": "2026-01-29T16:51:00Z",
     "lastUpdated": "2026-01-29T16:55:00Z",
-    "currentStep": 1
+    "currentStep": "stjs2129-0001-4000-8000-000000000001"
   },
   "subProcessState": {
-    "parentProcess": null,
+    "parentProcessPath": null,
     "childSubProcesses": [],
     "syncPoints": []
   },
   "steps": {
-    "step0": {
+    "stjs2129-0000-4000-8000-000000000000": {
       "name": "Init Process Principles",
       "status": "completed",
-      "timestamp": "2026-01-29T16:53:00Z",
+      "startedAt": "2026-01-29T16:52:00Z",
+      "updatedAt": "2026-01-29T16:53:00Z",
       "informationProduced": {
         "principlesLoaded": true,
         "principlesConfirmed": true
@@ -24,10 +26,11 @@
       "filesModifiedCreated": ["memory.json"],
       "notes": "5 Core Principles internalized: LOG FIRST, READ JSON, STOP AT CHECKPOINTS, NO TODOS, VERIFY ACTIONS"
     },
-    "step1": {
+    "stjs2129-0001-4000-8000-000000000001": {
       "name": "Understand concept",
       "status": "completed",
-      "timestamp": "2026-01-29T16:55:00Z",
+      "startedAt": "2026-01-29T16:54:00Z",
+      "updatedAt": "2026-01-29T16:55:00Z",
       "informationProduced": {
         "parameters": {
           "conceptName": "Strongly Typed JSON Schema",
@@ -89,10 +92,11 @@
       "filesModifiedCreated": ["memory.json"],
       "notes": "TypeScript types already exist! Main work is validation, gap-filling, and ensuring consistency."
     },
-    "step2": {
+    "stjs2129-0002-4000-8000-000000000002": {
       "name": "Identify target files",
       "status": "completed",
-      "timestamp": "2026-01-29T16:57:00Z",
+      "startedAt": "2026-01-29T16:56:00Z",
+      "updatedAt": "2026-01-29T16:57:00Z",
       "informationProduced": {
         "identifiedFilesPath": "identified-files.json",
         "summary": {
@@ -112,10 +116,11 @@
       "filesModifiedCreated": ["identified-files.json", "memory.json"],
       "notes": "See identified-files.json for complete file lists by category"
     },
-    "step3": {
+    "stjs2129-0003-4000-8000-000000000003": {
       "name": "Analyze existing state",
       "status": "completed",
-      "timestamp": "2026-01-29T17:00:00Z",
+      "startedAt": "2026-01-29T16:58:00Z",
+      "updatedAt": "2026-01-29T17:00:00Z",
       "informationProduced": {
         "findingsReportPath": "./findings-report.md",
         "verificationStatus": "FAILED - Types exist but don't match JSON files",
@@ -142,10 +147,11 @@
       "filesModifiedCreated": ["findings-report.md", "memory.json"],
       "notes": "Types exist but are incomplete - main work is expanding types and adding missing types"
     },
-    "step4": {
+    "stjs2129-0004-4000-8000-000000000004": {
       "name": "Design implementation plan",
       "status": "awaiting_approval",
-      "timestamp": "2026-01-29T17:05:00Z",
+      "startedAt": "2026-01-29T17:02:00Z",
+      "updatedAt": "2026-01-29T17:05:00Z",
       "informationProduced": {
         "implementationPlanPath": "./implementation-plan.md",
         "totalChangeProposals": 5,
@@ -167,10 +173,11 @@
       "filesModifiedCreated": ["implementation-plan.md", "memory.json"],
       "notes": "Awaiting user approval for implementation plan"
     },
-    "step5": {
+    "stjs2129-0005-4000-8000-000000000005": {
       "name": "Apply changes",
       "status": "completed",
-      "timestamp": "2026-01-29T17:20:00Z",
+      "startedAt": "2026-01-29T17:15:00Z",
+      "updatedAt": "2026-01-29T17:20:00Z",
       "informationProduced": {
         "changeApplicationReportPath": "./changes-applied.md",
         "totalChangesApplied": 7,
@@ -194,10 +201,11 @@
       "filesModifiedCreated": ["changes-applied.md", "memory.json", "15 source files"],
       "notes": "All changes verified after application"
     },
-    "step6": {
+    "stjs2129-0006-4000-8000-000000000006": {
       "name": "Verify implementation",
       "status": "completed",
-      "timestamp": "2026-01-29T17:25:00Z",
+      "startedAt": "2026-01-29T17:22:00Z",
+      "updatedAt": "2026-01-29T17:25:00Z",
       "informationProduced": {
         "verificationReportPath": "./verification-report.md",
         "verificationStatus": "PASSED",
@@ -211,10 +219,11 @@
       "filesModifiedCreated": ["verification-report.md", "memory.json"],
       "notes": "All 7 verification criteria passed"
     },
-    "step7": {
+    "stjs2129-0007-4000-8000-000000000007": {
       "name": "Continuous Improvement",
       "status": "completed",
-      "timestamp": "2026-01-29T17:28:00Z",
+      "startedAt": "2026-01-29T17:26:00Z",
+      "updatedAt": "2026-01-29T17:28:00Z",
       "informationProduced": {
         "improvementsIdentified": 3,
         "improvementsImplemented": 1,

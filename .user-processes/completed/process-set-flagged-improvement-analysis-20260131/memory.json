@@ -1,24 +1,27 @@
 {
+  "type": "memory-file",
   "processName": "Set Flagged Improvement Analysis Concept",
   "metadata": {
     "processId": "set-flagged-improvement-analysis-20260131",
     "created": "2026-01-31T18:17:00.000Z",
     "lastUpdated": "2026-01-31T19:12:00.000Z",
-    "currentStep": 8,
+    "currentStep": "sfia2131-0008-4000-8000-000000000008",
     "processCompleted": true,
     "completedTimestamp": "2026-01-31T19:12:00.000Z"
   },
   "subProcessState": {
-    "parent": null,
+    "parentProcessPath": null,
     "spawnedAtStep": null,
     "childSubProcesses": [],
     "nextSyncPoint": null,
     "pendingSubProcesses": []
   },
   "steps": {
-    "step0": {
+    "sfia2131-0000-4000-8000-000000000000": {
       "name": "Init Process Principles",
       "status": "completed",
+      "startedAt": "2026-01-31T18:17:00.000Z",
+      "updatedAt": "2026-01-31T18:18:00.000Z",
       "informationProduced": {
         "principlesLoaded": true,
         "principlesConfirmed": [
@@ -32,12 +35,13 @@
       },
       "decisionsMade": [],
       "filesModifiedCreated": [],
-      "notes": ["Operating principles internalized for all subsequent steps"],
-      "updated": "2026-01-31T18:18:00.000Z"
+      "notes": ["Operating principles internalized for all subsequent steps"]
     },
-    "step1": {
+    "sfia2131-0001-4000-8000-000000000001": {
       "name": "Understand concept",
       "status": "completed",
+      "startedAt": "2026-01-31T18:20:00.000Z",
+      "updatedAt": "2026-01-31T18:25:00.000Z",
       "informationProduced": {
         "conceptName": "Comprehensive Log Analysis for Continuous Improvement",
         "conceptDescription": "The continuous improvement step should analyze the ENTIRE log.json comprehensively - all sections, all data - to find ALL places where improvements can be identified. The forImprovementStep and potentialImprovement fields are additional markers that flag specific entries for review.",
@@ -78,12 +82,13 @@
       "notes": [
         "User corrected initial misunderstanding - wanted comprehensive log analysis, not just flag searching",
         "Approval received after correction"
-      ],
-      "updated": "2026-01-31T18:25:00.000Z"
+      ]
     },
-    "step2": {
+    "sfia2131-0002-4000-8000-000000000002": {
       "name": "Identify target files",
       "status": "completed",
+      "startedAt": "2026-01-31T18:30:00.000Z",
+      "updatedAt": "2026-01-31T18:30:00.000Z",
       "informationProduced": {
         "fileCount": 2,
         "resultsJsonPath": "identified-files.json",
@@ -110,12 +115,13 @@
       "filesModifiedCreated": [
         "identified-files.json"
       ],
-      "notes": [],
-      "updated": "2026-01-31T18:30:00.000Z"
+      "notes": []
     },
-    "step3": {
+    "sfia2131-0003-4000-8000-000000000003": {
       "name": "Analyze existing state",
       "status": "completed",
+      "startedAt": "2026-01-31T18:31:00.000Z",
+      "updatedAt": "2026-01-31T18:35:00.000Z",
       "informationProduced": {
         "findingsReportPath": "findings-report.md",
         "filesReviewed": 2,
@@ -156,12 +162,13 @@
       "notes": [
         "The forImprovementStep and potentialImprovement fields exist specifically for continuous improvement but are never referenced",
         "processWideObservations section contains already-aggregated insights that should be reviewed"
-      ],
-      "updated": "2026-01-31T18:35:00.000Z"
+      ]
     },
-    "step4": {
+    "sfia2131-0004-4000-8000-000000000004": {
       "name": "Design implementation plan",
       "status": "completed",
+      "startedAt": "2026-01-31T18:40:00.000Z",
+      "updatedAt": "2026-01-31T18:45:00.000Z",
       "informationProduced": {
         "implementationPlanPath": "implementation-plan.md",
         "requestedState": "The continuous improvement step explicitly analyzes ALL log sections comprehensively, prioritizes entries with forImprovementStep: true and potentialImprovement values, and reviews processWideObservations",
@@ -197,12 +204,13 @@
       "notes": [
         "Both proposals designed to be atomic and self-contained",
         "Changes preserve existing functionality while adding explicit comprehensive instructions"
-      ],
-      "updated": "2026-01-31T18:45:00.000Z"
+      ]
     },
-    "step5": {
+    "sfia2131-0005-4000-8000-000000000005": {
       "name": "Apply changes",
       "status": "completed",
+      "startedAt": "2026-01-31T18:50:00.000Z",
+      "updatedAt": "2026-01-31T18:52:00.000Z",
       "informationProduced": {
         "changesApplied": [
           {
@@ -233,12 +241,13 @@
       "notes": [
         "Both modifications applied successfully in single iteration",
         "JSON structure validated after changes"
-      ],
-      "updated": "2026-01-31T18:52:00.000Z"
+      ]
     },
-    "step6": {
+    "sfia2131-0006-4000-8000-000000000006": {
       "name": "Verify implementation",
       "status": "completed",
+      "startedAt": "2026-01-31T18:55:00.000Z",
+      "updatedAt": "2026-01-31T18:58:00.000Z",
       "informationProduced": {
         "verificationReport": {
           "overallStatus": "PASS",
@@ -275,13 +284,13 @@
         "All 11 criteria verified as PASS",
         "Implementation matches verification criteria from process parameters",
         "No gaps found - comprehensive log analysis fully implemented"
-      ],
-      "updated": "2026-01-31T18:58:00.000Z"
-    }
-  },
-  "step8": {
+      ]
+    },
+    "sfia2131-0008-4000-8000-000000000008": {
       "name": "End Process Validation",
       "status": "completed",
+      "startedAt": "2026-01-31T19:10:00.000Z",
+      "updatedAt": "2026-01-31T19:12:00.000Z",
       "informationProduced": {
         "complianceValidated": true,
         "violations": [],
@@ -307,8 +316,7 @@
       "notes": [
         "Process completed successfully",
         "Moved to .user-processes/completed/"
-      ],
-      "updated": "2026-01-31T19:12:00.000Z"
+      ]
     }
   },
   "crossReferences": {
