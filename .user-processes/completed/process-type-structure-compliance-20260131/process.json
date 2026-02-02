@@ -1,94 +1,94 @@
 {
   "type": "process-instance",
   "id": "process-type-structure-compliance-20260131",
-  "template": "review/review-and-verify",
-  "status": "Completed",
-  "created": "2026-01-31T00:00:00Z",
-  "lastUpdated": "2026-01-31T20:30:00Z",
+  "name": "Type Structure Compliance Review",
+  "metadata": {
+    "template": "review/review-and-verify",
+    "created": "2026-01-31T00:00:00Z",
+    "lastUpdated": "2026-01-31T20:30:00Z"
+  },
+  "status": "completed",
   "parameters": {
     "investigationScope": "Process file structure compliance with TypeScript type definitions",
     "verificationCriteria": "Process files (process.json, memory.json, log.json) must conform to the TypeScript types in .processes/types/ and maintain structural integrity throughout the process lifecycle",
     "targetFiles": ".user-processes/completed/**/*.json, .processes/types/*.ts"
   },
+  "currentState": {
+    "activeStepId": "ptsc2131-0009-4000-8000-000000000009",
+    "activeStepName": "End Process Validation",
+    "actionSummary": "Process completed"
+  },
   "steps": [
     {
+      "id": "ptsc2131-0000-4000-8000-000000000000",
       "number": 0,
       "name": "Init Process Principles",
       "stepRef": "@framework-step:common/init-process-principles",
-      "status": "completed",
-      "output": "Principles loaded and confirmed"
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0001-4000-8000-000000000001",
       "number": 1,
       "name": "Understand context",
       "stepRef": "@framework-step:planning/understand-context",
-      "status": "completed",
-      "output": "Context documented: 10 type files, 5 completed processes (18 JSON files), preliminary compliance gaps identified"
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0002-4000-8000-000000000002",
       "number": 2,
       "name": "Identify files to review",
       "stepRef": "@framework-step:investigation/identify-files",
-      "status": "completed",
-      "output": "Created identified-files.json: 10 TypeScript type definitions, 18 JSON files across 5 completed processes"
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0003-4000-8000-000000000003",
       "number": 3,
       "name": "Review, verify, and document",
       "stepRef": "@framework-step:investigation/review-verify-document",
-      "status": "completed",
-      "output": "68 issues found: 15 Critical, 38 High, 12 Medium, 3 Low. Created findings-report.md and issues-list.json"
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0004-4000-8000-000000000004",
       "number": 4,
       "name": "Propose fixes",
       "stepRef": "@framework-step:investigation/propose-fixes",
       "status": "completed",
-      "approvalRequired": true,
-      "output": "All 6 fix categories approved: A (Discriminators), B (Field Names), C (Step IDs), D (Metadata), E (Timestamps), F (Log-Specific)",
-      "conditional": "Only if issues found"
+      "approvalRequired": true
     },
     {
+      "id": "ptsc2131-0005-4000-8000-000000000005",
       "number": 5,
       "name": "Apply approved changes",
       "stepRef": "@framework-step:common/apply-changes",
-      "status": "completed",
-      "output": "65 issues fixed across 15 files in 5 processes. All 6 categories applied. See changes-applied.md for details.",
-      "conditional": "Only if fixes approved"
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0006-4000-8000-000000000006",
       "number": 6,
       "name": "Re-verify after changes",
       "stepRef": "@framework-step:investigation/review-verify-document",
-      "status": "completed",
-      "output": "Re-verification complete. 89% compliance achieved (58/65 issues resolved). 7 remaining issues documented in re-verification-report.md: 3 log timestamp structure, 3 missing metadata fields, 1 field name.",
-      "conditional": "Only after applying changes"
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0007-4000-8000-000000000007",
       "number": 7,
       "name": "Final summary",
       "stepRef": "@framework-step:investigation/final-summary",
-      "status": "completed",
-      "output": "Final summary created: 89% compliance achieved (58/68 issues resolved). Created final-summary.md with executive summary, detailed findings, fix documentation, and recommendations for remaining 7 issues."
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0008-4000-8000-000000000008",
       "number": 8,
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
-      "status": "completed",
-      "output": "Identified 5 framework improvements. Critical discovery: Template schemas (memory-template.md, log-template.md) don't match TypeScript types - this is the true root cause. Top recommendation: Fix template schemas (IMP-001) - LOW effort, prevents 100% of issues."
+      "status": "completed"
     },
     {
+      "id": "ptsc2131-0009-4000-8000-000000000009",
       "number": 9,
       "name": "End Process Validation",
       "stepRef": "@framework-step:common/end-process-validation",
-      "status": "completed",
-      "output": "All 6 operating principles validated: PASS. Process completed and moved to .user-processes/completed/"
+      "status": "completed"
     }
-  ],
-  "currentState": {
-    "currentStepNumber": 9,
-    "blockedReason": null,
-    "awaitingApproval": false
-  }
+  ]
 }
