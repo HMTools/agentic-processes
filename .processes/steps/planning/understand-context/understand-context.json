@@ -8,8 +8,8 @@
     "lastUpdated": "2026-01-21"
   },
   "output": {
-    "description": "Context documentation in memory.json",
-    "artifacts": ["memory.json update", "step{N}-context.md (optional detailed file)"],
+    "description": "Context documentation in step{N}-context.md file and memory.json reference",
+    "artifacts": ["step{N}-context.md (MANDATORY - full context documentation)", "memory.json update (reference to context file)"],
     "memoryUpdates": ["parameters", "informationSources", "requirements", "successCriteria", "constraints"]
   },
   "guidance": {
@@ -17,14 +17,15 @@
     "mandatoryComponents": ["mandatory-logging.md"],
     "specificActions": [
       "Follow the substeps below in sequence",
-      "Workflow: gather parameters → identify sources → clarify requirements → understand success criteria → document constraints → verify completeness → request missing info (if needed) → document in memory",
-      "Keep memory concise: Create step{N}-context.md for detailed documentation, keep memory.json as quick reference",
-      "Example memory reference: '**Detailed Context**: See [`step1-context.md`](./step1-context.md)'"
+      "Workflow: gather parameters → identify sources → clarify requirements → understand success criteria → document constraints → verify completeness → request missing info (if needed) → create context file → update memory reference",
+      "MANDATORY: Always create step{N}-context.md file with full context documentation - do NOT present context inline in conversation",
+      "Memory should only contain a reference: '**Detailed Context**: See [`step{N}-context.md`](./step{N}-context.md)'",
+      "Context file provides better readability for approval checkpoints"
     ],
     "files": {
       "read": ["process.md (process description and parameters)"],
-      "create": ["step{N}-context.md (optional detailed documentation)"],
-      "update": ["memory.json (current step section with context documentation)"]
+      "create": ["step{N}-context.md (MANDATORY - full context documentation for approval)"],
+      "update": ["memory.json (reference to context file only)"]
     },
     "tools": [
       "read_file - read process.md and understand process description",
@@ -141,14 +142,14 @@
     },
     {
       "number": 8,
-      "name": "Document Context in Memory",
-      "description": "Write gathered context to current step section in memory.json",
+      "name": "Create Context File and Update Memory",
+      "description": "Create step{N}-context.md with full documentation, update memory.json with reference",
       "actions": [
-        "Write gathered context to current step section in memory.json",
-        "Organize by categories: Parameters, Information Sources, Requirements, Success Criteria, Constraints",
-        "Include any decisions made during context gathering",
-        "Note any assumptions or clarifications needed",
-        "Document any Q&A questions and answers if applicable"
+        "MANDATORY: Create step{N}-context.md file in process directory with full context documentation",
+        "File structure: Concept Overview, Current State, Target State, Target Files, Requirements, Success Criteria, Constraints, Questions/Gaps",
+        "Organize clearly with headers and tables for readability",
+        "Update memory.json with reference only: '**Detailed Context**: See [`step{N}-context.md`](./step{N}-context.md)'",
+        "Do NOT put detailed context inline in conversation - the file IS the deliverable for approval"
       ]
     },
     {

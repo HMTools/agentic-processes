@@ -144,10 +144,13 @@ When `/process-new` is invoked:
    - Initialize `log.json` from template
    - Set status to "Running"
 
-6. **Start Process**
+6. **Start Process (Auto-Execute Step 0)**
    - Display summary
-   - Highlight first step
-   - Offer to begin immediately
+   - **Automatically execute Step 0** (Init Process Principles) - do NOT ask for confirmation
+   - Step 0 has no approval checkpoint and is mandatory for every process
+   - After Step 0 completes, highlight the next step
+   - If next step has `approvalRequired: true`, present deliverables and wait
+   - If next step has no approval, continue execution
 
 ### Handling User Corrections at Approval Checkpoints
 
@@ -170,10 +173,58 @@ When `/process-new` is invoked:
 
 ### File Initialization
 
-1. **process.json**: Primary state (id, status, parameters, steps array, currentState)
+**CRITICAL: Read TypeScript types BEFORE creating files**
+
+Before creating any process files, you MUST read the type definitions:
+- `.processes/types/process-instance.ts` for process.json structure
+- `.processes/types/memory-file.ts` for memory.json structure  
+- `.processes/types/log-file.ts` for log.json structure
+
+**1. process.json** - MUST conform to `ProcessInstance` type:
+```json
+{
+  "type": "process-instance",
+  "id": "<UUID>",
+  "name": "<process name>",
+  "metadata": {
+    "template": "<template-name>",
+    "templateCategory": "<category>",
+    "created": "<ISO 8601>",
+    "lastUpdated": "<ISO 8601>",
+    "projectPath": "<absolute project path>",
+    "processPath": ".user-processes/active/process-<name>-<YYYYMMDD>"
+  },
+  "status": "running",
+  "parameters": { ... },
+  "currentState": {
+    "activeStepId": "<UUID of step 0>",
+    "activeStepName": "<name of step 0>",
+    "actionSummary": "Initializing process",
+    "actionDetails": "Process created, ready to begin"
+  },
+  "steps": [
+    {
+      "id": "<UUID>",
+      "number": 0,
+      "name": "<step name>",
+      "status": "pending",
+      "stepRef": "@framework-step:category/step-name",
+      "approvalRequired": false
+    }
+  ]
+}
+```
+
+**CRITICAL Requirements**:
+- `status` MUST be lowercase (`running`, not `Running`)
+- `metadata` object is REQUIRED (not flat fields at root)
+- `currentState.activeStepId` and `activeStepName` are REQUIRED (not `currentStepId`)
+- Steps MUST NOT have `output` field (that's only in template definitions)
+- All IDs MUST be valid UUIDs
+
 2. **process.md**: All `{{placeholders}}` substituted, step references kept as references
-3. **memory.json**: Initialized from `.processes/templates/memory-template.md` (JSON schema)
-4. **log.json**: Initialized from `.processes/templates/log-template.md` (JSON schema)
+3. **memory.json**: Initialized from `.processes/templates/memory-template.md` (JSON schema) - MUST conform to `MemoryFile` type
+4. **log.json**: Initialized from `.processes/templates/log-template.md` (JSON schema) - MUST conform to `LogFile` type
 
 ### Step Reference Format
 
