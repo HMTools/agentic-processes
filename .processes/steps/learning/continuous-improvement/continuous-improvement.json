@@ -2,6 +2,7 @@
   "type": "step",
   "name": "continuous-improvement",
   "category": "learning",
+  "approvalRequired": true,
   "metadata": {
     "title": "Continuous Improvement & Learning",
     "purposeAndUsage": "Analyze process execution log and implement improvements for future iterations. Use at the end of every process to learn from execution and improve templates/steps.",

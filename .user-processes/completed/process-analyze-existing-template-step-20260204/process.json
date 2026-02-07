@@ -1,0 +1,86 @@
+{
+  "type": "process-instance",
+  "id": "5b9e0f3a-4c8d-5f2b-ae60-7d3c9b1f5e8a",
+  "name": "Create analyze-current-artifact-state Step",
+  "metadata": {
+    "template": "create-process-step-template",
+    "templateCategory": "infrastructure",
+    "created": "2026-02-04T13:40:00.000Z",
+    "lastUpdated": "2026-02-06T10:25:00.000Z",
+    "projectPath": "C:/Projects/HM/agentic-processes",
+    "processPath": ".user-processes/active/process-analyze-existing-template-step-20260204"
+  },
+  "status": "completed",
+  "parameters": {
+    "stepName": "analyze-current-artifact-state",
+    "stepCategory": "common",
+    "stepPurpose": "Load and analyze an existing framework artifact (template, step, or process) to document its current state before making updates. Parses artifact-specific structures and records the baseline for comparison.",
+    "useCases": "Analyzing templates (steps array, parameters), analyzing steps (substeps, guidance), analyzing processes (flow, metadata), establishing baselines before updates, cross-validating artifact consistency, documenting current state in memory"
+  },
+  "currentState": {
+    "activeStepId": "ff6a7b8c-9d0e-1234-5f01-234567890123",
+    "activeStepName": "End Process Validation",
+    "actionSummary": "Step 4 completed, proceeding to Step 5",
+    "actionDetails": "1 improvement implemented: added approvalRequired to create-step-file step in template. No other improvements needed."
+  },
+  "steps": [
+    {
+      "id": "aa1b2c3d-4e5f-6789-0abc-def123456789",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "approvalRequired": false
+    },
+    {
+      "id": "bb2c3d4e-5f6a-7890-1bcd-ef0123456789",
+      "number": 1,
+      "name": "Plan and design step",
+      "status": "completed",
+      "stepRef": "@framework-step:template/plan-and-design-step",
+      "approvalRequired": true
+    },
+    {
+      "id": "cc3d4e5f-6a7b-8901-2cde-f01234567890",
+      "number": 2,
+      "name": "Create step file",
+      "status": "completed",
+      "stepRef": "@framework-step:template/create-step-file",
+      "approvalRequired": true
+    },
+    {
+      "id": "dd4e5f6a-7b8c-9012-3def-012345678901",
+      "number": 3,
+      "name": "Validate step structure",
+      "status": "completed",
+      "stepRef": "@framework-step:template/validate-step-structure",
+      "approvalRequired": false
+    },
+    {
+      "id": "ee5f6a7b-8c9d-0123-4ef0-123456789012",
+      "number": 4,
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": false
+    },
+    {
+      "id": "ff6a7b8c-9d0e-1234-5f01-234567890123",
+      "number": 5,
+      "name": "End Process Validation",
+      "status": "completed",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "approvalRequired": false
+    }
+  ],
+  "subProcessState": {
+    "parentProcess": {
+      "id": "4a8d9f2e-3b7c-4e1a-9d5f-6c2b8a0e4d7f",
+      "name": "Create update-process-template Template",
+      "processPath": ".user-processes/active/process-update-process-template-20260204",
+      "returnToStep": "c4d5e6f7-a8b9-4012-1234-567890123def"
+    },
+    "childProcesses": [],
+    "nextSyncPoint": null
+  }
+}

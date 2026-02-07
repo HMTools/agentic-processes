@@ -47,6 +47,9 @@ These principles apply to ALL work in this process:
 7. **FOLLOW TYPE STRUCTURES** - All process files (process.json, memory.json, log.json) MUST conform to TypeScript type definitions in .processes/types/
    - Validate at End-Step: type discriminators present, field names match types, step IDs use correct format
 
+8. **GENERATE INTERACTION OPTIONS** - Whenever you need any form of user input, dynamically generate options and set `pendingInteraction` in process.json
+   - Output: "✓ pendingInteraction set in process.json"
+
 ---
 
 ### Instructions
@@ -166,15 +169,17 @@ When `/process-continue` is invoked:
 6. **Proceed with Guidance via Step Delegation**
    - **Delegate step execution** to the `step-executor` subagent
    - Provide to subagent:
+     - **Operating principles** (all 8 principles from `.processes/steps/_components/operating-principles.md`) — subagents run in isolated context and MUST receive these explicitly
      - Step's `.json` file path and content
      - Current process context (process.json, memory.json relevant sections)
      - Step number and any step-specific parameters
+     - **Scope boundary**: explicitly state what the subagent should and should NOT do
    - **Wait for subagent completion** (foreground execution)
    - **Process subagent results**:
      - Verify step completed successfully
      - Review memory/log updates made by subagent
      - Handle any issues reported
-   - **Handle approval checkpoints**: If step has `approvalRequired: true`, the subagent will prepare deliverables and return; present to user and wait for approval
+   - **Handle approval checkpoints**: If step has `approvalRequired: true`, the subagent will prepare deliverables and return; present deliverables to the user and wait for approval
    - **Handle user corrections at approval**: If user provides corrections/feedback instead of simple approval:
      1. Log the correction to log.json immediately (LOG FIRST principle)
      2. **Delegate correction processing** to `step-executor` subagent with:

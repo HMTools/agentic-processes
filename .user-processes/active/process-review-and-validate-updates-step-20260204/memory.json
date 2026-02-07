@@ -1,0 +1,24 @@
+{
+  "type": "memory-file",
+  "metadata": {
+    "process": "8e2b3c6d-7f1a-8c5e-db93-0a6f2e4c8b1d",
+    "template": "create-process-step-template",
+    "created": "2026-02-04T13:40:00.000Z",
+    "lastUpdated": "2026-02-04T13:40:00.000Z",
+    "currentStep": "a21b2c3d-4e5f-6789-0abc-def123456021"
+  },
+  "subProcessState": {
+    "parentProcessPath": ".user-processes/active/process-update-process-template-20260204",
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {},
+  "crossReferences": {
+    "keyDecisions": [],
+    "filesModified": [],
+    "filesCreated": []
+  },
+  "searchHelpers": {
+    "byCategory": {}
+  }
+}

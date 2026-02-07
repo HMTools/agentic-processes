@@ -45,7 +45,8 @@
       "Ensure flow diagram accurately represents substeps",
       "Agents make individual tool calls sequentially",
       "Consolidate related operations into single substeps",
-      "Prefer unified flows over multiple branches"
+      "Prefer unified flows over multiple branches",
+      "Look for generalization opportunities: if the step's logic could apply to multiple artifact types (templates, steps, processes), parameterize it rather than creating a narrow single-type step"
     ]
   },
   "substeps": [
@@ -70,12 +71,15 @@
     },
     {
       "number": 2,
-      "name": "Check existing steps",
-      "description": "Verify no similar step already exists",
+      "name": "Check existing steps and generalization patterns",
+      "description": "Verify no similar step exists and check for generalization opportunities",
       "actions": [
         "List existing steps in relevant categories",
         "Search for similar functionality",
-        "Identify steps that could be extended vs creating new"
+        "Identify steps that could be extended vs creating new",
+        "GENERALIZATION CHECK: Look for existing steps that solve a similar problem for a different artifact/entity type (e.g., analyze-current-artifact-state handles templates, steps, and processes via an artifactType parameter)",
+        "If a generalization pattern exists: propose parameterizing the new step to cover multiple types instead of creating a narrow single-type step",
+        "Consider: Could the step be placed in 'common' category with a type parameter instead of a type-specific category?"
       ]
     },
     {

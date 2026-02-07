@@ -2,7 +2,7 @@
 
 Shared component containing all operating principles that agents must follow during process execution. Referenced by `init-process-principles` step and all step Init-Step/End-Step substeps.
 
-## The 7 Principles
+## The 8 Principles
 
 ### 1. LOG FIRST, ACT SECOND
 **Rule**: Log every user interaction to log.json BEFORE responding or making changes
@@ -51,3 +51,10 @@ Shared component containing all operating principles that agents must follow dur
 - `process.json`: type='process-instance', steps[].id as UUID
 - `memory.json`: type='memory-file', steps keyed by StepId, subProcessState.parentProcessPath
 - `log.json`: type='log-file', metadata.parentProcessPath, metadata.subProcessPaths
+
+---
+
+### 8. GENERATE INTERACTION OPTIONS
+**Rule**: Whenever you need any form of user input, dynamically generate relevant options and set them in `process.json` `pendingInteraction` field. Never use predefined options from templates.
+
+**Verification**: Output "✓ pendingInteraction set in process.json" when options are generated

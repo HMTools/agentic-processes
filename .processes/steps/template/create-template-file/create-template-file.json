@@ -40,7 +40,7 @@
       "list_dir - Verify directory structure"
     ],
     "bestPractices": [
-      "Always include continuous improvement as final step",
+      "Always include continuous improvement as final step with approvalRequired: true",
       "Use @framework-step:category/step-name for all step references",
       "Keep parameters section clear with required vs optional",
       "Ensure flow diagram matches step sequence",
@@ -96,7 +96,7 @@
         "For each step: checkbox, description, step reference",
         "Use format: - [ ] Step N: Description (@framework-step:category/step-name)",
         "Include output for each step",
-        "Add continuous improvement as final step"
+        "Add continuous improvement as final step with approvalRequired: true"
       ]
     },
     {

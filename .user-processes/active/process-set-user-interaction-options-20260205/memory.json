@@ -1,0 +1,199 @@
+{
+  "type": "memory-file",
+  "metadata": {
+    "process": "34e3ed94-3c1c-4082-9c1c-ec43e3c3c6c5",
+    "template": "set-concept",
+    "created": "2026-02-05T10:00:00.000Z",
+    "lastUpdated": "2026-02-05T10:40:00.000Z",
+    "currentStep": "ded0d0ca-51a8-41c9-bce2-2b3ed4cafef9"
+  },
+  "subProcessState": {
+    "parentProcessPath": null,
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {
+    "3e6b7d2d-accb-4636-95f2-42f75bbbf6dc": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:00:00.000Z",
+      "updatedAt": "2026-02-05T10:10:00.000Z",
+      "informationProduced": {
+        "principlesLoaded": true,
+        "principleCount": 7
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [
+        "process.json",
+        "process.md",
+        "memory.json",
+        "log.json"
+      ]
+    },
+    "8704f0a9-6740-4747-857b-482d1ae9c8b6": {
+      "name": "Understand concept",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:10:00.000Z",
+      "updatedAt": "2026-02-05T10:18:00.000Z",
+      "informationProduced": {
+        "contextFile": "step1-context.md",
+        "conceptName": "User Interaction Options",
+        "targetTypes": ["ProcessStep", "InteractionOption"],
+        "targetFiles": [
+          ".processes/types/process-instance.ts",
+          ".processes/types/template-definition.ts"
+        ]
+      },
+      "decisionsMade": [
+        "New InteractionOption interface with id, label, description, isDefault fields",
+        "Add interactionOptions and selectedOptions to ProcessStep",
+        "All new fields are optional for backward compatibility"
+      ],
+      "filesModifiedCreated": [
+        "step1-context.md"
+      ],
+      "notes": "**Detailed Context**: See [`step1-context.md`](./step1-context.md)"
+    },
+    "17427d29-451e-4db8-a150-fc959a1c1c46": {
+      "name": "Identify target files",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:18:00.000Z",
+      "updatedAt": "2026-02-05T10:20:00.000Z",
+      "informationProduced": {
+        "resultsFile": "identified-files.json",
+        "fileCount": 2,
+        "primaryTargets": [".processes/types/process-instance.ts"],
+        "secondaryTargets": [".processes/types/template-definition.ts"]
+      },
+      "decisionsMade": [
+        "Simple search mode - targets already known from context",
+        "index.ts auto-exports via wildcard - no change needed",
+        "step-definition.ts not needed now - could add defaultInteractionOptions later"
+      ],
+      "filesModifiedCreated": [
+        "identified-files.json"
+      ],
+      "notes": "**File List**: See [`identified-files.json`](./identified-files.json)"
+    },
+    "ce0631b1-13e0-42b3-b59e-25de544b5d1b": {
+      "name": "Analyze existing state",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:20:00.000Z",
+      "updatedAt": "2026-02-05T10:25:00.000Z",
+      "informationProduced": {
+        "analysisFile": "step3-analysis.md",
+        "insertionPoints": {
+          "process-instance.ts": "After line 140 (ProcessStep interface)",
+          "template-definition.ts": "After line 70 (approvalRequired)"
+        }
+      },
+      "decisionsMade": [
+        "InteractionOption separate from UserInteraction (different purpose)",
+        "Use string IDs for flexibility",
+        "selectedOptions as array for multi-select support"
+      ],
+      "filesModifiedCreated": ["step3-analysis.md"],
+      "notes": "**Analysis**: See [`step3-analysis.md`](./step3-analysis.md)"
+    },
+    "19b3f153-011e-410d-aff5-6947660959e9": {
+      "name": "Design implementation plan",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:25:00.000Z",
+      "updatedAt": "2026-02-05T10:35:00.000Z",
+      "informationProduced": {
+        "implementationPlanPath": "implementation-plan.md",
+        "totalChangeProposals": 3,
+        "changeProposals": ["MOD-001", "MOD-002", "MOD-003"],
+        "filesToModify": [
+          ".processes/types/process-instance.ts",
+          ".processes/types/template-definition.ts"
+        ],
+        "approvalStatus": "approved",
+        "approvedChangeIds": ["MOD-001", "MOD-002", "MOD-003"]
+      },
+      "decisionsMade": [
+        "3 change proposals: MOD-001 (InteractionOption interface), MOD-002 (ProcessStep fields), MOD-003 (template step options)",
+        "All fields optional for backward compatibility"
+      ],
+      "filesModifiedCreated": ["implementation-plan.md"],
+      "notes": "**Implementation Plan**: See [`implementation-plan.md`](./implementation-plan.md)"
+    },
+    "378c3a15-c6f3-4fc1-a624-be9460b3e4dc": {
+      "name": "Apply changes",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:35:00.000Z",
+      "updatedAt": "2026-02-05T10:38:00.000Z",
+      "informationProduced": {
+        "changesApplied": ["MOD-001", "MOD-002", "MOD-003"],
+        "filesModified": [
+          ".processes/types/process-instance.ts",
+          ".processes/types/template-definition.ts"
+        ]
+      },
+      "decisionsMade": [
+        "Applied all 3 approved change proposals"
+      ],
+      "filesModifiedCreated": [
+        ".processes/types/process-instance.ts",
+        ".processes/types/template-definition.ts"
+      ]
+    },
+    "a076ec11-af70-48cd-879f-773221c35b8f": {
+      "name": "Verify implementation",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:38:00.000Z",
+      "updatedAt": "2026-02-05T10:40:00.000Z",
+      "informationProduced": {
+        "verificationResult": "passed",
+        "linterErrors": 0,
+        "typesValid": true
+      },
+      "decisionsMade": [
+        "All changes verified - no linter errors"
+      ],
+      "filesModifiedCreated": []
+    },
+    "ded0d0ca-51a8-41c9-bce2-2b3ed4cafef9": {
+      "name": "Continuous Improvement",
+      "status": "in-progress",
+      "startedAt": "2026-02-05T10:40:00.000Z",
+      "informationProduced": {},
+      "decisionsMade": [],
+      "filesModifiedCreated": []
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [
+      "InteractionOption: id, label, description?, isDefault?",
+      "ProcessStep: interactionOptions?, selectedOptions?",
+      "Backward compatible - all new fields optional"
+    ],
+    "filesModified": [
+      ".processes/types/process-instance.ts",
+      ".processes/types/template-definition.ts"
+    ],
+    "filesCreated": [
+      ".user-processes/active/process-set-user-interaction-options-20260205/process.json",
+      ".user-processes/active/process-set-user-interaction-options-20260205/process.md",
+      ".user-processes/active/process-set-user-interaction-options-20260205/memory.json",
+      ".user-processes/active/process-set-user-interaction-options-20260205/log.json",
+      ".user-processes/active/process-set-user-interaction-options-20260205/step1-context.md",
+      ".user-processes/active/process-set-user-interaction-options-20260205/identified-files.json",
+      ".user-processes/active/process-set-user-interaction-options-20260205/step3-analysis.md",
+      ".user-processes/active/process-set-user-interaction-options-20260205/implementation-plan.md"
+    ],
+    "targetFiles": [
+      ".processes/types/process-instance.ts",
+      ".processes/types/template-definition.ts"
+    ]
+  },
+  "searchHelpers": {
+    "byCategory": {
+      "types": [
+        ".processes/types/process-instance.ts",
+        ".processes/types/template-definition.ts"
+      ],
+      "templates": []
+    }
+  }
+}

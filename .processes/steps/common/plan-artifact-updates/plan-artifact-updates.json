@@ -1,0 +1,296 @@
+{
+  "type": "step",
+  "name": "plan-artifact-updates",
+  "category": "common",
+  "metadata": {
+    "title": "Plan Artifact Updates",
+    "purposeAndUsage": "Plan specific changes to an existing framework artifact (template, step, or process) by reviewing the update description, loading baseline analysis, prompting for backward compatibility, checking for active consumers, and producing an update-plan.md for approval. Use before applying changes to any artifact.",
+    "lastUpdated": "2026-02-06"
+  },
+  "parameters": {
+    "required": ["artifactType", "artifactPath", "updateDescription"],
+    "optional": ["changeScope", "preserveActiveConsumers"],
+    "defaults": {
+      "changeScope": null,
+      "preserveActiveConsumers": true
+    },
+    "definitions": {
+      "artifactType": {
+        "description": "Type of artifact being updated",
+        "type": "string",
+        "enum": ["template", "step", "process"]
+      },
+      "artifactPath": {
+        "description": "Path to the artifact (relative to project root)",
+        "type": "string",
+        "example": ".processes/templates/infrastructure/update-process-template"
+      },
+      "updateDescription": {
+        "description": "Description of what changes are needed",
+        "type": "string",
+        "example": "Add approval checkpoint after analysis step"
+      },
+      "changeScope": {
+        "description": "Scope of changes: minor (small fixes) or major (structural changes). If omitted, agent determines from analysis.",
+        "type": "string",
+        "enum": ["minor", "major"],
+        "default": null
+      },
+      "preserveActiveConsumers": {
+        "description": "Whether to warn if active consumers use this artifact",
+        "type": "boolean",
+        "default": true
+      }
+    }
+  },
+  "output": {
+    "description": "Detailed update plan document for user approval",
+    "artifacts": ["update-plan.md"],
+    "memoryUpdates": ["backwardCompatibility", "activeConsumersCheck", "changeDesign", "updatePlanRef"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Artifact has been analyzed by analyze-current-artifact-state (or equivalent)",
+      "Analysis baseline (currentStructure) is available in memory.json from prior step",
+      "updateDescription is available in process parameters"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: validate params → review requirements → load analysis → prompt compatibility → check consumers → design changes → (Q&A if needed) → create plan → review plan → present for approval",
+      "The backward compatibility prompt is the KEY user interaction — log it immediately",
+      "Use type-specific change targets and consumer checks (see artifactTypeConfig)",
+      "The update-plan.md serves as a contract: the apply step implements exactly what's approved",
+      "Do NOT apply changes in this step — only plan them"
+    ],
+    "files": {
+      "read": [
+        "memory.json (previous step's artifact analysis)",
+        "Artifact files for reference during change design"
+      ],
+      "create": ["update-plan.md (in process folder)"],
+      "update": ["memory.json (current step section with plan details)"]
+    },
+    "tools": [
+      "read_file - Read memory, artifact files",
+      "write - Create update-plan.md",
+      "grep - Search for active consumers (processes using template, templates referencing step)",
+      "list_dir - Browse active processes directory"
+    ],
+    "bestPractices": [
+      "Always load the baseline analysis before designing changes — never plan from scratch",
+      "Log the backward compatibility response immediately (LOG FIRST principle)",
+      "Design changes as before/after pairs for clarity",
+      "Check for side effects and downstream consequences",
+      "Keep the plan document human-readable — it's an approval deliverable",
+      "Self-review the plan before presenting to the user",
+      "When user requests changes, loop through review again before re-presenting"
+    ]
+  },
+  "artifactTypeConfig": {
+    "template": {
+      "changeTargets": ["steps array", "parameters (required/optional)", "metadata", "flow diagram", "MD documentation"],
+      "consumerCheck": {
+        "description": "Search for active processes using this template",
+        "searchPath": ".user-processes/active/",
+        "searchPattern": "Read process.json files and check metadata.template field"
+      },
+      "compatibilityConcerns": [
+        "Parameter removal/renaming breaks active processes",
+        "Step reordering affects running processes",
+        "Removing steps may orphan in-progress work"
+      ]
+    },
+    "step": {
+      "changeTargets": ["substeps", "guidance (actions, files, tools, best practices)", "dependencies", "references", "memory usage"],
+      "consumerCheck": {
+        "description": "Search for templates referencing this step",
+        "searchPath": ".processes/templates/",
+        "searchPattern": "Search for @framework-step:{category}/{stepName} in template JSON files"
+      },
+      "compatibilityConcerns": [
+        "Removing substeps may break templates that depend on specific outputs",
+        "Changing output format affects downstream steps",
+        "Renaming memory fields breaks steps that read from memory"
+      ]
+    },
+    "process": {
+      "changeTargets": ["step configuration", "parameters", "subprocess state", "metadata"],
+      "consumerCheck": {
+        "description": "Check for parent/child process relationships",
+        "searchPattern": "Read process.json subProcessState for parent and child references"
+      },
+      "compatibilityConcerns": [
+        "Active process instances may be mid-execution",
+        "Child processes may depend on parent state",
+        "Changing step IDs breaks memory references"
+      ]
+    }
+  },
+  "substeps": [
+    {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
+      "number": 1,
+      "name": "Validate Parameters",
+      "description": "Confirm all required parameters are valid",
+      "actions": [
+        "Confirm `artifactType` is one of: template, step, process",
+        "Confirm `artifactPath` is provided and non-empty",
+        "Confirm `updateDescription` is provided",
+        "If optional parameters are provided, note them",
+        "If required parameters are invalid, log error to log.json and stop"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Review Update Requirements",
+      "description": "Understand what changes are requested",
+      "actions": [
+        "Read the `updateDescription` from process parameters",
+        "Read any `changeScope` parameter (minor/major) if provided",
+        "Understand what changes are requested",
+        "Identify the scope and nature of the update"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Load Artifact Analysis from Memory",
+      "description": "Read the baseline analysis from the prior step",
+      "actions": [
+        "Read the previous step's analysis results from memory.json",
+        "This includes the `currentStructure` baseline recorded by `analyze-current-artifact-state`",
+        "Build understanding of the current state before planning changes",
+        "If analysis is missing or incomplete, log error and stop"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Prompt User for Backward Compatibility",
+      "description": "Ask the user about backward compatibility requirements",
+      "actions": [
+        "Ask the user: 'Is backward compatibility required for this update?'",
+        "Wait for user response",
+        "Log the response to log.json IMMEDIATELY (LOG FIRST principle)",
+        "Record the decision — it shapes how changes are designed",
+        "If yes: changes must not break active consumers (see artifactTypeConfig.compatibilityConcerns)",
+        "If no: breaking changes are allowed; full restructuring permitted"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Check for Active Consumers",
+      "description": "Search for consumers of this artifact based on its type",
+      "actions": [
+        "Based on `artifactType`, check for active consumers using artifactTypeConfig",
+        "For templates: search `.user-processes/active/` for processes using this template",
+        "For steps: search `.processes/templates/` for templates referencing this step via `@framework-step:{category}/{stepName}`",
+        "For processes: check `subProcessState` for parent/child relationships",
+        "Report findings to the user",
+        "If `preserveActiveConsumers` is true, flag changes that would break consumers"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Design Specific Changes",
+      "description": "Design each change using type-specific change targets",
+      "actions": [
+        "Based on update description, analysis baseline, backward compatibility decision, and artifact type, design each change",
+        "Use type-specific change targets from artifactTypeConfig",
+        "For each change, document: what exactly changes (before → after), why the change is needed, impact on existing functionality, whether it's backward compatible",
+        "If gaps or ambiguities exist, proceed to Q&A (Substep 7)"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Q&A Session (if needed)",
+      "description": "Gather missing details from user if gaps found in change design",
+      "conditional": true,
+      "component": ".processes/steps/_components/qa-session.md",
+      "actions": [
+        "If any gaps or ambiguities exist in the planned changes, ask the user for clarification",
+        "Use the qa-session component pattern",
+        "Log user responses to log.json",
+        "Return to Substep 6 after gathering answers",
+        "Skip this substep if all changes are well-defined"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Create update-plan.md",
+      "description": "Write the detailed change plan document",
+      "actions": [
+        "Create `update-plan.md` in the process folder",
+        "Include sections: Summary, Artifact (type/path/name), Backward Compatibility (decision and implications), Active Consumers (impact assessment), Detailed Changes (each change with before/after, rationale, impact), Files to Modify, Risks and Considerations"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Review and Refine Plan",
+      "description": "Self-review the plan for quality before presenting to user",
+      "actions": [
+        "Re-read the generated `update-plan.md` critically",
+        "Verify completeness: are all requested changes from `updateDescription` addressed?",
+        "Verify consistency: do changes align with the backward compatibility decision?",
+        "Verify correctness: are before/after descriptions accurate against the baseline analysis?",
+        "Check for missed impacts: are there side effects or downstream consequences not captured?",
+        "Check for unnecessary changes: is anything included that wasn't requested or needed?",
+        "If issues found, revise `update-plan.md` and re-review",
+        "Output: '✓ Plan reviewed and verified'"
+      ]
+    },
+    {
+      "number": 10,
+      "name": "Present Plan for User Approval",
+      "description": "Summarize the plan and wait for user to approve or request changes",
+      "actions": [
+        "Present a clear summary of the update plan to the user",
+        "Highlight the key changes, backward compatibility decision, and any risks",
+        "Reference the full `update-plan.md` for detailed review",
+        "This is the approval checkpoint — wait for user response",
+        "Log user response to log.json",
+        "If approved: proceed to End-Step",
+        "If request-changes: log the feedback, apply changes to update-plan.md, loop back to Substep 9 (Review and refine), then re-present"
+      ]
+    },
+    {
+      "number": 11,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for user interactions (backward compatibility prompt, Q&A, approval)?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Verify: Do modified process files conform to type definitions? (Principle 7)",
+        "Output: '✓ Step completed in compliance with operating principles'"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Validate params → Review requirements → Load analysis → Prompt backward compatibility → Type-specific consumer check → Design changes → (Q&A if needed) → Create plan → Review plan → Present for approval (loop on request-changes) → End"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters (artifactType, artifactPath, updateDescription) and previous step's analysis (currentStructure)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: backwardCompatibility decision, activeConsumersCheck results, changeDesign details, updatePlanRef path",
+      "Decisions Made: Backward compatibility decision, change design choices, scope determination"
+    ]
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "optionalComponents": ["qa-session.md"],
+    "requiredFiles": [],
+    "requiredTools": ["read_file", "write", "grep", "list_dir"]
+  },
+  "references": {
+    "relatedSteps": ["analyze-current-artifact-state", "init-process-principles", "end-process-validation"],
+    "usedInTemplates": ["update-process-template"]
+  }
+}

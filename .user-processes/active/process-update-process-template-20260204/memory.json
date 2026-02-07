@@ -1,0 +1,231 @@
+{
+  "type": "memory-file",
+  "metadata": {
+    "process": "4a8d9f2e-3b7c-4e1a-9d5f-6c2b8a0e4d7f",
+    "template": "create-process-template",
+    "created": "2026-02-04T13:08:00.000Z",
+    "lastUpdated": "2026-02-04T14:15:00.000Z",
+    "currentStep": "b3c4d5e6-f7a8-4901-0123-456789012cde"
+  },
+  "subProcessState": {
+    "parentProcessPath": null,
+    "childSubProcesses": [
+      {
+        "id": "5b9e0f3a-4c8d-5f2b-ae60-7d3c9b1f5e8a",
+        "name": "Create analyze-existing-template Step",
+        "processPath": ".user-processes/active/process-analyze-existing-template-step-20260204",
+        "spawnedFromStep": "c4d5e6f7-a8b9-4012-1234-567890123def",
+        "status": "running"
+      },
+      {
+        "id": "6c0f1a4b-5d9e-6a3c-bf71-8e4d0c2a6f9b",
+        "name": "Create plan-template-updates Step",
+        "processPath": ".user-processes/active/process-plan-template-updates-step-20260204",
+        "spawnedFromStep": "c4d5e6f7-a8b9-4012-1234-567890123def",
+        "status": "completed",
+        "completionSummary": "Created plan-artifact-updates step (generalized from plan-template-updates). Step files: .processes/steps/common/plan-artifact-updates/. 2 framework improvements implemented: generalization check in plan-and-design-step, interactionOptions as proactive framework concept."
+      },
+      {
+        "id": "7d1a2b5c-6e0f-7b4d-ca82-9f5e1d3b7a0c",
+        "name": "Create apply-template-updates Step",
+        "processPath": ".user-processes/active/process-apply-template-updates-step-20260204",
+        "spawnedFromStep": "c4d5e6f7-a8b9-4012-1234-567890123def",
+        "status": "running"
+      },
+      {
+        "id": "8e2b3c6d-7f1a-8c5e-db93-0a6f2e4c8b1d",
+        "name": "Create review-and-validate-updates Step",
+        "processPath": ".user-processes/active/process-review-and-validate-updates-step-20260204",
+        "spawnedFromStep": "c4d5e6f7-a8b9-4012-1234-567890123def",
+        "status": "running"
+      }
+    ],
+    "syncPoints": ["c4d5e6f7-a8b9-4012-1234-567890123def"]
+  },
+  "steps": {
+    "f1e2d3c4-b5a6-4789-8901-234567890abc": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "startedAt": "2026-02-04T13:08:00.000Z",
+      "updatedAt": "2026-02-04T13:09:00.000Z",
+      "informationProduced": {
+        "principlesLoaded": true,
+        "principleCount": 7
+      },
+      "decisionsMade": [
+        "All 7 operating principles loaded and confirmed"
+      ],
+      "filesModifiedCreated": []
+    },
+    "a2b3c4d5-e6f7-4890-9012-345678901bcd": {
+      "name": "Plan and design template",
+      "status": "in-progress",
+      "startedAt": "2026-02-04T14:00:00.000Z",
+      "updatedAt": "2026-02-04T14:15:00.000Z",
+      "informationProduced": {
+        "purpose": "A structured workflow for safely modifying existing process templates while validating all step references remain valid. Backward compatibility is user-controlled via prompt during execution.",
+        "useCases": [
+          "Updating existing templates when requirements change",
+          "Adding new steps to templates",
+          "Modifying template parameters",
+          "Improving template structure",
+          "Fixing issues in templates",
+          "Updating step references"
+        ],
+        "parameters": {
+          "required": ["templateName", "updateDescription"],
+          "optional": ["changeScope", "preserveActiveProcesses"]
+        },
+        "stepBreakdown": [
+          {"number": 0, "name": "Init Process Principles", "stepRef": "@framework-step:common/init-process-principles", "reuse": true},
+          {"number": 1, "name": "Analyze Existing Template", "stepRef": "@framework-step:template/analyze-existing-template", "reuse": false, "new": true},
+          {"number": 2, "name": "Plan Template Updates", "stepRef": "@framework-step:template/plan-template-updates", "reuse": false, "new": true, "approvalRequired": true, "description": "Analyzes proposed changes, asks user if backward compatibility is required, creates update plan"},
+          {"number": 3, "name": "Apply Template Updates", "stepRef": "@framework-step:template/apply-template-updates", "reuse": false, "new": true},
+          {"number": 4, "name": "Validate Updated Template", "stepRef": "@framework-step:template/validate-process-steps-exist", "reuse": true},
+          {"number": 5, "name": "Continuous Improvement", "stepRef": "@framework-step:learning/continuous-improvement", "reuse": true},
+          {"number": 6, "name": "End Process Validation", "stepRef": "@framework-step:common/end-process-validation", "reuse": true}
+        ],
+        "newStepsNeeded": [
+          "analyze-existing-template",
+          "plan-template-updates",
+          "apply-template-updates"
+        ],
+        "reusedSteps": [
+          "init-process-principles",
+          "validate-process-steps-exist",
+          "continuous-improvement",
+          "end-process-validation"
+        ],
+        "flowDiagram": "mermaid diagram created showing: init → analyze → plan (ask user: backward compat required?) → apply (with/without backward compat) → validate → CI → end",
+        "requirementsDocument": {
+          "title": "Requirements Document: update-process-template",
+          "version": "1.1",
+          "lastUpdated": "2026-02-04T14:30:00.000Z",
+          "sections": {
+            "overview": "A process template for safely updating existing process templates in the agentic-processes framework. The template guides users through analyzing, planning, and applying changes to templates while ensuring step references remain valid.",
+            "backwardCompatibility": {
+              "requirement": "Backward compatibility is NOT automatically enforced. During Step 2 (Plan Template Updates), the process MUST prompt the user: 'Is backward compatibility required for this update?'",
+              "userChoice": "If user responds 'yes', the update plan must maintain backward compatibility. If 'no', the update can make breaking changes.",
+              "implementation": "The backward compatibility decision is captured during the planning step and used to guide the Apply Template Updates step."
+            },
+            "parameters": {
+              "required": [
+                {"name": "templateName", "description": "Name of the template to update"},
+                {"name": "updateDescription", "description": "Description of what changes are being made"}
+              ],
+              "optional": [
+                {"name": "changeScope", "description": "Scope of changes (e.g., 'parameters', 'steps', 'structure')"},
+                {"name": "preserveActiveProcesses", "description": "Whether to preserve processes currently using this template"}
+              ]
+            },
+            "steps": {
+              "step2": {
+                "name": "Plan Template Updates",
+                "description": "Analyzes the proposed changes to the template, identifies potential impacts, and creates an update plan. MUST prompt the user: 'Is backward compatibility required for this update?' The user's response determines whether the update plan maintains backward compatibility or allows breaking changes.",
+                "outputs": [
+                  "Update plan document",
+                  "Backward compatibility decision (from user)",
+                  "Impact analysis",
+                  "Change summary"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "decisionsMade": [
+        "Template category: infrastructure (same as create-process-template)",
+        "Need 3 new steps specific to template updates",
+        "Reusing 4 existing steps from common/template/learning categories",
+        "Approval checkpoint at Step 2 (Plan Template Updates)",
+        "Include feedback loop for validation failures",
+        "Backward compatibility is user-controlled: Step 2 MUST prompt user 'Is backward compatibility required?' - not automatic",
+        "Removed validateBackwardCompat parameter - backward compatibility decision made via user prompt during execution"
+      ],
+      "filesModifiedCreated": []
+    },
+    "a2b3c4d5-e6f7-4890-9012-345678901bcd": {
+      "name": "Plan and design template",
+      "status": "completed",
+      "startedAt": "2026-02-04T13:09:00.000Z",
+      "updatedAt": "2026-02-04T13:30:00.000Z",
+      "completedAt": "2026-02-04T13:30:00.000Z",
+      "informationProduced": {
+        "templateName": "update-process-template",
+        "category": "infrastructure",
+        "totalSteps": 8,
+        "newStepsRequired": 4,
+        "reusedSteps": 4,
+        "approvalCheckpoints": 2,
+        "backwardCompatibility": "user-prompted during Step 2"
+      },
+      "decisionsMade": [
+        "Backward compatibility is user-controlled via prompt, not a parameter",
+        "Four new steps needed: analyze-existing-template, plan-template-updates, apply-template-updates, review-and-validate-updates",
+        "One approval checkpoint at Step 2",
+        "Step 2 outputs update-plan.md file for easier review instead of inline presentation",
+        "Separated template validation (Step 4) from step existence validation (Step 5) for better modularity",
+        "Step 4 reviews changes against approved plan AND validates template, outputs review-report.md"
+      ],
+      "filesModifiedCreated": [
+        ".user-processes/active/process-update-process-template-20260204/design.md"
+      ]
+    },
+    "b3c4d5e6-f7a8-4901-0123-456789012cde": {
+      "name": "Create template file",
+      "status": "completed",
+      "startedAt": "2026-02-05T09:00:00.000Z",
+      "updatedAt": "2026-02-05T09:15:00.000Z",
+      "completedAt": "2026-02-05T09:15:00.000Z",
+      "informationProduced": {
+        "templateCreated": "update-process-template",
+        "templateLocation": ".processes/templates/infrastructure/update-process-template/",
+        "newStepsCreated": 4,
+        "stepLocations": [
+          ".processes/steps/template/analyze-existing-template/",
+          ".processes/steps/template/plan-template-updates/",
+          ".processes/steps/template/apply-template-updates/",
+          ".processes/steps/template/review-and-validate-updates/"
+        ]
+      },
+      "decisionsMade": [
+        "Template JSON follows create-process-template structure as reference",
+        "All 4 new steps created with full substep definitions",
+        "Steps include mandatory Init-Step and End-Step compliance checks",
+        "Plan-template-updates step has mandatory user prompt for backward compatibility",
+        "Both approval checkpoints (Steps 2 and 4) produce MD files for review"
+      ],
+      "filesModifiedCreated": [
+        ".processes/templates/infrastructure/update-process-template/update-process-template.json",
+        ".processes/templates/infrastructure/update-process-template/update-process-template.md",
+        ".processes/steps/template/analyze-existing-template/analyze-existing-template.json",
+        ".processes/steps/template/plan-template-updates/plan-template-updates.json",
+        ".processes/steps/template/apply-template-updates/apply-template-updates.json",
+        ".processes/steps/template/review-and-validate-updates/review-and-validate-updates.json"
+      ]
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [
+      "3 new steps needed for update workflow",
+      "Approval checkpoint at planning step"
+    ],
+    "filesModified": [],
+    "filesCreated": [
+      ".user-processes/active/process-update-process-template-20260204/design.md",
+      ".processes/templates/infrastructure/update-process-template/update-process-template.json",
+      ".processes/templates/infrastructure/update-process-template/update-process-template.md"
+    ],
+    "subProcessesSpawned": [
+      ".user-processes/active/process-analyze-existing-template-step-20260204",
+      ".user-processes/active/process-plan-template-updates-step-20260204",
+      ".user-processes/active/process-apply-template-updates-step-20260204",
+      ".user-processes/active/process-review-and-validate-updates-step-20260204"
+    ]
+  },
+  "searchHelpers": {
+    "byCategory": {
+      "templateDesign": ["a2b3c4d5-e6f7-4890-9012-345678901bcd"]
+    }
+  }
+}

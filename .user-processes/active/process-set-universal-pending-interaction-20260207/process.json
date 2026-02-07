@@ -1,0 +1,112 @@
+{
+  "type": "process-instance",
+  "id": "f8a3b2c1-d4e5-4f67-8a9b-0c1d2e3f4a5b",
+  "name": "Set Universal PendingInteraction Concept",
+  "metadata": {
+    "template": "set-concept",
+    "templateCategory": "infrastructure",
+    "created": "2026-02-07T10:57:00.000Z",
+    "lastUpdated": "2026-02-07T11:00:00.000Z",
+    "projectPath": "C:/Projects/HM/agentic-processes",
+    "processPath": ".user-processes/active/process-set-universal-pending-interaction-20260207"
+  },
+  "status": "completed",
+  "parameters": {
+    "conceptName": "Universal PendingInteraction",
+    "conceptDescription": "The pendingInteraction field in process.json must be used for ALL user interactions during process execution, not only for approval checkpoints. This includes Q&A sessions, parameter collection, decision points, corrections, and any other point where the agent needs user input. Whenever the agent needs to interact with the user for any reason, it must set appropriate options in pendingInteraction so the UI can render them for easy user selection.",
+    "targetFiles": ".processes/types/process-instance.ts, .processes/steps/_components/operating-principles.md, .processes/prompts/process-continue.md",
+    "existingState": "pendingInteraction is currently described in Principle 8 as being for 'approval, choices, decisions' only. The mandatory-approval-checkpoint.md only references approval scenarios. The concept is not applied to Q&A sessions, parameter collection, or general interaction points.",
+    "requestedState": "pendingInteraction is used for ALL interactions: approvals, Q&A sessions, parameter collection, corrections, any user input. All guidance files consistently instruct agents to set pendingInteraction whenever they need any form of user input."
+  },
+  "currentState": {
+    "activeStepId": "c9d0e1f2-a3b4-4567-cdef-8901234567c3",
+    "activeStepName": "End Process Validation",
+    "actionSummary": "Process completed successfully",
+    "actionDetails": "All 3 files updated. Universal pendingInteraction concept established at principles level."
+  },
+  "steps": [
+    {
+      "id": "a1b2c3d4-e5f6-4789-abcd-0123456789ab",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "startedAt": "2026-02-07T10:57:00.000Z",
+      "completedAt": "2026-02-07T10:58:00.000Z"
+    },
+    {
+      "id": "b2c3d4e5-f6a7-4890-bcde-1234567890bc",
+      "number": 1,
+      "name": "Understand concept",
+      "status": "completed",
+      "stepRef": "@framework-step:planning/understand-context",
+      "approvalRequired": true,
+      "startedAt": "2026-02-07T11:00:00.000Z",
+      "completedAt": "2026-02-07T11:15:00.000Z"
+    },
+    {
+      "id": "c3d4e5f6-a7b8-4901-cdef-2345678901cd",
+      "number": 2,
+      "name": "Identify target files",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "startedAt": "2026-02-07T11:15:00.000Z",
+      "completedAt": "2026-02-07T11:16:00.000Z"
+    },
+    {
+      "id": "d4e5f6a7-b8c9-4012-defa-3456789012de",
+      "number": 3,
+      "name": "Analyze existing state",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "startedAt": "2026-02-07T11:16:00.000Z",
+      "completedAt": "2026-02-07T11:18:00.000Z"
+    },
+    {
+      "id": "e5f6a7b8-c9d0-4123-efab-4567890123ef",
+      "number": 4,
+      "name": "Design implementation plan",
+      "status": "completed",
+      "stepRef": "@framework-step:planning/design-implementation-plan",
+      "approvalRequired": true,
+      "approved": true,
+      "startedAt": "2026-02-07T11:18:00.000Z",
+      "completedAt": "2026-02-07T11:20:00.000Z"
+    },
+    {
+      "id": "f6a7b8c9-d0e1-4234-fabc-5678901234f0",
+      "number": 5,
+      "name": "Apply changes",
+      "status": "completed",
+      "stepRef": "@framework-step:common/apply-changes",
+      "startedAt": "2026-02-07T11:20:00.000Z",
+      "completedAt": "2026-02-07T11:21:00.000Z"
+    },
+    {
+      "id": "a7b8c9d0-e1f2-4345-abcd-6789012345a1",
+      "number": 6,
+      "name": "Verify implementation",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "startedAt": "2026-02-07T11:21:00.000Z",
+      "completedAt": "2026-02-07T11:22:00.000Z"
+    },
+    {
+      "id": "b8c9d0e1-f2a3-4456-bcde-7890123456b2",
+      "number": 7,
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": true,
+      "startedAt": "2026-02-07T11:22:00.000Z",
+      "completedAt": "2026-02-07T11:23:00.000Z"
+    },
+    {
+      "id": "c9d0e1f2-a3b4-4567-cdef-8901234567c3",
+      "number": 8,
+      "name": "End Process Validation",
+      "status": "completed",
+      "stepRef": "@framework-step:common/end-process-validation"
+    }
+  ]
+}

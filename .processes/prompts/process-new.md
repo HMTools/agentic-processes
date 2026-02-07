@@ -149,7 +149,7 @@ When `/process-new` is invoked:
    - **Automatically execute Step 0** (Init Process Principles) - do NOT ask for confirmation
    - Step 0 has no approval checkpoint and is mandatory for every process
    - After Step 0 completes, highlight the next step
-   - If next step has `approvalRequired: true`, present deliverables and wait
+   - If next step has `approvalRequired: true`, present deliverables to the user and wait for approval
    - If next step has no approval, continue execution
 
 ### Handling User Corrections at Approval Checkpoints
@@ -158,9 +158,11 @@ When `/process-new` is invoked:
 
 1. **Log the correction immediately** to log.json (LOG FIRST principle)
 2. **Delegate correction processing** to `step-executor` subagent with:
+   - **Operating principles** (all 8 principles from `.processes/steps/_components/operating-principles.md`) — subagents run in isolated context and MUST receive these explicitly
    - The correction details from the user
    - Current step context and artifacts to update
    - Instruction to apply the correction and re-prepare deliverables
+   - **Scope boundary**: explicitly state what the subagent should and should NOT do
 3. **Wait for subagent completion** (foreground execution)
 4. **Present updated deliverables** for re-approval
 5. **Repeat** until user provides simple approval ("approved", "yes", etc.)

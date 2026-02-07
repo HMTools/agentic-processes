@@ -1,0 +1,256 @@
+{
+  "type": "memory-file",
+  "metadata": {
+    "process": "5b9e0f3a-4c8d-5f2b-ae60-7d3c9b1f5e8a",
+    "template": "create-process-step-template",
+    "created": "2026-02-04T13:40:00.000Z",
+    "lastUpdated": "2026-02-06T10:20:00.000Z",
+    "currentStep": "ff6a7b8c-9d0e-1234-5f01-234567890123"
+  },
+  "subProcessState": {
+    "parentProcessPath": ".user-processes/active/process-update-process-template-20260204",
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {
+    "aa1b2c3d-4e5f-6789-0abc-def123456789": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "startedAt": "2026-02-05T09:00:00.000Z",
+      "updatedAt": "2026-02-05T09:01:00.000Z",
+      "informationProduced": {
+        "principlesLoaded": true,
+        "principlesCount": 7,
+        "principlesList": [
+          "LOG FIRST, ACT SECOND",
+          "READ JSON FOR GUIDANCE",
+          "STOP AT CHECKPOINTS",
+          "NO EXTERNAL TODOS",
+          "VERIFY MANDATORY ACTIONS",
+          "USE SUBAGENTS FOR STEPS",
+          "FOLLOW TYPE STRUCTURES"
+        ]
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [
+        "memory.json"
+      ]
+    },
+    "bb2c3d4e-5f6a-7890-1bcd-ef0123456789": {
+      "name": "Plan and Design Step",
+      "status": "completed",
+      "startedAt": "2026-02-05T09:15:00.000Z",
+      "updatedAt": "2026-02-05T10:35:00.000Z",
+      "informationProduced": {
+        "purpose": "Load and analyze an existing framework artifact (template, step, or process) to document its current state before making updates. Parses artifact-specific structures and records the baseline for comparison.",
+        "category": "common",
+        "categoryRationale": "Cross-cutting utility that works with multiple artifact types (templates, steps, processes). Not specific to template workflows - generic analysis capability.",
+        "parameters": {
+          "artifactType": {
+            "type": "enum",
+            "values": ["template", "step", "process"],
+            "required": true,
+            "description": "Type of artifact to analyze"
+          },
+          "artifactPath": {
+            "type": "string",
+            "required": true,
+            "description": "Path to the artifact to analyze"
+          },
+          "focusArea": {
+            "type": "string",
+            "required": false,
+            "default": null,
+            "description": "Free-form description of what aspect to focus on. Agent interprets dynamically. If omitted, full analysis is performed."
+          }
+        },
+        "structurePlan": {
+          "mdSections": ["Description", "Purpose & Usage", "Parameters", "Artifact Type Specifications", "Flow"],
+          "jsonSections": ["metadata", "parameters", "output", "guidance", "substeps", "flow", "memoryFileUsage", "dependencies", "references"],
+          "requiredComponents": ["mandatory-logging.md"]
+        },
+        "flowDiagram": "Linear with branching: Init → Validate params → Locate files → Branch by artifactType → Parse structure → Record baseline → End",
+        "substepsPlan": [
+          "Substep 0: Init-Step - Confirm Principles",
+          "Substep 1: Validate Parameters",
+          "Substep 2: Locate Artifact Files",
+          "Substep 3: Load Primary Files",
+          "Substep 4: Parse Structure (Type-Specific, Focus-Aware)",
+          "Substep 5: Record Baseline to Memory",
+          "Substep 6: End-Step - Compliance Check"
+        ],
+        "designDocument": "step-design.md",
+        "existingStepsChecked": [
+          "plan-and-design-template (different: creates new templates)",
+          "create-template-file (different: creates files)",
+          "validate-process-steps-exist (different: validates refs, doesn't document baseline)"
+        ],
+        "noSimilarStepExists": true,
+        "renamedFrom": "analyze-existing-template",
+        "renameRationale": "Generalized from template-specific to handle any artifact type (template, step, process)"
+      },
+      "decisionsMade": [
+        "Parameterized by artifact type - single step handles templates, steps, and processes",
+        "Optional focusArea parameter - free-form string interpreted dynamically by agent",
+        "Read-only step - does not modify artifacts",
+        "Comprehensive parsing of MD and JSON for cross-validation",
+        "Output to memory.json only, no artifacts",
+        "Branching flow based on artifact type, converges for validation",
+        "Issue logging over failure - documents issues but continues"
+      ],
+      "filesModifiedCreated": [
+        "step-design.md"
+      ]
+    },
+    "cc3d4e5f-6a7b-8901-2cde-f01234567890": {
+      "name": "Create Step File",
+      "status": "completed",
+      "startedAt": "2026-02-05T10:36:00.000Z",
+      "updatedAt": "2026-02-06T10:00:00.000Z",
+      "informationProduced": {
+        "stepFilePath": ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.md",
+        "jsonFilePath": ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.json",
+        "structureNotes": {
+          "mdSections": ["Required Components", "Description", "Purpose & Usage", "Quick Reference", "Flow", "Memory File Usage"],
+          "jsonSections": ["metadata", "parameters", "output", "guidance", "artifactTypeFiles", "substeps", "flow", "memoryFileUsage", "dependencies", "references"],
+          "substepsCount": 7,
+          "parametersCount": 3
+        },
+        "userApproved": true,
+        "validationResults": {
+          "mdSectionsPresent": ["Required Components", "Description", "Purpose & Usage", "Quick Reference", "Flow", "Memory File Usage"],
+          "jsonSectionsPresent": ["metadata", "parameters", "output", "guidance", "artifactTypeFiles", "substeps", "flow", "memoryFileUsage", "dependencies", "references"],
+          "consistencyChecks": {
+            "flowMatchesSubsteps": true,
+            "parametersConsistent": true,
+            "memoryFieldsConsistent": true
+          },
+          "issuesFixed": [
+            "MD Quick Reference table had '{path}/step.md' instead of '{path}/{stepName}.md' for step artifact type — corrected to match JSON"
+          ]
+        }
+      },
+      "decisionsMade": [
+        "Added interactionOptions to Step 2 in process.json after user identified missing approval config"
+      ],
+      "filesModifiedCreated": [
+        ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.md",
+        ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.json",
+        "process.json"
+      ]
+    },
+    "dd4e5f6a-7b8c-9012-3def-012345678901": {
+      "name": "Validate Step Structure",
+      "status": "completed",
+      "startedAt": "2026-02-06T10:02:00.000Z",
+      "updatedAt": "2026-02-06T10:05:00.000Z",
+      "informationProduced": {
+        "filesValidated": [
+          ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.md",
+          ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.json"
+        ],
+        "validationChecks": {
+          "selfContained": { "status": "pass", "detail": "No @framework-step references found" },
+          "sectionCompletenessMd": { "status": "pass", "detail": "All required sections present" },
+          "sectionCompletenessJson": { "status": "pass", "detail": "All required sections present" },
+          "mermaidDiagram": { "status": "pass", "detail": "Valid graph TD flowchart with branching by artifact type" },
+          "guidanceQuality": { "status": "pass", "detail": "9 specificActions, 3 tools, files complete, 6 bestPractices" },
+          "namingCompliance": { "status": "pass", "detail": "Kebab-case filename, proper title case, valid category" },
+          "substepsMatchFlow": { "status": "pass", "detail": "7 substeps (0-6) match flow diagram nodes" }
+        },
+        "overallResult": "pass",
+        "issuesFound": 0
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [
+        "memory.json",
+        "log.json"
+      ]
+    },
+    "ee5f6a7b-8c9d-0123-4ef0-123456789012": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "startedAt": "2026-02-06T10:06:00.000Z",
+      "updatedAt": "2026-02-06T10:15:00.000Z",
+      "informationProduced": {
+        "logAnalysis": {
+          "totalUserInteractions": 10,
+          "flaggedForImprovement": 0,
+          "patternsDetected": [
+            "Missing approvalRequired on template step that has internal approval checkpoint"
+          ]
+        },
+        "improvementsIdentified": 1,
+        "improvementsImplemented": [
+          {
+            "description": "Added approvalRequired: true to Step 2 (create-step-file) in create-process-step-template.json",
+            "rootCause": "Template didn't reflect the step's internal approvalCheckpoint, causing process instances to miss the approval flag",
+            "filesModified": [".processes/templates/infrastructure/create-process-step-template/create-process-step-template.json"],
+            "userApproved": true
+          }
+        ],
+        "improvementsDeferred": [],
+        "summary": "1 improvement identified and implemented. Template now correctly marks create-step-file step as requiring approval."
+      },
+      "decisionsMade": [
+        "Only 1 improvement warranted — remaining user interactions were normal design iteration"
+      ],
+      "filesModifiedCreated": [
+        ".processes/templates/infrastructure/create-process-step-template/create-process-step-template.json",
+        "memory.json",
+        "log.json"
+      ]
+    },
+    "ff6a7b8c-9d0e-1234-5f01-234567890123": {
+      "name": "End Process Validation",
+      "status": "in-progress",
+      "startedAt": "2026-02-06T10:16:00.000Z",
+      "updatedAt": "2026-02-06T10:20:00.000Z",
+      "informationProduced": {
+        "complianceChecks": {
+          "principle1_logFirst": "pass",
+          "principle2_readJson": "pass",
+          "principle3_stopAtCheckpoints": "pass",
+          "principle4_noTodos": "pass",
+          "principle5_verifyActions": "pass",
+          "principle7_typeCompliance": "fixed"
+        },
+        "typeComplianceFixes": [
+          "Restructured log.json step entries from non-standard format to LogStepEntry type (timestamp as StepTimestamp, UserInteraction with request/reason/agentResponse)",
+          "Restructured memory.json step entries from free-form to MemoryStepEntry type (name, informationProduced, decisionsMade, filesModifiedCreated)"
+        ],
+        "complianceValidated": true,
+        "violations": []
+      },
+      "decisionsMade": [
+        "User chose option (a): fix type deviations in current process files before completing"
+      ],
+      "filesModifiedCreated": [
+        "log.json",
+        "memory.json"
+      ]
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [
+      "Step category: common (cross-cutting utility for multiple artifact types)",
+      "Parameterized by artifactType (template | step | process)",
+      "Read-only analysis step - safe to run multiple times",
+      "Comprehensive MD+JSON parsing for cross-validation"
+    ],
+    "filesModified": [
+      "step-design.md",
+      ".processes/templates/infrastructure/create-process-step-template/create-process-step-template.json"
+    ],
+    "filesCreated": [
+      "step-design.md",
+      ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.md",
+      ".processes/steps/common/analyze-current-artifact-state/analyze-current-artifact-state.json"
+    ]
+  },
+  "searchHelpers": {
+    "byCategory": {
+      "common": ["analyze-current-artifact-state"]
+    }
+  }
+}

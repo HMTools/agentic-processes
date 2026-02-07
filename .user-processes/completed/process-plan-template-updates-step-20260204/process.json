@@ -1,0 +1,86 @@
+{
+  "type": "process-instance",
+  "id": "6c0f1a4b-5d9e-6a3c-bf71-8e4d0c2a6f9b",
+  "name": "Create plan-template-updates Step",
+  "metadata": {
+    "template": "create-process-step-template",
+    "templateCategory": "infrastructure",
+    "created": "2026-02-04T13:40:00.000Z",
+    "lastUpdated": "2026-02-04T13:40:00.000Z",
+    "projectPath": "C:/Projects/HM/agentic-processes",
+    "processPath": ".user-processes/active/process-plan-template-updates-step-20260204"
+  },
+  "status": "completed",
+  "parameters": {
+    "stepName": "plan-template-updates",
+    "stepCategory": "template",
+    "stepPurpose": "Create a detailed update plan for modifying an existing template. Prompts user about backward compatibility requirements, designs specific changes, and produces update-plan.md for approval.",
+    "useCases": "Reviewing user's update description, prompting user about backward compatibility requirements, designing specific changes based on user's answer, checking if active processes use the template, creating detailed change proposals, producing update-plan.md file for user review"
+  },
+  "currentState": {
+    "activeStepId": "f06a7b8c-9d0e-1234-5f01-234567890006",
+    "activeStepName": "End Process Validation",
+    "actionSummary": "Process completed — all steps done, compliance validated",
+    "actionDetails": "All 6 steps completed. Compliance report: all principles followed. Structural issues in log.json and memory.json fixed."
+  },
+  "steps": [
+    {
+      "id": "a01b2c3d-4e5f-6789-0abc-def123456001",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "approvalRequired": false
+    },
+    {
+      "id": "b02c3d4e-5f6a-7890-1bcd-ef0123456002",
+      "number": 1,
+      "name": "Plan and design step",
+      "status": "completed",
+      "stepRef": "@framework-step:template/plan-and-design-step",
+      "approvalRequired": true
+    },
+    {
+      "id": "c03d4e5f-6a7b-8901-2cde-f01234567003",
+      "number": 2,
+      "name": "Create step file",
+      "status": "completed",
+      "stepRef": "@framework-step:template/create-step-file",
+      "approvalRequired": true
+    },
+    {
+      "id": "d04e5f6a-7b8c-9012-3def-012345678004",
+      "number": 3,
+      "name": "Validate step structure",
+      "status": "completed",
+      "stepRef": "@framework-step:template/validate-step-structure",
+      "approvalRequired": false
+    },
+    {
+      "id": "e05f6a7b-8c9d-0123-4ef0-123456789005",
+      "number": 4,
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": false
+    },
+    {
+      "id": "f06a7b8c-9d0e-1234-5f01-234567890006",
+      "number": 5,
+      "name": "End Process Validation",
+      "status": "completed",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "approvalRequired": false
+    }
+  ],
+  "subProcessState": {
+    "parentProcess": {
+      "id": "4a8d9f2e-3b7c-4e1a-9d5f-6c2b8a0e4d7f",
+      "name": "Create update-process-template Template",
+      "processPath": ".user-processes/active/process-update-process-template-20260204",
+      "returnToStep": "c4d5e6f7-a8b9-4012-1234-567890123def"
+    },
+    "childProcesses": [],
+    "nextSyncPoint": null
+  }
+}

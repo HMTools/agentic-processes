@@ -1,0 +1,203 @@
+{
+  "type": "step",
+  "name": "analyze-current-artifact-state",
+  "category": "common",
+  "metadata": {
+    "title": "Analyze Current Artifact State",
+    "purposeAndUsage": "Load and analyze an existing framework artifact (template, step, or process) to document its current state before making updates. Read-only step that parses artifact-specific structures and records the baseline.",
+    "lastUpdated": "2026-02-05"
+  },
+  "parameters": {
+    "required": ["artifactType", "artifactPath"],
+    "optional": ["focusArea"],
+    "defaults": {
+      "focusArea": null
+    },
+    "definitions": {
+      "artifactType": {
+        "description": "Type of artifact to analyze",
+        "type": "string",
+        "enum": ["template", "step", "process"]
+      },
+      "artifactPath": {
+        "description": "Path to the artifact to analyze (relative to project root)",
+        "type": "string",
+        "example": ".processes/templates/infrastructure/create-process-step-template"
+      },
+      "focusArea": {
+        "description": "Free-form description of what aspect to focus on. Agent interprets dynamically. If omitted, full analysis is performed.",
+        "type": "string",
+        "default": null,
+        "examples": [
+          "only the parameters",
+          "step references and their validity",
+          "current status and progress",
+          "dependencies and what files it needs"
+        ]
+      }
+    }
+  },
+  "output": {
+    "description": "Baseline analysis of artifact structure recorded to memory",
+    "artifacts": [],
+    "memoryUpdates": ["artifactType", "artifactPath", "artifactName", "focusArea", "currentStructure", "baselineTimestamp"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Artifact path must be known (provided as parameter)",
+      "Artifact must exist (relevant files based on type)",
+      "Artifact type must be specified"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: validate params → locate files → load files → parse structure → record baseline",
+      "This is a READ-ONLY step — do not modify the artifact being analyzed",
+      "If focusArea is provided, interpret the free-form description to determine what to analyze",
+      "If focusArea is omitted, perform a full analysis of the entire artifact",
+      "For templates: parse steps array, parameters (required/optional), metadata, flow diagram",
+      "For steps: parse substeps, guidance, dependencies, memory usage, references",
+      "For processes: parse steps list, current state, subprocess state, parameters",
+      "Record all findings to memory.json — do not create separate artifact files"
+    ],
+    "files": {
+      "read": [
+        "Artifact files based on type (see artifactTypeFiles below)",
+        "memory.json (process parameters)"
+      ],
+      "create": [],
+      "update": ["memory.json (current step section with analysis results)"]
+    },
+    "artifactTypeFiles": {
+      "template": {
+        "required": ["{artifactPath}.json"],
+        "optional": ["{artifactPath}.md"],
+        "parseTargets": ["steps array", "parameters (required/optional)", "metadata", "flow"]
+      },
+      "step": {
+        "required": ["{artifactPath}/{stepName}.json"],
+        "optional": ["{artifactPath}/{stepName}.md"],
+        "parseTargets": ["substeps", "guidance", "dependencies", "memoryFileUsage", "references"]
+      },
+      "process": {
+        "required": ["{artifactPath}/process.json"],
+        "optional": ["{artifactPath}/process.md", "{artifactPath}/memory.json", "{artifactPath}/log.json"],
+        "parseTargets": ["steps list", "currentState", "subProcessState", "parameters", "status"]
+      }
+    },
+    "tools": [
+      "read_file - Read artifact files for analysis",
+      "list_dir - Verify artifact directory structure",
+      "grep - Search for patterns within artifact files"
+    ],
+    "bestPractices": [
+      "Never modify the artifact being analyzed",
+      "Parse both MD and JSON files for comprehensive understanding",
+      "Adapt analysis depth based on focusArea parameter",
+      "Record structured data to memory, not free-form text",
+      "Log any issues found (missing files, malformed structure) but continue analysis",
+      "Use type-specific parsing logic — don't apply template logic to steps"
+    ]
+  },
+  "substeps": [
+    {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
+      "number": 1,
+      "name": "Validate Parameters",
+      "description": "Confirm all required parameters are valid",
+      "actions": [
+        "Confirm `artifactType` is one of: template, step, process",
+        "Confirm `artifactPath` is provided and non-empty",
+        "If `focusArea` is provided, interpret what aspect to focus on and log interpretation",
+        "If required parameters are invalid, log error to log.json and stop"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Locate Artifact Files",
+      "description": "Construct expected file paths and verify they exist",
+      "actions": [
+        "Based on `artifactType`, construct expected file paths using guidance.artifactTypeFiles",
+        "Verify required files exist",
+        "Note which optional files are available",
+        "If required files are missing, log error to log.json and stop"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Load Primary Files",
+      "description": "Read the main artifact files identified in previous substep",
+      "actions": [
+        "Read all required files identified in Substep 2",
+        "Read available optional files",
+        "Store raw content for parsing in next substep"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Parse Structure (Type-Specific, Focus-Aware)",
+      "description": "Apply type-specific parsing logic, scoped by focusArea if provided",
+      "actions": [
+        "If focusArea is not provided: parse the entire artifact structure",
+        "If focusArea is provided: interpret the description and focus on relevant parts",
+        "For templates: extract steps array, parameters, metadata, flow diagram",
+        "For steps: extract substeps, guidance sections, dependencies, memory usage, references",
+        "For processes: extract steps list, current state, subprocess state, parameters, status",
+        "Build a structured representation of the parsed data"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Record Baseline to Memory",
+      "description": "Write analysis results to memory.json",
+      "actions": [
+        "Update memory.json current step section with:",
+        "  - artifactType: type analyzed",
+        "  - artifactPath: path analyzed",
+        "  - artifactName: name extracted from artifact",
+        "  - focusArea: area analyzed (null if full analysis)",
+        "  - currentStructure: parsed structure object (type-specific)",
+        "  - baselineTimestamp: current timestamp"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
+        "Output: '✓ Step completed in compliance with operating principles'"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Linear with branching: Validate params → Locate files → Load files → Branch by artifactType (with focusArea scoping) → Record baseline to memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters (artifactType, artifactPath, focusArea)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: artifactType, artifactPath, artifactName, focusArea, currentStructure, baselineTimestamp",
+      "Decisions Made: Focus area interpretation (if applicable)"
+    ]
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": [],
+    "requiredTools": ["read_file", "list_dir", "grep"]
+  },
+  "references": {
+    "relatedSteps": ["init-process-principles", "end-process-validation"],
+    "usedInTemplates": ["update-process-template"]
+  }
+}

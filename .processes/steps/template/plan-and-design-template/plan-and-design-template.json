@@ -41,7 +41,7 @@
       "Reuse existing steps where possible",
       "STEP REUSE FIRST: Before proposing ANY new step, explicitly search existing steps (planning/, common/, investigation/, learning/) to see if they can handle the use case with different parameters or scope. Only propose a new step after confirming no existing step can be adapted.",
       "Keep templates focused on a single workflow",
-      "Always include continuous improvement as final step",
+      "Always include continuous improvement as final step with approvalRequired: true",
       "Use clear parameter naming with camelCase",
       "Design steps to produce tangible outputs",
       "Ensure flow diagram matches step sequence",

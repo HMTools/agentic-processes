@@ -98,7 +98,8 @@
       "number": 7,
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
-      "output": "Improvements implemented"
+      "output": "Improvements implemented",
+      "approvalRequired": true
     },
     {
       "number": 8,

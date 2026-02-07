@@ -57,7 +57,8 @@
       "number": 2,
       "name": "Create step file",
       "stepRef": "@framework-step:template/create-step-file",
-      "output": "Complete step file with validation reports"
+      "output": "Complete step file with validation reports",
+      "approvalRequired": true
     },
     {
       "number": 3,
@@ -69,7 +70,8 @@
       "number": 4,
       "name": "Continuous Improvement",
       "stepRef": "@framework-step:learning/continuous-improvement",
-      "output": "Improvements implemented"
+      "output": "Improvements implemented",
+      "approvalRequired": true
     },
     {
       "number": 5,

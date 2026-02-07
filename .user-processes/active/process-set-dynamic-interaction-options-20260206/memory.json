@@ -1,0 +1,303 @@
+{
+  "type": "memory-file",
+  "metadata": {
+    "process": "a7c2f1e8-5d34-4b91-8f6a-3e9d7c2a1b0f",
+    "template": "set-concept",
+    "created": "2026-02-06T10:00:00.000Z",
+    "lastUpdated": "2026-02-07T11:10:00.000Z",
+    "currentStep": "d9f0a1b2-c3d4-4e5f-6a7b-8c9d0e1f2a3b"
+  },
+  "subProcessState": {
+    "parentProcessPath": null,
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {
+    "b1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "startedAt": "2026-02-06T10:00:00.000Z",
+      "updatedAt": "2026-02-06T10:02:00.000Z",
+      "informationProduced": {
+        "principlesLoaded": true
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": []
+    },
+    "c2e3f4a5-b6c7-4d8e-9f0a-1b2c3d4e5f6a": {
+      "name": "Understand concept",
+      "status": "completed",
+      "startedAt": "2026-02-06T10:02:00.000Z",
+      "updatedAt": "2026-02-06T10:40:00.000Z",
+      "informationProduced": {
+        "contextFile": "step1-context.md",
+        "conceptOverview": "Dynamic Interaction Options - agents must dynamically generate interactionOptions at runtime, never predefined in templates",
+        "filesAnalyzed": 7,
+        "filesToModify": 6,
+        "filesToKeepUnchanged": 1,
+        "removals": ["interactionOptions from template-definition.ts step type", "interactionOptions arrays from update-process-template.json"],
+        "guidanceUpdates": ["mandatory-approval-checkpoint.md", "process-new.md", "process-continue.md", "create-step-file.json"],
+        "noChanges": ["process-instance.ts (runtime type stays)"]
+      },
+      "decisionsMade": [
+        "OPTION B: Move interactionOptions from ProcessStep to process-level pendingInteraction field on ProcessInstance",
+        "New PendingInteraction interface with options only (no selectedOptions, no stepId)",
+        "Remove interactionOptions and selectedOptions from ProcessStep",
+        "Remove interactionOptions from template-definition.ts step type",
+        "All guidance must reference pendingInteraction and mandate dynamic generation",
+        "UI must be updated to read from process.pendingInteraction instead of activeStep.interactionOptions",
+        "Scope expanded to include UI files in agentic-processes-ui",
+        "Add as Principle 8 in operating-principles.md instead of scattered guidance",
+        "Migrate existing process.json files instead of backward compatibility in UI"
+      ],
+      "filesModifiedCreated": [
+        "step1-context.md"
+      ]
+    },
+    "d3f4a5b6-c7d8-4e9f-0a1b-2c3d4e5f6a7b": {
+      "name": "Identify target files",
+      "status": "completed",
+      "startedAt": "2026-02-07T10:00:00.000Z",
+      "updatedAt": "2026-02-07T10:05:00.000Z",
+      "informationProduced": {
+        "outputFile": "identified-files.json",
+        "totalFiles": 18,
+        "frameworkFiles": 8,
+        "uiFiles": 4,
+        "migrationFiles": 6,
+        "migrationFilesWithChanges": 5,
+        "noChangesNeeded": 1
+      },
+      "decisionsMade": [
+        "Categorized files into framework (8), UI (4), and migration (6) groups",
+        "Current process.json has no interactionOptions to migrate",
+        "5 other process.json files need interactionOptions removed from step entries"
+      ],
+      "filesModifiedCreated": [
+        "identified-files.json"
+      ]
+    },
+    "e4a5b6c7-d8e9-4f0a-1b2c-3d4e5f6a7b8c": {
+      "name": "Analyze existing state",
+      "status": "completed",
+      "startedAt": "2026-02-07T10:05:00.000Z",
+      "updatedAt": "2026-02-07T10:20:00.000Z",
+      "informationProduced": {
+        "outputFile": "step3-analysis.md",
+        "filesAnalyzed": 18,
+        "keyFindings": {
+          "operatingPrinciples": "Currently 7 principles, no mention of interactionOptions. Need to add Principle 8 and update title.",
+          "processInstanceTs": "interactionOptions on lines 141-142 and selectedOptions on lines 144-145 of ProcessStep. InteractionOption interface on lines 163-175 (keep). ProcessInstance needs new pendingInteraction field.",
+          "templateDefinitionTs": "interactionOptions field on lines 72-81 of step type (10 lines to remove).",
+          "mandatoryApproval": "6 specific locations with interactionOptions text to clean up (lines 7, 8, 11, 14-16, 26).",
+          "processNew": "Single line 152 with interactionOptions text to update.",
+          "processContinue": "Inline 7 principles (lines 29-48) need Principle 8 added. Line 177 has interactionOptions text.",
+          "createStepFile": "One bestPractices entry (line 49) with ARCHITECTURAL BOUNDARY note to remove.",
+          "updateProcessTemplate": "Steps 2 and 4 have hardcoded interactionOptions arrays.",
+          "uiTypes": "Mirrors framework types - same changes needed (remove from ProcessStep, add PendingInteraction, add to ProcessInstance).",
+          "lazyPromptsService": "getActiveStepOptions reads from activeStep.interactionOptions - needs to read from process.pendingInteraction.",
+          "lazyPromptModal": "References selectedOptions on line 272 - needs removal.",
+          "stepNode": "Options badge on lines 101-105 - remove entirely.",
+          "migrationSummary": "5 process.json files have interactionOptions on step entries: total of 8 step entries to clean across 5 files."
+        }
+      },
+      "decisionsMade": [
+        "All 18 files documented with exact line numbers and precise changes",
+        "LazyPromptModal needs selectedOptions references removed (not just updated)",
+        "StepNode Options badge should be removed entirely, not replaced"
+      ],
+      "filesModifiedCreated": [
+        "step3-analysis.md"
+      ]
+    },
+    "f5b6c7d8-e9f0-4a1b-2c3d-4e5f6a7b8c9d": {
+      "name": "Design implementation plan",
+      "status": "completed",
+      "startedAt": "2026-02-07T10:20:00.000Z",
+      "updatedAt": "2026-02-07T10:30:00.000Z",
+      "informationProduced": {
+        "outputFile": "implementation-plan.md",
+        "totalItems": 17,
+        "phases": 6,
+        "phaseBreakdown": {
+          "phase1_frameworkTypes": 2,
+          "phase2_operatingPrinciple": 2,
+          "phase3_guidanceCleanup": 3,
+          "phase4_templateCleanup": 1,
+          "phase5_uiUpdates": 4,
+          "phase6_processMigration": 5
+        },
+        "dependencies": "Phase 1 must complete before Phase 5 (UI types mirror framework types)"
+      },
+      "decisionsMade": [
+        "Organized 17 changes into 6 logical phases",
+        "Phase ordering: types first (foundation), then principle, then cleanup, then UI, then migration",
+        "Each item includes exact file path and precise change content from step3-analysis.md"
+      ],
+      "filesModifiedCreated": [
+        "implementation-plan.md"
+      ]
+    },
+    "a6c7d8e9-f0a1-4b2c-3d4e-5f6a7b8c9d0e": {
+      "name": "Apply changes",
+      "status": "completed",
+      "startedAt": "2026-02-07T10:35:00.000Z",
+      "updatedAt": "2026-02-07T10:50:00.000Z",
+      "informationProduced": {
+        "phasesCompleted": 6,
+        "totalItemsApplied": 17,
+        "frameworkFilesModified": 8,
+        "uiFilesModified": 4,
+        "processFilesMigrated": 5
+      },
+      "decisionsMade": [
+        "Applied all 17 changes across 6 phases in dependency order",
+        "Simplified mandatory-approval-checkpoint.md per user feedback (remove all interactionOptions text, not replace)"
+      ],
+      "filesModifiedCreated": [
+        ".processes/types/process-instance.ts",
+        ".processes/types/template-definition.ts",
+        ".processes/steps/_components/operating-principles.md",
+        ".processes/prompts/process-continue.md",
+        ".processes/steps/_components/mandatory-approval-checkpoint.md",
+        ".processes/prompts/process-new.md",
+        ".processes/steps/template/create-step-file/create-step-file.json",
+        ".processes/templates/infrastructure/update-process-template/update-process-template.json",
+        "agentic-processes-ui/src/types/index.ts",
+        "agentic-processes-ui/src/services/lazyPromptsService.ts",
+        "agentic-processes-ui/src/components/LazyPromptModal/index.tsx",
+        "agentic-processes-ui/src/components/DiagramView/StepNode.tsx"
+      ]
+    },
+    "b7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f": {
+      "name": "Verify implementation",
+      "status": "completed",
+      "startedAt": "2026-02-07T10:50:00.000Z",
+      "updatedAt": "2026-02-07T11:00:00.000Z",
+      "informationProduced": {
+        "outputFile": "step6-verification.md",
+        "totalCriteria": 16,
+        "criteriaPass": 16,
+        "criteriaFail": 0
+      },
+      "decisionsMade": [
+        "All 16 success criteria verified by reading actual files and running codebase-wide grep searches"
+      ],
+      "filesModifiedCreated": [
+        "step6-verification.md"
+      ]
+    },
+    "c8e9f0a1-b2c3-4d4e-5f6a-7b8c9d0e1f2a": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "startedAt": "2026-02-07T11:00:00.000Z",
+      "updatedAt": "2026-02-07T11:05:00.000Z",
+      "informationProduced": {
+        "outputFile": "step7-improvements.md",
+        "userInteractionsReviewed": 13,
+        "patternsIdentified": 6,
+        "recommendationsForFuture": 4
+      },
+      "decisionsMade": [
+        "Key pattern: user consistently pushed for simplification and single-source-of-truth",
+        "Recommendation: default to operating principles for new concepts instead of scattered guidance"
+      ],
+      "filesModifiedCreated": [
+        "step7-improvements.md"
+      ]
+    },
+    "d9f0a1b2-c3d4-4e5f-6a7b-8c9d0e1f2a3b": {
+      "name": "End Process Validation",
+      "status": "completed",
+      "startedAt": "2026-02-07T11:05:00.000Z",
+      "updatedAt": "2026-02-07T11:10:00.000Z",
+      "informationProduced": {
+        "typeValidation": "All 3 process files conform to TypeScript types",
+        "processJsonValid": true,
+        "memoryJsonValid": true,
+        "logJsonValid": true,
+        "processStatus": "completed"
+      },
+      "decisionsMade": [
+        "All process files validated against TypeScript type definitions",
+        "Process marked as completed"
+      ],
+      "filesModifiedCreated": [
+        "process.json",
+        "memory.json",
+        "log.json"
+      ]
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [
+      "OPTION B chosen: Move interactionOptions from ProcessStep to process-level pendingInteraction on ProcessInstance",
+      "interactionOptions removed from template-definition.ts type",
+      "interactionOptions removed from all template JSON files",
+      "interactionOptions and selectedOptions removed from ProcessStep",
+      "New PendingInteraction type added to process-instance.ts",
+      "All guidance docs mandate dynamic generation at process level",
+      "UI updated to read from process.pendingInteraction",
+      "Add as Principle 8 in operating-principles.md",
+      "Migrate 5 existing process.json files"
+    ],
+    "filesModified": [],
+    "filesCreated": [
+      "step1-context.md",
+      "identified-files.json",
+      "step3-analysis.md"
+    ],
+    "targetFiles": [
+      ".processes/steps/_components/operating-principles.md",
+      ".processes/types/process-instance.ts",
+      ".processes/types/template-definition.ts",
+      ".processes/steps/_components/mandatory-approval-checkpoint.md",
+      ".processes/prompts/process-new.md",
+      ".processes/prompts/process-continue.md",
+      ".processes/steps/template/create-step-file/create-step-file.json",
+      ".processes/templates/infrastructure/update-process-template/update-process-template.json",
+      "agentic-processes-ui/src/types/index.ts",
+      "agentic-processes-ui/src/services/lazyPromptsService.ts",
+      "agentic-processes-ui/src/components/LazyPromptModal/index.tsx",
+      "agentic-processes-ui/src/components/DiagramView/StepNode.tsx",
+      ".user-processes/active/process-update-process-template-20260204/process.json",
+      ".user-processes/active/process-review-and-validate-updates-step-20260204/process.json",
+      ".user-processes/active/process-apply-template-updates-step-20260204/process.json",
+      ".user-processes/completed/process-plan-template-updates-step-20260204/process.json",
+      ".user-processes/completed/process-analyze-existing-template-step-20260204/process.json"
+    ]
+  },
+  "searchHelpers": {
+    "byCategory": {
+      "types": [
+        ".processes/types/template-definition.ts",
+        ".processes/types/process-instance.ts"
+      ],
+      "prompts": [
+        ".processes/prompts/process-new.md",
+        ".processes/prompts/process-continue.md"
+      ],
+      "steps": [
+        ".processes/steps/_components/mandatory-approval-checkpoint.md",
+        ".processes/steps/_components/operating-principles.md",
+        ".processes/steps/template/create-step-file/create-step-file.json"
+      ],
+      "templates": [
+        ".processes/templates/infrastructure/update-process-template/update-process-template.json"
+      ],
+      "ui": [
+        "agentic-processes-ui/src/types/index.ts",
+        "agentic-processes-ui/src/services/lazyPromptsService.ts",
+        "agentic-processes-ui/src/components/LazyPromptModal/index.tsx",
+        "agentic-processes-ui/src/components/DiagramView/StepNode.tsx"
+      ],
+      "migration": [
+        ".user-processes/active/process-update-process-template-20260204/process.json",
+        ".user-processes/active/process-review-and-validate-updates-step-20260204/process.json",
+        ".user-processes/active/process-apply-template-updates-step-20260204/process.json",
+        ".user-processes/completed/process-plan-template-updates-step-20260204/process.json",
+        ".user-processes/completed/process-analyze-existing-template-step-20260204/process.json"
+      ]
+    }
+  }
+}

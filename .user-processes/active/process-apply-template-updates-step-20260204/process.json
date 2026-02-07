@@ -1,0 +1,86 @@
+{
+  "type": "process-instance",
+  "id": "7d1a2b5c-6e0f-7b4d-ca82-9f5e1d3b7a0c",
+  "name": "Create apply-template-updates Step",
+  "metadata": {
+    "template": "create-process-step-template",
+    "templateCategory": "infrastructure",
+    "created": "2026-02-04T13:40:00.000Z",
+    "lastUpdated": "2026-02-04T13:40:00.000Z",
+    "projectPath": "C:/Projects/HM/agentic-processes",
+    "processPath": ".user-processes/active/process-apply-template-updates-step-20260204"
+  },
+  "status": "running",
+  "parameters": {
+    "stepName": "apply-template-updates",
+    "stepCategory": "template",
+    "stepPurpose": "Apply approved changes from update-plan.md to the template files. Modifies JSON and MD files according to the approved plan and verifies changes were applied correctly.",
+    "useCases": "Reading approved update-plan.md from process directory, applying changes to template JSON file, applying changes to template MD file, updating mermaid diagram if flow changed, verifying changes were applied correctly"
+  },
+  "currentState": {
+    "activeStepId": "a11b2c3d-4e5f-6789-0abc-def123456011",
+    "activeStepName": "Init Process Principles",
+    "actionSummary": "Sub-process spawned",
+    "actionDetails": "Created as sub-process from parent process-update-process-template-20260204"
+  },
+  "steps": [
+    {
+      "id": "a11b2c3d-4e5f-6789-0abc-def123456011",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "pending",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "approvalRequired": false
+    },
+    {
+      "id": "b12c3d4e-5f6a-7890-1bcd-ef0123456012",
+      "number": 1,
+      "name": "Plan and design step",
+      "status": "pending",
+      "stepRef": "@framework-step:template/plan-and-design-step",
+      "approvalRequired": true
+    },
+    {
+      "id": "c13d4e5f-6a7b-8901-2cde-f01234567013",
+      "number": 2,
+      "name": "Create step file",
+      "status": "pending",
+      "stepRef": "@framework-step:template/create-step-file",
+      "approvalRequired": false
+    },
+    {
+      "id": "d14e5f6a-7b8c-9012-3def-012345678014",
+      "number": 3,
+      "name": "Validate step structure",
+      "status": "pending",
+      "stepRef": "@framework-step:template/validate-step-structure",
+      "approvalRequired": false
+    },
+    {
+      "id": "e15f6a7b-8c9d-0123-4ef0-123456789015",
+      "number": 4,
+      "name": "Continuous Improvement",
+      "status": "pending",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": true
+    },
+    {
+      "id": "f16a7b8c-9d0e-1234-5f01-234567890016",
+      "number": 5,
+      "name": "End Process Validation",
+      "status": "pending",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "approvalRequired": false
+    }
+  ],
+  "subProcessState": {
+    "parentProcess": {
+      "id": "4a8d9f2e-3b7c-4e1a-9d5f-6c2b8a0e4d7f",
+      "name": "Create update-process-template Template",
+      "processPath": ".user-processes/active/process-update-process-template-20260204",
+      "returnToStep": "c4d5e6f7-a8b9-4012-1234-567890123def"
+    },
+    "childProcesses": [],
+    "nextSyncPoint": null
+  }
+}

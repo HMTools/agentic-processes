@@ -1,0 +1,14 @@
+[
+  {
+    "path": ".processes/types/process-instance.ts",
+    "matchReason": "Line 147: JSDoc on InteractionOption says '(approval, choices, decisions)' — restrictive enumeration to remove. Line 155: example only shows approve/reject/revise options."
+  },
+  {
+    "path": ".processes/steps/_components/operating-principles.md",
+    "matchReason": "Line 58: Principle 8 rule says '(approval, choices, decisions)' — source of truth, restrictive enumeration to remove."
+  },
+  {
+    "path": ".processes/prompts/process-continue.md",
+    "matchReason": "Line 50: Inline copy of Principle 8 says '(approval, choices, decisions)' — must match operating-principles.md."
+  }
+]

@@ -1,0 +1,115 @@
+{
+  "type": "process-instance",
+  "id": "a7c2f1e8-5d34-4b91-8f6a-3e9d7c2a1b0f",
+  "name": "Set Dynamic Interaction Options Concept",
+  "status": "completed",
+  "metadata": {
+    "template": "set-concept",
+    "templateCategory": "infrastructure",
+    "created": "2026-02-06T10:00:00.000Z",
+    "lastUpdated": "2026-02-07T10:55:00.000Z",
+    "projectPath": "C:/Projects/HM/agentic-processes",
+    "processPath": ".user-processes/active/process-set-dynamic-interaction-options-20260206"
+  },
+  "parameters": {
+    "conceptName": "Dynamic Interaction Options",
+    "conceptDescription": "interactionOptions must NOT be predefined in template definitions. Instead, whenever an agent needs user input during process execution, the agent must dynamically generate the relevant options and set them as pendingInteraction on process.json, so the UI can render them for easy user selection.",
+    "targetFiles": ".processes/types/template-definition.ts, .processes/types/process-instance.ts, .processes/steps/_components/operating-principles.md, .processes/steps/_components/mandatory-approval-checkpoint.md, .processes/prompts/process-new.md, .processes/prompts/process-continue.md, .processes/steps/template/create-step-file/create-step-file.json, .processes/templates/infrastructure/update-process-template/update-process-template.json",
+    "existingState": "interactionOptions are defined both as predefined arrays in template-definition.ts (copied to process instances at creation) AND as per-step runtime state in process-instance.ts. Templates like update-process-template.json have hardcoded interactionOptions arrays.",
+    "requestedState": "pendingInteraction as a process-level field on ProcessInstance. Removed from ProcessStep and template-definition.ts. Agents dynamically generate options as Principle 8."
+  },
+  "currentState": {
+    "activeStepId": "d9f0a1b2-c3d4-4e5f-6a7b-8c9d0e1f2a3b",
+    "activeStepName": "End Process Validation",
+    "actionSummary": "Process completed",
+    "actionDetails": "All changes applied. Continuous improvement: fixed subagent delegation to include operating principles and scope boundaries."
+  },
+  "steps": [
+    {
+      "id": "b1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "startedAt": "2026-02-06T10:00:00.000Z",
+      "completedAt": "2026-02-06T10:02:00.000Z"
+    },
+    {
+      "id": "c2e3f4a5-b6c7-4d8e-9f0a-1b2c3d4e5f6a",
+      "number": 1,
+      "name": "Understand concept",
+      "status": "completed",
+      "stepRef": "@framework-step:planning/understand-context",
+      "approvalRequired": true,
+      "approved": true,
+      "startedAt": "2026-02-06T10:02:00.000Z",
+      "completedAt": "2026-02-06T10:40:00.000Z"
+    },
+    {
+      "id": "d3f4a5b6-c7d8-4e9f-0a1b-2c3d4e5f6a7b",
+      "number": 2,
+      "name": "Identify target files",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/identify-files",
+      "startedAt": "2026-02-07T10:00:00.000Z",
+      "completedAt": "2026-02-07T10:05:00.000Z"
+    },
+    {
+      "id": "e4a5b6c7-d8e9-4f0a-1b2c-3d4e5f6a7b8c",
+      "number": 3,
+      "name": "Analyze existing state",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "startedAt": "2026-02-07T10:05:00.000Z",
+      "completedAt": "2026-02-07T10:20:00.000Z"
+    },
+    {
+      "id": "f5b6c7d8-e9f0-4a1b-2c3d-4e5f6a7b8c9d",
+      "number": 4,
+      "name": "Design implementation plan",
+      "status": "completed",
+      "stepRef": "@framework-step:planning/design-implementation-plan",
+      "approvalRequired": true,
+      "approved": true,
+      "startedAt": "2026-02-07T10:20:00.000Z",
+      "completedAt": "2026-02-07T10:35:00.000Z"
+    },
+    {
+      "id": "a6c7d8e9-f0a1-4b2c-3d4e-5f6a7b8c9d0e",
+      "number": 5,
+      "name": "Apply changes",
+      "status": "completed",
+      "stepRef": "@framework-step:common/apply-changes",
+      "startedAt": "2026-02-07T10:35:00.000Z",
+      "completedAt": "2026-02-07T10:50:00.000Z"
+    },
+    {
+      "id": "b7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f",
+      "number": 6,
+      "name": "Verify implementation",
+      "status": "completed",
+      "stepRef": "@framework-step:investigation/review-verify-document",
+      "startedAt": "2026-02-07T10:50:00.000Z",
+      "completedAt": "2026-02-07T11:00:00.000Z"
+    },
+    {
+      "id": "c8e9f0a1-b2c3-4d4e-5f6a-7b8c9d0e1f2a",
+      "number": 7,
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": true,
+      "startedAt": "2026-02-07T10:55:00.000Z",
+      "completedAt": "2026-02-07T11:02:00.000Z"
+    },
+    {
+      "id": "d9f0a1b2-c3d4-4e5f-6a7b-8c9d0e1f2a3b",
+      "number": 8,
+      "name": "End Process Validation",
+      "status": "completed",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "startedAt": "2026-02-07T11:02:00.000Z",
+      "completedAt": "2026-02-07T11:05:00.000Z"
+    }
+  ],
+}
