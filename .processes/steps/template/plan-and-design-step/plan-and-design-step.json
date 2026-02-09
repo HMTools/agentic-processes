@@ -78,7 +78,7 @@
         "Search for similar functionality",
         "Identify steps that could be extended vs creating new",
         "GENERALIZATION CHECK: Look for existing steps that solve a similar problem for a different artifact/entity type (e.g., analyze-current-artifact-state handles templates, steps, and processes via an artifactType parameter)",
-        "If a generalization pattern exists: propose parameterizing the new step to cover multiple types instead of creating a narrow single-type step",
+        "If a generalization pattern IS detected: you MUST propose the generalized approach to the user before proceeding with a narrow type-specific design. Do NOT default to process parameters if they conflict with an established generalization pattern — present both options and let the user decide.",
         "Consider: Could the step be placed in 'common' category with a type parameter instead of a type-specific category?"
       ]
     },

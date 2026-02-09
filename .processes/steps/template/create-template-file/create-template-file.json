@@ -27,7 +27,8 @@
       "Use kebab-case for filename: `.processes/templates/{category}/{template-name}.md`",
       "MD file contains: Description, Purpose & Usage, Quick Reference, Flow diagram, Steps list",
       "JSON file contains: metadata, parameters, steps with full context, guidance",
-      "Each step references framework-step: @framework-step:category/step-name"
+      "Each step references framework-step: @framework-step:category/step-name",
+      "CRITICAL: Only create template files in this step. Do NOT create step files — missing steps are handled later by validate-process-steps-exist via sub-processes"
     ],
     "files": {
       "read": ["memory.json (template design from previous step)", ".processes/templates/template-template.md (if exists)"],
@@ -44,7 +45,11 @@
       "Use @framework-step:category/step-name for all step references",
       "Keep parameters section clear with required vs optional",
       "Ensure flow diagram matches step sequence",
-      "Include memory file configuration"
+      "Include memory file configuration",
+      "NEVER create step files (.processes/steps/) directly in this step. This step creates TEMPLATE files only. New steps must be created via the create-process-step-template sub-process in the validate-process-steps-exist step."
+    ],
+    "warnings": [
+      "CRITICAL: This step creates TEMPLATE files only (.processes/templates/). Do NOT create step files (.processes/steps/) here. If the template references steps that don't exist yet, they will be handled by the validate-process-steps-exist step which spawns create-process-step-template sub-processes for each missing step."
     ]
   },
   "substeps": [

@@ -58,3 +58,13 @@ Shared component containing all operating principles that agents must follow dur
 **Rule**: Whenever you need any form of user input, dynamically generate relevant options and set them in `process.json` `pendingInteraction` field. Never use predefined options from templates.
 
 **Verification**: Output "✓ pendingInteraction set in process.json" when options are generated
+
+---
+
+## End-Step Verification Checklist
+
+Every step's End-Step compliance check MUST verify all of the following. This checklist is the **single source of truth** for what End-Step verifies — agents read this file at End-Step time.
+
+- [ ] **Principle 1 (LOG FIRST)**: Was log.json updated for every user interaction before file changes?
+- [ ] **Principle 7 (TYPE STRUCTURES)**: Do modified process files conform to TypeScript type definitions in `.processes/types/`?
+- [ ] **Principle 8 (INTERACTION OPTIONS)**: If the step had ANY point where agent stopped for user input (approval, question, clarification), was `pendingInteraction` set in process.json at each of those points? Was it cleared after the user responded?

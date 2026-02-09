@@ -1,0 +1,243 @@
+{
+  "type": "step",
+  "name": "apply-artifact-updates",
+  "category": "common",
+  "metadata": {
+    "title": "Apply Artifact Updates",
+    "purposeAndUsage": "Apply approved changes from update-plan.md to artifact files (template, step, or process), executing each planned modification and verifying correctness. Use after plan-artifact-updates has produced an approved plan.",
+    "lastUpdated": "2026-02-08"
+  },
+  "parameters": {
+    "required": ["artifactType", "artifactPath"],
+    "optional": [],
+    "defaults": {},
+    "definitions": {
+      "artifactType": {
+        "description": "Type of artifact being updated",
+        "type": "string",
+        "enum": ["template", "step", "process"]
+      },
+      "artifactPath": {
+        "description": "Path to the artifact (relative to project root)",
+        "type": "string",
+        "example": ".processes/templates/infrastructure/update-process-template"
+      }
+    }
+  },
+  "output": {
+    "description": "Modified artifact files (JSON and MD) with verified changes",
+    "artifacts": ["Modified artifact JSON file", "Modified artifact MD file"],
+    "memoryUpdates": ["changesApplied", "filesModified", "verificationResults", "diagramUpdated"]
+  },
+  "guidance": {
+    "prerequisites": [
+      "Approved update-plan.md from plan-artifact-updates step",
+      "Memory contains: updatePlanRef (path to update-plan.md), artifactPath, artifactType from prior steps"
+    ],
+    "mandatoryComponents": ["mandatory-logging.md"],
+    "specificActions": [
+      "Follow the substeps below in sequence",
+      "Workflow: load context → read plan → resolve files by type → read files → apply JSON → apply MD → conditional diagram update → verify (retry on failure) → update memory",
+      "Read update-plan.md and parse each change with its before/after state",
+      "Use artifactTypeConfig to resolve file paths and understand change targets per type",
+      "Apply changes sequentially: JSON first, then MD, then diagram if needed",
+      "After applying, verify EVERY change by re-reading the files",
+      "If any verification fails, loop back and retry the failed changes",
+      "Do NOT skip verification — this step's output feeds the review step"
+    ],
+    "files": {
+      "read": [
+        "memory.json (previous step section: updatePlanRef, artifactPath, artifactType)",
+        "update-plan.md (in process folder, path from memory)",
+        "Artifact JSON file (current state before applying)",
+        "Artifact MD file (current state before applying)"
+      ],
+      "create": [],
+      "update": [
+        "Artifact JSON file (apply planned changes)",
+        "Artifact MD file (apply planned changes)",
+        "memory.json (current step section with results)",
+        "log.json (actions taken, progress)"
+      ]
+    },
+    "tools": [
+      "read_file - Read memory.json, update-plan.md, artifact files",
+      "search_replace - Apply changes that modify existing content",
+      "write - Apply changes that replace entire sections or create new content",
+      "read_file - Verify changes after modification"
+    ],
+    "bestPractices": [
+      "Always read the current file state before applying changes — never apply blindly",
+      "Verify the current state matches the plan's 'before' description",
+      "Apply changes exactly as specified in the approved plan",
+      "If current state doesn't match 'before', log warning and adapt (artifact may have been partially updated)",
+      "Verify every change after applying — do not skip verification",
+      "If verification fails, retry the failed changes (loop back to apply)",
+      "Log progress for each change applied",
+      "Update diagram only when flow actually changes — avoid unnecessary modifications"
+    ]
+  },
+  "artifactTypeConfig": {
+    "template": {
+      "files": {
+        "json": "{artifactPath}.json",
+        "md": "{artifactPath}.md",
+        "alternateJson": "{artifactPath}/{name}.json",
+        "alternateMd": "{artifactPath}/{name}.md"
+      },
+      "changeTargets": ["steps array", "parameters (required/optional)", "metadata", "references", "flow diagram", "MD documentation"],
+      "diagramType": "Mermaid flowchart showing step sequence"
+    },
+    "step": {
+      "files": {
+        "json": "{artifactPath}/{stepName}.json",
+        "md": "{artifactPath}/{stepName}.md"
+      },
+      "changeTargets": ["substeps", "guidance (actions, files, tools, best practices)", "dependencies", "references", "memoryFileUsage"],
+      "diagramType": "Mermaid flowchart showing substep flow"
+    },
+    "process": {
+      "files": {
+        "json": "{artifactPath}/process.json",
+        "md": "{artifactPath}/process.md"
+      },
+      "changeTargets": ["step configuration", "parameters", "subProcessState", "metadata"],
+      "diagramType": null
+    }
+  },
+  "substeps": [
+    {
+      "number": 0,
+      "name": "Init-Step: Confirm Principles",
+      "description": "Recall operating principles before starting this step",
+      "actions": [
+        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Output: '✓ Principles confirmed for this step'"
+      ]
+    },
+    {
+      "number": 1,
+      "name": "Load Context from Memory",
+      "description": "Get required references from prior steps in memory",
+      "actions": [
+        "Read memory.json to get: updatePlanRef (path to approved update-plan.md), artifactPath, artifactType, artifactName",
+        "Verify all required references are present",
+        "If missing, log error to log.json and stop"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Read Update Plan",
+      "description": "Parse the approved update plan into a list of changes",
+      "actions": [
+        "Read the update-plan.md from the process folder using updatePlanRef",
+        "Parse the detailed changes section",
+        "Build a list of changes, each with: target file (JSON or MD), change description, before state, after state",
+        "Log: 'Found {count} changes to apply from update-plan.md'"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Resolve and Read Artifact Files",
+      "description": "Determine file paths by artifact type and read current state",
+      "actions": [
+        "Based on artifactType, determine expected file paths using artifactTypeConfig",
+        "Read the artifact JSON file",
+        "Read the artifact MD file (if exists)",
+        "Verify current state matches the 'before' descriptions in the plan",
+        "If discrepancies found, log warning but continue (artifact may have been partially updated)"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Apply Changes to JSON",
+      "description": "Execute each JSON modification using type-specific change targets",
+      "actions": [
+        "For each change targeting the JSON file:",
+        "Apply the modification using search/replace or structural edit",
+        "Log: 'Applied change: {description}'",
+        "Type-specific targets: templates (steps, params, metadata, refs), steps (substeps, guidance, deps, refs), processes (steps, state, params)"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Apply Changes to MD",
+      "description": "Execute each MD modification using type-specific change targets",
+      "actions": [
+        "For each change targeting the MD file:",
+        "Apply the modification using search/replace",
+        "Log: 'Applied change: {description}'",
+        "Type-specific targets: templates (docs, step descriptions, param tables), steps (description, guidance, substeps), processes (checklist, state, params)"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Update Diagram (Conditional)",
+      "description": "Update mermaid diagram in MD if flow changed",
+      "conditional": true,
+      "actions": [
+        "Check if any changes affect the artifact's flow (additions, removals, reordering of steps/substeps)",
+        "If flow changed: update the mermaid diagram in the MD file to reflect new sequence",
+        "If flow unchanged or artifact type has no diagram (process): skip",
+        "Log: 'Diagram updated' or 'No flow changes — diagram unchanged'"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Verify Changes Applied",
+      "description": "Re-read files and verify each change; retry on failure",
+      "actions": [
+        "Re-read all modified artifact files",
+        "For each planned change, verify the 'after' state matches what was applied",
+        "Build verification results: pass/fail per change",
+        "If all verified: proceed to Update Memory",
+        "If any verification fails: log which changes failed, loop back to Substep 4 to re-apply only the failed changes",
+        "Log: 'Verification complete: {passed}/{total} changes verified'"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Update Memory with Results",
+      "description": "Record all results to memory for the review step",
+      "actions": [
+        "Update memory.json current step section with:",
+        "  changesApplied: list of changes with status (applied/verified)",
+        "  filesModified: list of modified file paths",
+        "  verificationResults: pass/fail summary",
+        "  diagramUpdated: boolean",
+        "Log completion: 'Step complete — {count} changes applied to {count} files'"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "End-Step: Compliance Check",
+      "description": "Verify principles were followed in this step",
+      "actions": [
+        "Verify: Was log.json updated for any user interactions?",
+        "Verify: Were mandatory actions confirmed with output?",
+        "Verify: Do modified process files conform to type definitions? (Principle 7)",
+        "Output: '✓ Step completed in compliance with operating principles'"
+      ]
+    }
+  ],
+  "flow": {
+    "description": "Load context → Read plan → Resolve files by type → Read files → Apply JSON → Apply MD → Conditional diagram update → Verify (loop back to apply on failure) → Update memory"
+  },
+  "memoryFileUsage": {
+    "readFrom": "Process parameters (artifactType, artifactPath) and previous step's plan (updatePlanRef from plan-artifact-updates)",
+    "writeTo": "Current step section in memory.json",
+    "fields": [
+      "Information Produced: changesApplied, filesModified, verificationResults, diagramUpdated",
+      "Decisions Made: Diagram update decision, retry decisions on verification failure"
+    ]
+  },
+  "dependencies": {
+    "requiredComponents": ["mandatory-logging.md"],
+    "requiredFiles": ["update-plan.md (in process folder)"],
+    "requiredTools": ["read_file", "search_replace", "write"]
+  },
+  "references": {
+    "relatedSteps": ["plan-artifact-updates", "analyze-current-artifact-state"],
+    "usedInTemplates": ["update-process-template"]
+  }
+}

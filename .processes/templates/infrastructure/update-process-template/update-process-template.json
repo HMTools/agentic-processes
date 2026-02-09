@@ -5,7 +5,7 @@
   "metadata": {
     "title": "Update Process Template",
     "purposeAndUsage": "Workflow for safely modifying existing process templates. Use when you need to update a template's steps, parameters, structure, or documentation while ensuring all references remain valid.",
-    "lastUpdated": "2026-02-05"
+    "lastUpdated": "2026-02-08"
   },
   "parameters": {
     "required": ["templateName", "updateDescription"],
@@ -42,28 +42,28 @@
     },
     {
       "number": 1,
-      "name": "Analyze Existing Template",
-      "stepRef": "@framework-step:template/analyze-existing-template",
-      "output": "Template analysis with current structure, steps, parameters documented in memory"
+      "name": "Analyze Current Artifact State",
+      "stepRef": "@framework-step:common/analyze-current-artifact-state",
+      "output": "Baseline analysis of artifact structure recorded to memory"
     },
     {
       "number": 2,
-      "name": "Plan Template Updates",
+      "name": "Plan Artifact Updates",
       "stepRef": "@framework-step:common/plan-artifact-updates",
       "output": "update-plan.md with proposed changes",
       "approvalRequired": true
     },
     {
       "number": 3,
-      "name": "Apply Template Updates",
-      "stepRef": "@framework-step:template/apply-template-updates",
-      "output": "Updated template JSON and MD files"
+      "name": "Apply Artifact Updates",
+      "stepRef": "@framework-step:common/apply-artifact-updates",
+      "output": "Modified artifact JSON and MD files with verified changes"
     },
     {
       "number": 4,
-      "name": "Review and Validate Updates",
-      "stepRef": "@framework-step:template/review-and-validate-updates",
-      "output": "review-report.md with plan compliance and validation results",
+      "name": "Review and Validate Artifact Updates",
+      "stepRef": "@framework-step:common/review-and-validate-artifact-updates",
+      "output": "review-report.md with plan compliance, quality assessment, and validation results",
       "approvalRequired": true
     },
     {
@@ -96,10 +96,10 @@
   "references": {
     "steps": [
       "@framework-step:common/init-process-principles",
-      "@framework-step:template/analyze-existing-template",
+      "@framework-step:common/analyze-current-artifact-state",
       "@framework-step:common/plan-artifact-updates",
-      "@framework-step:template/apply-template-updates",
-      "@framework-step:template/review-and-validate-updates",
+      "@framework-step:common/apply-artifact-updates",
+      "@framework-step:common/review-and-validate-artifact-updates",
       "@framework-step:template/validate-process-steps-exist",
       "@framework-step:learning/continuous-improvement",
       "@framework-step:common/end-process-validation"
