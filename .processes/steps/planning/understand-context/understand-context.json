@@ -149,7 +149,8 @@
         "File structure: Concept Overview, Current State, Target State, Target Files, Requirements, Success Criteria, Constraints, Questions/Gaps",
         "Organize clearly with headers and tables for readability",
         "Update memory.json with reference only: '**Detailed Context**: See [`step{N}-context.md`](./step{N}-context.md)'",
-        "Do NOT put detailed context inline in conversation - the file IS the deliverable for approval"
+        "Do NOT put detailed context inline in conversation - the file IS the deliverable for approval",
+        "Output: '✓ Created step{N}-context.md' - DO NOT proceed to approval checkpoint without this verification"
       ]
     },
     {

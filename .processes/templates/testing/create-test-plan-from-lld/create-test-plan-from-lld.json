@@ -1,0 +1,188 @@
+{
+  "type": "template",
+  "name": "create-test-plan-from-lld",
+  "category": "testing",
+  "metadata": {
+    "title": "Create Test Plan from LLD",
+    "purposeAndUsage": "Create comprehensive test plans from user story Low-Level Design (LLD) documents by analyzing requirements, designing test cases, and optionally syncing with external test management tools. Use when a user story has an approved LLD and needs comprehensive test planning, or when existing test cases need updating based on new features or LLD changes.",
+    "lastUpdated": "2026-02-11"
+  },
+  "parameters": {
+    "required": ["userStoryId", "lldPath"],
+    "optional": ["testPlanId"],
+    "definitions": {
+      "userStoryId": {
+        "description": "ID/reference of the user story (e.g., ADO work item ID, JIRA ticket)",
+        "type": "string",
+        "example": "US-1234"
+      },
+      "lldPath": {
+        "description": "Path to the LLD document (relative to project root)",
+        "type": "string",
+        "example": "plans/us-1234-payment-flow/low-level-design.md"
+      },
+      "testPlanId": {
+        "description": "Existing test plan ID to update (for incremental updates)",
+        "type": "string",
+        "example": "TP-5678"
+      }
+    },
+    "notes": "Test types, formats, and sync configuration are handled via guidelines rather than runtime parameters"
+  },
+  "guidelines": [
+    {
+      "name": "how-to-write-test-plan.md",
+      "purpose": "Comprehensive guide for test plan creation: test types, test case format/structure, documentation standards, naming conventions",
+      "defaultBehavior": "Generate functional, integration, and edge-case tests with standard format"
+    },
+    {
+      "name": "how-to-check-existing-test-cases.md",
+      "purpose": "How to find and compare existing test cases (location, matching criteria)",
+      "defaultBehavior": "Check local plans/ folder for existing test-plan.md files"
+    },
+    {
+      "name": "how-to-sync-test-management.md",
+      "purpose": "How to sync with external test management tools (Azure DevOps, Zephyr, TestRail)",
+      "defaultBehavior": "No sync (local test plan only)"
+    }
+  ],
+  "steps": [
+    {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "description": "Load and confirm the 8 operating principles for this process execution",
+      "output": "Principles loaded and confirmed",
+      "approvalRequired": false
+    },
+    {
+      "number": 1,
+      "name": "Understand LLD Context",
+      "stepRef": "@framework-step:planning/understand-context",
+      "description": "Parse and understand the LLD document to identify scope for test planning. Extract feature overview, technical implementation details, component interactions, data flows, API contracts, and integration points.",
+      "context": {
+        "contextSource": "LLD document at {{lldPath}}",
+        "focusAreas": "Feature scope, technical design, APIs, data flows, error handling"
+      },
+      "output": "Context summary in memory",
+      "approvalRequired": false
+    },
+    {
+      "number": 2,
+      "name": "Gather Test Requirements",
+      "stepRef": "@framework-step:testing/gather-test-requirements",
+      "description": "Extract and organize test-specific requirements from the LLD: acceptance criteria, edge cases, boundary conditions, integration points, test data requirements, error handling scenarios.",
+      "output": "Test requirements in memory",
+      "approvalRequired": false
+    },
+    {
+      "number": 3,
+      "name": "Create Test Plan",
+      "stepRef": "@framework-step:testing/create-test-plan",
+      "description": "Analyze test scope and create the complete test plan document. Includes: analyzing scope, determining required test cases, checking for existing test cases (using guideline), creating/updating test cases, and compiling the test plan document.",
+      "output": "Test plan document at plans/{user-story-name}/test-plan.md",
+      "approvalRequired": true,
+      "postApprovalActions": [
+        "Finalize test plan document",
+        "Proceed to sync step if configured"
+      ],
+      "notes": "Uses how-to-write-test-plan.md and how-to-check-existing-test-cases.md guidelines"
+    },
+    {
+      "number": 4,
+      "name": "Sync to Test Management Tool",
+      "stepRef": "@framework-step:testing/sync-test-management",
+      "description": "Push test cases to external test management tool (Azure DevOps, Zephyr, TestRail) based on guideline configuration.",
+      "output": "Sync report with test case IDs and status",
+      "conditional": "Only executes if sync is configured in how-to-sync-test-management.md guideline",
+      "approvalRequired": false,
+      "notes": "Conditional step - skipped if no sync configured"
+    },
+    {
+      "number": 5,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "description": "Review the process execution and capture learnings: what worked well, what could be improved, suggested enhancements to guidelines or process.",
+      "output": "Improvements documented",
+      "approvalRequired": true
+    },
+    {
+      "number": 6,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "description": "Final compliance check to ensure all process requirements were met.",
+      "output": "Compliance report",
+      "approvalRequired": false
+    }
+  ],
+  "memoryFileStructure": {
+    "sections": [
+      "lldContext",
+      "testRequirements",
+      "testPlan",
+      "syncResults",
+      "improvements"
+    ],
+    "keyFields": [
+      "userStoryId",
+      "lldPath",
+      "testPlanPath",
+      "testCaseCount",
+      "syncStatus"
+    ]
+  },
+  "references": {
+    "steps": [
+      "@framework-step:common/init-process-principles",
+      "@framework-step:planning/understand-context",
+      "@framework-step:testing/gather-test-requirements",
+      "@framework-step:testing/create-test-plan",
+      "@framework-step:testing/sync-test-management",
+      "@framework-step:learning/continuous-improvement",
+      "@framework-step:common/end-process-validation"
+    ],
+    "relatedTemplates": [
+      "low-level-design-user-story",
+      "develop-user-story"
+    ],
+    "dependencies": []
+  },
+  "memoryFileUsage": {
+    "Step 1: Understand LLD Context": {
+      "informationProduced": [
+        "Feature overview and business context",
+        "Technical implementation details",
+        "Component interactions and data flows",
+        "API contracts and integration points"
+      ]
+    },
+    "Step 2: Gather Test Requirements": {
+      "informationProduced": [
+        "Acceptance criteria list",
+        "Edge cases and boundary conditions",
+        "Integration points requiring testing",
+        "Test data requirements",
+        "Error handling scenarios"
+      ]
+    },
+    "Step 3: Create Test Plan": {
+      "informationProduced": [
+        "Test coverage matrix",
+        "Test categorization",
+        "Existing vs new test case analysis",
+        "Complete test plan document path"
+      ],
+      "decisionsMade": [
+        "Test scope boundaries",
+        "Test case priorities",
+        "Which existing cases to update/keep/remove"
+      ]
+    },
+    "Step 4: Sync to Test Management Tool": {
+      "informationProduced": [
+        "Sync report with IDs",
+        "Created/updated test case mappings"
+      ]
+    }
+  }
+}
