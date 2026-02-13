@@ -110,12 +110,14 @@ Update log.json with what was changed
 
 ### Subagent Delegation Model
 
-This framework uses Cursor subagents for context isolation:
+This framework uses subagents for context isolation:
 
 - **step-executor**: Executes individual process steps in isolated context
 - **process-spawner**: Creates new processes/sub-processes in isolated context
 
 The main agent orchestrates while subagents execute specialized work.
+
+> **Tool-specific subagent invocation:** See the command file for your AI tool (e.g., `.cursor/commands/`, `.claude/commands/`, `.github/prompts/`) for how to invoke subagents in your environment.
 
 ### JSON-First Architecture
 
