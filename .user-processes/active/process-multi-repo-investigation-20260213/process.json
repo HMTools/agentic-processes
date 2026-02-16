@@ -1,0 +1,108 @@
+{
+  "type": "process-instance",
+  "id": "bf9e0ec9-fd9d-49c6-8acc-1a6fa1599621",
+  "name": "Create Multi-Repo Codebase Investigation Template",
+  "metadata": {
+    "template": "create-process-template",
+    "templateCategory": "infrastructure",
+    "created": "2026-02-13T20:30:00.000Z",
+    "lastUpdated": "2026-02-14T00:00:00.000Z",
+    "projectPath": "c:\\Users\\m4t4n\\OneDrive\\Desktop\\Automate With AI\\agentic-processes",
+    "processPath": ".user-processes/active/process-multi-repo-investigation-20260213"
+  },
+  "status": "running",
+  "parameters": {
+    "templateName": "multi-repo-codebase-investigation",
+    "templatePurpose": "Systematic investigation of multiple repositories to answer research questions. Allows users to investigate patterns, implementations, and gather information across multiple codebases in a structured way.",
+    "useCases": "When investigating how features are implemented across microservices, comparing patterns in different codebases, gathering metrics from multiple projects, understanding architectural decisions across repos, analyzing security practices across repositories."
+  },
+  "currentState": {
+    "activeStepId": "8bc039a8-36ee-496e-b512-aaf171b0ebd7",
+    "activeStepName": "Plan and design template",
+    "actionSummary": "Awaiting approval of template design",
+    "actionDetails": "Template design completed: 8 steps (4 new multi-repo steps, 4 reused framework steps), feedback loops included, ready for user review"
+  },
+  "pendingInteraction": {
+    "options": [
+      {
+        "id": "approve",
+        "label": "Approve Design",
+        "description": "Approve the template design and proceed to create template file",
+        "isDefault": true
+      },
+      {
+        "id": "request-changes",
+        "label": "Request Changes",
+        "description": "Request modifications to the template design before proceeding"
+      },
+      {
+        "id": "add-step",
+        "label": "Add Step",
+        "description": "Suggest adding an additional step to the workflow"
+      },
+      {
+        "id": "modify-parameters",
+        "label": "Modify Parameters",
+        "description": "Change the required or optional parameters"
+      },
+      {
+        "id": "reject",
+        "label": "Reject and Restart",
+        "description": "Reject the current design and restart the planning process"
+      }
+    ]
+  },
+  "steps": [
+    {
+      "id": "dd4a6618-3c81-4021-8694-7d06a9cc95a1",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "approvalRequired": false,
+      "startedAt": "2026-02-13T20:30:00.000Z",
+      "completedAt": "2026-02-13T20:31:00.000Z"
+    },
+    {
+      "id": "8bc039a8-36ee-496e-b512-aaf171b0ebd7",
+      "number": 1,
+      "name": "Plan and design template",
+      "status": "pending-approval",
+      "stepRef": "@framework-step:template/plan-and-design-template",
+      "approvalRequired": true,
+      "startedAt": "2026-02-14T00:00:00.000Z"
+    },
+    {
+      "id": "c67a07f4-b021-4f8a-8be2-cda6dc7bb024",
+      "number": 2,
+      "name": "Create template file",
+      "status": "pending",
+      "stepRef": "@framework-step:template/create-template-file",
+      "approvalRequired": false
+    },
+    {
+      "id": "d74d5dac-e9f4-47bf-bc6e-8f55a6806fb3",
+      "number": 3,
+      "name": "Validate process-steps exist",
+      "status": "pending",
+      "stepRef": "@framework-step:template/validate-process-steps-exist",
+      "approvalRequired": false
+    },
+    {
+      "id": "a9051d58-c803-4eee-8857-2f76b94717c6",
+      "number": 4,
+      "name": "Continuous Improvement",
+      "status": "pending",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": true
+    },
+    {
+      "id": "7409b105-89a4-4a45-9d12-5a9091d06a37",
+      "number": 5,
+      "name": "End Process Validation",
+      "status": "pending",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "approvalRequired": false
+    }
+  ]
+}

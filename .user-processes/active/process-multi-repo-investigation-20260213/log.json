@@ -1,0 +1,98 @@
+{
+  "type": "log-file",
+  "metadata": {
+    "process": "Create Multi-Repo Codebase Investigation Template",
+    "template": "create-process-template",
+    "started": "2026-02-13T20:30:00.000Z",
+    "completed": null,
+    "parentProcessPath": null,
+    "subProcessPaths": []
+  },
+  "steps": {
+    "dd4a6618-3c81-4021-8694-7d06a9cc95a1": {
+      "timestamp": "2026-02-13T20:30:00.000Z",
+      "actionsTaken": [
+        "Read operating-principles.md",
+        "Loaded 8 operating principles",
+        "Confirmed understanding",
+        "Updated memory.json with principles confirmation"
+      ],
+      "agentReasoning": ["Step 0 is mandatory for all processes to ensure compliance with framework operating principles"],
+      "userInteractions": [],
+      "problemsEncountered": [],
+      "filesModified": ["memory.json", "process.json"],
+      "decisionsMade": [],
+      "performanceNotes": ["Step completed as designed"]
+    },
+    "8bc039a8-36ee-496e-b512-aaf171b0ebd7": {
+      "timestamp": {
+        "startedAt": "2026-02-14T00:00:00.000Z",
+        "updatedAt": "2026-02-14T00:00:00.000Z"
+      },
+      "actionsTaken": [
+        "Read plan-and-design-template.json step definition",
+        "Executed substep 0: Confirmed operating principles",
+        "Executed substep 1: Reviewed requirements from process parameters",
+        "Executed substep 2: Searched for existing multi-repo templates (none found)",
+        "Executed substep 3: Wrote purpose statement",
+        "Executed substep 4: Defined use cases from process parameters",
+        "Executed substep 5: Checked existing reusable steps in planning/, investigation/, common/, data/",
+        "Executed substep 6: Planned step breakdown with focus on step reuse",
+        "Executed substep 7: Identified required and optional parameters",
+        "Executed substep 8: Designed process flow with feedback loops",
+        "Executed substep 9: Created mermaid diagram showing approval checkpoints and feedback paths"
+      ],
+      "agentReasoning": [
+        "Multi-repo investigation requires orchestrating investigation across multiple codebases - no existing template handles this",
+        "Identified understand-context as reusable for initial context gathering",
+        "Searched existing investigation steps (identify-files, review-verify-document, final-summary) but they are single-repo focused",
+        "Determined need for new 'multi-repo' step category - this is a distinct concern not covered by existing categories",
+        "Designed 4 new steps: gather-repository-information (enumerate repos), investigate-across-repositories (parallel investigation), compare-and-synthesize-findings (cross-repo analysis), create-investigation-report (multi-repo reporting)",
+        "Added feedback loops: investigation can return to repository gathering if more context needed, synthesis can return to investigation if gaps found",
+        "Set approval checkpoints at context understanding and synthesis to allow user review before final report generation"
+      ],
+      "userInteractions": [
+        {
+          "timestamp": "2026-02-14T00:05:00.000Z",
+          "userRequest": "Always create the design as dedicated md file so it will be easy to read",
+          "agentResponse": "Creating template-design.md file with complete design documentation for easier review",
+          "reasoning": "User feedback to improve design deliverable format - dedicated MD file is more accessible than JSON"
+        },
+        {
+          "timestamp": "2026-02-14T00:10:00.000Z",
+          "userRequest": "Repos won't exist locally and need to be cloned. Steps 3 & 4 should be in a subprocess of single-repo codebase investigation",
+          "agentResponse": "Updating design to: 1) Handle repo cloning in preparation step, 2) Use subprocess pattern for per-repo investigation (spawn investigate-single-repo subprocess for each repo), 3) Parent aggregates results after all subprocesses complete",
+          "reasoning": "Better architecture: subprocess isolation for each repo investigation, cleaner orchestration, handles remote repos properly"
+        },
+        {
+          "timestamp": "2026-02-14T00:15:00.000Z",
+          "userRequest": "Step 2 should be in subprocess. Don't clone all repos in advance - clone on-demand per subprocess and remove after investigation (only if cloned, not local paths)",
+          "agentResponse": "Updating design: 1) Parent Step 2 becomes 'Parse Repository List' (lightweight), 2) Subprocess handles 'Prepare Repository' (clone if URL), 3) Subprocess adds cleanup step to remove cloned repos, 4) No cloneDirectory parameter needed",
+          "reasoning": "Optimal architecture: minimal disk usage, on-demand cloning per subprocess, automatic cleanup, subprocess fully self-contained"
+        },
+        {
+          "timestamp": "2026-02-14T00:20:00.000Z",
+          "userRequest": "The tracking in step 3 can be in the repositories-list file and not in the memory",
+          "agentResponse": "Updating design: Step 3 updates repositories-list.json with subprocess tracking (subProcessId, status, subProcessPath) instead of parent memory. Cleaner data organization.",
+          "reasoning": "Better data locality - subprocess tracking belongs with the repo list itself, not separate in memory"
+        }
+      ],
+      "problemsEncountered": [],
+      "filesModified": ["memory.json", "process.json"],
+      "decisionsMade": [
+        "Create new 'multi-repo' step category for specialized multi-repository steps",
+        "Reuse 4 existing framework steps (init-process-principles, understand-context, continuous-improvement, end-process-validation)",
+        "Create 4 new steps specific to multi-repo investigation workflow",
+        "Include feedback loop from synthesis back to investigation for iterative refinement",
+        "Use 'repositories' parameter (plural) to indicate multiple repo paths expected"
+      ],
+      "performanceNotes": ["Systematic search of existing steps completed before proposing new ones per best practices"]
+    }
+  },
+  "processWideObservations": {
+    "patternsDetected": [],
+    "userFeedbackSummary": [],
+    "efficiencyMetrics": [],
+    "recommendationsForFuture": []
+  }
+}
