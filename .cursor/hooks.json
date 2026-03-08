@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "command": "bash .cursor/hooks/check-approval-stop.sh"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "bash .cursor/hooks/block-tools-on-pending.sh"
+      },
+      {
+        "command": "bash .cursor/hooks/block-todo-tools.sh",
+        "matcher": "Task"
+      },
+      {
+        "command": "bash .cursor/hooks/enforce-log-first.sh",
+        "matcher": "Write|StrReplace"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "bash .cursor/hooks/validate-process-files.sh",
+        "matcher": "Write|StrReplace"
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "bash .cursor/hooks/check-approval-stop.sh"
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "bash .cursor/hooks/create-log-flag.sh"
+      }
+    ]
+  }
+}
