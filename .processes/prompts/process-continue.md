@@ -18,7 +18,6 @@ This prompt guides the continuation of an existing process by discovering active
 |-------------|-------------|
 | Must have process | Never work outside a process |
 | Must restore state | Read process.json, process.md and memory.json |
-| Must log interactions | Log user interactions before file changes |
 
 ---
 
@@ -28,27 +27,19 @@ This prompt guides the continuation of an existing process by discovering active
 
 These principles apply to ALL work in this process:
 
-1. **LOG FIRST, ACT SECOND** - Log every user interaction to log.json BEFORE responding or making changes
-   - Output: "✓ Logged to log.json"
+1. **READ JSON FOR GUIDANCE** - Step instructions live in .json files, not .md files
 
-2. **READ JSON FOR GUIDANCE** - Step instructions live in .json files, not .md files
-
-3. **STOP AT CHECKPOINTS** - When approvalRequired: true, present deliverables and WAIT for user response
-   - Output: "⏸️ Awaiting approval"
-
-4. **NO EXTERNAL TODOS** - Process steps ARE your task list. Do NOT use todo_write during processes
-
-5. **VERIFY MANDATORY ACTIONS** - For MANDATORY/CRITICAL instructions, do action then confirm
+2. **VERIFY MANDATORY ACTIONS** - For MANDATORY/CRITICAL instructions, do action then confirm
    - Output: "✓ [Action] completed"
 
-6. **USE SUBAGENTS FOR STEPS** - Delegate step execution to step-executor subagent. Do NOT execute steps directly.
+3. **USE SUBAGENTS FOR STEPS** - Delegate step execution to step-executor subagent. Do NOT execute steps directly.
    - Each step must be executed via Task tool with subagent_type='step-executor'
 
-7. **FOLLOW TYPE STRUCTURES** - All process files (process.json, memory.json, log.json) MUST conform to TypeScript type definitions in .processes/types/
+4. **FOLLOW TYPE STRUCTURES** - All process files (process.json, memory.json, log.json) MUST conform to TypeScript type definitions in .processes/types/
    - Validate at End-Step: type discriminators present, field names match types, step IDs use correct format
 
-8. **GENERATE INTERACTION OPTIONS** - Whenever you need any form of user input, dynamically generate options and set `pendingInteraction` in process.json
-   - Output: "✓ pendingInteraction set in process.json"
+5. **GENERATE INTERACTION OPTIONS** - Whenever you need any form of user input, dynamically generate options and write `pending-interaction.json` in the process folder. Delete it when the user responds.
+   - Output: "✓ pending-interaction.json written to process folder"
 
 ---
 
@@ -73,40 +64,6 @@ Reference the process management knowledge file for complete instructions:
 - Inform the user that no active process exists
 - Suggest using `/process-new` to create a process from a template first
 - Never implement directly - always create a process first
-
-#### Do Not Use Built-in Todo System
-
-**CRITICAL RULE**: Do NOT use the built-in todo system (`todo_write` tool) when executing processes.
-
-- The process steps defined in `process.md` serve as your task tracking
-- Using external todos creates conflicts with approval checkpoints
-- Approval checkpoints require you to STOP and WAIT - external todos may override this
-
-**Process steps are your only task list** - do not create separate todos.
-
-#### Log User Interactions Immediately
-
-**Mandatory Workflow:**
-```
-User Makes Request/Correction → 
-IMMEDIATELY Log to log.json (before any file changes) → 
-Make File Changes → 
-Update log.json with what was changed
-```
-
-**Enforcement Checklist (MUST verify before ANY file modification):**
-- [ ] **Did the user make a request/correction?** → Log it immediately
-- [ ] **Am I about to modify a file?** → Check if I logged the user interaction first
-- [ ] **Did I just modify a file?** → Update log.json filesModified array
-
-**Log Format:**
-```markdown
-### User Interactions
-1. **User Request**: {exact request or summary}
-   - **Reason**: {why user explained, or inferred}
-   - **Agent Response**: {what changed in response}
-   - **Timestamp**: {YYYY-MM-DD HH:mm:ss}
-```
 
 ### Subagent Delegation Model
 
@@ -167,11 +124,12 @@ When `/process-continue` is invoked:
 5. **Update Current State**
    - Update **Current State** to reflect resumption
    - Set active step to next incomplete step
+   - **CRITICAL**: Write `metadata.sessionId` to process.json using the `session_id` value Claude Code exposes in the environment. WITHOUT THIS, the log-first enforcement hook (`enforce-log-first.sh`), the pending-interaction block hook, and the `UserPromptSubmit` flag hook are ALL silently disabled for this session — user interactions won't be enforced to log first and pending-interaction checkpoints won't be detected.
 
 6. **Proceed with Guidance via Step Delegation**
    - **Delegate step execution** to the `step-executor` subagent
    - Provide to subagent:
-     - **Operating principles** (all 8 principles from `.processes/steps/_components/operating-principles.md`) — subagents run in isolated context and MUST receive these explicitly
+     - **Operating principles** (all 5 principles from `.processes/steps/_components/operating-principles.md`) — subagents run in isolated context and MUST receive these explicitly
      - Step's `.json` file path and content
      - Current process context (process.json, memory.json relevant sections)
      - Step number and any step-specific parameters
@@ -183,7 +141,7 @@ When `/process-continue` is invoked:
      - Handle any issues reported
    - **Handle approval checkpoints**: If step has `approvalRequired: true`, the subagent will prepare deliverables and return; present deliverables to the user and wait for approval
    - **Handle user corrections at approval**: If user provides corrections/feedback instead of simple approval:
-     1. Log the correction to log.json immediately (LOG FIRST principle)
+     1. Log the correction to log.json immediately
      2. **Delegate correction processing** to `step-executor` subagent with:
         - The correction details from user
         - Current step context and artifacts to update
@@ -202,7 +160,7 @@ The AI reads `process.json`, `process.md` and `memory.json` to fully restore con
 - Files created
 - Important notes
 
-### Validation on Resume (Principle 7: FOLLOW TYPE STRUCTURES)
+### Validation on Resume (Principle 4: FOLLOW TYPE STRUCTURES)
 
 **After reading process files, validate they conform to TypeScript types in `.processes/types/`:**
 

@@ -2,47 +2,28 @@
 
 Shared component containing all operating principles that agents must follow during process execution. Referenced by `init-process-principles` step and all step Init-Step/End-Step substeps.
 
-## The 8 Principles
+## The 5 Principles
 
-### 1. LOG FIRST, ACT SECOND
-**Rule**: Log every user interaction to log.json BEFORE responding or making changes
-
-**Verification**: Output "✓ Logged to log.json" before file changes
-
----
-
-### 2. READ JSON FOR GUIDANCE
+### 1. READ JSON FOR GUIDANCE
 **Rule**: Step instructions live in .json files, not .md files
 
 ---
 
-### 3. STOP AT CHECKPOINTS
-**Rule**: When approvalRequired: true, present deliverables, ask for approval, WAIT
-
-**Verification**: Output "⏸️ Awaiting approval" and stop
-
----
-
-### 4. NO EXTERNAL TODOS
-**Rule**: Process steps ARE your task list. Do NOT use todo_write during processes
-
----
-
-### 5. VERIFY MANDATORY ACTIONS
+### 2. VERIFY MANDATORY ACTIONS
 **Rule**: For MANDATORY/CRITICAL instructions: do action, then output confirmation
 
 **Verification**: Output "✓ [Action] completed"
 
 ---
 
-### 6. USE SUBAGENTS FOR STEPS
+### 3. USE SUBAGENTS FOR STEPS
 **Rule**: Delegate step execution to step-executor subagent. Do NOT execute steps directly in the main conversation.
 
 **Verification**: Each step must be executed via Task tool with subagent_type='step-executor'
 
 ---
 
-### 7. FOLLOW TYPE STRUCTURES
+### 4. FOLLOW TYPE STRUCTURES
 **Rule**: All process files (process.json, memory.json, log.json) MUST conform to TypeScript type definitions in `.processes/types/`
 
 **Verification**: Validate at End-Step: type discriminators present, field names match types, step IDs use correct format
@@ -54,10 +35,8 @@ Shared component containing all operating principles that agents must follow dur
 
 ---
 
-### 8. GENERATE INTERACTION OPTIONS
-**Rule**: Whenever you need any form of user input, dynamically generate relevant options and set them in `process.json` `pendingInteraction` field. Never use predefined options from templates.
-
-**Verification**: Output "✓ pendingInteraction set in process.json" when options are generated
+### 5. GENERATE INTERACTION OPTIONS
+**Rule**: Whenever you need any form of user input, dynamically generate relevant options and write them to `pending-interaction.json` in the process folder. Delete the file when the user responds. Never use predefined options from templates.
 
 ---
 
@@ -65,6 +44,5 @@ Shared component containing all operating principles that agents must follow dur
 
 Every step's End-Step compliance check MUST verify all of the following. This checklist is the **single source of truth** for what End-Step verifies — agents read this file at End-Step time.
 
-- [ ] **Principle 1 (LOG FIRST)**: Was log.json updated for every user interaction before file changes?
-- [ ] **Principle 7 (TYPE STRUCTURES)**: Do modified process files conform to TypeScript type definitions in `.processes/types/`?
-- [ ] **Principle 8 (INTERACTION OPTIONS)**: If the step had ANY point where agent stopped for user input (approval, question, clarification), was `pendingInteraction` set in process.json at each of those points? Was it cleared after the user responded?
+- [ ] **Principle 4 (TYPE STRUCTURES)**: Do modified process files conform to TypeScript type definitions in `.processes/types/`?
+- [ ] **Principle 5 (INTERACTION OPTIONS)**: If the step had ANY point where agent stopped for user input (approval, question, clarification), was `pending-interaction.json` created in the process folder at each of those points? Was it deleted after the user responded?

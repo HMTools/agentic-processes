@@ -18,7 +18,6 @@ This prompt guides the creation of a new process instance from an existing templ
 |-------------|-------------|
 | Must use template | Never skip templates or work directly |
 | Must create instance | Always create process.json, process.md, memory.json, log.json |
-| Must log interactions | Log user interactions before file changes |
 
 ---
 
@@ -46,16 +45,6 @@ Reference the process management knowledge file for complete instructions:
 - Stop and wait for user's decision
 - Do NOT automatically create a template
 - Do NOT proceed with any work
-
-#### Do Not Use Built-in Todo System
-
-**CRITICAL RULE**: Do NOT use the built-in todo system (`todo_write` tool) when executing processes.
-
-- The process steps defined in `process.md` serve as your task tracking
-- Using external todos creates conflicts with approval checkpoints
-- Approval checkpoints require you to STOP and WAIT - external todos may override this
-
-**Process steps are your only task list** - do not create separate todos.
 
 #### Always Create Process Instance
 
@@ -143,22 +132,24 @@ When `/process-new` is invoked:
    - Initialize `memory.json` from template
    - Initialize `log.json` from template
    - Set status to "Running"
+   - **CRITICAL**: Write `metadata.sessionId` to process.json using the `session_id` value Claude Code exposes in the environment. WITHOUT THIS, the log-first enforcement hook (`enforce-log-first.sh`), the pending-interaction block hook, and the `UserPromptSubmit` flag hook are ALL silently disabled for this process — user interactions won't be enforced to log first and pending-interaction checkpoints won't be detected.
 
 6. **Start Process (Auto-Execute Step 0)**
    - Display summary
    - **Automatically execute Step 0** (Init Process Principles) - do NOT ask for confirmation
    - Step 0 has no approval checkpoint and is mandatory for every process
-   - After Step 0 completes, highlight the next step
-   - If next step has `approvalRequired: true`, present deliverables to the user and wait for approval
-   - If next step has no approval, continue execution
+   - After Step 0 completes, execute the next step via step-executor subagent — do NOT ask for permission before executing
+   - If the step has `approvalRequired: true`: execute it first via step-executor, then present its deliverables to the user and wait for approval
+   - If the step has no approval required, continue to the next step after completion
+   - **CRITICAL**: `approvalRequired: true` means **post-execution approval of deliverables**. NEVER write `pending-interaction.json` or ask for user permission before a step runs. Pre-execution gating is a process violation.
 
 ### Handling User Corrections at Approval Checkpoints
 
 **CRITICAL**: When a step has `approvalRequired: true` and the user provides **corrections or feedback** instead of simple approval:
 
-1. **Log the correction immediately** to log.json (LOG FIRST principle)
+1. **Log the correction immediately** to log.json
 2. **Delegate correction processing** to `step-executor` subagent with:
-   - **Operating principles** (all 8 principles from `.processes/steps/_components/operating-principles.md`) — subagents run in isolated context and MUST receive these explicitly
+   - **Operating principles** (all 5 principles from `.processes/steps/_components/operating-principles.md`) — subagents run in isolated context and MUST receive these explicitly
    - The correction details from the user
    - Current step context and artifacts to update
    - Instruction to apply the correction and re-prepare deliverables
@@ -168,7 +159,7 @@ When `/process-new` is invoked:
 5. **Repeat** until user provides simple approval ("approved", "yes", etc.)
 
 **Why delegate corrections to subagent?**
-- Maintains context isolation (Principle 6: USE SUBAGENTS)
+- Maintains context isolation (Principle 3: USE SUBAGENTS)
 - Subagent has full step context to properly update all artifacts
 - Main agent stays in orchestration role
 - Ensures consistency with how initial step execution works
@@ -235,25 +226,6 @@ Before creating any process files, you MUST read the type definitions:
   - **Step**: `@framework-step:category/step-name`
   - **Description**: Brief description
   - **Output**: Brief output description
-```
-
-### User Interaction Logging
-
-**Mandatory Workflow (once process is active):**
-```
-User Makes Request → 
-IMMEDIATELY Log to log.json → 
-Make File Changes → 
-Update log.json with changes
-```
-
-**Log Format:**
-```markdown
-### User Interactions
-1. **User Request**: {exact request}
-   - **Reason**: {why}
-   - **Agent Response**: {what changed}
-   - **Timestamp**: {YYYY-MM-DD HH:mm:ss}
 ```
 
 ### Sub-Process Creation via Delegation

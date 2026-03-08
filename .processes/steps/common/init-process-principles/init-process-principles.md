@@ -4,27 +4,16 @@
 
 Load and confirm understanding of the agent operating principles before beginning any process work. This is a mandatory first step for all processes.
 
-## The 6 Core Principles
+## The 3 Core Principles
 
-### 1. LOG FIRST, ACT SECOND
-Log every user interaction to `log.json` BEFORE responding or making changes.
-- **Verification**: Output "✓ Logged to log.json" before file changes
-
-### 2. READ JSON FOR GUIDANCE
+### 1. READ JSON FOR GUIDANCE
 Step instructions live in `.json` files, not `.md` files.
 
-### 3. STOP AT CHECKPOINTS
-When `approvalRequired: true`, present deliverables, ask for approval, WAIT.
-- **Verification**: Output "⏸️ Awaiting approval" and stop
-
-### 4. NO EXTERNAL TODOS
-Process steps ARE your task list. Do NOT use `todo_write` during processes.
-
-### 5. VERIFY MANDATORY ACTIONS
+### 2. VERIFY MANDATORY ACTIONS
 For MANDATORY/CRITICAL instructions: do action, then output confirmation.
 - **Verification**: Output "✓ [Action] completed"
 
-### 6. USE SUBAGENTS FOR STEPS
+### 3. USE SUBAGENTS FOR STEPS
 Delegate step execution to `step-executor` subagent. Do NOT execute steps directly in the main conversation.
 - **Verification**: Each step must be executed via Task tool with `subagent_type='step-executor'`
 

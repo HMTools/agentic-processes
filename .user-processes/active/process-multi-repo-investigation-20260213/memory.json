@@ -23,7 +23,7 @@
     },
     "8bc039a8-36ee-496e-b512-aaf171b0ebd7": {
       "name": "Plan and design template",
-      "status": "in-progress",
+      "status": "completed",
       "startedAt": "2026-02-14T00:00:00.000Z",
       "updatedAt": "2026-02-14T00:00:00.000Z",
       "informationProduced": {
@@ -199,6 +199,30 @@
       ],
       "filesModifiedCreated": ["memory.json", "template-design.md"],
       "notes": "Template v3.0: On-demand cloning with automatic cleanup. Parent lightweight (parse/spawn/aggregate). Subprocess self-contained (clone→investigate→cleanup). 2 new multi-repo steps + 1 new subprocess template (6 steps, 4 new). 62.5% parent step reuse. Optimal disk usage."
+    },
+    "c67a07f4-b021-4f8a-8be2-cda6dc7bb024": {
+      "name": "Create template file",
+      "status": "completed",
+      "startedAt": "2026-02-28T00:01:00.000Z",
+      "updatedAt": "2026-02-28T00:15:00.000Z",
+      "informationProduced": [
+        "Created .processes/templates/investigation/ category directory",
+        "Created .processes/templates/investigation/multi-repo-codebase-investigation.md with all required sections",
+        "Created .processes/templates/investigation/multi-repo-codebase-investigation.json with full step context, guidance, and memoryFileUsage configuration"
+      ],
+      "decisionsMade": [
+        "Used v3.0 design from template-design.md (approved) as authoritative source for step content",
+        "Followed develop-user-story template as formatting reference for both MD and JSON files",
+        "Included full guidance section in JSON covering architecture, key behaviors, repositories-list.json schema, and subprocess outputs",
+        "Step 5 uses @framework-step:investigation/create-research-report (as noted in design: 'Reused - May Need Adaptation')"
+      ],
+      "filesModifiedCreated": [
+        ".processes/templates/investigation/multi-repo-codebase-investigation.md",
+        ".processes/templates/investigation/multi-repo-codebase-investigation.json",
+        "memory.json",
+        "log.json"
+      ],
+      "notes": "Template created for investigation category. New category directory created. Both MD and JSON files validated for required sections. Step references consistent between files. 2 new steps flagged in references.newStepsRequired for Step 3 (validate-process-steps-exist) to act on."
     }
   }
 }

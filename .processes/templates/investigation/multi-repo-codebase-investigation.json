@@ -1,0 +1,216 @@
+{
+  "type": "template",
+  "name": "multi-repo-codebase-investigation",
+  "category": "investigation",
+  "metadata": {
+    "title": "Multi-Repo Codebase Investigation",
+    "purposeAndUsage": "Systematic investigation of multiple repositories to answer a specific research question. Orchestrates per-repository investigation subprocesses with on-demand cloning (for remote repos) and automatic cleanup. Aggregates and synthesizes cross-repository findings into a comprehensive comparative report. Use when investigating patterns, implementations, or practices across multiple codebases.",
+    "lastUpdated": "2026-02-28",
+    "version": "3.0",
+    "subProcessTemplate": "investigate-single-repo"
+  },
+  "parameters": {
+    "required": ["researchQuestion", "repositories"],
+    "optional": ["investigationScope", "filePatterns", "excludePatterns", "outputFormat"],
+    "definitions": {
+      "researchQuestion": {
+        "description": "The specific question or investigation goal to answer across repositories",
+        "type": "string",
+        "example": "How is authentication implemented across our microservices?"
+      },
+      "repositories": {
+        "description": "List of repository URLs or local paths to investigate (comma-separated). Supports GitHub URLs, other git hosting URLs, and local file system paths.",
+        "type": "string",
+        "example": "https://github.com/org/service-auth, https://github.com/org/service-api, c:/local/service-web"
+      },
+      "investigationScope": {
+        "description": "Specific areas or patterns to focus on within each repository. Narrows the investigation to relevant subsystems or concerns.",
+        "type": "string",
+        "example": "authentication and authorization patterns"
+      },
+      "filePatterns": {
+        "description": "File patterns to search within each repository. Used to target specific file types or locations.",
+        "type": "string",
+        "example": "**/*.cs, **/*.ts, **/config/*.json"
+      },
+      "excludePatterns": {
+        "description": "Patterns to exclude from investigation. Used to skip irrelevant directories such as build outputs or third-party code.",
+        "type": "string",
+        "example": "**/node_modules/**, **/bin/**, **/obj/**"
+      },
+      "outputFormat": {
+        "description": "Desired output format for the final investigation report.",
+        "type": "string",
+        "default": "markdown",
+        "example": "comparative-table"
+      }
+    }
+  },
+  "steps": [
+    {
+      "number": 0,
+      "name": "Init Process Principles",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "output": "Operating principles loaded and confirmed",
+      "approvalRequired": false,
+      "reused": true
+    },
+    {
+      "number": 1,
+      "name": "Understand Investigation Context",
+      "stepRef": "@framework-step:planning/understand-context",
+      "output": "Context documentation with research question, repositories list, and investigation scope",
+      "approvalRequired": true,
+      "reused": true,
+      "context": "Gathers and clarifies all parameters for the investigation. Produces a context document that defines the research question, lists all target repositories, and establishes the investigation scope. User approval confirms the context before investigation begins."
+    },
+    {
+      "number": 2,
+      "name": "Parse Repository List",
+      "stepRef": "@framework-step:multi-repo/parse-repository-list",
+      "output": "repositories-list.json with each repository entry containing: name, source, type (remote/local), subProcessId (null), subProcessPath (null), status (pending)",
+      "approvalRequired": false,
+      "reused": false,
+      "context": "Lightweight parsing step. Reads the comma-separated repositories parameter and produces a structured JSON file. Determines if each entry is a remote URL or local path. Does NOT clone any repositories — that is handled by each subprocess in Step 3.",
+      "outputFile": "repositories-list.json"
+    },
+    {
+      "number": 3,
+      "name": "Investigate Repositories (Subprocess Loop)",
+      "stepRef": "@framework-step:common/spawn-sub-process",
+      "output": "Spawned subprocesses for each repository; repositories-list.json updated with subProcessId, subProcessPath, and status for each entry",
+      "approvalRequired": false,
+      "reused": true,
+      "subProcessTemplate": "investigate-single-repo",
+      "syncPoint": "step-4",
+      "context": "Spawns one investigate-single-repo subprocess per repository. Passes researchQuestion, investigationScope, filePatterns, and excludePatterns to each subprocess. Updates repositories-list.json with subprocess tracking data. Does NOT wait for subprocesses to complete here — continues to Step 4 which is the sync point.",
+      "subProcessParameters": {
+        "repositorySource": "URL or local path from repositories-list.json entry",
+        "repositoryName": "Repository name extracted from URL or path",
+        "repositoryType": "remote or local",
+        "researchQuestion": "From parent parameter researchQuestion",
+        "investigationScope": "From parent parameter investigationScope (optional)",
+        "filePatterns": "From parent parameter filePatterns (optional)",
+        "excludePatterns": "From parent parameter excludePatterns (optional)"
+      }
+    },
+    {
+      "number": 4,
+      "name": "Aggregate and Synthesize Findings",
+      "stepRef": "@framework-step:multi-repo/aggregate-and-synthesize-findings",
+      "output": "comparative-analysis.md with common patterns, differences, unique implementations, anomalies, and cross-cutting recommendations",
+      "approvalRequired": true,
+      "reused": false,
+      "syncPoint": true,
+      "context": "SYNC POINT: Waits for all subprocesses from Step 3 to complete. Reads repositories-list.json to locate each subprocess and its findings. Reads summary.json and repo-findings.md from each subprocess. Aggregates relevance determinations and findings. Performs cross-repository comparison: identifies common patterns, highlights differences, detects anomalies. Produces comparative-analysis.md for user approval.",
+      "outputFile": "comparative-analysis.md"
+    },
+    {
+      "number": 5,
+      "name": "Create Investigation Report",
+      "stepRef": "@framework-step:investigation/create-research-report",
+      "output": "investigation-report.md (or .json based on outputFormat) with executive summary, per-repository findings, comparative analysis, recommendations, and conclusion",
+      "approvalRequired": false,
+      "reused": true,
+      "context": "Structures the final report based on the outputFormat parameter. Draws from comparative-analysis.md (Step 4) and per-repository findings. Sections include: Executive Summary, Research Question, Repositories Investigated (total/relevant/not-relevant counts), Per-Repository Findings, Comparative Analysis, Common Patterns, Unique Approaches, Recommendations, Conclusion.",
+      "outputFile": "investigation-report.{md|json}"
+    },
+    {
+      "number": 6,
+      "name": "Continuous Improvement",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "output": "Improvements implemented to template, step definitions, or process",
+      "approvalRequired": true,
+      "reused": true
+    },
+    {
+      "number": 7,
+      "name": "End Process Validation",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "output": "Compliance report confirming all steps completed, all artifacts present, and process files valid",
+      "approvalRequired": false,
+      "reused": true
+    }
+  ],
+  "guidance": {
+    "architecture": {
+      "description": "This template uses a parent-subprocess architecture. The parent process handles orchestration and aggregation. Each repository is investigated by a dedicated subprocess.",
+      "parentResponsibilities": [
+        "Parse repository list into structured format",
+        "Spawn one subprocess per repository",
+        "Wait for all subprocesses at Step 4 sync point",
+        "Aggregate and synthesize findings",
+        "Produce final report"
+      ],
+      "subprocessResponsibilities": [
+        "Clone repository if remote (to temp directory)",
+        "Check repository relevance to research question",
+        "Extract detailed findings if relevant",
+        "Create summary for parent",
+        "Delete cloned repository (if it was cloned)"
+      ]
+    },
+    "keyBehaviors": [
+      "On-demand cloning: repositories are only cloned when their subprocess begins, not in advance",
+      "Automatic cleanup: each subprocess deletes its cloned repository after investigation",
+      "Local path preservation: local repositories are never deleted",
+      "Subprocess isolation: a clone or investigation failure in one subprocess does not block others",
+      "Tracking in file: all subprocess tracking data lives in repositories-list.json, not parent memory"
+    ],
+    "repositoryListJson": {
+      "description": "Central tracking file created in Step 2, updated in Step 3, and read in Step 4",
+      "schema": {
+        "name": "string - repository name extracted from URL or path",
+        "source": "string - original URL or local path",
+        "type": "remote | local",
+        "subProcessId": "string | null - UUID of spawned subprocess, populated in Step 3",
+        "subProcessPath": "string | null - filesystem path to subprocess directory, populated in Step 3",
+        "status": "pending | running | completed | failed"
+      }
+    },
+    "subProcessOutputs": {
+      "description": "Each investigate-single-repo subprocess produces these artifacts in its process directory",
+      "files": [
+        "relevance-check.md - Relevance determination with reasoning",
+        "repo-findings.md - Detailed findings (only if repository is relevant)",
+        "summary.json - Structured output for parent: { repositoryName, relevance, findingsSummary, outputFiles }"
+      ]
+    }
+  },
+  "memoryFileUsage": {
+    "description": "Configuration for how memory.json is used during this process",
+    "parentMemoryTracks": [
+      "researchQuestion and investigationScope",
+      "Total repository count",
+      "Count of relevant vs not-relevant repositories",
+      "Aggregated cross-repository patterns",
+      "Report output location"
+    ],
+    "repositoriesListJsonTracks": [
+      "Per-repository subprocess IDs and paths",
+      "Per-repository investigation status",
+      "Per-repository relevance outcome"
+    ],
+    "note": "Subprocess tracking data is intentionally kept in repositories-list.json rather than parent memory.json for better data locality and easier access by Step 4 aggregation."
+  },
+  "references": {
+    "steps": [
+      "@framework-step:common/init-process-principles",
+      "@framework-step:planning/understand-context",
+      "@framework-step:multi-repo/parse-repository-list",
+      "@framework-step:common/spawn-sub-process",
+      "@framework-step:multi-repo/aggregate-and-synthesize-findings",
+      "@framework-step:investigation/create-research-report",
+      "@framework-step:learning/continuous-improvement",
+      "@framework-step:common/end-process-validation"
+    ],
+    "newStepsRequired": [
+      "@framework-step:multi-repo/parse-repository-list",
+      "@framework-step:multi-repo/aggregate-and-synthesize-findings"
+    ],
+    "relatedTemplates": [
+      "investigate-single-repo"
+    ],
+    "dependencies": []
+  }
+}

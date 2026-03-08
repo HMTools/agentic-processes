@@ -2,8 +2,6 @@
 name: step-executor
 description: Executes individual process steps with context isolation. Use when a process step needs to be executed.
 model: inherit
-readonly: false
-is_background: false
 ---
 
 You are a process step executor for the agentic-processes framework.

@@ -1,0 +1,77 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Check if the current session has an active process step with approvalRequired: true and pending-interaction.json not created. First check stop_hook_active in input — if true, return {\"ok\": true} to prevent infinite loop. Then use Glob to find all .user-processes/active/*/process.json files. Read each and compare metadata.sessionId to the session_id from hook input. If a match is found: check if any step has status 'in_progress' and approvalRequired: true. If found AND pending-interaction.json does not exist in that process folder (derive folder by stripping 'process.json' from the matched file path): return {\"ok\": false, \"reason\": \"Approval checkpoint skipped — present deliverable and write pending-interaction.json before stopping\"}. Otherwise return {\"ok\": true}."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-tools-on-pending.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskCreate|TaskUpdate",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Check if the current session has an active process. Use Glob to find all .user-processes/active/*/process.json files. Read each and compare metadata.sessionId to session_id from hook input. If any match is found and its status is 'running': return {\"ok\": false, \"reason\": \"External todo tools are blocked during process execution — process steps are your task list\"}. Otherwise return {\"ok\": true}."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/enforce-log-first.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "You are checking two things after a Write or Edit tool call. (1) JSON validation: If the written file is process.json, memory.json, or log.json, read it and verify it has the correct 'type' discriminator field and required top-level fields. If invalid, return {\"ok\": false, \"reason\": \"Process file written with invalid structure — [describe the issue]\"}. (2) Log-first flag: Check if the written file path ends with 'log.json'. If so, check if .claude/pending-log-{session_id} flag file exists (where session_id comes from hook input). If it exists, delete it using Bash. Return {\"ok\": true} in all valid cases."
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Check if the current session has an active process step with approvalRequired: true and pending-interaction.json not created. Use Glob to find all .user-processes/active/*/process.json files. Read each and compare metadata.sessionId to session_id from hook input. If a match is found: check if any step has status 'in_progress' and approvalRequired: true AND pending-interaction.json does not exist in that process folder (derive folder by stripping 'process.json' from the matched file path): return {\"ok\": false, \"reason\": \"step-executor returned from approvalRequired step without writing pending-interaction.json — write it now before stopping\"}. Otherwise return {\"ok\": true}."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Check if the current session has an active process. Use Glob to find all .user-processes/active/*/process.json files. Read each and compare metadata.sessionId to session_id from hook input. If a match is found: create flag file .claude/pending-log-{session_id} (where session_id is from hook input) using Write tool. Return {\"ok\": true}. If no match found, return {\"ok\": true} without creating the flag."
+          }
+        ]
+      }
+    ]
+  }
+}

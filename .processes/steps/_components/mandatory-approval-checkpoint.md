@@ -1,20 +1,6 @@
-**⚠️ APPROVAL CHECKPOINT - STOP AND WAIT**
+**Approval checkpoint behavior is enforced by hooks:**
 
-**DO NOT proceed to the next step until user explicitly approves.**
+- **H1a (Stop hook)**: Blocks Claude from finishing a turn when a step has `approvalRequired: true` and `pending-interaction.json` does not exist in the process folder
+- **H1b (PreToolUse hook)**: Blocks all action tool calls when `pending-interaction.json` exists in the process folder, trapping the agent until the user responds and the agent deletes `pending-interaction.json`
 
-Before continuing:
-- [ ] Present the deliverables for this step to the user
-- [ ] **WAIT** for user response - do NOT proceed automatically
-- [ ] Log user response in `log.json`
-- [ ] Only proceed to next step if user selects an approval option
-
-**If user has not explicitly approved → STOP and wait for their response**
-
-**AGENT: Output this confirmation when reaching an approval checkpoint:**
-
-⏸️ APPROVAL CHECKPOINT REACHED
-
-Deliverables presented above. Awaiting your approval.
-
-I will NOT proceed until you respond.
-
+These hooks enforce the two-way contract: the agent cannot skip presenting deliverables (H1a), and cannot continue working once the checkpoint is active (H1b).
