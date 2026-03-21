@@ -1,22 +1,29 @@
 #!/usr/bin/env bash
-# Validate process files after Write/StrReplace and clear log-first flag
+# Validate process files after Write/StrReplace/Edit and clear log-first flag
 # Checks JSON structure for process.json, memory.json, log.json
+# Platform-agnostic: works with both Cursor and Claude Code
 
 INPUT=$(cat)
 
-# Cursor uses conversation_id
-SESSION_ID=$(echo "$INPUT" | grep -o '"conversation_id":"[^"]*"' | head -1 | cut -d'"' -f4)
-
-# Get the file path from tool_input or tool_output
-FILE_PATH=$(echo "$INPUT" | grep -o '"path":"[^"]*"' | head -1 | cut -d'"' -f4)
-
-# Use CURSOR_PROJECT_DIR (CLAUDE_PROJECT_DIR is also available as alias)
-PROJECT_DIR="${CURSOR_PROJECT_DIR:-$CLAUDE_PROJECT_DIR}"
+# Platform detection
+if [ -n "$CURSOR_PROJECT_DIR" ]; then
+    # Cursor environment
+    SESSION_ID=$(echo "$INPUT" | grep -o '"conversation_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+    PROJECT_DIR="$CURSOR_PROJECT_DIR"
+    FILE_PATH=$(echo "$INPUT" | grep -o '"path":"[^"]*"' | head -1 | cut -d'"' -f4)
+    FLAG_DIR=".cursor"
+else
+    # Claude Code environment
+    SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+    PROJECT_DIR="$CLAUDE_PROJECT_DIR"
+    FILE_PATH=$(echo "$INPUT" | grep -o '"file_path":"[^"]*"' | head -1 | cut -d'"' -f4)
+    FLAG_DIR=".claude"
+fi
 
 # Check if it's a log.json write - clear the pending-log flag if exists
 if [[ "$FILE_PATH" == *log.json ]]; then
   if [ -n "$SESSION_ID" ]; then
-    FLAG_FILE="$PROJECT_DIR/.cursor/pending-log-$SESSION_ID"
+    FLAG_FILE="$PROJECT_DIR/$FLAG_DIR/pending-log-$SESSION_ID"
     if [ -f "$FLAG_FILE" ]; then
       rm -f "$FLAG_FILE"
     fi

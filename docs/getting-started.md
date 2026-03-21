@@ -4,36 +4,50 @@ This guide will help you get started with the Agentic Process System, from insta
 
 ## Prerequisites
 
-- Cursor IDE or GitHub Copilot Chat
+- Cursor IDE or Claude Code
 - Basic understanding of markdown files
 - Familiarity with workflow management concepts
 
 ## Installation
 
-The Agentic Process System uses a **multi-folder workspace** setup:
+### Option 1: Plugin Marketplace (Recommended)
 
-1. **Add the framework to your workspace:**
-   - In Cursor/VS Code: File → Add Folder to Workspace
-   - Add your project folder
-   - Add the `agentic-processes` folder
+**For Cursor IDE:**
+```bash
+cursor plugin install agentic-processes
+```
 
-2. **No manual setup required** - the `.user-processes/` directory is created automatically when you start your first process. Folders are created on-demand:
-   - `active/` - created when a process starts
-   - `completed/` - created when a process completes
-   - `templates/`, `steps/`, etc. - created when you add custom resources
+**For Claude Code:**
+```bash
+claude plugin install agentic-processes
+```
 
-3. The system is ready to use - no additional installation required
+### Option 2: Local Plugin Directory
+
+For development or customization, use the plugin directory flag:
+
+**For Cursor IDE:**
+```bash
+cursor --plugin-dir /path/to/agentic-processes
+```
+
+**For Claude Code:**
+```bash
+claude --plugin-dir /path/to/agentic-processes
+```
+
+### After Installation
+
+No manual setup required - the `.user-processes/` directory is created automatically in your project when you start your first process. Folders are created on-demand:
+- `active/` - created when a process starts
+- `completed/` - created when a process completes
+- `templates/`, `steps/`, etc. - created when you add custom resources
 
 ## Your First Process
 
 ### Step 1: Invoke Process Creation
 
-In Cursor IDE chat, type:
-```
-/process-new
-```
-
-Or in GitHub Copilot Chat:
+In Cursor IDE or Claude Code chat, type:
 ```
 /process-new
 ```
@@ -43,6 +57,7 @@ Or in GitHub Copilot Chat:
 The system will display available templates. For example:
 - `develop-user-story` - End-to-end user story implementation
 - `integration-test-fix` - Fix failing integration tests
+- `set-concept` - Establish a new concept/pattern
 
 Select the template that matches your task.
 
@@ -69,16 +84,21 @@ The process is ready. The system will highlight the first step and offer to begi
 
 ## Understanding Process Structure
 
-### Process File (`process.md`)
+### Process File (`process.json`)
 
-The main process file contains:
+The primary state file contains:
 - Process metadata (name, template, status)
 - Current state (active step, current action)
-- Description and parameters
-- Process flow diagram
-- All steps with checkboxes
-- Errors & notes section
-- Audit log
+- All steps with status tracking
+- Parameters
+
+### Process Documentation (`process.md`)
+
+User-readable workflow documentation with:
+- Process description
+- Flow diagram
+- Step details
+- Notes and audit log
 
 ### Memory File (`memory.json`)
 
@@ -92,8 +112,8 @@ Stores information shared across steps:
 
 Automatically maintained execution log:
 - Detailed action history
+- User interactions
 - Challenges encountered
-- Learnings and insights
 - Time tracking
 
 ## Working with Processes
@@ -195,18 +215,16 @@ The prefix makes it clear where each resource comes from.
 
 - Read [Architecture Guide](architecture.md) for system details
 - Check [Examples](examples.md) for more use cases
-- Review [Core System](../core/README.md) documentation
 - Explore [Templates](../.processes/templates/README.md) and [Steps](../.processes/steps/README.md)
 
 ## Getting Help
 
 If you encounter issues:
-1. Check the process's Errors & Notes section
-2. Review the audit log for action history
-3. Check the log file for detailed execution history
+1. Check the process's log.json for execution history
+2. Review memory.json for context
+3. Check the process.json for current state
 4. Consult the documentation files
 
 ---
 
-**Ready to create your first process?** Type `/process-new` in Cursor or GitHub Copilot Chat!
-
+**Ready to create your first process?** Type `/process-new` in Cursor or Claude Code!

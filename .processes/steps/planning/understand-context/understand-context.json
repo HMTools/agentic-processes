@@ -40,7 +40,9 @@
       "Organize context information clearly in memory.json",
       "Use specific, actionable questions when requesting missing information",
       "Wait for user answers before proceeding if context is incomplete",
-      "Verify context completeness before moving to next step"
+      "Verify context completeness before moving to next step",
+      "VERIFY FILE EXISTENCE: Before claiming files exist or are missing, use Glob or list_dir to verify. Never make claims about codebase state without tool-based verification.",
+      "DOCUMENTATION FIRST: Read existing project documentation (README.md, docs/, etc.) before creating context analysis. Existing docs may already answer questions or provide critical context."
     ]
   },
   "substeps": [
@@ -70,11 +72,13 @@
       "name": "Identify Information Sources",
       "description": "Determine what files, directories, or documentation need to be reviewed",
       "actions": [
+        "FIRST: Read existing project documentation (README.md, docs/ directory) - these often contain critical context that should inform analysis",
         "Determine what files, directories, or documentation need to be reviewed",
+        "Use Glob or list_dir to VERIFY which files/directories actually exist before claiming their presence or absence",
         "Use codebase_search to find relevant codebase areas if scope is mentioned",
         "Use read_file to examine process description and context",
         "List external resources if applicable (documentation, APIs, etc.)",
-        "Note any missing sources that cannot be located"
+        "Note any missing sources that cannot be located (only after verification with Glob/list_dir)"
       ]
     },
     {

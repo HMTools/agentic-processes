@@ -1,0 +1,425 @@
+{
+  "type": "memory-file",
+  "metadata": {
+    "process": "7a15cc92-6292-4d36-a67d-7891261bcb1d",
+    "template": "set-concept",
+    "created": "2026-03-08T13:47:00.000Z",
+    "lastUpdated": "2026-03-09T10:00:00.000Z",
+    "currentStep": "a39cb2e8-d48f-4943-a5f1-d76e16b247e1"
+  },
+  "subProcessState": {
+    "parentProcessPath": null,
+    "childSubProcesses": [],
+    "syncPoints": []
+  },
+  "steps": {
+    "9ae85cc1-47b6-4e4b-a803-cd0722db3deb": {
+      "name": "Init Process Principles",
+      "status": "completed",
+      "startedAt": "2026-03-08T13:47:00.000Z",
+      "updatedAt": "2026-03-08T13:48:00.000Z",
+      "informationProduced": {
+        "principlesLoaded": true,
+        "principleCount": 5
+      },
+      "decisionsMade": [],
+      "filesModifiedCreated": [],
+      "notes": "All 5 operating principles loaded and confirmed"
+    },
+    "3bd55d58-b573-44bf-b8e9-221b0519115e": {
+      "name": "Understand concept",
+      "status": "completed",
+      "startedAt": "2026-03-08T14:00:00.000Z",
+      "updatedAt": "2026-03-08T14:30:00.000Z",
+      "completedAt": "2026-03-08T14:30:00.000Z",
+      "informationProduced": {
+        "contextDocumentation": "**Detailed Context**: See [`step1-context.md`](./step1-context.md)",
+        "correctionApplied": true,
+        "correctionSummary": "Fixed incorrect assumption that Claude Code integration was missing - both .cursor/ and .claude/ directories exist with full integration"
+      },
+      "decisionsMade": [
+        "CORRECTED: Both Cursor AND Claude Code integration already exist and are functional",
+        "The actual gap is plugin manifests for marketplace publishing (.cursor-plugin/, .claude-plugin/)",
+        "Additional gaps: AGENTS.md and skills/ directory for discoverability",
+        "No need to create root-level agents/, commands/, hooks/ - platform-specific directories work"
+      ],
+      "filesModifiedCreated": [
+        "step1-context.md (corrected)"
+      ],
+      "notes": "Context documentation corrected based on user verification. Previous version incorrectly stated Claude Code was 'documented but not implemented'. Actual state: both platforms fully integrated, gap is marketplace manifests."
+    },
+    "17cb09fc-a77a-4000-b9f5-bf9adc466794": {
+      "name": "Identify target files",
+      "status": "completed",
+      "startedAt": "2026-03-08T15:00:00.000Z",
+      "updatedAt": "2026-03-08T15:10:00.000Z",
+      "completedAt": "2026-03-08T15:10:00.000Z",
+      "informationProduced": {
+        "identifiedFilesPath": "./identified-files.json",
+        "summary": {
+          "create": 16,
+          "move": 10,
+          "modify": 3,
+          "delete": 2,
+          "total": 31
+        },
+        "keyComponents": {
+          "pluginManifests": [".cursor-plugin/plugin.json", ".claude-plugin/plugin.json"],
+          "rootLevelComponents": ["agents/", "commands/", "hooks/", "scripts/", "skills/"],
+          "newAssets": ["assets/logo.svg", "AGENTS.md"]
+        }
+      },
+      "decisionsMade": [
+        "Use simple search mode - file structure is well-defined from Step 1 context",
+        "Consolidate .cursor/ and .claude/ components into single root-level files",
+        "Scripts directory for shared hook scripts (platform-agnostic)",
+        "Separate plugin manifests for each platform (.cursor-plugin/ and .claude-plugin/)",
+        "Claude Code agent-type hooks need special handling in unified hooks.json"
+      ],
+      "filesModifiedCreated": [
+        "identified-files.json"
+      ],
+      "notes": "Comprehensive file list created based on Cursor and Claude Code plugin specifications. Key insight: Claude Code hooks support 'agent' type for complex validation that requires tool access - this pattern is used in current .claude/settings.json and must be preserved."
+    },
+    "07190392-6105-41ff-9e95-b560096a16a1": {
+      "name": "Analyze existing state",
+      "status": "completed",
+      "startedAt": "2026-03-08T15:30:00.000Z",
+      "updatedAt": "2026-03-08T15:45:00.000Z",
+      "completedAt": "2026-03-08T15:45:00.000Z",
+      "informationProduced": {
+        "findingsReportPath": "./step3-findings-report.md",
+        "agentComparison": {
+          "stepExecutor": "100% identical content, minor frontmatter differences (Cursor has readonly, is_background)",
+          "processSpawner": "100% identical content, model differs (fast vs haiku)"
+        },
+        "commandComparison": {
+          "processNew": "Cursor is 1 line, Claude Code is 8 lines with Task tool delegation",
+          "processContinue": "Cursor is 1 line, Claude Code is 10 lines with $ARGUMENTS and Task tool"
+        },
+        "hookComparison": {
+          "cursorHooksCount": 6,
+          "claudeHooksCount": 2,
+          "keyDifference": "Cursor uses pure scripts; Claude Code uses mixed agent+script approach",
+          "agentTypeHooks": ["Stop", "SubagentStop", "PostToolUse", "UserPromptSubmit", "block-todo-tools"]
+        },
+        "scriptDifferences": {
+          "sessionIdField": "conversation_id (Cursor) vs session_id (Claude Code)",
+          "filePathField": "path (Cursor) vs file_path (Claude Code)",
+          "outputFormat": "permission/user_message/agent_message (Cursor) vs decision/reason (Claude Code)",
+          "toolNames": "Write|StrReplace|Shell (Cursor) vs Write|Edit|Bash (Claude Code)"
+        }
+      },
+      "decisionsMade": [
+        "Agent files can be consolidated - content is identical",
+        "Use model: inherit to avoid platform-specific model names",
+        "Command files need Claude Code Task tool delegation preserved",
+        "Recommend dual hook configurations - Cursor scripts + Claude Code agent hooks",
+        "Scripts should auto-detect platform and adjust I/O accordingly",
+        "Documentation updates needed for plugin-based installation"
+      ],
+      "filesModifiedCreated": [
+        "step3-findings-report.md"
+      ],
+      "notes": "Comprehensive analysis reveals that consolidation is feasible for agents and commands, but hook configurations have fundamental architectural differences. Claude Code's agent-type hooks provide richer validation capabilities that should be preserved as an optional enhancement."
+    },
+    "129a6e96-e694-4bc7-906d-4911da00769f": {
+      "name": "Design implementation plan",
+      "status": "completed",
+      "startedAt": "2026-03-08T16:00:00.000Z",
+      "updatedAt": "2026-03-08T17:00:00.000Z",
+      "completedAt": "2026-03-08T17:00:00.000Z",
+      "approved": true,
+      "informationProduced": {
+        "implementationPlanPath": "./implementation-plan.md",
+        "changeProposalSummary": {
+          "NEW": 22,
+          "MODIFY": 3,
+          "DELETE": 2,
+          "total": 27
+        },
+        "phases": [
+          "Phase 1: Create directories and plugin manifests (8 items)",
+          "Phase 2: Create/consolidate agents and commands (4 items)",
+          "Phase 3: Create hooks configuration and scripts (7 items)",
+          "Phase 4: Create skill and AGENTS.md (3 items)",
+          "Phase 5: Update documentation (3 items)",
+          "Phase 6: Delete legacy directories (2 items)"
+        ],
+        "keyDecisions": {
+          "hooks": "Dual configuration - scripts with platform detection for both, agent hooks documented as enhancement",
+          "scripts": "Platform auto-detection via CURSOR_PROJECT_DIR vs CLAUDE_PROJECT_DIR",
+          "commands": "Include Claude Code Task tool instructions with conditional note",
+          "agents": "Use model: inherit for cross-platform compatibility"
+        }
+      },
+      "decisionsMade": [
+        "Dual hook configuration approach (scripts + documented agent hooks)",
+        "Platform auto-detection in scripts via environment variables",
+        "Claude Code Task tool instructions preserved in commands with conditional note",
+        "model: inherit used for all agents (cross-platform safe)",
+        "Separate plugin manifests for Cursor (.cursor-plugin/) and Claude Code (.claude-plugin/)",
+        "6-phase implementation order to handle dependencies"
+      ],
+      "filesModifiedCreated": [
+        "implementation-plan.md"
+      ],
+      "notes": "Implementation plan created with 27 change proposals across 6 phases. Plan includes detailed content specifications for key files and verification approach. Awaiting user approval before proceeding to Step 5 (Apply Changes)."
+    },
+    "355238cf-ecc1-490e-a37a-9559e982d472": {
+      "name": "Apply Changes",
+      "status": "completed",
+      "startedAt": "2026-03-08T22:00:00.000Z",
+      "updatedAt": "2026-03-08T22:30:00.000Z",
+      "completedAt": "2026-03-08T22:30:00.000Z",
+      "informationProduced": {
+        "changeApplicationReportPath": "./changes-applied.md",
+        "totalChangesApplied": 27,
+        "summary": {
+          "filesCreated": 22,
+          "filesModified": 5,
+          "directoriesCreated": 8,
+          "directoriesDeleted": 2
+        },
+        "phasesCompleted": [
+          "Phase 1: Create directories and plugin manifests (8 items)",
+          "Phase 2: Create/consolidate agents and commands (4 items)",
+          "Phase 3: Create hooks configuration and scripts (7 items)",
+          "Phase 4: Create skill and AGENTS.md (3 items)",
+          "Phase 5: Update documentation (5 items)",
+          "Phase 6: Delete legacy directories (2 items)"
+        ]
+      },
+      "decisionsMade": [
+        "All 27 change proposals from implementation plan applied as specified",
+        "Platform detection implemented in all hook scripts",
+        "model: inherit used for all agents",
+        "Claude Code Task tool instructions included in commands",
+        "Legacy .cursor/ and .claude/ directories deleted after verification"
+      ],
+      "filesModifiedCreated": [
+        ".cursor-plugin/plugin.json",
+        ".claude-plugin/plugin.json",
+        "agents/step-executor.md",
+        "agents/process-spawner.md",
+        "commands/process-new.md",
+        "commands/process-continue.md",
+        "hooks/hooks.json",
+        "scripts/check-approval-stop.sh",
+        "scripts/block-tools-on-pending.sh",
+        "scripts/block-todo-tools.sh",
+        "scripts/enforce-log-first.sh",
+        "scripts/validate-process-files.sh",
+        "scripts/create-log-flag.sh",
+        "skills/agentic-processes/SKILL.md",
+        "AGENTS.md",
+        "assets/logo.svg",
+        "README.md (modified)",
+        "docs/getting-started.md (modified)",
+        "docs/architecture.md (modified)",
+        ".processes/prompts/process-continue.md (modified)",
+        ".processes/prompts/process-new.md (modified)",
+        "changes-applied.md"
+      ],
+      "notes": "All 6 phases executed successfully. Plugin framework migration complete. Legacy directories .cursor/ and .claude/ deleted. Framework now uses root-level components for auto-discovery by both Cursor IDE and Claude Code."
+    },
+    "a39cb2e8-d48f-4943-a5f1-d76e16b247e1": {
+      "name": "Verify Implementation",
+      "status": "completed",
+      "startedAt": "2026-03-09T09:30:00.000Z",
+      "updatedAt": "2026-03-09T10:00:00.000Z",
+      "completedAt": "2026-03-09T10:00:00.000Z",
+      "informationProduced": {
+        "verificationReportPath": "./verification-report.md",
+        "verificationStatus": "PASS",
+        "categoriesVerified": 8,
+        "categoriesPassed": 8,
+        "issuesFound": 0,
+        "verificationSummary": {
+          "pluginManifests": "PASS - Both manifests exist with all required fields",
+          "agents": "PASS - Both agents exist with model: inherit frontmatter",
+          "commands": "PASS - Both commands exist with Task tool instructions",
+          "hooks": "PASS - hooks.json exists with 6 scripts, all with platform detection",
+          "skillAndAgentsMd": "PASS - All files exist with proper structure",
+          "documentation": "PASS - Updated with plugin references, no legacy paths",
+          "legacyCleanup": "PASS - .cursor/ and .claude/ directories deleted",
+          "noBrokenReferences": "PASS - No broken references in framework files"
+        }
+      },
+      "decisionsMade": [
+        "All verification checks passed objective criteria",
+        "References to .cursor/ and .claude/ in process files are acceptable (historical documentation)",
+        "References in docs/cursor/ and docs/claude/ are acceptable (platform reference documentation)",
+        "No issues require remediation"
+      ],
+      "filesModifiedCreated": [
+        "verification-report.md"
+      ],
+      "notes": "Comprehensive verification of all 8 categories completed. All checks passed. Plugin framework migration verified complete with no issues."
+    },
+    "c408c6a5-6d21-4f4b-bc1e-5fa930c01d50": {
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "startedAt": "2026-03-09T10:15:00.000Z",
+      "updatedAt": "2026-03-09T10:45:00.000Z",
+      "completedAt": "2026-03-09T10:45:00.000Z",
+      "informationProduced": {
+        "logAnalysis": {
+          "sectionsAnalyzed": ["userInteractions", "actionsTaken", "agentReasoning", "processWideObservations"],
+          "flaggedItemsFound": 4,
+          "improvementsIdentified": 3
+        },
+        "improvementsImplemented": [
+          {
+            "id": "improvement-1",
+            "title": "Add file verification guidance to understand-context step",
+            "status": "implemented",
+            "targetFile": ".processes/steps/planning/understand-context/understand-context.json",
+            "change": "Added 'VERIFY FILE EXISTENCE' to bestPractices array and verification action to substep 2"
+          },
+          {
+            "id": "improvement-2",
+            "title": "Add documentation-first guidance to understand-context step",
+            "status": "implemented",
+            "targetFile": ".processes/steps/planning/understand-context/understand-context.json",
+            "change": "Added 'DOCUMENTATION FIRST' to bestPractices array and 'FIRST: Read existing project documentation' action to substep 2"
+          },
+          {
+            "id": "improvement-3",
+            "title": "Add scope completeness requirement to design-implementation-plan step",
+            "status": "implemented",
+            "targetFile": ".processes/steps/planning/design-implementation-plan/design-implementation-plan.json",
+            "change": "Added 'CATEGORIZE ALL FILES' to bestPractices array requiring explicit file categorization"
+          }
+        ],
+        "improvementsDeferred": [
+          {
+            "id": "improvement-4",
+            "title": "Verify all internal file references are valid",
+            "reason": "Lower priority - better suited to a verification step rather than planning guidance"
+          }
+        ],
+        "summary": {
+          "totalIdentified": 4,
+          "totalImplemented": 3,
+          "totalDeferred": 1
+        }
+      },
+      "decisionsMade": [
+        "All 3 approved improvements implemented via step JSON changes",
+        "Improvements 1 and 2 applied to same file (understand-context.json)",
+        "Improvement 3 applied to design-implementation-plan.json",
+        "Deferred 1 lower-priority improvement (internal reference validation)"
+      ],
+      "filesModifiedCreated": [
+        ".processes/steps/planning/understand-context/understand-context.json",
+        ".processes/steps/planning/design-implementation-plan/design-implementation-plan.json"
+      ],
+      "notes": "All 3 user-approved improvements implemented. Changes add: (1) file verification requirement before making existence claims, (2) documentation-first approach in context gathering, (3) explicit file categorization in implementation plans."
+    }
+  },
+  "crossReferences": {
+    "keyDecisions": [
+      "CORRECTED: Both Cursor AND Claude Code integration already exist",
+      "Cursor: .cursor/agents/, .cursor/commands/, .cursor/hooks/, .cursor/hooks.json",
+      "Claude Code: .claude/agents/, .claude/commands/, .claude/hooks/, .claude/settings.json",
+      "Actual gap: plugin manifests for marketplace publishing",
+      "Additional gaps: AGENTS.md, skills/ directory",
+      "Agent files: 100% identical content, can consolidate to root level",
+      "Command files: Need to preserve Claude Code Task tool delegation instructions",
+      "Hook architecture: Cursor=scripts, Claude Code=agent+scripts (preserve both patterns)",
+      "Scripts: Can unify with platform detection in bash",
+      "STEP 4: Dual hook config (scripts + documented agent hooks)",
+      "STEP 4: Platform auto-detection via environment variables",
+      "STEP 4: model: inherit for cross-platform agent compatibility",
+      "STEP 4: 6-phase implementation with 27 change proposals",
+      "STEP 5: All 27 changes applied successfully",
+      "STEP 5: Legacy .cursor/ and .claude/ directories deleted",
+      "STEP 5: Plugin framework migration complete",
+      "STEP 6: Verification PASSED - all 8 categories verified",
+      "STEP 6: No issues found requiring remediation"
+    ],
+    "filesModified": [
+      "step1-context.md",
+      "README.md",
+      "docs/getting-started.md",
+      "docs/architecture.md",
+      ".processes/prompts/process-continue.md",
+      ".processes/prompts/process-new.md"
+    ],
+    "filesCreated": [
+      ".cursor-plugin/plugin.json",
+      ".claude-plugin/plugin.json",
+      "agents/step-executor.md",
+      "agents/process-spawner.md",
+      "commands/process-new.md",
+      "commands/process-continue.md",
+      "hooks/hooks.json",
+      "scripts/check-approval-stop.sh",
+      "scripts/block-tools-on-pending.sh",
+      "scripts/block-todo-tools.sh",
+      "scripts/enforce-log-first.sh",
+      "scripts/validate-process-files.sh",
+      "scripts/create-log-flag.sh",
+      "skills/agentic-processes/SKILL.md",
+      "AGENTS.md",
+      "assets/logo.svg"
+    ],
+    "targetFiles": [
+      ".claude-plugin/plugin.json",
+      ".cursor-plugin/plugin.json",
+      "AGENTS.md",
+      "skills/agentic-processes/SKILL.md",
+      "docs/plugin-architecture.md",
+      "docs/installation/marketplace-setup.md"
+    ],
+    "custom": {
+      "existingIntegration": {
+        "cursor": [
+          ".cursor/agents/step-executor.md",
+          ".cursor/agents/process-spawner.md",
+          ".cursor/commands/process-new.md",
+          ".cursor/commands/process-continue.md",
+          ".cursor/hooks.json",
+          ".cursor/hooks/*.sh"
+        ],
+        "claudeCode": [
+          ".claude/agents/step-executor.md",
+          ".claude/agents/process-spawner.md",
+          ".claude/commands/process-new.md",
+          ".claude/commands/process-continue.md",
+          ".claude/hooks/enforce-log-first.sh",
+          ".claude/hooks/block-tools-on-pending.sh",
+          ".claude/settings.json",
+          ".claude/settings.local.json"
+        ]
+      },
+      "missingComponents": [
+        "AGENTS.md",
+        "skills/",
+        ".claude-plugin/plugin.json",
+        ".cursor-plugin/plugin.json"
+      ],
+      "informationSources": [
+        "docs/cursor/cursor-plugins-guide.md",
+        "docs/cursor/claude-code-plugins-reference.md",
+        "docs/claude/claude-code-hooks-reference.md",
+        "docs/claude/claude-code-sub-agents.md",
+        ".cursor/hooks.json",
+        ".cursor/agents/step-executor.md",
+        ".cursor/agents/process-spawner.md",
+        ".claude/settings.json",
+        ".claude/agents/step-executor.md",
+        ".claude/agents/process-spawner.md"
+      ]
+    }
+  },
+  "searchHelpers": {
+    "byCategory": {
+      "documentation": ["step1-context.md"]
+    },
+    "byFileType": {
+      "md": ["step1-context.md"]
+    }
+  }
+}

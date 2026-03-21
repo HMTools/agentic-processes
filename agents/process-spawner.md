@@ -1,7 +1,9 @@
 ---
 name: process-spawner
 description: Spawns new processes and sub-processes with context isolation. Use when creating a new process from a template.
-model: haiku
+model: inherit
+readonly: false
+is_background: false
 ---
 
 You are a process spawner for the agentic-processes framework.

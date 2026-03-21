@@ -45,8 +45,8 @@ These principles apply to ALL work in this process:
 
 ### Instructions
 
-Reference the process management knowledge file for complete instructions:
-`ai/knowledge/best-practices/ai-tooling/process-management.md`
+Reference the process management documentation for complete instructions:
+`docs/process-management.md`
 
 ### Mandatory Requirements
 
@@ -74,7 +74,7 @@ This framework uses subagents for context isolation:
 
 The main agent orchestrates while subagents execute specialized work.
 
-> **Tool-specific subagent invocation:** See the command file for your AI tool (e.g., `.cursor/commands/`, `.claude/commands/`, `.github/prompts/`) for how to invoke subagents in your environment.
+> **Tool-specific subagent invocation:** See the command file in `commands/` for how to invoke subagents in your environment. Cursor handles subagent delegation automatically; Claude Code uses the Task tool.
 
 ### JSON-First Architecture
 

@@ -25,8 +25,8 @@ This prompt guides the creation of a new process instance from an existing templ
 
 ### Instructions
 
-Reference the process management knowledge file for complete instructions:
-`ai/knowledge/best-practices/ai-tooling/process-management.md`
+Reference the process management documentation for complete instructions:
+`docs/process-management.md`
 
 ### Mandatory Requirements
 
@@ -57,37 +57,35 @@ Reference the process management knowledge file for complete instructions:
 - `memory.json` (step information and cross-references)
 - `log.json` (execution history and user interactions)
 
-### Multi-Workspace Architecture
+### Plugin Architecture
 
-**CRITICAL RULE**: When multiple workspaces are open, distinguish between the **framework repo** and the **client repo**.
+**CRITICAL RULE**: When the plugin is installed, distinguish between the **plugin location** and the **user's project**.
 
-#### Identifying Repositories
+#### Identifying Locations
 
-| Repository Type | Identification | Contains |
-|-----------------|----------------|----------|
-| **Framework Repo** | Contains `.processes/templates/` and `.processes/steps/` | Templates, steps, prompts, framework code |
-| **Client Repo** | The repository being worked on (where user stories are implemented) | Application code, `.user-processes/` |
+| Location | Identification | Contains |
+|----------|----------------|----------|
+| **Plugin Location** | Where the plugin is installed (marketplace cache or `--plugin-dir` path) | Templates, steps, prompts, framework code |
+| **User's Project** | The repository being worked on (where code changes happen) | Application code, `.user-processes/` |
 
 #### Resource Location Rules
 
-| Resource | Source Repository | Path |
-|----------|-------------------|------|
-| Templates | Framework repo | `.processes/templates/` |
-| Steps | Framework repo | `.processes/steps/` |
-| Process instances | **Client repo** | `.user-processes/active/` |
-| Guidelines | **Client repo** | `.user-processes/guidelines/` |
-| User-defined templates | Client repo | `.user-processes/templates/` |
-| User-defined steps | Client repo | `.user-processes/steps/` |
+| Resource | Source Location | Path |
+|----------|-----------------|------|
+| Templates | Plugin | `.processes/templates/` |
+| Steps | Plugin | `.processes/steps/` |
+| Process instances | **User's project** | `.user-processes/active/` |
+| Guidelines | **User's project** | `.user-processes/guidelines/` |
+| User-defined templates | User's project | `.user-processes/templates/` |
+| User-defined steps | User's project | `.user-processes/steps/` |
 
 #### Detection Logic
 
-1. If multiple workspaces are open:
-   - The workspace containing `.processes/templates/` AND `.processes/steps/` is the **framework repo**
-   - The workspace being actively developed (where code changes happen) is the **client repo**
-2. If only one workspace is open:
-   - It serves as both framework and client repo
+The AI accesses plugin files relative to the plugin root. Paths like `.processes/templates/` work because they're relative to the plugin root.
 
-**NEVER create process instances in the framework repo when a separate client repo is open.**
+Process instances (`.user-processes/`) are always created in the **user's project**, not in the plugin location.
+
+**NEVER create process instances in the plugin location.**
 
 ### JSON-First Architecture
 

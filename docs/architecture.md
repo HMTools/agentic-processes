@@ -4,7 +4,32 @@ This document provides a detailed overview of the Agentic Process System archite
 
 ## System Overview
 
-The Agentic Process System is a markdown-based workflow management system designed for AI agents. It provides structured, repeatable processes with persistent state management.
+The Agentic Process System is a plugin-based workflow management system designed for AI agents. It provides structured, repeatable processes with persistent state management, working seamlessly with both Cursor IDE and Claude Code.
+
+## Plugin Architecture
+
+The framework is distributed as a plugin that can be installed via marketplace or local directory:
+
+```
+agentic-processes/                    # Plugin root
+├── .cursor-plugin/plugin.json        # Cursor plugin manifest
+├── .claude-plugin/plugin.json        # Claude Code plugin manifest
+├── agents/                           # Auto-discovered agents
+├── commands/                         # Auto-discovered commands
+├── hooks/hooks.json                  # Hook configuration
+├── scripts/                          # Platform-agnostic scripts
+├── skills/                           # Skills for AI discoverability
+├── AGENTS.md                         # Agent discovery file
+└── .processes/                       # Framework core
+```
+
+### Component Auto-Discovery
+
+Both Cursor and Claude Code automatically discover:
+- **Agents**: From `agents/` directory
+- **Commands**: From `commands/` directory
+- **Skills**: From `skills/` directory
+- **Hooks**: From `hooks/hooks.json`
 
 ## Core Components
 
@@ -17,7 +42,7 @@ The Process Manager is the central component that:
 - Updates process files
 - Manages process lifecycle
 
-**Location**: Defined in integration files (`.cursor/commands/`, `.github/prompts/`)
+**Location**: Defined in `commands/` directory with entry prompts in `.processes/prompts/`
 
 ### 2. Templates
 
@@ -72,8 +97,8 @@ Steps are modular, self-contained definitions with:
 ### 4. Process Instances
 
 Process instances are created from templates and contain:
-- Process file (`process.md`) - Human-readable workflow definition
-- Process data (`process.json`) - Machine-readable state for tooling/UI
+- Process file (`process.json`) - Machine-readable state for tooling/UI
+- Process doc (`process.md`) - Human-readable workflow definition
 - Memory file (`memory.json`) - Persistent information shared across steps
 - Log file (`log.json`) - Detailed execution log
 
@@ -84,18 +109,30 @@ Process instances are created from templates and contain:
 - `completed/` - Finished successfully
 - `failed/` - Encountered errors
 
-### 5. Process Instance JSON (`process.json`)
+### 5. Subagents
 
-Each process instance includes a `process.json` file that provides machine-readable state for external tooling, UIs, and programmatic access. This file is generated when a process is created and updated whenever the process state changes.
+The framework uses subagents for context isolation:
 
-**Type Definitions**: See `.processes/types/`
+- **step-executor**: Executes individual process steps in isolated context
+- **process-spawner**: Creates new processes/sub-processes in isolated context
 
-**When Updated**:
-- Process creation (initial state)
-- Step started/completed
-- Status change (running → completed/failed)
-- Current action updates
-- Sub-process spawned/completed
+Subagent files are in `agents/` and are auto-discovered by both platforms.
+
+### 6. Hooks System
+
+Hooks provide behavioral controls during process execution:
+
+**Hook Types**:
+- `stop` / `subagentStop`: Check approval requirements before stopping
+- `preToolUse`: Block tools during pending interactions, enforce log-first
+- `postToolUse`: Validate process file structure
+- `beforeSubmitPrompt`: Create log-first flags
+
+**Platform Compatibility**:
+Scripts use platform detection to work with both Cursor and Claude Code:
+- Environment variables: `CURSOR_PROJECT_DIR` vs `CLAUDE_PROJECT_DIR`
+- Session IDs: `conversation_id` vs `session_id`
+- Output formats: Cursor format vs Claude Code format
 
 ## Data Flow
 
@@ -113,7 +150,7 @@ graph TD
     D --> I[State Reading]
     I --> H
     
-    H --> J[Step Execution]
+    H --> J[Step Execution via Subagent]
     J --> K[State Update]
     K --> L{Complete?}
     L -->|No| J
@@ -122,7 +159,7 @@ graph TD
     F --> N[Templates]
     F --> O[Steps Library]
     H --> P[Memory]
-    H --> Q[Audit Log]
+    H --> Q[Log]
 ```
 
 ## Step Resolution Process
@@ -142,171 +179,132 @@ When a process is created from a template:
 
 ### Process State
 
-Process state is maintained in `process.md`:
+Process state is maintained in `process.json`:
 
-```markdown
-## Current State
-**Active Step**: Step 3 - Description
-**Current Action**: Working on specific task
-**Details**: Additional context
-
-## Steps
-- [x] Step 1: Completed
-  **Completed At**: 2025-01-15 10:30
-- [ ] Step 2: In Progress
-  **Started At**: 2025-01-15 11:00
+```json
+{
+  "type": "process-instance",
+  "id": "uuid",
+  "status": "running",
+  "currentState": {
+    "activeStepId": "uuid",
+    "activeStepName": "Step Name",
+    "actionSummary": "Working on specific task"
+  },
+  "steps": [...]
+}
 ```
 
 ### Memory State
 
 Memory state is maintained in `memory.json`:
 
-```markdown
-## Step 1: Step Name
-**Information Produced**: What was created
-**Decisions Made**: Technical decisions
-**Files Modified/Created**: List of files
-**Notes**: Additional context
+```json
+{
+  "type": "memory-file",
+  "steps": {
+    "step-uuid": {
+      "informationProduced": {},
+      "decisionsMade": [],
+      "filesModifiedCreated": []
+    }
+  }
+}
 ```
-
-### Audit Log
-
-Audit log is automatically maintained:
-
-```markdown
-## Audit Log
-- [2025-01-15 10:30] Step 1 completed
-- [2025-01-15 11:00] Step 2 started
-- [2025-01-15 11:15] File created: path/to/file.cs
-```
-
-## Process Lifecycle
-
-### Creation
-
-1. User invokes `/process-new`
-2. Template selected
-3. Parameters collected
-4. Steps resolved
-5. Process instance created in `active/`
-6. Status set to "Running"
-
-### Execution
-
-1. Process Manager reads current state
-2. Identifies next incomplete step
-3. Executes step according to guidance
-4. Updates state, memory, and audit log
-5. Moves to next step
-
-### Completion
-
-1. All steps marked complete
-2. Status updated to "Completed"
-3. Process moved to `completed/`
-4. Final summary provided
-
-### Failure
-
-1. Error encountered
-2. Status updated to "Failed"
-3. Error details added to Errors & Notes
-4. Process moved to `failed/`
-5. Troubleshooting suggestions provided
 
 ## Integration Points
 
 ### Cursor IDE
 
-**Location**: `integrations/cursor/commands/`
-
-**Commands**:
+**Commands**: Auto-discovered from `commands/` directory
 - `process-new.md` - Process creation command
 - `process-continue.md` - Process continuation command
 
-**Usage**: Commands are invoked in Cursor chat using `/process-new` or `/process-continue`
+**Agents**: Auto-discovered from `agents/` directory
+- `step-executor.md` - Step execution subagent
+- `process-spawner.md` - Process spawning subagent
 
-### GitHub Copilot
+**Hooks**: Configured in `hooks/hooks.json`
 
-**Location**: `integrations/github/prompts/`
+### Claude Code
 
-**Prompts**:
-- `process-new.prompt.md` - Process creation prompt
-- `process-continue.prompt.md` - Process continuation prompt
+**Commands**: Auto-discovered from `commands/` directory (same files)
 
-**Usage**: Prompts are invoked in GitHub Copilot Chat using `/process-new` or `/process-continue`
+**Agents**: Auto-discovered from `agents/` and `AGENTS.md`
+
+**Hooks**: Same `hooks/hooks.json` with platform-detecting scripts
+
+**Task Tool Delegation**: Commands include Claude Code-specific instructions for using the Task tool to invoke subagents.
 
 ## File Structure
 
 ```
-# Framework (agentic-processes/)
-.processes/                      # Framework-provided resources
-├── templates/                   # Process templates (by category)
-│   ├── development/
-│   ├── testing/
-│   ├── review/
-│   └── infrastructure/
-├── steps/                       # Modular step definitions
-│   ├── api/
-│   ├── service/
-│   ├── testing/
-│   └── ...
-├── prompts/                     # Process management prompts
-└── types/                       # TypeScript type definitions
+# Plugin (agentic-processes/)
+.cursor-plugin/plugin.json           # Cursor manifest
+.claude-plugin/plugin.json           # Claude Code manifest
+agents/                              # Subagents
+commands/                            # Commands
+hooks/hooks.json                     # Hook configuration
+scripts/                             # Hook scripts
+skills/agentic-processes/SKILL.md   # Main skill
+AGENTS.md                            # Agent discovery
+.processes/                          # Framework core
+├── templates/                       # Process templates
+├── steps/                           # Step definitions
+├── types/                           # TypeScript types
+└── prompts/                         # Entry prompts
 
-# User Resources (.user-processes/)
-.user-processes/                 # User resources & process instances
-├── active/                      # Running processes
-│   └── process-{name}-{date}/   # Individual process folder
-│       ├── process.md           # Human-readable workflow
-│       ├── process.json         # Machine-readable state
-│       ├── memory.json            # Cross-step information
-│       └── log.json               # Detailed execution log
-├── completed/                   # Finished processes
-├── failed/                      # Failed processes
-├── templates/                   # User-defined templates
-├── steps/                       # User-defined steps
-├── components/                  # User-defined components
-└── guidelines/                  # Project-specific guidelines
+# User Resources (.user-processes/ in user's project)
+.user-processes/
+├── active/                          # Running processes
+│   └── process-{name}-{date}/
+│       ├── process.json             # Primary state
+│       ├── process.md               # Documentation
+│       ├── memory.json              # Cross-step info
+│       └── log.json                 # Execution log
+├── completed/                       # Finished processes
+├── failed/                          # Failed processes
+├── templates/                       # User templates
+├── steps/                           # User steps
+└── guidelines/                      # Project guidelines
 ```
 
 ## Design Principles
 
-### 1. Markdown-Based
+### 1. Plugin-First Architecture
 
-All process definitions and state are stored in markdown files:
-- Human-readable
-- Version control friendly
-- Easy to edit manually if needed
+The framework is distributed as a plugin for easy installation and updates:
+- Marketplace distribution
+- Version management
+- Automatic component discovery
 
-### 2. Modular Steps
+### 2. Platform Agnostic
+
+Works with both Cursor IDE and Claude Code:
+- Shared agents, commands, and hooks
+- Platform detection in scripts
+- Conditional instructions for platform differences
+
+### 3. Modular Steps
 
 Steps are self-contained and reusable:
 - DRY principle
 - Consistent patterns
 - Easy maintenance
 
-### 3. Persistent State
+### 4. Persistent State
 
 State is always persisted:
 - No data loss between sessions
 - Resume from any point
 - Complete audit trail
 
-### 4. Strict Adherence
+### 5. Subagent Delegation
 
-Process Manager enforces strict adherence:
-- Cannot skip steps
-- Cannot work out of order
-- Cannot deviate from process
-
-### 5. Automatic Updates
-
-System automatically updates:
-- Process state
-- Audit logs
-- Memory files
-- Log files
+Steps are executed by subagents for:
+- Context isolation
+- Clear responsibility boundaries
+- Consistent execution patterns
 
 ## Extension Points
 
@@ -324,40 +322,24 @@ System automatically updates:
 3. Include all required sections
 4. Add examples and guidance
 
-### Custom Integrations
+### Custom Hooks
 
-Integration files can be customized:
-- Add new commands/prompts
-- Modify behavior
-- Add custom logic
+Add custom hook scripts in `scripts/` and register them in `hooks/hooks.json`.
 
-## Performance Considerations
+## Platform Differences
 
-- **File I/O**: All operations are file-based, suitable for small to medium workflows
-- **Step Resolution**: Steps are resolved once during process creation
-- **State Updates**: Incremental updates to process files
-- **Memory Usage**: Minimal - all state in markdown files
+| Feature | Cursor IDE | Claude Code |
+|---------|-----------|-------------|
+| Session ID field | `conversation_id` | `session_id` |
+| File path field | `path` | `file_path` |
+| Project dir env | `CURSOR_PROJECT_DIR` | `CLAUDE_PROJECT_DIR` |
+| Tool names | `Write`, `StrReplace`, `Shell` | `Write`, `Edit`, `Bash` |
+| Subagent invocation | Automatic via agent files | Task tool with agent content |
 
-## Security Considerations
-
-- **File Access**: Processes can read/write files in workspace
-- **Process Isolation**: Each process in its own directory
-- **State Validation**: Process Manager validates state before operations
-- **Audit Trail**: Complete history of all actions
-
-## Future Enhancements
-
-Potential improvements:
-- Process templates with versioning
-- Step dependency graphs
-- Process analytics
-- Multi-process coordination
-- Remote process execution
+Scripts handle these differences via platform detection.
 
 ---
 
 For more details, see:
 - [Getting Started](getting-started.md)
 - [Examples](examples.md)
-- [Core System](../core/README.md)
-

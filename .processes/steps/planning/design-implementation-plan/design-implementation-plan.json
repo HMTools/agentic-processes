@@ -42,7 +42,8 @@
       "Consider dependencies: Order changes to avoid breaking things",
       "Provide rationale: Explain why each change is needed",
       "Keep proposals atomic: Each proposal should be self-contained",
-      "Use consistent IDs: Makes it easy for user to approve specific proposals"
+      "Use consistent IDs: Makes it easy for user to approve specific proposals",
+      "CATEGORIZE ALL FILES: Implementation plans must explicitly address ALL file groups in scope: (1) Files to CREATE, (2) Files to MODIFY, (3) Files to DELETE, (4) Files UNCHANGED with brief explanation why they're out of scope. This prevents 'what about X?' questions."
     ]
   },
   "substeps": [
