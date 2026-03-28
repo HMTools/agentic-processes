@@ -1,38 +1,72 @@
 {
-  "version": 1,
   "hooks": {
-    "stop": [
+    "Stop": [
       {
-        "command": "bash scripts/check-approval-stop.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-approval-stop.sh"
+          }
+        ]
       }
     ],
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "command": "bash scripts/block-tools-on-pending.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/block-tools-on-pending.sh"
+          }
+        ]
       },
       {
-        "command": "bash scripts/block-todo-tools.sh",
-        "matcher": "Task|TaskCreate|TaskUpdate"
+        "matcher": "Task|TaskCreate|TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/block-todo-tools.sh"
+          }
+        ]
       },
       {
-        "command": "bash scripts/enforce-log-first.sh",
-        "matcher": "Write|StrReplace|Edit"
+        "matcher": "Write|StrReplace|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/enforce-log-first.sh"
+          }
+        ]
       }
     ],
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "command": "bash scripts/validate-process-files.sh",
-        "matcher": "Write|StrReplace|Edit"
+        "matcher": "Write|StrReplace|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-process-files.sh"
+          }
+        ]
       }
     ],
-    "subagentStop": [
+    "SubagentStop": [
       {
-        "command": "bash scripts/check-approval-stop.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-approval-stop.sh"
+          }
+        ]
       }
     ],
-    "beforeSubmitPrompt": [
+    "UserPromptSubmit": [
       {
-        "command": "bash scripts/create-log-flag.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/create-log-flag.sh"
+          }
+        ]
       }
     ]
   }
