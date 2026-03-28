@@ -4,20 +4,6 @@ A powerful plugin for managing long-running, multi-step workflows with AI agents
 
 ## Installation
 
-### Cursor IDE
-
-Install from the marketplace:
-```bash
-cursor plugin install agentic-processes
-```
-
-Or use a local plugin directory:
-```bash
-cursor --plugin-dir /path/to/agentic-processes
-```
-
-### Claude Code
-
 Install from the marketplace:
 ```bash
 claude plugin install agentic-processes
@@ -35,7 +21,7 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 - **Process Templates**: Reusable workflow definitions with parameter substitution
 - **Modular Steps**: Self-contained, reusable step definitions that can be composed into processes
 - **State Management**: Persistent process state with checkboxes, timestamps, and audit logs
-- **AI Integration**: Seamless integration with Cursor IDE and Claude Code
+- **AI Integration**: Seamless integration with Claude Code
 - **Process Tracking**: Resume interrupted processes, track progress, and maintain context across sessions
 
 ## Key Features
@@ -105,8 +91,6 @@ A process consists of:
 
 ```
 agentic-processes/                    # Plugin root
-├── .cursor-plugin/
-│   └── plugin.json                   # Cursor plugin manifest
 ├── .claude-plugin/
 │   └── plugin.json                   # Claude Code plugin manifest
 ├── agents/                           # Root-level agents (auto-discovered)
@@ -117,7 +101,7 @@ agentic-processes/                    # Plugin root
 │   └── process-continue.md
 ├── hooks/
 │   └── hooks.json                    # Unified hook configuration
-├── scripts/                          # Platform-agnostic hook scripts
+├── scripts/                          # Hook scripts
 │   ├── check-approval-stop.sh
 │   ├── block-tools-on-pending.sh
 │   ├── block-todo-tools.sh

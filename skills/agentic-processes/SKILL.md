@@ -47,4 +47,4 @@ Templates are located in `.processes/templates/`. Each template defines:
 - Templates: `.processes/templates/`
 - Active processes: `.user-processes/active/`
 - Framework types: `.processes/types/`
-- Entry prompts: `.processes/prompts/`
+- Commands (entry prompts): `commands/`

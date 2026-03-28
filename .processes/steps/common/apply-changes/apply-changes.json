@@ -135,6 +135,7 @@
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
         "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
+        "Update log.json processWideObservations: add any patterns detected during change application to patternsDetected, add efficiency metrics (changes applied, files modified, verification pass/fail counts) to efficiencyMetrics",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }

@@ -4,7 +4,7 @@ This document provides a detailed overview of the Agentic Process System archite
 
 ## System Overview
 
-The Agentic Process System is a plugin-based workflow management system designed for AI agents. It provides structured, repeatable processes with persistent state management, working seamlessly with both Cursor IDE and Claude Code.
+The Agentic Process System is a plugin-based workflow management system designed for AI agents. It provides structured, repeatable processes with persistent state management, working seamlessly with Claude Code.
 
 ## Plugin Architecture
 
@@ -12,12 +12,11 @@ The framework is distributed as a plugin that can be installed via marketplace o
 
 ```
 agentic-processes/                    # Plugin root
-├── .cursor-plugin/plugin.json        # Cursor plugin manifest
 ├── .claude-plugin/plugin.json        # Claude Code plugin manifest
 ├── agents/                           # Auto-discovered agents
 ├── commands/                         # Auto-discovered commands
 ├── hooks/hooks.json                  # Hook configuration
-├── scripts/                          # Platform-agnostic scripts
+├── scripts/                          # Hook scripts
 ├── skills/                           # Skills for AI discoverability
 ├── AGENTS.md                         # Agent discovery file
 └── .processes/                       # Framework core
@@ -25,7 +24,7 @@ agentic-processes/                    # Plugin root
 
 ### Component Auto-Discovery
 
-Both Cursor and Claude Code automatically discover:
+Claude Code automatically discovers:
 - **Agents**: From `agents/` directory
 - **Commands**: From `commands/` directory
 - **Skills**: From `skills/` directory
@@ -42,7 +41,7 @@ The Process Manager is the central component that:
 - Updates process files
 - Manages process lifecycle
 
-**Location**: Defined in `commands/` directory with entry prompts in `.processes/prompts/`
+**Location**: Defined in `commands/` directory
 
 ### 2. Templates
 
@@ -116,7 +115,7 @@ The framework uses subagents for context isolation:
 - **step-executor**: Executes individual process steps in isolated context
 - **process-spawner**: Creates new processes/sub-processes in isolated context
 
-Subagent files are in `agents/` and are auto-discovered by both platforms.
+Subagent files are in `agents/` and are auto-discovered by Claude Code.
 
 ### 6. Hooks System
 
@@ -128,11 +127,11 @@ Hooks provide behavioral controls during process execution:
 - `postToolUse`: Validate process file structure
 - `beforeSubmitPrompt`: Create log-first flags
 
-**Platform Compatibility**:
-Scripts use platform detection to work with both Cursor and Claude Code:
-- Environment variables: `CURSOR_PROJECT_DIR` vs `CLAUDE_PROJECT_DIR`
-- Session IDs: `conversation_id` vs `session_id`
-- Output formats: Cursor format vs Claude Code format
+**Platform Integration**:
+Scripts integrate with Claude Code's hook system:
+- Environment variable: `CLAUDE_PROJECT_DIR` for project directory
+- Session tracking: `session_id` for process-session binding
+- Output format: Claude Code JSON response format (`decision`/`reason`)
 
 ## Data Flow
 
@@ -214,33 +213,22 @@ Memory state is maintained in `memory.json`:
 
 ## Integration Points
 
-### Cursor IDE
-
 **Commands**: Auto-discovered from `commands/` directory
 - `process-new.md` - Process creation command
 - `process-continue.md` - Process continuation command
 
-**Agents**: Auto-discovered from `agents/` directory
+**Agents**: Auto-discovered from `agents/` and `AGENTS.md`
 - `step-executor.md` - Step execution subagent
 - `process-spawner.md` - Process spawning subagent
 
 **Hooks**: Configured in `hooks/hooks.json`
 
-### Claude Code
-
-**Commands**: Auto-discovered from `commands/` directory (same files)
-
-**Agents**: Auto-discovered from `agents/` and `AGENTS.md`
-
-**Hooks**: Same `hooks/hooks.json` with platform-detecting scripts
-
-**Task Tool Delegation**: Commands include Claude Code-specific instructions for using the Task tool to invoke subagents.
+**Task Tool Delegation**: Commands include instructions for using the Task tool to invoke subagents.
 
 ## File Structure
 
 ```
 # Plugin (agentic-processes/)
-.cursor-plugin/plugin.json           # Cursor manifest
 .claude-plugin/plugin.json           # Claude Code manifest
 agents/                              # Subagents
 commands/                            # Commands
@@ -278,12 +266,12 @@ The framework is distributed as a plugin for easy installation and updates:
 - Version management
 - Automatic component discovery
 
-### 2. Platform Agnostic
+### 2. Plugin Architecture
 
-Works with both Cursor IDE and Claude Code:
-- Shared agents, commands, and hooks
-- Platform detection in scripts
-- Conditional instructions for platform differences
+Distributed as a Claude Code plugin with automatic component discovery:
+- Marketplace distribution and local directory support
+- Automatic agent, command, skill, and hook discovery
+- Unified hook configuration
 
 ### 3. Modular Steps
 
@@ -325,18 +313,6 @@ Steps are executed by subagents for:
 ### Custom Hooks
 
 Add custom hook scripts in `scripts/` and register them in `hooks/hooks.json`.
-
-## Platform Differences
-
-| Feature | Cursor IDE | Claude Code |
-|---------|-----------|-------------|
-| Session ID field | `conversation_id` | `session_id` |
-| File path field | `path` | `file_path` |
-| Project dir env | `CURSOR_PROJECT_DIR` | `CLAUDE_PROJECT_DIR` |
-| Tool names | `Write`, `StrReplace`, `Shell` | `Write`, `Edit`, `Bash` |
-| Subagent invocation | Automatic via agent files | Task tool with agent content |
-
-Scripts handle these differences via platform detection.
 
 ---
 

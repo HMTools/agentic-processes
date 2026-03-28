@@ -132,6 +132,7 @@
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
         "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
+        "Update log.json processWideObservations.patternsDetected with any cross-file patterns found during review (e.g., repeated code structures, shared issues across files, common anti-patterns)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }

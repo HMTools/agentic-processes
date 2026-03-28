@@ -46,3 +46,4 @@ Every step's End-Step compliance check MUST verify all of the following. This ch
 
 - [ ] **Principle 4 (TYPE STRUCTURES)**: Do modified process files conform to TypeScript type definitions in `.processes/types/`?
 - [ ] **Principle 5 (INTERACTION OPTIONS)**: If the step had ANY point where agent stopped for user input (approval, question, clarification), was `pending-interaction.json` created in the process folder at each of those points? Was it deleted after the user responded?
+- [ ] **Cross-References**: Were `crossReferences` in memory.json updated? Append this step's `decisionsMade` entries to `crossReferences.keyDecisions`, and this step's `filesModifiedCreated` entries to `crossReferences.filesModified`.

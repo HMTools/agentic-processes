@@ -17,7 +17,7 @@
     "relatedDocs": ["getting-started", "process-management", "examples"],
     "templatesLocation": ".processes/templates/",
     "stepsLocation": ".processes/steps/",
-    "promptsLocation": ".processes/prompts/",
+    "commandsLocation": "commands/",
     "typesLocation": ".processes/types/"
   }
 }

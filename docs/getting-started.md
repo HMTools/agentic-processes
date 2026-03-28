@@ -4,7 +4,7 @@ This guide will help you get started with the Agentic Process System, from insta
 
 ## Prerequisites
 
-- Cursor IDE or Claude Code
+- Claude Code
 - Basic understanding of markdown files
 - Familiarity with workflow management concepts
 
@@ -12,12 +12,6 @@ This guide will help you get started with the Agentic Process System, from insta
 
 ### Option 1: Plugin Marketplace (Recommended)
 
-**For Cursor IDE:**
-```bash
-cursor plugin install agentic-processes
-```
-
-**For Claude Code:**
 ```bash
 claude plugin install agentic-processes
 ```
@@ -26,12 +20,6 @@ claude plugin install agentic-processes
 
 For development or customization, use the plugin directory flag:
 
-**For Cursor IDE:**
-```bash
-cursor --plugin-dir /path/to/agentic-processes
-```
-
-**For Claude Code:**
 ```bash
 claude --plugin-dir /path/to/agentic-processes
 ```
@@ -47,7 +35,7 @@ No manual setup required - the `.user-processes/` directory is created automatic
 
 ### Step 1: Invoke Process Creation
 
-In Cursor IDE or Claude Code chat, type:
+In Claude Code, type:
 ```
 /process-new
 ```
@@ -227,4 +215,4 @@ If you encounter issues:
 
 ---
 
-**Ready to create your first process?** Type `/process-new` in Cursor or Claude Code!
+**Ready to create your first process?** Type `/process-new` to get started!

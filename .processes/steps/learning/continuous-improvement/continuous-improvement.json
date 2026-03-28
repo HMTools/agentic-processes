@@ -80,10 +80,10 @@
         "- Extract ALL potentialImprovement values - these are user-provided improvement suggestions",
         "- Create a priority list of flagged items to analyze first",
         "PROCESS-WIDE OBSERVATIONS - Review aggregated insights:",
-        "- processWideObservations.patternsDetected: Cross-step patterns already identified",
+        "- processWideObservations.patternsDetected: Cross-step patterns already identified (should be populated by prior steps; if empty, note this as an improvement opportunity)",
         "- processWideObservations.userFeedbackSummary: Aggregated user feedback",
         "- processWideObservations.recommendationsForFuture: Prior recommendations to action",
-        "- processWideObservations.efficiencyMetrics: Performance data for trend analysis"
+        "- processWideObservations.efficiencyMetrics: Performance data for trend analysis (should be populated by apply-changes and other steps; if empty, derive from step logs)"
       ]
     },
     {
@@ -155,7 +155,8 @@
       "actions": [
         "List all improvements made",
         "List improvements skipped and why",
-        "Provide recommendations for future work"
+        "Provide recommendations for future work",
+        "Populate log.json processWideObservations.recommendationsForFuture with all recommendations from this analysis (both implemented and deferred improvements)"
       ]
     },
     {

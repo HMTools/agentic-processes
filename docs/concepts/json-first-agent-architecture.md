@@ -30,7 +30,7 @@ Transform the agentic process system from a dual-file approach (where both JSON 
 Apply this concept to all files in:
 - `.processes/steps/**/*.json` and `.processes/steps/**/*.md`
 - `.processes/templates/**/*.json` and `.processes/templates/**/*.md`
-- `.processes/prompts/**/*.json` and `.processes/prompts/**/*.md`
+- `commands/**/*.md`
 - `docs/**/*.json` and `docs/**/*.md`
 
 **Approximate file counts:**

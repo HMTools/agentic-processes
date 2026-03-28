@@ -10,7 +10,7 @@
   "output": {
     "description": "File list and identification report",
     "artifacts": ["identified-files.json", "deep-search-tracking.json (for deep mode)"],
-    "memoryUpdates": ["fileCount", "resultsJsonPath", "summary", "searchApproach", "exclusionsApplied"]
+    "memoryUpdates": ["fileCount", "resultsJsonPath", "summary", "searchApproach", "exclusionsApplied", "contentPreservationFlags"]
   },
   "guidance": {
     "prerequisites": ["Context parameters from process.md or memory.json"],
@@ -98,11 +98,12 @@
     {
       "number": 5,
       "name": "Create File Identification Report",
-      "description": "Document the search results",
+      "description": "Document the search results and flag content preservation needs",
       "actions": [
         "Document search approach used",
         "Include summary: total files found, excluded files count",
-        "Note any issues encountered"
+        "Note any issues encountered",
+        "For files marked for deletion: check if any contain content that belongs elsewhere or should be preserved (e.g., useful documentation misplaced in a directory being removed). Flag these with contentPreservationRequired: true and describe the preservation action needed."
       ]
     },
     {
@@ -111,7 +112,8 @@
       "description": "Save results and update memory reference",
       "actions": [
         "Save file list to identified-files.json",
-        "Format: array of paths (default) or array of {path, matchReason} objects",
+        "Format: array of paths (default) or array of {path, matchReason, contentPreservationRequired?, preservationAction?} objects",
+        "For any file flagged for content preservation, include contentPreservationRequired: true and preservationAction describing what to do (e.g., 'Move to docs/claude/ before deleting parent directory')",
         "Write reference to memory.json with file count and path to JSON"
       ]
     },
