@@ -138,7 +138,7 @@ When `/process-new` is invoked:
    - Initialize `memory.json` from template
    - Initialize `log.json` from template
    - Set status to "Running"
-   - **CRITICAL**: Write `metadata.sessionId` to process.json using the `session_id` value Claude Code exposes in the environment. WITHOUT THIS, the log-first enforcement hook (`enforce-log-first.sh`), the pending-interaction block hook, and the `UserPromptSubmit` flag hook are ALL silently disabled for this process — user interactions won't be enforced to log first and pending-interaction checkpoints won't be detected.
+   - **CRITICAL**: Include `metadata.sessionId` as an empty string `""` in process.json when creating the process. The `bind-session-to-process` PostToolUse hook will automatically replace it with the correct session ID when the file is written. WITHOUT THIS field present in the JSON, the hook cannot inject the session ID and all enforcement hooks will be silently disabled.
 
 6. **Start Process (Auto-Execute Step 0)**
    - Display summary
