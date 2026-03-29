@@ -4,7 +4,7 @@
 
 INPUT=$(cat)
 
-SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
 PROJECT_DIR="$CLAUDE_PROJECT_DIR"
 FLAG_DIR=".claude"
 

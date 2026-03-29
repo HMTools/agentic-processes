@@ -3,9 +3,9 @@
 
 INPUT=$(cat)
 
-SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
 PROJECT_DIR="$CLAUDE_PROJECT_DIR"
-FILE_PATH=$(echo "$INPUT" | grep -o '"file_path":"[^"]*"' | head -1 | cut -d'"' -f4)
+FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]*' | head -1)
 FLAG_DIR=".claude"
 
 if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
@@ -27,8 +27,11 @@ case "$FILE_PATH" in
     ;;
 esac
 
+# Normalize backslashes for path matching
+NORMALIZED_PATH="${FILE_PATH//\\//}"
+
 # Block writes to process files until log is written
-case "$FILE_PATH" in
+case "$NORMALIZED_PATH" in
     */.user-processes/active/*)
         cat << 'EOF'
 {

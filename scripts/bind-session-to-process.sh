@@ -5,11 +5,14 @@
 
 INPUT=$(cat)
 
-SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
-FILE_PATH=$(echo "$INPUT" | grep -o '"file_path":"[^"]*"' | head -1 | cut -d'"' -f4)
+SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
+FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]*' | head -1)
+
+# Normalize backslashes to forward slashes for path matching
+NORMALIZED_PATH="${FILE_PATH//\\//}"
 
 # Only act on process.json files in active process directories
-if [[ "$FILE_PATH" == */.user-processes/active/*/process.json ]]; then
+if [[ "$NORMALIZED_PATH" == */.user-processes/active/*/process.json ]]; then
     if [ -n "$SESSION_ID" ] && [ -f "$FILE_PATH" ]; then
         # Replace existing sessionId value (including empty or placeholder)
         if grep -qE '"sessionId"' "$FILE_PATH"; then
