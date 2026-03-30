@@ -13,14 +13,12 @@ if [ -z "$PROJECT_DIR" ] || [ -z "$SESSION_ID" ]; then
     exit 0
 fi
 
-# Find if there's an active process for this session
+# Find if there's an active process for this session by matching .session file
 HAS_ACTIVE_PROCESS=false
-for PROCESS_JSON in "$PROJECT_DIR"/.user-processes/active/*/process.json; do
-    if [ -f "$PROCESS_JSON" ]; then
-        if grep -qE "\"sessionId\"[[:space:]]*:[[:space:]]*\"$SESSION_ID\"" "$PROCESS_JSON"; then
-            HAS_ACTIVE_PROCESS=true
-            break
-        fi
+for SESSION_FILE in "$PROJECT_DIR"/.user-processes/active/*/.session; do
+    if [ -f "$SESSION_FILE" ] && [ "$(cat "$SESSION_FILE" 2>/dev/null)" = "$SESSION_ID" ]; then
+        HAS_ACTIVE_PROCESS=true
+        break
     fi
 done
 

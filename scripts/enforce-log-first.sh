@@ -27,8 +27,8 @@ case "$FILE_PATH" in
     ;;
 esac
 
-# Normalize backslashes for path matching
-NORMALIZED_PATH="${FILE_PATH//\\//}"
+# Normalize: unescape JSON double-backslashes then collapse to single forward slashes
+NORMALIZED_PATH=$(printf '%s' "$FILE_PATH" | tr '\\' '/' | sed 's|//*|/|g')
 
 # Block writes to process files until log is written
 case "$NORMALIZED_PATH" in

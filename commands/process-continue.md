@@ -111,14 +111,12 @@ When `/process-continue` is invoked:
    - If only one process exists, proceed directly
 
 2. **Bind Session to Process** (MANDATORY — MUST be done BEFORE any other steps)
-   - **Immediately** write to `.user-processes/active/{process-folder}/process.json` to set `metadata.sessionId` to `""`.
-   - This MUST be the **very first write action** in the session. The `bind-session-to-process` PostToolUse hook fires on this write and injects the real session ID.
-   - WITHOUT this early write, all enforcement hooks (approval blocking, log-first, todo blocking, stop checks) will be **silently disabled** for the entire session because they match processes by sessionId.
-   - Do NOT batch this write with other changes — it must be a standalone Edit/Write so the hook fires cleanly.
-   - After writing, read back process.json to confirm sessionId was populated (non-empty). If still empty, warn the user that hooks may not be active.
+   - **Immediately** write any file in the process directory (e.g., Edit `process.json` to update `lastUpdated`). The `bind-session-to-process` PostToolUse hook fires on any write inside `.user-processes/active/*/` and creates a `.session` file containing the session ID.
+   - This MUST be the **very first write action** in the session. WITHOUT it, all enforcement hooks (approval blocking, log-first, todo blocking, stop checks) will be **silently disabled** for the entire session because they match processes by `.session` file.
+   - After writing, verify that `.user-processes/active/{process-folder}/.session` exists and contains a non-empty session ID. If missing, warn the user that hooks may not be active.
 
 3. **Read Process State**
-   - Read `.user-processes/active/{process-folder}/process.json` (primary state — now with sessionId bound)
+   - Read `.user-processes/active/{process-folder}/process.json` (primary state)
    - Read `.user-processes/active/{process-folder}/process.md` (user documentation)
    - Review completed steps and identify next incomplete step
 

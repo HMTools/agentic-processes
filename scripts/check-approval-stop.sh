@@ -13,20 +13,18 @@ if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
     exit 0
 fi
 
-# Find the active process folder
+# Find the active process folder by matching .session file
 PROCESS_DIR=""
 PROCESS_JSON_FILE=""
-for PROCESS_JSON in "$PROJECT_DIR"/.user-processes/active/*/process.json; do
-    if [ -f "$PROCESS_JSON" ]; then
-        if grep -qE "\"sessionId\"[[:space:]]*:[[:space:]]*\"$SESSION_ID\"" "$PROCESS_JSON"; then
-            PROCESS_JSON_FILE="$PROCESS_JSON"
-            PROCESS_DIR=$(dirname "$PROCESS_JSON")
-            break
-        fi
+for SESSION_FILE in "$PROJECT_DIR"/.user-processes/active/*/.session; do
+    if [ -f "$SESSION_FILE" ] && [ "$(cat "$SESSION_FILE" 2>/dev/null)" = "$SESSION_ID" ]; then
+        PROCESS_DIR=$(dirname "$SESSION_FILE")
+        PROCESS_JSON_FILE="$PROCESS_DIR/process.json"
+        break
     fi
 done
 
-if [ -z "$PROCESS_JSON_FILE" ]; then
+if [ -z "$PROCESS_JSON_FILE" ] || [ ! -f "$PROCESS_JSON_FILE" ]; then
     echo '{}'
     exit 0
 fi

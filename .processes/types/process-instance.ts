@@ -90,10 +90,10 @@ export interface ProcessMetadata {
   processPath?: ProcessPath;
 
   /**
-   * Claude Code session ID for hook-to-process matching.
-   * Written to process.json when the agent starts or resumes a process.
-   * Hooks receive session_id in their input and match it against this field
-   * to identify the active process instance within the current session.
+   * @deprecated Session binding moved to .session file in process directory.
+   * The bind-session-to-process hook writes the session ID to a dedicated
+   * .session file (plain text) alongside process.json. Consumer hooks read
+   * that file instead of grepping process.json. This field is no longer used.
    */
   sessionId?: string;
 }

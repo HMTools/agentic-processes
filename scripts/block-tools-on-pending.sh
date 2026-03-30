@@ -13,15 +13,13 @@ if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
     exit 0
 fi
 
-# Find the active process folder and check for pending-interaction.json
+# Find the active process folder by matching .session file
 PENDING_FILE=""
-for PROCESS_JSON in "$PROJECT_DIR"/.user-processes/active/*/process.json; do
-    if [ -f "$PROCESS_JSON" ]; then
-        if grep -qE "\"sessionId\"[[:space:]]*:[[:space:]]*\"$SESSION_ID\"" "$PROCESS_JSON"; then
-            PROCESS_DIR=$(dirname "$PROCESS_JSON")
-            PENDING_FILE="$PROCESS_DIR/pending-interaction.json"
-            break
-        fi
+for SESSION_FILE in "$PROJECT_DIR"/.user-processes/active/*/.session; do
+    if [ -f "$SESSION_FILE" ] && [ "$(cat "$SESSION_FILE" 2>/dev/null)" = "$SESSION_ID" ]; then
+        PROCESS_DIR=$(dirname "$SESSION_FILE")
+        PENDING_FILE="$PROCESS_DIR/pending-interaction.json"
+        break
     fi
 done
 

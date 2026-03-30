@@ -134,8 +134,8 @@ When `/process-new` is invoked:
 
 5. **Create Process Instance** (MANDATORY)
    - Create process directory
-   - **Create `process.json` FIRST** — this MUST be the first file written. Include `metadata.sessionId` as an empty string `""`. The `bind-session-to-process` PostToolUse hook fires on this write and injects the real session ID. Do NOT batch this write with other files — it must be a standalone Write so the hook fires cleanly.
-   - After writing process.json, read it back to confirm sessionId was populated (non-empty). If still empty, warn the user that hooks may not be active.
+   - **Create `process.json` FIRST** — this MUST be the first file written in the process directory. The `bind-session-to-process` PostToolUse hook fires on any write inside `.user-processes/active/*/` and creates a `.session` file containing the session ID. Do NOT batch this write with other files — it must be a standalone Write so the hook fires cleanly.
+   - After writing process.json, verify that `.session` exists in the process directory and contains a non-empty session ID. If missing, warn the user that hooks may not be active.
    - Then create the remaining files:
      - Create `process.md` with substituted placeholders
      - Initialize `memory.json` from template
