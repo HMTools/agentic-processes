@@ -110,16 +110,23 @@ When `/process-continue` is invoked:
      - Last updated timestamp
    - If only one process exists, proceed directly
 
-2. **Read Process State**
-   - Read `.user-processes/active/{process-folder}/process.json` (primary state)
+2. **Bind Session to Process** (MANDATORY — MUST be done BEFORE any other steps)
+   - **Immediately** write to `.user-processes/active/{process-folder}/process.json` to set `metadata.sessionId` to `""`.
+   - This MUST be the **very first write action** in the session. The `bind-session-to-process` PostToolUse hook fires on this write and injects the real session ID.
+   - WITHOUT this early write, all enforcement hooks (approval blocking, log-first, todo blocking, stop checks) will be **silently disabled** for the entire session because they match processes by sessionId.
+   - Do NOT batch this write with other changes — it must be a standalone Edit/Write so the hook fires cleanly.
+   - After writing, read back process.json to confirm sessionId was populated (non-empty). If still empty, warn the user that hooks may not be active.
+
+3. **Read Process State**
+   - Read `.user-processes/active/{process-folder}/process.json` (primary state — now with sessionId bound)
    - Read `.user-processes/active/{process-folder}/process.md` (user documentation)
    - Review completed steps and identify next incomplete step
 
-3. **Read Memory File**
+4. **Read Memory File**
    - Read `.user-processes/active/{process-folder}/memory.json`
    - Summarize key information from previous steps
 
-4. **Summarize Current State**
+5. **Summarize Current State**
    - Present clear summary of:
      - Process being resumed
      - What was being worked on
@@ -127,12 +134,11 @@ When `/process-continue` is invoked:
      - Key information from memory
    - Highlight next step
 
-5. **Update Current State**
+6. **Update Current State**
    - Update **Current State** to reflect resumption
    - Set active step to next incomplete step
-   - **CRITICAL**: Include `metadata.sessionId` as an empty string `""` in process.json when writing. The `bind-session-to-process` PostToolUse hook will automatically replace it with the correct session ID when the file is written. WITHOUT THIS field present in the JSON, the hook cannot inject the session ID and all enforcement hooks will be silently disabled.
 
-6. **Proceed with Guidance via Step Delegation**
+7. **Proceed with Guidance via Step Delegation**
    - **Delegate step execution** to the `step-executor` subagent
    - Provide to subagent:
      - **Operating principles** (all 5 principles from `.processes/steps/_components/operating-principles.md`) — subagents run in isolated context and MUST receive these explicitly

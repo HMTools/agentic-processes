@@ -134,11 +134,14 @@ When `/process-new` is invoked:
 
 5. **Create Process Instance** (MANDATORY)
    - Create process directory
-   - Create `process.md` with substituted placeholders
-   - Initialize `memory.json` from template
-   - Initialize `log.json` from template
-   - Set status to "Running"
-   - **CRITICAL**: Include `metadata.sessionId` as an empty string `""` in process.json when creating the process. The `bind-session-to-process` PostToolUse hook will automatically replace it with the correct session ID when the file is written. WITHOUT THIS field present in the JSON, the hook cannot inject the session ID and all enforcement hooks will be silently disabled.
+   - **Create `process.json` FIRST** — this MUST be the first file written. Include `metadata.sessionId` as an empty string `""`. The `bind-session-to-process` PostToolUse hook fires on this write and injects the real session ID. Do NOT batch this write with other files — it must be a standalone Write so the hook fires cleanly.
+   - After writing process.json, read it back to confirm sessionId was populated (non-empty). If still empty, warn the user that hooks may not be active.
+   - Then create the remaining files:
+     - Create `process.md` with substituted placeholders
+     - Initialize `memory.json` from template
+     - Initialize `log.json` from template
+   - Set status to "running"
+   - WITHOUT the early process.json write, all enforcement hooks (approval blocking, log-first, todo blocking, stop checks) will be **silently disabled** for the entire session.
 
 6. **Start Process (Auto-Execute Step 0)**
    - Display summary
