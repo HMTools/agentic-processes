@@ -39,7 +39,7 @@ fi
 # Check if any step has status 'in_progress' and approvalRequired: true
 HAS_APPROVAL_STEP=false
 
-if grep -qE '"status"[[:space:]]*:[[:space:]]*"in_progress"' "$PROCESS_JSON_FILE"; then
+if grep -qE '"status"[[:space:]]*:[[:space:]]*"in[_-]progress"' "$PROCESS_JSON_FILE"; then
   if grep -qE '"approvalRequired"[[:space:]]*:[[:space:]]*true' "$PROCESS_JSON_FILE"; then
     HAS_APPROVAL_STEP=true
   fi
