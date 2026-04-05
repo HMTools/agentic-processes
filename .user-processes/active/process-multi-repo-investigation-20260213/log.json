@@ -6,7 +6,11 @@
     "started": "2026-02-13T20:30:00.000Z",
     "completed": null,
     "parentProcessPath": null,
-    "subProcessPaths": []
+    "subProcessPaths": [
+      ".user-processes/active/process-create-step-parse-repository-list-20260401",
+      ".user-processes/active/process-create-step-aggregate-and-synthesize-findings-20260401",
+      ".user-processes/active/process-create-step-create-research-report-20260401"
+    ]
   },
   "steps": {
     "dd4a6618-3c81-4021-8694-7d06a9cc95a1": {
@@ -96,6 +100,13 @@
       "userRequest": "Approve Design",
       "agentResponse": "Approved template design v3.0. Proceeding to Step 2: Create template file.",
       "reasoning": "User approved the multi-repo codebase investigation template design (v3.0) with on-demand cloning and automatic cleanup architecture."
+    },
+    {
+      "timestamp": "2026-04-01T00:00:00.000Z",
+      "stepId": "d74d5dac-e9f4-47bf-bc6e-8f55a6806fb3",
+      "userRequest": "Spawn sub-processes for all 3 missing steps",
+      "agentResponse": "Spawning create-process-step-template sub-processes for: parse-repository-list, aggregate-and-synthesize-findings, create-research-report",
+      "reasoning": "User chose option 1 to spawn sub-processes for all 3 missing steps identified during validation."
     }
   ],
   "processWideObservations": {
@@ -224,6 +235,43 @@
         "All subprocess output files documented to aid Step 4 aggregation step authors"
       ],
       "performanceNotes": ["Both template files validated before updating process files"]
+    },
+    "d74d5dac-e9f4-47bf-bc6e-8f55a6806fb3": {
+      "timestamp": {
+        "startedAt": "2026-04-01T00:00:00.000Z",
+        "updatedAt": "2026-04-01T00:00:00.000Z"
+      },
+      "actionsTaken": [
+        "Read operating-principles.md and confirmed principles",
+        "Read template JSON and MD files for step references",
+        "Extracted 8 @framework-step references from template",
+        "Checked existence of both .md and .json for each referenced step",
+        "Found 5 valid, 3 missing steps",
+        "Created validation report in memory.json",
+        "Presented options to user for handling missing steps",
+        "User chose: spawn sub-processes for all 3 missing steps"
+      ],
+      "agentReasoning": [
+        "Systematic check of all 8 step references in both MD and JSON template files",
+        "3 missing: multi-repo/parse-repository-list, multi-repo/aggregate-and-synthesize-findings, investigation/create-research-report",
+        "Note: create-research-report was marked as 'reused' in template but doesn't exist - design oversight",
+        "User chose to spawn sub-processes for all 3 to create them via create-process-step-template"
+      ],
+      "userInteractions": [
+        {
+          "timestamp": "2026-04-01T00:00:00.000Z",
+          "userRequest": "Spawn sub-processes for all 3 missing steps",
+          "agentResponse": "Proceeding to spawn create-process-step-template sub-processes for each missing step",
+          "reasoning": "User wants all missing steps created via sub-processes"
+        }
+      ],
+      "problemsEncountered": [],
+      "filesModified": ["memory.json", "log.json", "process.json"],
+      "decisionsMade": [
+        "Spawn 3 sub-processes using create-process-step-template for each missing step",
+        "Use immediate sync point - wait for all sub-processes before proceeding"
+      ],
+      "performanceNotes": []
     }
   }
 }

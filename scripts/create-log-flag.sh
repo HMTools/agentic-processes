@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Create pending-log flag file when user submits a prompt during active process
 # This enforces log-first ordering for user interactions
+export LANG=C.UTF-8
 
 INPUT=$(cat)
 

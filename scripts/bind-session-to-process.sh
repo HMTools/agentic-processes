@@ -2,6 +2,7 @@
 # PostToolUse hook: bind session_id to active process directory
 # When agent writes/edits any file in .user-processes/active/*/,
 # write the session_id to a .session file in that process directory
+export LANG=C.UTF-8
 
 INPUT=$(cat)
 

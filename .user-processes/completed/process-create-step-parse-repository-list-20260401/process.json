@@ -1,0 +1,77 @@
+{
+  "type": "process-instance",
+  "id": "a1b2c3d4-1111-4000-8000-000000000001",
+  "name": "Create parse-repository-list Step",
+  "metadata": {
+    "template": "create-process-step-template",
+    "templateCategory": "infrastructure",
+    "created": "2026-04-01T00:00:00.000Z",
+    "lastUpdated": "2026-04-05T10:00:00.000Z",
+    "projectPath": "C:\\Projects\\HM\\agentic-processes",
+    "processPath": ".user-processes/active/process-create-step-parse-repository-list-20260401",
+    "parentProcessPath": ".user-processes/active/process-multi-repo-investigation-20260213"
+  },
+  "status": "completed",
+  "parameters": {
+    "stepName": "parse-repository-list",
+    "stepCategory": "multi-repo",
+    "stepPurpose": "Parse comma-separated repository list parameter into a structured repositories-list.json file. Determines if each entry is a remote URL or local path. Validates entries and produces metadata per repository (name, source, type). Does NOT clone repositories — that is handled by subprocesses downstream.",
+    "useCases": "When a multi-repo investigation or operation needs to enumerate, validate, and structure a list of repositories provided as a parameter. Used as a lightweight preparation step before spawning per-repository subprocesses."
+  },
+  "currentState": {
+    "activeStepId": "e0000001-0006-4000-8000-000000000001",
+    "activeStepName": "End Process Validation",
+    "actionSummary": "Process completed",
+    "actionDetails": "All 6 steps completed. End process validation done with 2 known violations documented (grep locale bug, now fixed)."
+  },
+  "steps": [
+    {
+      "id": "e0000001-0001-4000-8000-000000000001",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "approvalRequired": false
+    },
+    {
+      "id": "e0000001-0002-4000-8000-000000000001",
+      "number": 1,
+      "name": "Plan and design step",
+      "status": "completed",
+      "stepRef": "@framework-step:template/plan-and-design-step",
+      "approvalRequired": true
+    },
+    {
+      "id": "e0000001-0003-4000-8000-000000000001",
+      "number": 2,
+      "name": "Create step file",
+      "status": "completed",
+      "stepRef": "@framework-step:template/create-step-file",
+      "approvalRequired": true
+    },
+    {
+      "id": "e0000001-0004-4000-8000-000000000001",
+      "number": 3,
+      "name": "Validate step structure",
+      "status": "completed",
+      "stepRef": "@framework-step:template/validate-step-structure",
+      "approvalRequired": false
+    },
+    {
+      "id": "e0000001-0005-4000-8000-000000000001",
+      "number": 4,
+      "name": "Continuous Improvement",
+      "status": "completed",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": true
+    },
+    {
+      "id": "e0000001-0006-4000-8000-000000000001",
+      "number": 5,
+      "name": "End Process Validation",
+      "status": "completed",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "approvalRequired": false
+    }
+  ]
+}

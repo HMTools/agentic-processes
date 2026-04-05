@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Validate process files after Write/Edit and clear log-first flag
 # Checks JSON structure for process.json, memory.json, log.json
+export LANG=C.UTF-8
 
 INPUT=$(cat)
 

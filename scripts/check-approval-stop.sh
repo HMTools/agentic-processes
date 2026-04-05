@@ -2,6 +2,7 @@
 # Check approval requirements before stopping (used by stop and subagentStop hooks)
 # Blocks stop if there's an active step with approvalRequired: true and no pending-interaction.json
 # Works with Claude Code hooks system
+export LANG=C.UTF-8
 
 INPUT=$(cat)
 

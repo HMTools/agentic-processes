@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Block Task/Todo tools during active process execution
 # Process steps should be the task list, not external todo tools
+export LANG=C.UTF-8
 
 INPUT=$(cat)
 

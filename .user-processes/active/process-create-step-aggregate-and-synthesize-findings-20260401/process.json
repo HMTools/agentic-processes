@@ -1,0 +1,77 @@
+{
+  "type": "process-instance",
+  "id": "a1b2c3d4-2222-4000-8000-000000000002",
+  "name": "Create aggregate-and-synthesize-findings Step",
+  "metadata": {
+    "template": "create-process-step-template",
+    "templateCategory": "infrastructure",
+    "created": "2026-04-01T00:00:00.000Z",
+    "lastUpdated": "2026-04-01T10:20:00.000Z",
+    "projectPath": "C:\\Projects\\HM\\agentic-processes",
+    "processPath": ".user-processes/active/process-create-step-aggregate-and-synthesize-findings-20260401",
+    "parentProcessPath": ".user-processes/active/process-multi-repo-investigation-20260213"
+  },
+  "status": "in-progress",
+  "parameters": {
+    "stepName": "aggregate-and-synthesize-findings",
+    "stepCategory": "multi-repo",
+    "stepPurpose": "Aggregate findings from completed per-repository investigation subprocesses and synthesize cross-cutting patterns. Acts as sync point — waits for all subprocesses to complete, reads their outputs (summary.json, repo-findings.md), and produces a comparative-analysis.md with common patterns, differences, unique implementations, anomalies, and cross-cutting recommendations.",
+    "useCases": "After all per-repository investigation subprocesses complete. Used as the synthesis step in multi-repo investigation workflows to combine individual findings into cross-repository insights."
+  },
+  "currentState": {
+    "activeStepId": "e0000002-0002-4000-8000-000000000002",
+    "activeStepName": "Plan and design step",
+    "actionSummary": "Step 1 completed - step design created, awaiting approval",
+    "actionDetails": "Designed aggregate-and-synthesize-findings step: multi-repo category, 9 substeps, produces comparative-analysis.md. Design documented in step-design.md. Awaiting user approval before proceeding to step file creation."
+  },
+  "steps": [
+    {
+      "id": "e0000002-0001-4000-8000-000000000002",
+      "number": 0,
+      "name": "Init Process Principles",
+      "status": "completed",
+      "stepRef": "@framework-step:common/init-process-principles",
+      "approvalRequired": false
+    },
+    {
+      "id": "e0000002-0002-4000-8000-000000000002",
+      "number": 1,
+      "name": "Plan and design step",
+      "status": "in-progress",
+      "stepRef": "@framework-step:template/plan-and-design-step",
+      "approvalRequired": true
+    },
+    {
+      "id": "e0000002-0003-4000-8000-000000000002",
+      "number": 2,
+      "name": "Create step file",
+      "status": "pending",
+      "stepRef": "@framework-step:template/create-step-file",
+      "approvalRequired": true
+    },
+    {
+      "id": "e0000002-0004-4000-8000-000000000002",
+      "number": 3,
+      "name": "Validate step structure",
+      "status": "pending",
+      "stepRef": "@framework-step:template/validate-step-structure",
+      "approvalRequired": false
+    },
+    {
+      "id": "e0000002-0005-4000-8000-000000000002",
+      "number": 4,
+      "name": "Continuous Improvement",
+      "status": "pending",
+      "stepRef": "@framework-step:learning/continuous-improvement",
+      "approvalRequired": true
+    },
+    {
+      "id": "e0000002-0006-4000-8000-000000000002",
+      "number": 5,
+      "name": "End Process Validation",
+      "status": "pending",
+      "stepRef": "@framework-step:common/end-process-validation",
+      "approvalRequired": false
+    }
+  ]
+}

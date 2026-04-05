@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Block action tools when pending-interaction.json exists in the active process folder
+export LANG=C.UTF-8
 
 INPUT=$(cat)
 

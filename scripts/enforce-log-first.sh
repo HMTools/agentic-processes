@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Enforce log-first ordering for user interactions
+export LANG=C.UTF-8
 
 INPUT=$(cat)
 
