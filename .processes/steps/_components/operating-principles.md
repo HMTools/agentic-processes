@@ -38,6 +38,20 @@ Shared component containing all operating principles that agents must follow dur
 ### 5. GENERATE INTERACTION OPTIONS
 **Rule**: Whenever you need any form of user input, dynamically generate relevant options and write them to `pending-interaction.json` in the process folder. Delete the file when the user responds. Never use predefined options from templates.
 
+**Required format** (must match `PendingInteractionFile` type in `.processes/types/process-instance.ts`):
+```json
+{
+  "type": "pending-interaction",
+  "options": [
+    { "id": "approve", "label": "Approve", "isDefault": true },
+    { "id": "reject", "label": "Reject" },
+    { "id": "revise", "label": "Request Changes", "description": "Ask for modifications" }
+  ]
+}
+```
+- `type` MUST be `"pending-interaction"` (not `"approval"` or any other value)
+- Each option MUST have `id` (unique identifier) and `label` (display text)
+
 ---
 
 ## End-Step Verification Checklist

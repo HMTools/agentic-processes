@@ -22,10 +22,11 @@ Trigger this skill when the user wants to:
 - **Memory**: Persistent context across steps in `memory.json`
 - **Approval Checkpoint**: Steps requiring user approval before continuing
 
-## Available Commands
+## Available Skills
 
 - `/process-new` - Start a new process from a template
 - `/process-continue` - Continue an existing process
+- `/process-state-update` - Update process state files (used by step-executor during execution)
 
 ## Process Templates
 
@@ -37,8 +38,8 @@ Templates are located in `.processes/templates/`. Each template defines:
 
 ## Instructions
 
-1. **To start a new process**: Use the `/process-new` command or ask to "start a process"
-2. **To continue a process**: Use the `/process-continue` command with the process path
+1. **To start a new process**: Use the `/process-new` skill or ask to "start a process"
+2. **To continue a process**: Use the `/process-continue` skill with the process path
 3. **Active processes**: Check `.user-processes/active/` for running processes
 4. **Process state**: Each process has `process.json`, `memory.json`, and `log.json`
 
@@ -47,4 +48,4 @@ Templates are located in `.processes/templates/`. Each template defines:
 - Templates: `.processes/templates/`
 - Active processes: `.user-processes/active/`
 - Framework types: `.processes/types/`
-- Commands (entry prompts): `commands/`
+- Skills: `skills/`

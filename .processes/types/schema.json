@@ -1,0 +1,352 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-processes/schema.json",
+  "title": "Agentic Processes Schema",
+  "description": "Shared JSON Schema for all process file structures. Single source of truth for Python and TypeScript.",
+  "$defs": {
+    "ProcessStatus": {
+      "type": "string",
+      "enum": ["running", "completed", "failed", "paused"]
+    },
+    "StepStatus": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "completed", "skipped", "awaiting_approval"]
+    },
+    "ProcessMetadata": {
+      "type": "object",
+      "required": ["template", "created", "lastUpdated"],
+      "properties": {
+        "template": { "type": "string" },
+        "templateCategory": { "type": "string" },
+        "created": { "type": "string", "format": "date-time" },
+        "lastUpdated": { "type": "string", "format": "date-time" },
+        "projectPath": { "type": "string" },
+        "processPath": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ProcessCurrentState": {
+      "type": "object",
+      "required": ["activeStepId", "activeStepName", "actionSummary"],
+      "properties": {
+        "activeStepId": { "type": "string", "format": "uuid" },
+        "activeStepName": { "type": "string" },
+        "actionSummary": { "type": "string" },
+        "actionDetails": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ProcessStep": {
+      "type": "object",
+      "required": ["id", "number", "name", "status", "stepRef"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "number": { "type": "integer", "minimum": 0 },
+        "name": { "type": "string" },
+        "status": { "$ref": "#/$defs/StepStatus" },
+        "stepRef": { "type": "string" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "approvalRequired": { "type": "boolean" },
+        "approved": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "ChildProcessRef": {
+      "type": "object",
+      "required": ["id", "name", "status", "spawnedAtStep", "syncPoint", "processPath"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string" },
+        "status": { "$ref": "#/$defs/ProcessStatus" },
+        "spawnedAtStep": { "type": "string", "format": "uuid" },
+        "syncPoint": { "type": "string", "format": "uuid" },
+        "processPath": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ParentProcessRef": {
+      "type": "object",
+      "required": ["id", "name", "processPath", "returnToStep"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string" },
+        "processPath": { "type": "string" },
+        "returnToStep": { "type": "string", "format": "uuid" }
+      },
+      "additionalProperties": false
+    },
+    "SubProcessState": {
+      "type": "object",
+      "required": ["parentProcess", "childProcesses"],
+      "properties": {
+        "parentProcess": {
+          "oneOf": [
+            { "$ref": "#/$defs/ParentProcessRef" },
+            { "type": "null" }
+          ]
+        },
+        "childProcesses": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ChildProcessRef" }
+        },
+        "nextSyncPoint": { "type": "string", "format": "uuid" }
+      },
+      "additionalProperties": false
+    },
+    "InteractionOption": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "isDefault": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "StepTimestamp": {
+      "type": "object",
+      "required": ["startedAt"],
+      "properties": {
+        "startedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "UserInteraction": {
+      "type": "object",
+      "required": ["request", "reason", "agentResponse", "timestamp"],
+      "properties": {
+        "request": { "type": "string" },
+        "reason": { "type": "string" },
+        "agentResponse": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "forImprovementStep": { "type": "boolean" },
+        "potentialImprovement": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "MemoryStepEntry": {
+      "type": "object",
+      "required": ["name", "informationProduced", "decisionsMade", "filesModifiedCreated"],
+      "properties": {
+        "name": { "type": "string" },
+        "status": { "$ref": "#/$defs/StepStatus" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "informationProduced": { "type": "object" },
+        "decisionsMade": { "type": "array", "items": { "type": "string" } },
+        "filesModifiedCreated": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "LogStepEntry": {
+      "type": "object",
+      "required": ["timestamp"],
+      "properties": {
+        "timestamp": {
+          "oneOf": [
+            { "type": "string", "format": "date-time" },
+            { "$ref": "#/$defs/StepTimestamp" }
+          ]
+        },
+        "userInteractions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/UserInteraction" }
+        },
+        "actionsTaken": { "type": "array", "items": { "type": "string" } },
+        "agentReasoning": { "type": "array", "items": { "type": "string" } },
+        "problemsEncountered": { "type": "array", "items": { "type": "string" } },
+        "filesModified": { "type": "array", "items": { "type": "string" } },
+        "decisionsMade": { "type": "array", "items": { "type": "string" } },
+        "performanceNotes": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "ProcessInstance": {
+      "type": "object",
+      "required": ["type", "id", "name", "metadata", "status", "parameters", "currentState", "steps"],
+      "properties": {
+        "type": { "const": "process-instance" },
+        "id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string" },
+        "metadata": { "$ref": "#/$defs/ProcessMetadata" },
+        "status": { "$ref": "#/$defs/ProcessStatus" },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "currentState": { "$ref": "#/$defs/ProcessCurrentState" },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProcessStep" }
+        },
+        "subProcessState": { "$ref": "#/$defs/SubProcessState" }
+      },
+      "additionalProperties": false
+    },
+    "MemoryFile": {
+      "type": "object",
+      "required": ["type", "metadata", "subProcessState", "steps", "crossReferences", "searchHelpers"],
+      "properties": {
+        "type": { "const": "memory-file" },
+        "metadata": {
+          "type": "object",
+          "required": ["process", "template", "created", "lastUpdated", "currentStep"],
+          "properties": {
+            "process": { "type": "string" },
+            "template": { "type": "string" },
+            "created": { "type": "string", "format": "date-time" },
+            "lastUpdated": { "type": "string", "format": "date-time" },
+            "currentStep": { "type": "string", "format": "uuid" }
+          },
+          "additionalProperties": false
+        },
+        "subProcessState": {
+          "type": "object",
+          "required": ["parentProcessPath", "childSubProcesses", "syncPoints"],
+          "properties": {
+            "parentProcessPath": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "null" }
+              ]
+            },
+            "childSubProcesses": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/ChildProcessRef" }
+            },
+            "syncPoints": {
+              "type": "array",
+              "items": { "type": "string", "format": "uuid" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "steps": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/MemoryStepEntry" }
+        },
+        "crossReferences": {
+          "type": "object",
+          "required": ["keyDecisions"],
+          "properties": {
+            "keyDecisions": { "type": "array", "items": { "type": "string" } },
+            "filesModified": { "type": "array", "items": { "type": "string" } },
+            "filesCreated": { "type": "array", "items": { "type": "string" } },
+            "schemaFiles": { "type": "array", "items": { "type": "string" } },
+            "targetFiles": { "type": "array", "items": { "type": "string" } },
+            "custom": { "type": "object" }
+          },
+          "additionalProperties": false
+        },
+        "searchHelpers": {
+          "type": "object",
+          "required": ["byCategory"],
+          "properties": {
+            "byCategory": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "byFileType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "LogFile": {
+      "type": "object",
+      "required": ["type", "metadata", "steps", "processWideObservations"],
+      "properties": {
+        "type": { "const": "log-file" },
+        "metadata": {
+          "type": "object",
+          "required": ["process", "template", "started", "completed", "parentProcessPath", "subProcessPaths"],
+          "properties": {
+            "process": { "type": "string" },
+            "template": { "type": "string" },
+            "started": { "type": "string", "format": "date-time" },
+            "completed": {
+              "oneOf": [
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
+              ]
+            },
+            "parentProcessPath": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "null" }
+              ]
+            },
+            "subProcessPaths": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "executionMetrics": {
+          "type": "object",
+          "required": ["totalSteps", "stepsCompleted", "currentStep"],
+          "properties": {
+            "totalSteps": { "type": "integer" },
+            "stepsCompleted": { "type": "integer" },
+            "currentStep": { "type": "string", "format": "uuid" }
+          },
+          "additionalProperties": false
+        },
+        "steps": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/LogStepEntry" }
+        },
+        "userInteractions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/UserInteraction" }
+        },
+        "processWideObservations": {
+          "type": "object",
+          "required": ["patternsDetected", "userFeedbackSummary", "efficiencyMetrics", "recommendationsForFuture"],
+          "properties": {
+            "patternsDetected": { "type": "array", "items": { "type": "string" } },
+            "userFeedbackSummary": { "type": "array", "items": { "type": "string" } },
+            "efficiencyMetrics": { "type": "object" },
+            "recommendationsForFuture": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "PendingInteractionFile": {
+      "type": "object",
+      "required": ["type", "options"],
+      "properties": {
+        "type": { "const": "pending-interaction" },
+        "options": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InteractionOption" }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/ProcessInstance" },
+    { "$ref": "#/$defs/MemoryFile" },
+    { "$ref": "#/$defs/LogFile" },
+    { "$ref": "#/$defs/PendingInteractionFile" }
+  ]
+}

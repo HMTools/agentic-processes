@@ -44,15 +44,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-process-files.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|StrReplace|Edit",
-        "hooks": [
-          {
-            "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/bind-session-to-process.sh"
           }
         ]

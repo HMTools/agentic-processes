@@ -96,9 +96,6 @@ agentic-processes/                    # Plugin root
 ├── agents/                           # Root-level agents (auto-discovered)
 │   ├── step-executor.md
 │   └── process-spawner.md
-├── commands/                         # Root-level commands (auto-discovered)
-│   ├── process-new.md
-│   └── process-continue.md
 ├── hooks/
 │   └── hooks.json                    # Unified hook configuration
 ├── scripts/                          # Hook scripts
@@ -106,18 +103,24 @@ agentic-processes/                    # Plugin root
 │   ├── block-tools-on-pending.sh
 │   ├── block-todo-tools.sh
 │   ├── enforce-log-first.sh
-│   ├── validate-process-files.sh
-│   └── create-log-flag.sh
+│   ├── create-log-flag.sh
+│   └── bind-session-to-process.sh
 ├── skills/
-│   └── agentic-processes/
-│       └── SKILL.md                  # Main framework skill
+│   ├── agentic-processes/
+│   │   └── SKILL.md                  # Main framework skill
+│   ├── process-new/
+│   │   └── SKILL.md                  # Start a new process from a template
+│   ├── process-continue/
+│   │   └── SKILL.md                  # Continue an existing process
+│   └── process-state-update/
+│       └── SKILL.md                  # Update process state files
 ├── assets/
 │   └── logo.svg                      # Plugin branding
 ├── AGENTS.md                         # Agent discovery file
 ├── .processes/                       # Framework core
 │   ├── templates/                    # Process templates
 │   ├── steps/                        # Step definitions
-│   ├── types/                        # TypeScript type definitions
+│   ├── types/                        # TypeScript types + schema.json (shared source of truth)
 │   └── prompts/                      # Entry prompts
 └── docs/                             # Documentation
 ```

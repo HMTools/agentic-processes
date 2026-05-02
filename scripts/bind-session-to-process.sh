@@ -22,7 +22,11 @@ if [[ "$NORMALIZED_PATH" == */.user-processes/active/*/* ]]; then
     # Extract the process directory (up to the process folder name)
     PROCESS_DIR=$(echo "$NORMALIZED_PATH" | sed 's|\(.*/.user-processes/active/[^/]*\)/.*|\1|')
     if [ -d "$PROCESS_DIR" ]; then
-        echo "$SESSION_ID" > "$PROCESS_DIR/.session"
+        SESSION_FILE="$PROCESS_DIR/.session"
+        # Only write session ID when .session content is empty (or file doesn't exist)
+        if [ ! -f "$SESSION_FILE" ] || [ -z "$(cat "$SESSION_FILE" 2>/dev/null | tr -d '[:space:]')" ]; then
+            echo "$SESSION_ID" > "$SESSION_FILE"
+        fi
     fi
 fi
 

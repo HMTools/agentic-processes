@@ -6,11 +6,21 @@ export LANG=C.UTF-8
 INPUT=$(cat)
 
 SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
+TOOL_NAME=$(echo "$INPUT" | grep -oP '"tool_name"\s*:\s*"\K[^"]*' | head -1)
 PROJECT_DIR="$CLAUDE_PROJECT_DIR"
 
 if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
     exit 0
 fi
+
+# Only block actual task/todo tools — allow everything else through
+case "$TOOL_NAME" in
+    Task|TaskCreate|TaskUpdate|TaskGet|TaskList|TaskStop|TaskOutput)
+        ;;
+    *)
+        exit 0
+        ;;
+esac
 
 # Find the active process folder by matching .session file
 PROCESS_JSON_FILE=""

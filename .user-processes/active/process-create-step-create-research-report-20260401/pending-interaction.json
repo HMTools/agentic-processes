@@ -1,0 +1,28 @@
+{
+  "type": "approval",
+  "stepId": "e0000003-0002-4000-8000-000000000003",
+  "stepName": "Plan and design step",
+  "prompt": "The design document (step-design.md) for the create-research-report step is ready for review. Do you approve this design?",
+  "deliverable": "step-design.md",
+  "options": [
+    {
+      "label": "Approve",
+      "value": "approved",
+      "description": "Approve the design and proceed to Step 2: Create step file"
+    },
+    {
+      "label": "Request Changes",
+      "value": "corrections",
+      "description": "Provide feedback or corrections to the design"
+    },
+    {
+      "label": "Reject",
+      "value": "rejected",
+      "description": "Reject the design and redesign from scratch"
+    }
+  ],
+  "context": {
+    "designDocument": "step-design.md",
+    "keySummary": "7 substeps, 3 output formats (markdown/JSON/comparative-table), category: investigation, no overlap with final-summary"
+  }
+}
