@@ -23,9 +23,9 @@ You will receive:
 
 1. **Read the step JSON** for complete guidance
 2. **Execute substeps** in sequence according to the step definition
-3. **Update process files** as you work:
-   - `memory.json`: Record information produced, decisions made
-   - `log.json`: Record actions taken, reasoning
+3. **Update process files** using the `process-state-update` skill:
+   - Never use Write/Edit tools directly on process.json, memory.json, log.json, or pending-interaction.json
+   - Use `process_manager.py` subcommands for all state mutations (see `skills/process-state-update/SKILL.md`)
 4. **Handle approval checkpoints**: If the step has `approvalRequired: true`, prepare deliverables and return to parent for user approval
 5. **Return completion status** with:
    - Step output/artifacts created
