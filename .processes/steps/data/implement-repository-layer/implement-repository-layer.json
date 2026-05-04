@@ -9,15 +9,24 @@
   },
   "output": {
     "description": "Repository interfaces, implementations, and MongoDB entity models",
-    "artifacts": ["Data/Repositories/Interfaces/*.cs", "Data/Repositories/{category}/*.cs", "Data/Entities/*.cs"],
-    "memoryUpdates": ["repositoryCreated", "operationsImplemented"]
+    "artifacts": [
+      "Data/Repositories/Interfaces/*.cs",
+      "Data/Repositories/{category}/*.cs",
+      "Data/Entities/*.cs"
+    ],
+    "memoryUpdates": [
+      "repositoryCreated",
+      "operationsImplemented"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Domain models defined",
       "MongoDB collections designed"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/data-access/how-to-implement-repositories.md",
       ".user-processes/guidelines/data-access/how-to-use-mongodb.md"
@@ -31,13 +40,18 @@
       "Register in DI Container: Add repository registration"
     ],
     "files": {
-      "read": ["Existing repositories for patterns", "Domain models"],
+      "read": [
+        "Existing repositories for patterns",
+        "Domain models"
+      ],
       "create": [
         "Data/Entities/{Entity}.cs (if new)",
         "Data/Repositories/Interfaces/I{Entity}Repository.cs",
         "Data/Repositories/{category}/{Entity}Repository.cs"
       ],
-      "update": ["DI registration file"]
+      "update": [
+        "DI registration file"
+      ]
     },
     "tools": [
       "read_file - Read existing repository patterns",
@@ -120,7 +134,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -130,27 +143,49 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step (domain models, requirements)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Repository created, operations implemented",
       "Files Modified/Created: Entity model, interface, implementation"
     ]
   },
   "contextParameters": {
-    "entityName": {"description": "Name of the entity"},
-    "collectionName": {"description": "MongoDB collection name"},
-    "operations": {"description": "Operations to add/modify/remove"},
-    "category": {"description": "Repository category folder"},
-    "isNewRepository": {"description": "Whether creating new or modifying existing"}
+    "entityName": {
+      "description": "Name of the entity"
+    },
+    "collectionName": {
+      "description": "MongoDB collection name"
+    },
+    "operations": {
+      "description": "Operations to add/modify/remove"
+    },
+    "category": {
+      "description": "Repository category folder"
+    },
+    "isNewRepository": {
+      "description": "Whether creating new or modifying existing"
+    }
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Domain models"],
-    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Domain models"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "codebase_search",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["implement-service-layer"],
-    "usedInTemplates": ["develop-user-story"]
+    "relatedSteps": [
+      "implement-service-layer"
+    ],
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }
-

@@ -9,12 +9,22 @@
   },
   "output": {
     "description": "Fix implemented according to root cause",
-    "artifacts": ["Modified test or application files"],
-    "memoryUpdates": ["fixDetails", "changesMade", "modifiedFiles"]
+    "artifacts": [
+      "Modified test or application files"
+    ],
+    "memoryUpdates": [
+      "fixDetails",
+      "changesMade",
+      "modifiedFiles"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Root cause analysis from previous step"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Root cause analysis from previous step"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/testing/how-to-write-integration-tests.md",
       ".user-processes/guidelines/testing/how-to-mock-dependencies.md"
@@ -30,9 +40,16 @@
       "Document all changes"
     ],
     "files": {
-      "read": ["memory.json (previous step)", "Target files to fix"],
+      "read": [
+        "memory.json (previous step)",
+        "Target files to fix"
+      ],
       "create": [],
-      "update": ["Test files (if test fix)", "Application code (if code fix)", "Infrastructure/config (if infrastructure fix)"]
+      "update": [
+        "Test files (if test fix)",
+        "Application code (if code fix)",
+        "Infrastructure/config (if infrastructure fix)"
+      ]
     },
     "tools": [
       "read_file - Read files to fix",
@@ -101,7 +118,7 @@
       "description": "Record all modified files for verification",
       "actions": [
         "Track all modified files",
-        "Write to memory.json for next step"
+        "Record: modified files list for verification"
       ]
     },
     {
@@ -111,7 +128,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -121,24 +137,49 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step - root cause analysis",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Fix details, changes made",
       "Files Modified/Created: All files changed"
     ]
   },
   "fixBranches": [
-    {"branch": "Test Fix", "target": "Test logic, assertions, data", "location": "Test project"},
-    {"branch": "Code Fix", "target": "Application bugs", "location": "Service, Repository, Controller"},
-    {"branch": "Infrastructure Fix", "target": "Setup, mocks, Docker", "location": "Test base, fixtures, config"}
+    {
+      "branch": "Test Fix",
+      "target": "Test logic, assertions, data",
+      "location": "Test project"
+    },
+    {
+      "branch": "Code Fix",
+      "target": "Application bugs",
+      "location": "Service, Repository, Controller"
+    },
+    {
+      "branch": "Infrastructure Fix",
+      "target": "Setup, mocks, Docker",
+      "location": "Test base, fixtures, config"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Previous step memory with root cause"],
-    "requiredTools": ["read_file", "write", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Previous step memory with root cause"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "search_replace"
+    ]
   },
   "references": {
-    "relatedSteps": ["diagnose-integration-test-failure", "verify-test-passes"],
-    "usedInTemplates": ["integration-test-fix"]
+    "relatedSteps": [
+      "diagnose-integration-test-failure",
+      "verify-test-passes"
+    ],
+    "usedInTemplates": [
+      "integration-test-fix"
+    ]
   }
 }

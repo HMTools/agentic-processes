@@ -9,12 +9,24 @@
   },
   "output": {
     "description": "Structured repository list with classification and validation metadata",
-    "artifacts": ["repositories-list.json"],
-    "memoryUpdates": ["repositoryCount", "validCount", "invalidCount", "sourceTypeSummary", "repositoriesListPath"]
+    "artifacts": [
+      "repositories-list.json"
+    ],
+    "memoryUpdates": [
+      "repositoryCount",
+      "validCount",
+      "invalidCount",
+      "sourceTypeSummary",
+      "repositoriesListPath"
+    ]
   },
   "guidance": {
-    "prerequisites": ["repositoryList parameter available in process context (from process.json parameters or memory.json)"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "repositoryList parameter available in process context (from process.json parameters or memory.json)"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Read the repositoryList parameter from process.json parameters or memory.json",
       "Split the comma-separated string by comma and trim whitespace from each entry",
@@ -23,12 +35,17 @@
       "Validate each entry: non-empty after trim, basic format check; set valid:false with validationNote for invalid entries",
       "Build the repositories-list.json structure with metadata (counts, source type breakdown) and repositories array",
       "Write repositories-list.json to the process folder",
-      "Update memory.json with summary statistics (repositoryCount, validCount, invalidCount, sourceTypeSummary, repositoriesListPath)"
+      "Record: summary statistics (repositoryCount, validCount, invalidCount, sourceTypeSummary, repositoriesListPath)"
     ],
     "files": {
-      "read": ["process.json (repositoryList parameter)", "memory.json (fallback parameter source)"],
-      "create": ["repositories-list.json (in process folder)"],
-      "update": ["memory.json (current step section with summary statistics)", "log.json (actions taken)"]
+      "read": [
+        "process.json (repositoryList parameter)",
+        "memory.json (fallback parameter source)"
+      ],
+      "create": [
+        "repositories-list.json (in process folder)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read process context files",
@@ -108,12 +125,12 @@
       "description": "Write the structured JSON to disk and update process memory with summary statistics",
       "actions": [
         "Write repositories-list.json to the process folder",
-        "Update memory.json current step section with informationProduced:",
+        "Record: informationProduced -",
         "  repositoryCount (total), validCount, invalidCount, sourceTypeSummary (breakdown by type), repositoriesListPath",
-        "Update memory.json current step section with decisionsMade: classification decisions, validation choices",
-        "Update memory.json current step section with filesModifiedCreated: path to repositories-list.json",
-        "Update memory.json crossReferences with new decisions and files",
-        "Update log.json with all actions taken in this step"
+        "Record: decisionsMade: classification decisions, validation choices",
+        "Record: filesModifiedCreated: path to repositories-list.json",
+        "Record: crossReferences for new decisions and files",
+        "Record: all actions taken in this step"
       ]
     },
     {
@@ -123,8 +140,6 @@
       "actions": [
         "Verify: Was log.json updated with actions taken?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions in .processes/types/?",
-        "Verify: Were crossReferences updated in memory.json?",
         "Verify: If any user interaction occurred, was pending-interaction.json created and later deleted?",
         "Output: 'Step completed in compliance with operating principles'"
       ]
@@ -135,14 +150,16 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters (process.json) or previous step section in memory.json - repositoryList comma-separated string",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: repositoryCount, validCount, invalidCount, sourceTypeSummary, repositoriesListPath",
       "Decisions Made: Source type classification choices, validation decisions"
     ]
   },
   "parameters": {
-    "required": ["repositoryList"],
+    "required": [
+      "repositoryList"
+    ],
     "definitions": {
       "repositoryList": {
         "type": "string",
@@ -152,12 +169,24 @@
     }
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["process.json or memory.json (parameter source)"],
-    "requiredTools": ["read_file", "write"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "process.json or memory.json (parameter source)"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write"
+    ]
   },
   "references": {
-    "relatedSteps": ["identify-files", "spawn-sub-process"],
-    "usedInTemplates": ["multi-repo-investigation"]
+    "relatedSteps": [
+      "identify-files",
+      "spawn-sub-process"
+    ],
+    "usedInTemplates": [
+      "multi-repo-investigation"
+    ]
   }
 }

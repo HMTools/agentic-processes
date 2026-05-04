@@ -8,14 +8,21 @@
     "lastUpdated": "2026-02-08"
   },
   "parameters": {
-    "required": ["artifactType", "artifactPath"],
+    "required": [
+      "artifactType",
+      "artifactPath"
+    ],
     "optional": [],
     "defaults": {},
     "definitions": {
       "artifactType": {
         "description": "Type of artifact being updated",
         "type": "string",
-        "enum": ["template", "step", "process"]
+        "enum": [
+          "template",
+          "step",
+          "process"
+        ]
       },
       "artifactPath": {
         "description": "Path to the artifact (relative to project root)",
@@ -26,15 +33,25 @@
   },
   "output": {
     "description": "Modified artifact files (JSON and MD) with verified changes",
-    "artifacts": ["Modified artifact JSON file", "Modified artifact MD file"],
-    "memoryUpdates": ["changesApplied", "filesModified", "verificationResults", "diagramUpdated"]
+    "artifacts": [
+      "Modified artifact JSON file",
+      "Modified artifact MD file"
+    ],
+    "memoryUpdates": [
+      "changesApplied",
+      "filesModified",
+      "verificationResults",
+      "diagramUpdated"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Approved update-plan.md from plan-artifact-updates step",
       "Memory contains: updatePlanRef (path to update-plan.md), artifactPath, artifactType from prior steps"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: load context → read plan → resolve files by type → read files → apply JSON → apply MD → conditional diagram update → verify (retry on failure) → update memory",
@@ -55,9 +72,7 @@
       "create": [],
       "update": [
         "Artifact JSON file (apply planned changes)",
-        "Artifact MD file (apply planned changes)",
-        "memory.json (current step section with results)",
-        "log.json (actions taken, progress)"
+        "Artifact MD file (apply planned changes)"
       ]
     },
     "tools": [
@@ -85,7 +100,14 @@
         "alternateJson": "{artifactPath}/{name}.json",
         "alternateMd": "{artifactPath}/{name}.md"
       },
-      "changeTargets": ["steps array", "parameters (required/optional)", "metadata", "references", "flow diagram", "MD documentation"],
+      "changeTargets": [
+        "steps array",
+        "parameters (required/optional)",
+        "metadata",
+        "references",
+        "flow diagram",
+        "MD documentation"
+      ],
       "diagramType": "Mermaid flowchart showing step sequence"
     },
     "step": {
@@ -93,7 +115,13 @@
         "json": "{artifactPath}/{stepName}.json",
         "md": "{artifactPath}/{stepName}.md"
       },
-      "changeTargets": ["substeps", "guidance (actions, files, tools, best practices)", "dependencies", "references", "memoryFileUsage"],
+      "changeTargets": [
+        "substeps",
+        "guidance (actions, files, tools, best practices)",
+        "dependencies",
+        "references",
+        "memoryFileUsage"
+      ],
       "diagramType": "Mermaid flowchart showing substep flow"
     },
     "process": {
@@ -101,7 +129,12 @@
         "json": "{artifactPath}/process.json",
         "md": "{artifactPath}/process.md"
       },
-      "changeTargets": ["step configuration", "parameters", "subProcessState", "metadata"],
+      "changeTargets": [
+        "step configuration",
+        "parameters",
+        "subProcessState",
+        "metadata"
+      ],
       "diagramType": null
     }
   },
@@ -200,7 +233,7 @@
       "name": "Update Memory with Results",
       "description": "Record all results to memory for the review step",
       "actions": [
-        "Update memory.json current step section with:",
+        "Record:",
         "  changesApplied: list of changes with status (applied/verified)",
         "  filesModified: list of modified file paths",
         "  verificationResults: pass/fail summary",
@@ -215,7 +248,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -225,19 +257,32 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters (artifactType, artifactPath) and previous step's plan (updatePlanRef from plan-artifact-updates)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: changesApplied, filesModified, verificationResults, diagramUpdated",
       "Decisions Made: Diagram update decision, retry decisions on verification failure"
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["update-plan.md (in process folder)"],
-    "requiredTools": ["read_file", "search_replace", "write"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "update-plan.md (in process folder)"
+    ],
+    "requiredTools": [
+      "read_file",
+      "search_replace",
+      "write"
+    ]
   },
   "references": {
-    "relatedSteps": ["plan-artifact-updates", "analyze-current-artifact-state"],
-    "usedInTemplates": ["update-process-template"]
+    "relatedSteps": [
+      "plan-artifact-updates",
+      "analyze-current-artifact-state"
+    ],
+    "usedInTemplates": [
+      "update-process-template"
+    ]
   }
 }

@@ -9,15 +9,24 @@
   },
   "output": {
     "description": "Complete step file with all sections",
-    "artifacts": [".processes/steps/{category}/{step-name}.md", ".processes/steps/{category}/{step-name}.json"],
-    "memoryUpdates": ["stepFilePath", "jsonFilePath", "validationResults"]
+    "artifacts": [
+      ".processes/steps/{category}/{step-name}.md",
+      ".processes/steps/{category}/{step-name}.json"
+    ],
+    "memoryUpdates": [
+      "stepFilePath",
+      "jsonFilePath",
+      "validationResults"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Step design completed (purpose, category, structure, flow diagram)",
       "Category directory identified"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/docs/how-to-document-flows.md"
     ],
@@ -30,9 +39,15 @@
       "Reference step-template.md for structure guidance"
     ],
     "files": {
-      "read": ["memory.json (step design from previous step)", ".processes/steps/step-template.md"],
-      "create": [".processes/steps/{category}/{step-name}.md", ".processes/steps/{category}/{step-name}.json"],
-      "update": ["memory.json (current step section with file paths and validation)"]
+      "read": [
+        "memory.json (step design from previous step)",
+        ".processes/steps/step-template.md"
+      ],
+      "create": [
+        ".processes/steps/{category}/{step-name}.md",
+        ".processes/steps/{category}/{step-name}.json"
+      ],
+      "update": []
     },
     "tools": [
       "write - Create step MD and JSON files",
@@ -131,7 +146,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -141,19 +155,32 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section (step design)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Step file path, JSON file path, validation results",
       "Files Modified/Created: Step MD file, JSON companion file"
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["step-template.md"],
-    "requiredTools": ["write", "read_file", "list_dir"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "step-template.md"
+    ],
+    "requiredTools": [
+      "write",
+      "read_file",
+      "list_dir"
+    ]
   },
   "references": {
-    "relatedSteps": ["validate-step-structure", "plan-and-design-step"],
-    "usedInTemplates": ["create-process-step-template"]
+    "relatedSteps": [
+      "validate-step-structure",
+      "plan-and-design-step"
+    ],
+    "usedInTemplates": [
+      "create-process-step-template"
+    ]
   }
 }

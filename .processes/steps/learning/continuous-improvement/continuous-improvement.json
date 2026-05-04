@@ -10,12 +10,25 @@
   },
   "output": {
     "description": "Analysis report and implemented improvements",
-    "artifacts": ["updated templates", "updated steps", "updated documentation"],
-    "memoryUpdates": ["improvementsIdentified", "improvementsImplemented", "improvementsDeferred", "summary"]
+    "artifacts": [
+      "updated templates",
+      "updated steps",
+      "updated documentation"
+    ],
+    "memoryUpdates": [
+      "improvementsIdentified",
+      "improvementsImplemented",
+      "improvementsDeferred",
+      "summary"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Process execution log (log.json) with user interactions"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Process execution log (log.json) with user interactions"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Read Process Log: Load log.json; parse all user interactions and change requests; identify patterns and recurring issues; note high iteration counts",
       "Analyze for Improvements: Group similar user corrections; identify corrections that could be automated; find missing validations; detect documentation gaps",
@@ -26,7 +39,9 @@
       "Summarize All Improvements: List improvements made (with file paths modified) and skipped; provide recommendations"
     ],
     "files": {
-      "read": [".user-processes/active/{process-name}/log.json"],
+      "read": [
+        ".user-processes/active/{process-name}/log.json"
+      ],
       "create": [],
       "update": [
         "Process templates in .processes/templates/",
@@ -156,7 +171,7 @@
         "List all improvements made",
         "List improvements skipped and why",
         "Provide recommendations for future work",
-        "Populate log.json processWideObservations.recommendationsForFuture with all recommendations from this analysis (both implemented and deferred improvements)"
+        "Record processWideObservations.recommendationsForFuture with all recommendations from this analysis (both implemented and deferred improvements)"
       ]
     },
     {
@@ -166,7 +181,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -176,7 +190,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process log (log.json)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Improvements Identified: List with descriptions",
       "Improvements Implemented: Each with Change, Files Modified, User Approval, Impact",
@@ -185,20 +199,48 @@
     ]
   },
   "improvementCategories": [
-    {"name": "Automation Opportunities", "description": "User repeatedly asked for same type of change"},
-    {"name": "Process Optimization", "description": "Steps required too many iterations"},
-    {"name": "Documentation Enhancement", "description": "User had questions documentation should answer"},
-    {"name": "Validation Strengthening", "description": "Errors caught late that could be caught early"},
-    {"name": "Context Enhancement", "description": "Missing information requiring multiple round trips"},
-    {"name": "Pattern Violations", "description": "Deviations from standards that should be enforced"}
+    {
+      "name": "Automation Opportunities",
+      "description": "User repeatedly asked for same type of change"
+    },
+    {
+      "name": "Process Optimization",
+      "description": "Steps required too many iterations"
+    },
+    {
+      "name": "Documentation Enhancement",
+      "description": "User had questions documentation should answer"
+    },
+    {
+      "name": "Validation Strengthening",
+      "description": "Errors caught late that could be caught early"
+    },
+    {
+      "name": "Context Enhancement",
+      "description": "Missing information requiring multiple round trips"
+    },
+    {
+      "name": "Pattern Violations",
+      "description": "Deviations from standards that should be enforced"
+    }
   ],
   "prioritization": {
-    "criteria": ["frequency", "impact", "ease"],
+    "criteria": [
+      "frequency",
+      "impact",
+      "ease"
+    ],
     "maxImprovements": 5,
     "focus": "high frequency + high impact + easy to implement"
   },
   "workflow": {
-    "steps": ["propose", "investigate", "implement", "approve", "document"],
+    "steps": [
+      "propose",
+      "investigate",
+      "implement",
+      "approve",
+      "document"
+    ],
     "approvalRequired": true
   },
   "successCriteria": [
@@ -209,12 +251,22 @@
     "No more high-priority improvements remain"
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["log.json"],
-    "requiredTools": ["read_file", "write", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "log.json"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "search_replace"
+    ]
   },
   "references": {
     "relatedSteps": [],
-    "usedInTemplates": ["all templates (final step)"]
+    "usedInTemplates": [
+      "all templates (final step)"
+    ]
   }
 }

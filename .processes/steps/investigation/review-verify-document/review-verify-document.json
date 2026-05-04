@@ -9,15 +9,29 @@
   },
   "output": {
     "description": "Findings report and issues list",
-    "artifacts": ["findings-report.md", "issues-list.json (if issues found)"],
-    "memoryUpdates": ["findingsReportPath", "issuesListPath", "filesReviewed", "itemsVerified", "issuesFound", "countsByCategory", "countsBySeverity", "verificationStatus"]
+    "artifacts": [
+      "findings-report.md",
+      "issues-list.json (if issues found)"
+    ],
+    "memoryUpdates": [
+      "findingsReportPath",
+      "issuesListPath",
+      "filesReviewed",
+      "itemsVerified",
+      "issuesFound",
+      "countsByCategory",
+      "countsBySeverity",
+      "verificationStatus"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Identified files list from previous step",
       "Investigation scope and verification criteria"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: read files → analyze content → verify against criteria → identify issues → categorize → document findings",
@@ -33,15 +47,17 @@
         "process.md (context parameters)",
         "Files identified in previous step"
       ],
-      "create": ["findings-report.md", "issues-list.json (if issues found)"],
-      "update": ["memory.json (current step section with all findings)", "log.json (actions taken, progress, files reviewed)"]
+      "create": [
+        "findings-report.md",
+        "issues-list.json (if issues found)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read memory.json, process.md, identified-files.json, each file for review",
       "grep - Search for specific patterns or content in files",
       "codebase_search - Understand context or find related content",
-      "write - Create report files",
-      "search_replace - Update memory.json"
+      "write - Create report files"
     ],
     "bestPractices": [
       "Review files systematically - don't skip any identified files",
@@ -120,8 +136,8 @@
       "actions": [
         "Create findings-report.md with: Executive Summary, Review Findings, Verification Results, Issues Found (if any)",
         "If issues found, create issues-list.json with structured issue data",
-        "Write summary to memory.json",
-        "Document in log.json"
+        "Record: summary",
+        "Record: actions taken"
       ]
     },
     {
@@ -131,8 +147,7 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
-        "Update log.json processWideObservations.patternsDetected with any cross-file patterns found during review (e.g., repeated code structures, shared issues across files, common anti-patterns)",
+        "Record processWideObservations.patternsDetected with any cross-file patterns found during review (e.g., repeated code structures, shared issues across files, common anti-patterns)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -142,22 +157,51 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section (identified files list, investigationScope, verificationCriteria), process.md",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Findings report path, Issues list path, Files reviewed count, Items verified count, Issues found count, Counts by category/severity, Verification status",
       "Decisions Made: Issue categorization scheme, Severity levels assigned, Verification approach",
       "Files Modified/Created: findings-report.md, issues-list.json (if issues)"
     ]
   },
-  "issueCategories": ["Missing", "Incorrect", "Violation", "Incomplete", "Format Error", "Other"],
-  "severityLevels": ["Critical", "High", "Medium", "Low"],
+  "issueCategories": [
+    "Missing",
+    "Incorrect",
+    "Violation",
+    "Incomplete",
+    "Format Error",
+    "Other"
+  ],
+  "severityLevels": [
+    "Critical",
+    "High",
+    "Medium",
+    "Low"
+  ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.json", "identified-files.json"],
-    "requiredTools": ["read_file", "grep", "codebase_search", "write", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "memory.json",
+      "identified-files.json"
+    ],
+    "requiredTools": [
+      "read_file",
+      "grep",
+      "codebase_search",
+      "write",
+      "search_replace"
+    ]
   },
   "references": {
-    "relatedSteps": ["identify-files", "propose-fixes"],
-    "usedInTemplates": ["set-concept", "review-and-verify"]
+    "relatedSteps": [
+      "identify-files",
+      "propose-fixes"
+    ],
+    "usedInTemplates": [
+      "set-concept",
+      "review-and-verify"
+    ]
   }
 }

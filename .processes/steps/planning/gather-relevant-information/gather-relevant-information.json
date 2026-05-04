@@ -10,14 +10,23 @@
   "output": {
     "description": "Gathered information stored in memory organized by source type",
     "artifacts": [],
-    "memoryUpdates": ["gatheredInformation.sources", "gatheredInformation.documentation", "gatheredInformation.codePatterns", "gatheredInformation.specifications", "gatheredInformation.externalServiceContracts", "gatheredInformation.additionalContext"]
+    "memoryUpdates": [
+      "gatheredInformation.sources",
+      "gatheredInformation.documentation",
+      "gatheredInformation.codePatterns",
+      "gatheredInformation.specifications",
+      "gatheredInformation.externalServiceContracts",
+      "gatheredInformation.additionalContext"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Information needs identified (what to gather and why)",
       "Process context established"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/planning/how-to-gather-relevant-information.md"
     ],
@@ -36,7 +45,7 @@
         ".user-processes/guidelines/planning/how-to-gather-relevant-information.md (if exists)"
       ],
       "create": [],
-      "update": ["memory.json (current step section with gatheredInformation)"]
+      "update": []
     },
     "tools": [
       "read_file - Read guideline file, documentation, code files",
@@ -161,7 +170,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -171,7 +179,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process context and previous steps for what information to gather",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: gatheredInformation object with sources, documentation, codePatterns, specifications, externalServiceContracts, additionalContext",
       "Decisions Made: Source selection, what to include/exclude",
@@ -179,20 +187,46 @@
     ]
   },
   "sourceTypes": [
-    {"type": "documentation", "description": "Project docs, READMEs, architecture decisions, design docs"},
-    {"type": "codePatterns", "description": "Existing implementations, conventions, patterns in codebase"},
-    {"type": "specifications", "description": "API specs, requirements docs, contracts, schemas"},
-    {"type": "externalServiceContracts", "description": "External API endpoints, request/response contracts, auth methods, error codes"},
-    {"type": "smeInput", "description": "Subject matter expert knowledge, clarifications, tribal knowledge"}
+    {
+      "type": "documentation",
+      "description": "Project docs, READMEs, architecture decisions, design docs"
+    },
+    {
+      "type": "codePatterns",
+      "description": "Existing implementations, conventions, patterns in codebase"
+    },
+    {
+      "type": "specifications",
+      "description": "API specs, requirements docs, contracts, schemas"
+    },
+    {
+      "type": "externalServiceContracts",
+      "description": "External API endpoints, request/response contracts, auth methods, error codes"
+    },
+    {
+      "type": "smeInput",
+      "description": "Subject matter expert knowledge, clarifications, tribal knowledge"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["read_file", "list_dir", "codebase_search", "grep"]
+    "requiredTools": [
+      "read_file",
+      "list_dir",
+      "codebase_search",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["understand-context", "get-user-story-parameters"],
-    "usedInTemplates": ["low-level-design-user-story"]
+    "relatedSteps": [
+      "understand-context",
+      "get-user-story-parameters"
+    ],
+    "usedInTemplates": [
+      "low-level-design-user-story"
+    ]
   }
 }
-

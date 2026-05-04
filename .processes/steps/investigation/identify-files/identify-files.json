@@ -9,21 +9,40 @@
   },
   "output": {
     "description": "File list and identification report",
-    "artifacts": ["identified-files.json", "deep-search-tracking.json (for deep mode)"],
-    "memoryUpdates": ["fileCount", "resultsJsonPath", "summary", "searchApproach", "exclusionsApplied", "contentPreservationFlags"]
+    "artifacts": [
+      "identified-files.json",
+      "deep-search-tracking.json (for deep mode)"
+    ],
+    "memoryUpdates": [
+      "fileCount",
+      "resultsJsonPath",
+      "summary",
+      "searchApproach",
+      "exclusionsApplied",
+      "contentPreservationFlags"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Context parameters from process.md or memory.json"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Context parameters from process.md or memory.json"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below - workflow depends on search depth mode (simple or deep)",
       "Simple mode: Agent decides search approach based on available parameters",
       "Deep mode: Exhaustive search with tracking to ensure completeness"
     ],
     "files": {
-      "read": ["memory.json or process.md (context parameters)"],
-      "create": ["identified-files.json (results file)", "deep-search-tracking.json (for deep search mode, temporary)"],
-      "update": ["memory.json (current step section with reference to JSON files)", "log.json (actions taken, progress reporting)"]
+      "read": [
+        "memory.json or process.md (context parameters)"
+      ],
+      "create": [
+        "identified-files.json (results file)",
+        "deep-search-tracking.json (for deep search mode, temporary)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read context parameters",
@@ -114,7 +133,7 @@
         "Save file list to identified-files.json",
         "Format: array of paths (default) or array of {path, matchReason, contentPreservationRequired?, preservationAction?} objects",
         "For any file flagged for content preservation, include contentPreservationRequired: true and preservationAction describing what to do (e.g., 'Move to docs/claude/ before deleting parent directory')",
-        "Write reference to memory.json with file count and path to JSON"
+        "Record: file count and path to results JSON"
       ]
     },
     {
@@ -124,7 +143,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -134,30 +152,73 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section in memory.json or process.md - context parameters (filePatterns, scope, excludePatterns, searchDepth, includeMatchReason)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: File count, Path to results JSON file, Brief summary",
       "Decisions Made: Search approach used, Search depth mode, Exclusion patterns applied"
     ]
   },
   "searchModes": [
-    {"mode": "simple", "default": true, "description": "Fast search using glob, grep, codebase_search"},
-    {"mode": "deep", "default": false, "description": "Exhaustive search with tracking"}
+    {
+      "mode": "simple",
+      "default": true,
+      "description": "Fast search using glob, grep, codebase_search"
+    },
+    {
+      "mode": "deep",
+      "default": false,
+      "description": "Exhaustive search with tracking"
+    }
   ],
   "parameters": {
-    "filePatterns": {"type": "string", "description": "Glob patterns to match"},
-    "scope": {"type": "string", "description": "Scope description for semantic search"},
-    "excludePatterns": {"type": "string", "description": "Patterns to exclude"},
-    "searchDepth": {"type": "string", "enum": ["simple", "deep"], "default": "simple"},
-    "includeMatchReason": {"type": "boolean", "default": false}
+    "filePatterns": {
+      "type": "string",
+      "description": "Glob patterns to match"
+    },
+    "scope": {
+      "type": "string",
+      "description": "Scope description for semantic search"
+    },
+    "excludePatterns": {
+      "type": "string",
+      "description": "Patterns to exclude"
+    },
+    "searchDepth": {
+      "type": "string",
+      "enum": [
+        "simple",
+        "deep"
+      ],
+      "default": "simple"
+    },
+    "includeMatchReason": {
+      "type": "boolean",
+      "default": false
+    }
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.json or process.md"],
-    "requiredTools": ["read_file", "glob_file_search", "list_dir", "grep", "codebase_search", "write"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "memory.json or process.md"
+    ],
+    "requiredTools": [
+      "read_file",
+      "glob_file_search",
+      "list_dir",
+      "grep",
+      "codebase_search",
+      "write"
+    ]
   },
   "references": {
-    "relatedSteps": ["review-verify-document"],
-    "usedInTemplates": ["set-concept", "review-and-verify"]
+    "relatedSteps": [
+      "review-verify-document"
+    ],
+    "usedInTemplates": [
+      "set-concept",
+      "review-and-verify"
+    ]
   }
 }

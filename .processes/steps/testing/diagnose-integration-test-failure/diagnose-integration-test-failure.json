@@ -10,11 +10,19 @@
   "output": {
     "description": "Root cause identified and categorized with rationale",
     "artifacts": [],
-    "memoryUpdates": ["rootCauseCategory", "analysisResults", "fixDecision"]
+    "memoryUpdates": [
+      "rootCauseCategory",
+      "analysisResults",
+      "fixDecision"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Captured failure information from previous step"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Captured failure information from previous step"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Review test failure information from previous step",
       "Validate test expectations match business requirements",
@@ -26,9 +34,15 @@
       "Document reasoning"
     ],
     "files": {
-      "read": ["memory.json (previous step)", "Test code", "Application code", "Test setup", "Docker config"],
+      "read": [
+        "memory.json (previous step)",
+        "Test code",
+        "Application code",
+        "Test setup",
+        "Docker config"
+      ],
       "create": [],
-      "update": ["memory.json (current step)"]
+      "update": []
     },
     "tools": [
       "read_file - Read test and application code",
@@ -124,7 +138,7 @@
       "description": "Document reasoning for root cause determination",
       "actions": [
         "Document decision rationale",
-        "Write root cause and fix decision to memory"
+        "Record: root cause and fix decision"
       ]
     },
     {
@@ -134,7 +148,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -144,24 +157,49 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step - captured failure information",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Root cause category, analysis results",
       "Decisions Made: What needs to be fixed and why"
     ]
   },
   "rootCauseCategories": [
-    {"category": "Test Issue", "description": "Wrong assertions, bad test data", "fixTarget": "Test code"},
-    {"category": "Code Issue", "description": "Bug in application code", "fixTarget": "Application code"},
-    {"category": "Infrastructure", "description": "Setup, Docker, mocks broken", "fixTarget": "Infrastructure/setup"}
+    {
+      "category": "Test Issue",
+      "description": "Wrong assertions, bad test data",
+      "fixTarget": "Test code"
+    },
+    {
+      "category": "Code Issue",
+      "description": "Bug in application code",
+      "fixTarget": "Application code"
+    },
+    {
+      "category": "Infrastructure",
+      "description": "Setup, Docker, mocks broken",
+      "fixTarget": "Infrastructure/setup"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Previous step memory with failure info"],
-    "requiredTools": ["read_file", "grep", "run_terminal_cmd"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Previous step memory with failure info"
+    ],
+    "requiredTools": [
+      "read_file",
+      "grep",
+      "run_terminal_cmd"
+    ]
   },
   "references": {
-    "relatedSteps": ["capture-test-failure", "implement-integration-test-fix"],
-    "usedInTemplates": ["integration-test-fix"]
+    "relatedSteps": [
+      "capture-test-failure",
+      "implement-integration-test-fix"
+    ],
+    "usedInTemplates": [
+      "integration-test-fix"
+    ]
   }
 }

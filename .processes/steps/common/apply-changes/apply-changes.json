@@ -9,15 +9,25 @@
   },
   "output": {
     "description": "Modified files and change application report",
-    "artifacts": ["changes-applied.md", "modified files"],
-    "memoryUpdates": ["changeApplicationReportPath", "totalChangesApplied", "filesModified"]
+    "artifacts": [
+      "changes-applied.md",
+      "modified files"
+    ],
+    "memoryUpdates": [
+      "changeApplicationReportPath",
+      "totalChangesApplied",
+      "filesModified"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Approved change proposals from previous step",
       "Change proposals document with detailed instructions"
     ],
-    "mandatoryComponents": ["mandatory-logging.md", "mandatory-consultation.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md",
+      "mandatory-consultation.md"
+    ],
     "specificActions": [
       "Read approved change proposals from memory (IDs list and document path)",
       "Read change proposals document to get detailed instructions",
@@ -31,8 +41,12 @@
         "Change proposals document (path from memory.json reference)",
         "Target files that need changes applied"
       ],
-      "create": ["changes-applied.md (change application report)"],
-      "update": ["Files with approved changes applied", "memory.json (current step section with results)", "log.json (actions taken, progress)"]
+      "create": [
+        "changes-applied.md (change application report)"
+      ],
+      "update": [
+        "Files with approved changes applied"
+      ]
     },
     "tools": [
       "read_file - Read memory.json, change proposals document, target files",
@@ -123,7 +137,7 @@
       "name": "Update Memory with Results",
       "description": "Update memory with change application results",
       "actions": [
-        "Write to memory.json: Change application report path, Total changes applied, List of files modified",
+        "Record: Change application report path, Total changes applied, List of files modified",
         "Log completion: 'Step complete - {count} changes applied to {count} files'"
       ]
     },
@@ -134,8 +148,7 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
-        "Update log.json processWideObservations: add any patterns detected during change application to patternsDetected, add efficiency metrics (changes applied, files modified, verification pass/fail counts) to efficiencyMetrics",
+        "Record processWideObservations: add any patterns detected during change application to patternsDetected, add efficiency metrics (changes applied, files modified, verification pass/fail counts) to efficiencyMetrics",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -145,7 +158,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section (approved change IDs list, change proposals document path)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Change application report path, Total changes applied, List of files modified",
       "Decisions Made: Any decisions during application",
@@ -154,13 +167,28 @@
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md", "mandatory-consultation.md"],
-    "requiredFiles": ["memory.json", "change proposals document"],
-    "requiredTools": ["read_file", "search_replace", "write"]
+    "requiredComponents": [
+      "mandatory-logging.md",
+      "mandatory-consultation.md"
+    ],
+    "requiredFiles": [
+      "memory.json",
+      "change proposals document"
+    ],
+    "requiredTools": [
+      "read_file",
+      "search_replace",
+      "write"
+    ]
   },
   "references": {
-    "relatedSteps": ["propose-fixes", "review-verify-document"],
-    "usedInTemplates": ["set-concept", "review-and-verify"]
+    "relatedSteps": [
+      "propose-fixes",
+      "review-verify-document"
+    ],
+    "usedInTemplates": [
+      "set-concept",
+      "review-and-verify"
+    ]
   }
 }
-

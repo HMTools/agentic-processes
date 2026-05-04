@@ -9,8 +9,15 @@
   },
   "output": {
     "description": "Complete LLD document with architecture, data flow, and technical specifications",
-    "artifacts": ["plans/{user-story-name}/lld.md"],
-    "memoryUpdates": ["lldPath", "lldSections", "approvalStatus", "keyDesignDecisions"]
+    "artifacts": [
+      "plans/{user-story-name}/lld.md"
+    ],
+    "memoryUpdates": [
+      "lldPath",
+      "lldSections",
+      "approvalStatus",
+      "keyDesignDecisions"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -18,8 +25,13 @@
       "Gathered information (from gather-relevant-information step)",
       "System analysis report (from analyze-affected-system step)"
     ],
-    "mandatoryComponents": ["mandatory-logging.md", "qa-session.md"],
-    "userGuidelines": [".user-processes/guidelines/planning/how-to-write-low-level-design.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md",
+      "qa-session.md"
+    ],
+    "userGuidelines": [
+      ".user-processes/guidelines/planning/how-to-write-low-level-design.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: read context → check guideline → apply guideline/default → create LLD → review completeness → handle gaps → present for approval → process response → update memory",
@@ -29,9 +41,14 @@
       "Revisions after user feedback return to Review completeness (substep 5)"
     ],
     "files": {
-      "read": ["memory.json (context from Steps 2, 3, 4)", ".user-processes/guidelines/planning/how-to-write-low-level-design.md"],
-      "create": ["plans/{user-story-name}/lld.md"],
-      "update": ["memory.json (current step section with LLD path and approval status)", "log.json"]
+      "read": [
+        "memory.json (context from Steps 2, 3, 4)",
+        ".user-processes/guidelines/planning/how-to-write-low-level-design.md"
+      ],
+      "create": [
+        "plans/{user-story-name}/lld.md"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read context from memory and previous step outputs",
@@ -125,7 +142,7 @@
         "If gaps can be answered by user: Conduct Q&A session following qa-session.md workflow",
         "If deeper analysis needed: Trigger feedback loop to Step 3 (gather-relevant-information)",
         "Log Q&A session results to log.json",
-        "Update memory.json with key answers"
+        "Record: key answers"
       ]
     },
     {
@@ -154,7 +171,7 @@
       "name": "Update memory",
       "description": "Record LLD path, approval status, key decisions",
       "actions": [
-        "Update memory.json with LLD document path",
+        "Record: LLD document path",
         "Record approval status",
         "Document key design decisions made"
       ]
@@ -166,7 +183,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -176,7 +192,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous steps (understand-context, gather-relevant-information, analyze-affected-system)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: LLD document path, sections included, approval status, key design decisions",
       "Decisions Made: Technical approach, architecture choices",
@@ -203,13 +219,28 @@
   },
   "approvalRequired": true,
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md", "qa-session.md"],
-    "requiredFiles": ["memory.json with context from previous steps"],
-    "requiredTools": ["read_file", "write", "codebase_search", "list_dir"]
+    "requiredComponents": [
+      "mandatory-logging.md",
+      "qa-session.md"
+    ],
+    "requiredFiles": [
+      "memory.json with context from previous steps"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "codebase_search",
+      "list_dir"
+    ]
   },
   "references": {
-    "relatedSteps": ["gather-relevant-information", "analyze-affected-system", "understand-context"],
-    "usedInTemplates": ["low-level-design-user-story"]
+    "relatedSteps": [
+      "gather-relevant-information",
+      "analyze-affected-system",
+      "understand-context"
+    ],
+    "usedInTemplates": [
+      "low-level-design-user-story"
+    ]
   }
 }
-

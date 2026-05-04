@@ -9,8 +9,17 @@
   },
   "output": {
     "description": "Service component files with interfaces and implementations",
-    "artifacts": ["Service/Managers/Interfaces/*.cs", "Service/Managers/*.cs", "Contracts.Internal/Arguments/*.cs", "Contracts.Internal/Results/*.cs"],
-    "memoryUpdates": ["serviceComponentsCreated", "interfaces", "implementations"]
+    "artifacts": [
+      "Service/Managers/Interfaces/*.cs",
+      "Service/Managers/*.cs",
+      "Contracts.Internal/Arguments/*.cs",
+      "Contracts.Internal/Results/*.cs"
+    ],
+    "memoryUpdates": [
+      "serviceComponentsCreated",
+      "interfaces",
+      "implementations"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -19,7 +28,10 @@
       "Repository layer (if data access needed)",
       "External service integrations (if applicable)"
     ],
-    "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md",
+      "pre-implementation-patterns.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/implementation/how-to-implement-services.md",
       ".user-processes/guidelines/implementation/how-to-use-dependency-injection.md",
@@ -34,14 +46,19 @@
       "Register in DI Container: Add service registration following existing patterns"
     ],
     "files": {
-      "read": ["Existing services for patterns", "Repository interfaces (if data access needed)"],
+      "read": [
+        "Existing services for patterns",
+        "Repository interfaces (if data access needed)"
+      ],
       "create": [
         "Service/Managers/Interfaces/I{Name}Manager.cs",
         "Service/Managers/{Name}Manager.cs",
         "Contracts.Internal/Arguments/{Operation}Arguments.cs",
         "Contracts.Internal/Results/{Operation}Result.cs"
       ],
-      "update": ["DI registration file"]
+      "update": [
+        "DI registration file"
+      ]
     },
     "tools": [
       "read_file - Read existing service patterns",
@@ -137,7 +154,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -147,7 +163,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step (requirements, domain models)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Service components created, interfaces, implementations",
       "Decisions Made: Pattern choices, naming decisions",
@@ -155,12 +171,36 @@
     ]
   },
   "componentTypes": [
-    {"type": "Manager", "purpose": "Orchestrate business operations", "example": "UserManager"},
-    {"type": "Calculator", "purpose": "Compute values/decisions", "example": "InterestCalculator"},
-    {"type": "Checker", "purpose": "Validate conditions", "example": "EligibilityChecker"},
-    {"type": "Validator", "purpose": "Validate input data", "example": "RequestValidator"},
-    {"type": "Publisher", "purpose": "Publish events", "example": "NotificationPublisher"},
-    {"type": "Subscriber", "purpose": "Handle events", "example": "PaymentSubscriber"}
+    {
+      "type": "Manager",
+      "purpose": "Orchestrate business operations",
+      "example": "UserManager"
+    },
+    {
+      "type": "Calculator",
+      "purpose": "Compute values/decisions",
+      "example": "InterestCalculator"
+    },
+    {
+      "type": "Checker",
+      "purpose": "Validate conditions",
+      "example": "EligibilityChecker"
+    },
+    {
+      "type": "Validator",
+      "purpose": "Validate input data",
+      "example": "RequestValidator"
+    },
+    {
+      "type": "Publisher",
+      "purpose": "Publish events",
+      "example": "NotificationPublisher"
+    },
+    {
+      "type": "Subscriber",
+      "purpose": "Handle events",
+      "example": "PaymentSubscriber"
+    }
   ],
   "contextParameters": {
     "components": {
@@ -170,12 +210,26 @@
     }
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "requiredComponents": [
+      "mandatory-logging.md",
+      "pre-implementation-patterns.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+    "requiredTools": [
+      "read_file",
+      "write",
+      "codebase_search",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["implement-repository-layer", "implement-controller-layer", "write-unit-tests-service"],
-    "usedInTemplates": ["develop-user-story"]
+    "relatedSteps": [
+      "implement-repository-layer",
+      "implement-controller-layer",
+      "write-unit-tests-service"
+    ],
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }

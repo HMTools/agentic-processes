@@ -9,15 +9,23 @@
   },
   "output": {
     "description": "Comprehensive validation report with pass/fail status",
-    "artifacts": ["validation-report"],
-    "memoryUpdates": ["validationResults", "issuesFound", "passFail"]
+    "artifacts": [
+      "validation-report"
+    ],
+    "memoryUpdates": [
+      "validationResults",
+      "issuesFound",
+      "passFail"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Step file to validate exists",
       "Both MD and JSON files present"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: read step → self-contained check → section check → diagram check → guidance check → naming check → report",
@@ -26,9 +34,12 @@
       "Naming compliance: kebab-case filename, proper title format"
     ],
     "files": {
-      "read": ["Step MD file to validate", "Step JSON file to validate"],
+      "read": [
+        "Step MD file to validate",
+        "Step JSON file to validate"
+      ],
       "create": [],
-      "update": ["memory.json (current step section with validation results)"]
+      "update": []
     },
     "tools": [
       "read_file - Read step MD and JSON files",
@@ -133,7 +144,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -143,26 +153,53 @@
   },
   "memoryFileUsage": {
     "readFrom": "Step file path from previous step or parameters",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Validation results, issues found, pass/fail status",
       "Decisions Made: Required fixes if validation failed"
     ]
   },
   "validationChecks": [
-    {"check": "Self-contained", "requirement": "No references to other steps"},
-    {"check": "Section completeness", "requirement": "All required sections present"},
-    {"check": "Diagram validation", "requirement": "Mermaid syntax correct"},
-    {"check": "Guidance quality", "requirement": "Detailed and actionable"},
-    {"check": "Naming compliance", "requirement": "Kebab-case filename"}
+    {
+      "check": "Self-contained",
+      "requirement": "No references to other steps"
+    },
+    {
+      "check": "Section completeness",
+      "requirement": "All required sections present"
+    },
+    {
+      "check": "Diagram validation",
+      "requirement": "Mermaid syntax correct"
+    },
+    {
+      "check": "Guidance quality",
+      "requirement": "Detailed and actionable"
+    },
+    {
+      "check": "Naming compliance",
+      "requirement": "Kebab-case filename"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Step file to validate"],
-    "requiredTools": ["read_file", "grep"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Step file to validate"
+    ],
+    "requiredTools": [
+      "read_file",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["create-step-file", "plan-and-design-step"],
-    "usedInTemplates": ["create-process-step-template"]
+    "relatedSteps": [
+      "create-step-file",
+      "plan-and-design-step"
+    ],
+    "usedInTemplates": [
+      "create-process-step-template"
+    ]
   }
 }

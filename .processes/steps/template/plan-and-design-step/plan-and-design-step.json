@@ -9,15 +9,26 @@
   },
   "output": {
     "description": "Complete step design including purpose, structure, and flow diagram",
-    "artifacts": ["step-design.md"],
-    "memoryUpdates": ["purpose", "category", "structurePlan", "flowDiagram", "substepsPlan", "designDocument"]
+    "artifacts": [
+      "step-design.md"
+    ],
+    "memoryUpdates": [
+      "purpose",
+      "category",
+      "structurePlan",
+      "flowDiagram",
+      "substepsPlan",
+      "designDocument"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Clear understanding of what the step should accomplish",
       "Knowledge of existing steps to avoid duplication"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: review requirements → check existing → determine category → write purpose → define use cases → plan structure → design flow → plan substeps",
@@ -27,9 +38,15 @@
       "Check .processes/steps/README.md for available categories"
     ],
     "files": {
-      "read": [".processes/steps/README.md", ".processes/steps/step-template.md", "Existing steps in relevant category"],
-      "create": ["step-design.md (readable design document in process folder)"],
-      "update": ["memory.json (current step section with design details)"]
+      "read": [
+        ".processes/steps/README.md",
+        ".processes/steps/step-template.md",
+        "Existing steps in relevant category"
+      ],
+      "create": [
+        "step-design.md (readable design document in process folder)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read existing steps and README",
@@ -151,7 +168,7 @@
         "Create step-design.md in the process folder",
         "Include: Overview, Purpose, Use Cases, Prerequisites, Output, Flow Diagram, Substeps, Decisions Made",
         "This document is easier to review than memory.json",
-        "Update memory.json with reference to design document"
+        "Record: reference to design document"
       ]
     },
     {
@@ -161,7 +178,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -171,30 +187,71 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters and context",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Purpose statement, category, structure plan, flow diagram, substeps plan",
       "Decisions Made: Category selection, design choices"
     ]
   },
   "categories": [
-    {"category": "api", "useCase": "Controller/endpoint steps"},
-    {"category": "service", "useCase": "Business logic steps"},
-    {"category": "data", "useCase": "Repository/database steps"},
-    {"category": "template", "useCase": "Template creation steps"},
-    {"category": "testing", "useCase": "Test-related steps"},
-    {"category": "planning", "useCase": "Planning/design steps"},
-    {"category": "investigation", "useCase": "Research and analysis steps"},
-    {"category": "common", "useCase": "Cross-cutting utility steps"},
-    {"category": "learning", "useCase": "Improvement steps"}
+    {
+      "category": "api",
+      "useCase": "Controller/endpoint steps"
+    },
+    {
+      "category": "service",
+      "useCase": "Business logic steps"
+    },
+    {
+      "category": "data",
+      "useCase": "Repository/database steps"
+    },
+    {
+      "category": "template",
+      "useCase": "Template creation steps"
+    },
+    {
+      "category": "testing",
+      "useCase": "Test-related steps"
+    },
+    {
+      "category": "planning",
+      "useCase": "Planning/design steps"
+    },
+    {
+      "category": "investigation",
+      "useCase": "Research and analysis steps"
+    },
+    {
+      "category": "common",
+      "useCase": "Cross-cutting utility steps"
+    },
+    {
+      "category": "learning",
+      "useCase": "Improvement steps"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["step-template.md", "steps/README.md"],
-    "requiredTools": ["read_file", "list_dir", "grep"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "step-template.md",
+      "steps/README.md"
+    ],
+    "requiredTools": [
+      "read_file",
+      "list_dir",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["create-step-file", "validate-step-structure"],
-    "usedInTemplates": ["create-process-step-template"]
+    "relatedSteps": [
+      "create-step-file",
+      "validate-step-structure"
+    ],
+    "usedInTemplates": [
+      "create-process-step-template"
+    ]
   }
 }

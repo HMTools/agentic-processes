@@ -188,6 +188,31 @@ Templates reference steps using explicit prefixes:
 - [Templates Guide](.processes/templates/README.md) - Template authoring
 - [Steps Guide](.processes/steps/README.md) - Step creation guide
 
+## Roadmap
+
+### Agentic Processes (Framework Plugin)
+- finish session hook - empty .session file
+- improve pending-interactions - add to where each option is sending to (next step, some prev step) - framework + ui
+- events - event on different life cycle acts of the processes - can be framework (global) level and template level - multiple subscriptions can be assigned to each event listener (can be also on the server app)
+- hook that blocks framework file changes by the agent- so only skills using python can change them
+- git managment - branches, tagging, work trees
+- dynamic processes / templates
+- simple `do` template / - dynamic built workflow that checks for exist steps and with final step for saving steps, guidelines and process
+- imrove continuous learning step - guide it to find things so in the future everything will be one-shot, also guide it to find improvements for better token cost effective, and context management effective
+- move processes files to .claude/agentic-processes directory
+- Q&A session skill - same hook as pending-interactions, and special ui implementation - q&a hook blocks also pending-interactions, pending-interactions not blocking q&a
+
+### Agentic Processes UI
+- improve dashboard - processses connectivity
+- add the option of using `Channel` mcp - and not directly writing to cli
+- Web-based deployment (beyond Electron)
+- steps inner flow live diagrams
+- create a persist way to see which files been modified
+- add more super easy UX ways for reviewing processes (maybe not md)
+
+### Agentic Processes Server - TBD
+- Template marketplace — discover and share community templates
+
 ## Contributing
 
 ### Adding Your Own Templates

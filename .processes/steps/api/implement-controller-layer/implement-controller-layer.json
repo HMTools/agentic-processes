@@ -9,8 +9,17 @@
   },
   "output": {
     "description": "Controller class, request/response DTOs, mapping extensions",
-    "artifacts": ["WebApi/Controllers/{category}/*.cs", "Contracts/Requests/*.cs", "Contracts/Responses/*.cs", "WebApi/Mapping/*.cs"],
-    "memoryUpdates": ["endpointsCreated", "dtosCreated", "controllerLocation"]
+    "artifacts": [
+      "WebApi/Controllers/{category}/*.cs",
+      "Contracts/Requests/*.cs",
+      "Contracts/Responses/*.cs",
+      "WebApi/Mapping/*.cs"
+    ],
+    "memoryUpdates": [
+      "endpointsCreated",
+      "dtosCreated",
+      "controllerLocation"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -18,7 +27,9 @@
       "Authentication requirements",
       "Service layer contracts (Arguments, Results)"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/api-design/how-to-implement-controllers.md",
       ".user-processes/guidelines/api-design/how-to-handle-authentication.md",
@@ -35,7 +46,10 @@
       "Create Mapping Extensions: Add mappers between DTOs and service arguments/results"
     ],
     "files": {
-      "read": ["Service layer contracts", "Existing controllers for patterns"],
+      "read": [
+        "Service layer contracts",
+        "Existing controllers for patterns"
+      ],
       "create": [
         "WebApi/Controllers/{category}/*Controller.cs",
         "Contracts/Requests/*Request.cs",
@@ -134,7 +148,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -144,27 +157,60 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step (requirements, service contracts)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Endpoints created, DTOs, controller location",
       "Files Modified/Created: Controller, DTOs, mapping extensions"
     ]
   },
   "endpointCategories": [
-    {"category": "v1", "auth": "Standard", "useCase": "Standard API endpoints"},
-    {"category": "External", "auth": "MyAccount", "useCase": "External user-facing endpoints"},
-    {"category": "Internal", "auth": "Service", "useCase": "Internal service communication"},
-    {"category": "ngv1", "auth": "Partner", "useCase": "External partner APIs"},
-    {"category": "Public", "auth": "None", "useCase": "Public endpoints"}
+    {
+      "category": "v1",
+      "auth": "Standard",
+      "useCase": "Standard API endpoints"
+    },
+    {
+      "category": "External",
+      "auth": "MyAccount",
+      "useCase": "External user-facing endpoints"
+    },
+    {
+      "category": "Internal",
+      "auth": "Service",
+      "useCase": "Internal service communication"
+    },
+    {
+      "category": "ngv1",
+      "auth": "Partner",
+      "useCase": "External partner APIs"
+    },
+    {
+      "category": "Public",
+      "auth": "None",
+      "useCase": "Public endpoints"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Service layer contracts (Arguments, Results)"],
-    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Service layer contracts (Arguments, Results)"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "codebase_search",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["implement-service-layer", "write-integration-tests-api"],
-    "usedInTemplates": ["develop-user-story"]
+    "relatedSteps": [
+      "implement-service-layer",
+      "write-integration-tests-api"
+    ],
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }
-

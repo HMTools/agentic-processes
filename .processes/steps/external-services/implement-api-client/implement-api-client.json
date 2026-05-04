@@ -9,8 +9,16 @@
   },
   "output": {
     "description": "Complete API client with contracts, settings, interface, implementation",
-    "artifacts": ["ExternalServices/*/Contracts/*.cs", "ExternalServices/*/Settings/*.cs", "ExternalServices/*/I*Client.cs", "ExternalServices/*/*Client.cs"],
-    "memoryUpdates": ["apiClientCreated", "endpointsImplemented"]
+    "artifacts": [
+      "ExternalServices/*/Contracts/*.cs",
+      "ExternalServices/*/Settings/*.cs",
+      "ExternalServices/*/I*Client.cs",
+      "ExternalServices/*/*Client.cs"
+    ],
+    "memoryUpdates": [
+      "apiClientCreated",
+      "endpointsImplemented"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -18,7 +26,10 @@
       "Authentication requirements",
       "Request/response contracts"
     ],
-    "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md",
+      "pre-implementation-patterns.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/api-design/how-to-handle-authentication.md",
       ".user-processes/guidelines/implementation/how-to-handle-errors.md"
@@ -32,7 +43,10 @@
       "Register in DI Container: Add client registration; configure HTTP client settings"
     ],
     "files": {
-      "read": ["Existing API clients for patterns", "API documentation"],
+      "read": [
+        "Existing API clients for patterns",
+        "API documentation"
+      ],
       "create": [
         "ExternalServices/{Api}/Contracts/*Request.cs",
         "ExternalServices/{Api}/Contracts/*Response.cs",
@@ -40,7 +54,10 @@
         "ExternalServices/{Api}/I{Api}Client.cs",
         "ExternalServices/{Api}/{Api}Client.cs"
       ],
-      "update": ["DI registration file", "Configuration binding"]
+      "update": [
+        "DI registration file",
+        "Configuration binding"
+      ]
     },
     "tools": [
       "read_file - Read existing API client patterns",
@@ -132,7 +149,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -142,34 +158,77 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step (API requirements, authentication details)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: API client created, endpoints implemented",
       "Files Modified/Created: Contracts, settings, interface, implementation"
     ]
   },
   "authenticationPatterns": [
-    {"pattern": "Apigee", "useCase": "Enterprise API gateway"},
-    {"pattern": "ApiKey", "useCase": "Simple key authentication"},
-    {"pattern": "OAuth", "useCase": "OAuth 2.0 flows"},
-    {"pattern": "BearerToken", "useCase": "JWT/Bearer tokens"},
-    {"pattern": "Custom", "useCase": "Custom authentication"}
+    {
+      "pattern": "Apigee",
+      "useCase": "Enterprise API gateway"
+    },
+    {
+      "pattern": "ApiKey",
+      "useCase": "Simple key authentication"
+    },
+    {
+      "pattern": "OAuth",
+      "useCase": "OAuth 2.0 flows"
+    },
+    {
+      "pattern": "BearerToken",
+      "useCase": "JWT/Bearer tokens"
+    },
+    {
+      "pattern": "Custom",
+      "useCase": "Custom authentication"
+    }
   ],
   "contextParameters": {
-    "apiName": {"required": true, "description": "Name of the external API"},
-    "serviceLocation": {"required": true, "description": "Path for API client"},
-    "authenticationPattern": {"required": true, "description": "Type of authentication"},
-    "endpoints": {"required": true, "description": "List of endpoints to implement"},
-    "settingsProperties": {"required": true, "description": "Configuration properties needed"}
+    "apiName": {
+      "required": true,
+      "description": "Name of the external API"
+    },
+    "serviceLocation": {
+      "required": true,
+      "description": "Path for API client"
+    },
+    "authenticationPattern": {
+      "required": true,
+      "description": "Type of authentication"
+    },
+    "endpoints": {
+      "required": true,
+      "description": "List of endpoints to implement"
+    },
+    "settingsProperties": {
+      "required": true,
+      "description": "Configuration properties needed"
+    }
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
-    "requiredFiles": ["API documentation"],
-    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+    "requiredComponents": [
+      "mandatory-logging.md",
+      "pre-implementation-patterns.md"
+    ],
+    "requiredFiles": [
+      "API documentation"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "codebase_search",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["implement-service-layer"],
-    "usedInTemplates": ["develop-user-story"]
+    "relatedSteps": [
+      "implement-service-layer"
+    ],
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }
-

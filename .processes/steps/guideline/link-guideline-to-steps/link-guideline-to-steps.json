@@ -9,15 +9,25 @@
   },
   "output": {
     "description": "Updated step JSON files with new userGuidelines entries",
-    "artifacts": ["Updated .processes/steps/{category}/{step-name}.json files"],
-    "memoryUpdates": ["stepsUpdated", "stepsSkipped", "guidelineLinked", "qaSession"]
+    "artifacts": [
+      "Updated .processes/steps/{category}/{step-name}.json files"
+    ],
+    "memoryUpdates": [
+      "stepsUpdated",
+      "stepsSkipped",
+      "guidelineLinked",
+      "qaSession"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Guideline file must exist (created in previous step)",
       "Guideline file path known (stored in memory.json)"
     ],
-    "mandatoryComponents": ["mandatory-logging.md", "qa-session.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md",
+      "qa-session.md"
+    ],
     "userGuidelines": [],
     "specificActions": [
       "Follow the substeps below in sequence",
@@ -33,9 +43,7 @@
         ".processes/steps/**/*.json (all step JSON files for analysis)"
       ],
       "update": [
-        "Step JSON files that user confirms",
-        "memory.json (current step section)",
-        "log.json"
+        "Step JSON files that user confirms"
       ]
     },
     "tools": [
@@ -108,7 +116,7 @@
       "description": "Verify updates were applied correctly and document changes",
       "actions": [
         "For each modified file, verify the guideline is in userGuidelines",
-        "Update memory.json with: stepsUpdated, stepsSkipped, guidelineLinked",
+        "Record: stepsUpdated, stepsSkipped, guidelineLinked",
         "Log the changes in log.json"
       ]
     },
@@ -119,7 +127,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -129,7 +136,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section - guidelineFilePath, guidelinePurpose",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: stepsUpdated (array of paths), stepsSkipped (with reasons)",
       "guidelineLinked: Path to the guideline that was added",
@@ -137,13 +144,26 @@
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md", "qa-session.md"],
-    "requiredFiles": ["Step JSON files in .processes/steps/"],
-    "requiredTools": ["read_file", "list_dir", "grep", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md",
+      "qa-session.md"
+    ],
+    "requiredFiles": [
+      "Step JSON files in .processes/steps/"
+    ],
+    "requiredTools": [
+      "read_file",
+      "list_dir",
+      "grep",
+      "search_replace"
+    ]
   },
   "references": {
-    "relatedSteps": ["create-guideline-file"],
-    "usedInTemplates": ["create-guideline"]
+    "relatedSteps": [
+      "create-guideline-file"
+    ],
+    "usedInTemplates": [
+      "create-guideline"
+    ]
   }
 }
-

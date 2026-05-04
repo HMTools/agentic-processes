@@ -22,12 +22,12 @@
       "Internalize all principles from the 'principles' array",
       "Output each principle name and rule",
       "Output confirmation: '✓ Operating principles loaded and understood'",
-      "Update memory.json with principlesLoaded: true"
+      "Record: principlesLoaded confirmation"
     ],
     "files": {
       "read": [".processes/steps/_components/operating-principles.md"],
       "create": [],
-      "update": ["memory.json"]
+      "update": []
     },
     "tools": [],
     "bestPractices": [
@@ -63,7 +63,7 @@
       "description": "Output confirmation and update memory",
       "actions": [
         "Output: '✓ Operating principles loaded and understood'",
-        "Update memory.json: principlesLoaded: true, timestamp"
+        "Record: principlesLoaded confirmation, timestamp"
       ]
     }
   ],
@@ -72,7 +72,7 @@
   },
   "memoryFileUsage": {
     "readFrom": null,
-    "writeTo": "Step 0 section in memory.json",
+    "writeTo": "Principles confirmation status",
     "fields": ["principlesLoaded: true", "timestamp"]
   },
   "dependencies": {

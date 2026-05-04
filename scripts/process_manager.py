@@ -8,6 +8,8 @@ Subcommands:
   add-memory-entry     Add or update a step entry in memory.json
   add-log-entry        Append actions to a step entry in log.json
   log-interaction      Log a user interaction in log.json (+ clear pending-log flag)
+  update-process-status    Change process status (running/completed/failed/paused)
+  update-log-observations  Update processWideObservations in log.json
   write-pending        Create or delete pending-interaction.json
 """
 
@@ -51,6 +53,24 @@ def _error(msg: str) -> None:
     json.dump({"status": "error", "message": msg}, sys.stdout)
     print()
     sys.exit(1)
+
+
+def _check_pending_log(process_dir: Path) -> None:
+    """Block state-mutating commands while a user interaction is unlogged."""
+    session_file = process_dir / ".session"
+    if not session_file.exists():
+        return
+    session_id = session_file.read_text(encoding="utf-8").strip()
+    if not session_id:
+        return
+    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "")
+    if not project_dir:
+        return
+    flag_file = Path(project_dir) / ".claude" / f"pending-log-{session_id}"
+    if flag_file.exists():
+        _error(
+            "User interaction not yet logged — call log-interaction before modifying process state"
+        )
 
 
 # --- Subcommand handlers ---
@@ -317,6 +337,53 @@ def cmd_log_interaction(args: argparse.Namespace) -> None:
     _ok("log.json")
 
 
+def cmd_update_process_status(args: argparse.Namespace) -> None:
+    process_dir = Path(args.process_dir)
+    process_path = process_dir / "process.json"
+
+    if not process_path.exists():
+        _error(f"process.json not found in {process_dir}")
+
+    data = read_json(process_path)
+    process = ProcessInstance.from_dict(data)
+
+    process.status = ProcessStatus(args.status)
+    process.metadata.lastUpdated = _now_iso()
+
+    write_json(process_path, process.to_dict())
+    _ok("process.json")
+
+
+def cmd_update_log_observations(args: argparse.Namespace) -> None:
+    process_dir = Path(args.process_dir)
+    log_path = process_dir / "log.json"
+
+    if not log_path.exists():
+        _error(f"log.json not found in {process_dir}")
+
+    data = read_json(log_path)
+    log = LogFile.from_dict(data)
+
+    if args.patterns:
+        items = json.loads(args.patterns)
+        log.processWideObservations.setdefault("patternsDetected", []).extend(items)
+
+    if args.feedback:
+        items = json.loads(args.feedback)
+        log.processWideObservations.setdefault("userFeedbackSummary", []).extend(items)
+
+    if args.metrics:
+        metrics = json.loads(args.metrics)
+        log.processWideObservations.setdefault("efficiencyMetrics", {}).update(metrics)
+
+    if args.recommendations:
+        items = json.loads(args.recommendations)
+        log.processWideObservations.setdefault("recommendationsForFuture", []).extend(items)
+
+    write_json(log_path, log.to_dict())
+    _ok("log.json")
+
+
 def cmd_write_pending(args: argparse.Namespace) -> None:
     process_dir = Path(args.process_dir)
     pending_path = process_dir / "pending-interaction.json"
@@ -406,6 +473,21 @@ def main() -> None:
     p_interact.add_argument("--potential-improvement", default=None)
     p_interact.set_defaults(func=cmd_log_interaction)
 
+    # update-process-status
+    p_pstatus = subparsers.add_parser("update-process-status", help="Change process status")
+    p_pstatus.add_argument("--process-dir", required=True)
+    p_pstatus.add_argument("--status", required=True, choices=[s.value for s in ProcessStatus])
+    p_pstatus.set_defaults(func=cmd_update_process_status)
+
+    # update-log-observations
+    p_obs = subparsers.add_parser("update-log-observations", help="Update processWideObservations in log.json")
+    p_obs.add_argument("--process-dir", required=True)
+    p_obs.add_argument("--patterns", help="JSON array of patterns detected")
+    p_obs.add_argument("--feedback", help="JSON array of user feedback summaries")
+    p_obs.add_argument("--metrics", help="JSON object of efficiency metrics")
+    p_obs.add_argument("--recommendations", help="JSON array of recommendations for future")
+    p_obs.set_defaults(func=cmd_update_log_observations)
+
     # write-pending
     p_pending = subparsers.add_parser("write-pending", help="Create/delete pending interaction")
     p_pending.add_argument("--process-dir", required=True)
@@ -413,7 +495,17 @@ def main() -> None:
     p_pending.add_argument("--delete", action="store_true", help="Delete pending-interaction.json")
     p_pending.set_defaults(func=cmd_write_pending)
 
+    _GATED_COMMANDS = {
+        "update-step-status",
+        "update-current-state",
+        "add-memory-entry",
+        "update-process-status",
+        "write-pending",
+    }
+
     parsed = parser.parse_args()
+    if parsed.command in _GATED_COMMANDS:
+        _check_pending_log(Path(parsed.process_dir))
     try:
         parsed.func(parsed)
     except json.JSONDecodeError as e:

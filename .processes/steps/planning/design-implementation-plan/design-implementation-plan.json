@@ -9,8 +9,18 @@
   },
   "output": {
     "description": "Implementation plan document with change proposals",
-    "artifacts": ["implementation-plan.md"],
-    "memoryUpdates": ["implementationPlanPath", "requestedState", "totalChangeProposals", "filesToModify", "filesToCreate", "approvalStatus", "approvedChangeIds"]
+    "artifacts": [
+      "implementation-plan.md"
+    ],
+    "memoryUpdates": [
+      "implementationPlanPath",
+      "requestedState",
+      "totalChangeProposals",
+      "filesToModify",
+      "filesToCreate",
+      "approvalStatus",
+      "approvedChangeIds"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -18,7 +28,9 @@
       "Findings report with current state analysis",
       "Process parameters (conceptDescription, requestedState, verificationCriteria)"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Read Context from Previous Steps: Read from memory.json (concept definition, findings, gaps); read from process.md (conceptDescription, requestedState, verificationCriteria); read the findings report to understand current state",
       "Understand Requested State: If requestedState parameter provided, use as specification; if NOT provided, derive from concept description and characteristics; document requested state specification clearly",
@@ -28,14 +40,20 @@
       "Present Plan and Get Approval: Present implementation-plan.md to user; explain approval options; wait for user response; log user interaction before processing"
     ],
     "files": {
-      "read": ["memory.json", "process.md", "findings report", "target files"],
-      "create": ["implementation-plan.md"],
-      "update": ["memory.json", "log.json"]
+      "read": [
+        "memory.json",
+        "process.md",
+        "findings report",
+        "target files"
+      ],
+      "create": [
+        "implementation-plan.md"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read context from memory, process, findings, target files",
-      "write - Create implementation-plan.md",
-      "search_replace - Update memory.json and log.json"
+      "write - Create implementation-plan.md"
     ],
     "bestPractices": [
       "Be specific: Change proposals should be detailed enough for next step to apply without ambiguity",
@@ -176,9 +194,9 @@
     {
       "number": 12,
       "name": "Update memory with approval status",
-      "description": "Update memory.json with plan summary and approval status",
+      "description": "Record plan summary and approval status",
       "actions": [
-        "Write to memory.json current step section",
+        "Record: plan summary and approval status",
         "Include: implementation plan path, total proposals, files to modify/create",
         "Include: approval status, list of approved Change IDs"
       ]
@@ -190,7 +208,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -200,7 +217,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous steps (concept definition, findings, gaps), process.md parameters",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Implementation plan path, Requested state specification, Total change proposals count, Files to modify/create lists",
       "Decisions Made: Implementation approach, Change proposal priorities",
@@ -210,21 +227,49 @@
   "changeProposalFormat": {
     "modification": {
       "prefix": "MOD",
-      "fields": ["File path", "Type: modification", "Current state", "Requested state", "Detailed instructions", "Rationale"]
+      "fields": [
+        "File path",
+        "Type: modification",
+        "Current state",
+        "Requested state",
+        "Detailed instructions",
+        "Rationale"
+      ]
     },
     "newFile": {
       "prefix": "NEW",
-      "fields": ["File path", "Type: new_file", "Content specification", "Rationale"]
+      "fields": [
+        "File path",
+        "Type: new_file",
+        "Content specification",
+        "Rationale"
+      ]
     }
   },
   "approvalRequired": true,
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.json", "process.md", "findings-report"],
-    "requiredTools": ["read_file", "write", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "memory.json",
+      "process.md",
+      "findings-report"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "search_replace"
+    ]
   },
   "references": {
-    "relatedSteps": ["understand-context", "review-verify-document", "apply-changes"],
-    "usedInTemplates": ["set-concept"]
+    "relatedSteps": [
+      "understand-context",
+      "review-verify-document",
+      "apply-changes"
+    ],
+    "usedInTemplates": [
+      "set-concept"
+    ]
   }
 }

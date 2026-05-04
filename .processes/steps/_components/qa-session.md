@@ -46,33 +46,11 @@ I need the following information to continue:
 
 ### 4. Log Q&A Session
 
-Log to `log.json` under current step's section:
-
-```json
-{
-  "qaSession": {
-    "timestamp": "YYYY-MM-DDTHH:mm:ssZ",
-    "questionsAsked": [
-      {
-        "id": "Q1",
-        "topic": "Topic name",
-        "question": "The question asked",
-        "priority": "required | optional",
-        "context": "Why this was needed"
-      }
-    ],
-    "answersReceived": [
-      {
-        "questionId": "Q1",
-        "answer": "User's answer",
-        "timestamp": "YYYY-MM-DDTHH:mm:ssZ"
-      }
-    ],
-    "unansweredQuestions": ["Q2"],
-    "outcome": "all_answered | partial | deferred"
-  }
-}
-```
+Record Q&A session results:
+- Questions asked (id, topic, question, priority, context)
+- Answers received (question id, answer, timestamp)
+- Unanswered questions
+- Outcome (all_answered, partial, deferred)
 
 ### 5. Handle Outcomes
 
@@ -92,24 +70,9 @@ Log to `log.json` under current step's section:
 
 ## Memory File Integration
 
-Update `memory.json` with Q&A results:
-
-```json
-{
-  "steps": {
-    "stepN": {
-      "qaSession": {
-        "conducted": true,
-        "questionsCount": 3,
-        "answeredCount": 2,
-        "keyAnswers": {
-          "topic1": "answer summary",
-          "topic2": "answer summary"
-        },
-        "assumptions": ["assumption if any question was unanswered"]
-      }
-    }
-  }
-}
-```
+Record Q&A results for future steps:
+- Whether a Q&A session was conducted
+- Number of questions asked and answered
+- Key answers (topic and answer summary)
+- Assumptions made if any questions were unanswered
 

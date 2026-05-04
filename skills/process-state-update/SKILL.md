@@ -122,6 +122,35 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py write-pending \
 
 ---
 
+### update-process-status
+
+Change the top-level process status in `process.json`.
+
+```
+python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-process-status \
+  --process-dir <dir> \
+  --status <running|completed|failed|paused>
+```
+
+---
+
+### update-log-observations
+
+Append entries to the `processWideObservations` section of `log.json`. Used by steps like `apply-changes`, `review-verify-document`, and `continuous-improvement` to record cross-step patterns and recommendations.
+
+```
+python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-log-observations \
+  --process-dir <dir> \
+  --patterns '["pattern 1", "pattern 2"]' \
+  --feedback '["user feedback summary"]' \
+  --metrics '{"key": "value"}' \
+  --recommendations '["recommendation 1"]'
+```
+
+All flags are optional — only provided fields are appended/merged.
+
+---
+
 ## Important Rules
 
 - **Never use Write/Edit** directly on `process.json`, `memory.json`, `log.json`, or `pending-interaction.json`

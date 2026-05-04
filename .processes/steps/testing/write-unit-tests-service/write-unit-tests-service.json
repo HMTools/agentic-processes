@@ -9,15 +9,24 @@
   },
   "output": {
     "description": "Unit test files with full code coverage",
-    "artifacts": ["Tests/UnitTests/{ServiceName}Tests.cs"],
-    "memoryUpdates": ["testFilesCreated", "coveragePercentage", "testCountByCategory"]
+    "artifacts": [
+      "Tests/UnitTests/{ServiceName}Tests.cs"
+    ],
+    "memoryUpdates": [
+      "testFilesCreated",
+      "coveragePercentage",
+      "testCountByCategory"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Service layer implementation completed",
       "Business logic finalized"
     ],
-    "mandatoryComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md",
+      "pre-implementation-patterns.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/testing/how-to-write-unit-tests.md",
       ".user-processes/guidelines/testing/how-to-mock-dependencies.md"
@@ -32,8 +41,13 @@
       "Verify Full Coverage: Run tests; check coverage; add missing tests until 100%"
     ],
     "files": {
-      "read": ["Service implementation", "Existing unit tests for patterns"],
-      "create": ["Tests/UnitTests/{ServiceName}Tests.cs"],
+      "read": [
+        "Service implementation",
+        "Existing unit tests for patterns"
+      ],
+      "create": [
+        "Tests/UnitTests/{ServiceName}Tests.cs"
+      ],
       "update": []
     },
     "tools": [
@@ -143,7 +157,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -153,7 +166,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step (service implementation)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Test files created, coverage percentage, test count by category",
       "Decisions Made: Mock patterns used, helper classes created"
@@ -166,18 +179,41 @@
     "helperCreation": "If mocking same method 3+ times"
   },
   "contextParameters": {
-    "serviceName": {"description": "Name of the service to test"},
-    "serviceNamespace": {"description": "Namespace of the service"},
-    "methodsToTest": {"description": "List of service methods needing coverage"},
-    "dependencies": {"description": "List of dependencies to mock"}
+    "serviceName": {
+      "description": "Name of the service to test"
+    },
+    "serviceNamespace": {
+      "description": "Namespace of the service"
+    },
+    "methodsToTest": {
+      "description": "List of service methods needing coverage"
+    },
+    "dependencies": {
+      "description": "List of dependencies to mock"
+    }
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md", "pre-implementation-patterns.md"],
-    "requiredFiles": ["Service implementation"],
-    "requiredTools": ["read_file", "write", "codebase_search", "grep"]
+    "requiredComponents": [
+      "mandatory-logging.md",
+      "pre-implementation-patterns.md"
+    ],
+    "requiredFiles": [
+      "Service implementation"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "codebase_search",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["implement-service-layer", "write-integration-tests-api"],
-    "usedInTemplates": ["develop-user-story"]
+    "relatedSteps": [
+      "implement-service-layer",
+      "write-integration-tests-api"
+    ],
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }

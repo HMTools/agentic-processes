@@ -9,15 +9,24 @@
   },
   "output": {
     "description": "Complete template file with all sections",
-    "artifacts": [".processes/templates/{category}/{template-name}.md", ".processes/templates/{category}/{template-name}.json"],
-    "memoryUpdates": ["templateFilePath", "jsonFilePath", "validationResults"]
+    "artifacts": [
+      ".processes/templates/{category}/{template-name}.md",
+      ".processes/templates/{category}/{template-name}.json"
+    ],
+    "memoryUpdates": [
+      "templateFilePath",
+      "jsonFilePath",
+      "validationResults"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Template design completed (purpose, parameters, steps, flow diagram)",
       "All referenced steps exist or are identified for creation"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/docs/how-to-document-flows.md"
     ],
@@ -31,9 +40,15 @@
       "CRITICAL: Only create template files in this step. Do NOT create step files — missing steps are handled later by validate-process-steps-exist via sub-processes"
     ],
     "files": {
-      "read": ["memory.json (template design from previous step)", ".processes/templates/template-template.md (if exists)"],
-      "create": [".processes/templates/{category}/{template-name}.md", ".processes/templates/{category}/{template-name}.json"],
-      "update": ["memory.json (current step section with file paths and validation)"]
+      "read": [
+        "memory.json (template design from previous step)",
+        ".processes/templates/template-template.md (if exists)"
+      ],
+      "create": [
+        ".processes/templates/{category}/{template-name}.md",
+        ".processes/templates/{category}/{template-name}.json"
+      ],
+      "update": []
     },
     "tools": [
       "write - Create template MD and JSON files",
@@ -135,7 +150,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -145,19 +159,30 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section (template design)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Template file path, JSON file path, validation results",
       "Files Modified/Created: Template MD file, JSON companion file"
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["write", "read_file", "list_dir"]
+    "requiredTools": [
+      "write",
+      "read_file",
+      "list_dir"
+    ]
   },
   "references": {
-    "relatedSteps": ["plan-and-design-template", "validate-process-steps-exist"],
-    "usedInTemplates": ["create-process-template"]
+    "relatedSteps": [
+      "plan-and-design-template",
+      "validate-process-steps-exist"
+    ],
+    "usedInTemplates": [
+      "create-process-template"
+    ]
   }
 }

@@ -10,11 +10,19 @@
   "output": {
     "description": "Complete failure information documented",
     "artifacts": [],
-    "memoryUpdates": ["errorMessages", "stackTraces", "failurePoint"]
+    "memoryUpdates": [
+      "errorMessages",
+      "stackTraces",
+      "failurePoint"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Failing test identified"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Failing test identified"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Run the specific failing test in isolation",
       "Capture complete error message and exception type",
@@ -26,9 +34,12 @@
       "Check if failure is consistent or intermittent"
     ],
     "files": {
-      "read": ["Test class file", "Test output logs"],
+      "read": [
+        "Test class file",
+        "Test output logs"
+      ],
       "create": [],
-      "update": ["memory.json"]
+      "update": []
     },
     "tools": [
       "run_terminal_cmd - Run test: dotnet test --filter \"FullyQualifiedName~{testClass}.{testName}\"",
@@ -115,9 +126,9 @@
       "name": "Store findings in memory",
       "description": "Document all findings in memory.json",
       "actions": [
-        "Write error messages to memory",
-        "Write stack traces to memory",
-        "Write failure point to memory"
+        "Record: error messages",
+        "Record: stack traces",
+        "Record: failure point"
       ]
     },
     {
@@ -127,7 +138,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -137,25 +147,47 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters (test class, test name)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Error messages, stack traces, failure point",
       "Decisions Made: Failure consistency (intermittent vs consistent)"
     ]
   },
   "captureTypes": [
-    {"type": "Error message", "capture": "Exception type and message"},
-    {"type": "Stack trace", "capture": "Full trace showing failure point"},
-    {"type": "Test logs", "capture": "Setup, execution, teardown logs"},
-    {"type": "Infrastructure", "capture": "Docker, database, queue errors"}
+    {
+      "type": "Error message",
+      "capture": "Exception type and message"
+    },
+    {
+      "type": "Stack trace",
+      "capture": "Full trace showing failure point"
+    },
+    {
+      "type": "Test logs",
+      "capture": "Setup, execution, teardown logs"
+    },
+    {
+      "type": "Infrastructure",
+      "capture": "Docker, database, queue errors"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["run_terminal_cmd", "read_file"]
+    "requiredTools": [
+      "run_terminal_cmd",
+      "read_file"
+    ]
   },
   "references": {
-    "relatedSteps": ["diagnose-integration-test-failure", "implement-integration-test-fix"],
-    "usedInTemplates": ["integration-test-fix"]
+    "relatedSteps": [
+      "diagnose-integration-test-failure",
+      "implement-integration-test-fix"
+    ],
+    "usedInTemplates": [
+      "integration-test-fix"
+    ]
   }
 }

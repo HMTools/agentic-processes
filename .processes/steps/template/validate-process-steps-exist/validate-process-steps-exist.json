@@ -9,15 +9,23 @@
   },
   "output": {
     "description": "Validation report of existing vs. missing process-steps",
-    "artifacts": ["validation-report"],
-    "memoryUpdates": ["validationResults", "missingStepsList", "spawnedSubProcesses"]
+    "artifacts": [
+      "validation-report"
+    ],
+    "memoryUpdates": [
+      "validationResults",
+      "missingStepsList",
+      "spawnedSubProcesses"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Template file to validate exists",
       "Template contains @framework-step references"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: read template → extract references → check existence → create report → handle missing",
@@ -26,9 +34,12 @@
       "If missing steps found: either spawn sub-processes or PAUSE for manual creation"
     ],
     "files": {
-      "read": ["Template file to validate", ".processes/steps/{category}/{step-name}.md for each reference"],
+      "read": [
+        "Template file to validate",
+        ".processes/steps/{category}/{step-name}.md for each reference"
+      ],
       "create": [],
-      "update": ["memory.json (current step section with validation results)"]
+      "update": []
     },
     "tools": [
       "read_file - Read template and check step files",
@@ -121,7 +132,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -131,7 +141,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Template file path from previous step",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Validation results, missing steps list, spawned sub-processes (if any)",
       "Decisions Made: How to handle missing steps"
@@ -139,8 +149,12 @@
   },
   "parameters": {
     "required": [],
-    "optional": ["autoSpawnMissing"],
-    "defaults": {"autoSpawnMissing": false}
+    "optional": [
+      "autoSpawnMissing"
+    ],
+    "defaults": {
+      "autoSpawnMissing": false
+    }
   },
   "subProcessSupport": {
     "canSpawnSubProcesses": true,
@@ -153,12 +167,25 @@
     "location": ".processes/steps/category/step-name.md"
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Template file to validate"],
-    "requiredTools": ["read_file", "grep", "list_dir"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Template file to validate"
+    ],
+    "requiredTools": [
+      "read_file",
+      "grep",
+      "list_dir"
+    ]
   },
   "references": {
-    "relatedSteps": ["create-template-file", "validate-step-structure"],
-    "usedInTemplates": ["create-process-template"]
+    "relatedSteps": [
+      "create-template-file",
+      "validate-step-structure"
+    ],
+    "usedInTemplates": [
+      "create-process-template"
+    ]
   }
 }

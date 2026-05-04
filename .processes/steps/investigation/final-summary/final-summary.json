@@ -9,15 +9,24 @@
   },
   "output": {
     "description": "Final summary document",
-    "artifacts": ["final-summary.md"],
-    "memoryUpdates": ["finalSummaryPath", "overallConclusion", "finalVerificationStatus", "recommendations"]
+    "artifacts": [
+      "final-summary.md"
+    ],
+    "memoryUpdates": [
+      "finalSummaryPath",
+      "overallConclusion",
+      "finalVerificationStatus",
+      "recommendations"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "All previous investigation steps completed",
       "Data available in memory from previous steps"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Read all investigation data from previous steps in memory",
       "Compile into organized sections",
@@ -31,13 +40,14 @@
         "process.md (context parameters if not in memory)",
         "findings-report.md, issues-list.json, fix-proposals.md (if created)"
       ],
-      "create": ["final-summary.md (comprehensive final summary document)"],
-      "update": ["memory.json (current step section with summary path and conclusion)", "log.json (actions taken, progress)"]
+      "create": [
+        "final-summary.md (comprehensive final summary document)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read memory.json, process.md, report files",
-      "write - Create final-summary.md",
-      "search_replace - Update memory.json"
+      "write - Create final-summary.md"
     ],
     "bestPractices": [
       "Read systematically from all previous steps in memory.json",
@@ -112,7 +122,7 @@
       "name": "Update Memory",
       "description": "Update memory with summary path and conclusion",
       "actions": [
-        "Write to memory.json: Final summary document path, Overall conclusion, Final verification status, Recommendations"
+        "Record: Final summary document path, Overall conclusion, Final verification status, Recommendations"
       ]
     },
     {
@@ -122,7 +132,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -132,15 +141,24 @@
   },
   "memoryFileUsage": {
     "readFrom": "All previous step sections in memory.json (scope, files, findings, issues, fixes, verification)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Final summary document path, Overall conclusion, Final verification status, Recommendations"
     ]
   },
   "summaryScenarios": [
-    {"scenario": "No issues found", "content": "Success message, verification passed"},
-    {"scenario": "Issues found, not fixed", "content": "Issues summary, recommendations"},
-    {"scenario": "Issues found and fixed", "content": "Fixes applied, verification status"}
+    {
+      "scenario": "No issues found",
+      "content": "Success message, verification passed"
+    },
+    {
+      "scenario": "Issues found, not fixed",
+      "content": "Issues summary, recommendations"
+    },
+    {
+      "scenario": "Issues found and fixed",
+      "content": "Fixes applied, verification status"
+    }
   ],
   "summarySections": [
     "Executive Summary",
@@ -155,12 +173,29 @@
     "Conclusion"
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.json", "findings-report.md (if exists)", "issues-list.json (if exists)", "fix-proposals.md (if exists)"],
-    "requiredTools": ["read_file", "write", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "memory.json",
+      "findings-report.md (if exists)",
+      "issues-list.json (if exists)",
+      "fix-proposals.md (if exists)"
+    ],
+    "requiredTools": [
+      "read_file",
+      "write",
+      "search_replace"
+    ]
   },
   "references": {
-    "relatedSteps": ["review-verify-document", "propose-fixes", "apply-changes"],
-    "usedInTemplates": ["review-and-verify"]
+    "relatedSteps": [
+      "review-verify-document",
+      "propose-fixes",
+      "apply-changes"
+    ],
+    "usedInTemplates": [
+      "review-and-verify"
+    ]
   }
 }

@@ -10,11 +10,18 @@
   "output": {
     "description": "Test verification results and debug cleanup",
     "artifacts": [],
-    "memoryUpdates": ["testResults", "finalStatus"]
+    "memoryUpdates": [
+      "testResults",
+      "finalStatus"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Implemented fix from previous step"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Implemented fix from previous step"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Run the specific test that was failing",
       "Capture complete test output",
@@ -23,9 +30,14 @@
       "If failed: Capture new failure information; present to user; offer options (revise analysis, add diagnostics, end process); wait for user decision"
     ],
     "files": {
-      "read": ["memory.json (previous step)", "Files with debug logging"],
+      "read": [
+        "memory.json (previous step)",
+        "Files with debug logging"
+      ],
       "create": [],
-      "update": ["Files to clean debug code from"]
+      "update": [
+        "Files to clean debug code from"
+      ]
     },
     "tools": [
       "run_terminal_cmd - Run test: dotnet test --filter \"FullyQualifiedName~{testClass}.{testName}\"",
@@ -91,7 +103,7 @@
       "description": "Record final outcome in memory",
       "actions": [
         "Document test results",
-        "Write final status to memory.json"
+        "Record: final status"
       ]
     },
     {
@@ -101,7 +113,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -111,23 +122,42 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step - files modified",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Test results, final status",
       "Decisions Made: Success/failure, next steps (if failed)"
     ]
   },
   "results": [
-    {"result": "Pass", "action": "Clean up debug logging, document success"},
-    {"result": "Fail", "action": "Capture new failure, present user options"}
+    {
+      "result": "Pass",
+      "action": "Clean up debug logging, document success"
+    },
+    {
+      "result": "Fail",
+      "action": "Capture new failure, present user options"
+    }
   ],
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Previous step memory"],
-    "requiredTools": ["run_terminal_cmd", "search_replace", "read_file"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Previous step memory"
+    ],
+    "requiredTools": [
+      "run_terminal_cmd",
+      "search_replace",
+      "read_file"
+    ]
   },
   "references": {
-    "relatedSteps": ["implement-integration-test-fix", "capture-test-failure"],
-    "usedInTemplates": ["integration-test-fix"]
+    "relatedSteps": [
+      "implement-integration-test-fix",
+      "capture-test-failure"
+    ],
+    "usedInTemplates": [
+      "integration-test-fix"
+    ]
   }
 }

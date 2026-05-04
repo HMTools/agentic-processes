@@ -24,14 +24,13 @@ You will receive:
 1. **Validate template exists** in `.processes/templates/`
 2. **Create process directory**: `.user-processes/active/process-{name}-{YYYYMMDD}/`
 3. **Create process files** using the `process-new` skill:
-   - Use `process_manager.py create-process` to create all state files (process.json, memory.json, log.json)
+   - Use the `process-new` skill to create all state files (process.json, memory.json, log.json)
    - Never use Write/Edit tools directly on process state files
-   - See `skills/process-state-update/SKILL.md` for the invocation pattern
    - Write `process.md` directly (it's documentation, not state)
 
 4. **Handle sub-process creation** (if parent context provided):
-   - Pass `--parent-process-path` to `process_manager.py create-process`
-   - Update parent's memory.json childSubProcesses array via `process_manager.py add-memory-entry`
+   - Use the `process-new` skill with parent process path context
+   - Use the `process-state-update` skill to register child in parent's memory
 
 5. **Return process info**:
    - Process ID

@@ -8,8 +8,13 @@
     "lastUpdated": "2026-01-21"
   },
   "parameters": {
-    "required": ["template", "parameters"],
-    "optional": ["syncPoint"],
+    "required": [
+      "template",
+      "parameters"
+    ],
+    "optional": [
+      "syncPoint"
+    ],
     "defaults": {
       "syncPoint": "immediate"
     },
@@ -22,38 +27,55 @@
       "parameters": {
         "description": "Parameters to pass to the sub-process",
         "type": "object",
-        "example": { "stepName": "my-step", "category": "common" }
+        "example": {
+          "stepName": "my-step",
+          "category": "common"
+        }
       },
       "syncPoint": {
         "description": "When parent waits for sub-process completion",
         "type": "string",
-        "enum": ["immediate", "step-N", "end"],
+        "enum": [
+          "immediate",
+          "step-N",
+          "end"
+        ],
         "default": "immediate"
       }
     }
   },
   "output": {
     "description": "Sub-process created with parent reference, parent memory updated",
-    "artifacts": ["sub-process directory", "parent memory update"]
+    "artifacts": [
+      "sub-process directory",
+      "parent memory update"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Parent process must be active"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Parent process must be active"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Determine Sub-Process Configuration: Identify template to use; gather parameters for the sub-process; determine sync point (when parent should wait)",
       "Create Sub-Process: Use /process-new with the specified template; pass parent process path as context; sub-process memory will have parent reference",
-      "Update Parent Memory: Add entry to parent's 'Child Sub-Processes' table in memory.json with name, template, status=running, spawned at step, sync point",
+      "Update Parent Memory: Record child sub-process reference in parent with name, template, status=running, spawned at step, sync point",
       "Handle Sync Point: If 'immediate', wait for sub-process to complete before continuing; if deferred ('step-N' or 'end'), continue parent process"
     ],
     "files": {
-      "read": ["Parent process.md", "Parent memory.json"],
-      "create": ["Sub-process directory and files"],
-      "update": ["Parent memory.json (add child reference)"]
+      "read": [
+        "Parent process.md",
+        "Parent memory.json"
+      ],
+      "create": [
+        "Sub-process directory and files"
+      ],
+      "update": []
     },
     "tools": [
-      "read_file - Read parent process state",
-      "write - Create sub-process files",
-      "search_replace - Update parent memory"
+      "read_file - Read parent process state"
     ],
     "bestPractices": [
       "Use 'immediate' sync for delegation (need result before continuing)",
@@ -102,10 +124,9 @@
     {
       "number": 4,
       "name": "Update parent memory with child reference",
-      "description": "Add sub-process to parent's tracking table",
+      "description": "Use process-state-update skill to register child sub-process in parent",
       "actions": [
-        "Add entry to parent's 'Child Sub-Processes' table:",
-        "| {name} | {template} | running | Step {N} | {syncPoint} |"
+        "Use process-state-update skill to add child sub-process entry to parent memory (name, template, status=running, spawned at step, sync point)"
       ]
     },
     {
@@ -124,7 +145,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -134,12 +154,16 @@
   },
   "memoryFileUsage": {
     "readFrom": "Parent memory.json (to add child reference)",
-    "writeTo": "Parent memory.json (add to Child Sub-Processes table), Sub-process memory.json (set parent reference)",
+    "writeTo": "Parent-child process linkage",
     "fields": []
   },
   "references": {
-    "relatedSteps": ["notify-parent-complete"],
-    "usedInTemplates": ["create-process-template", "develop-user-story"]
+    "relatedSteps": [
+      "notify-parent-complete"
+    ],
+    "usedInTemplates": [
+      "create-process-template",
+      "develop-user-story"
+    ]
   }
 }
-

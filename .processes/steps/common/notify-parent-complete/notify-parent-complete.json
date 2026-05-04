@@ -9,7 +9,10 @@
   },
   "parameters": {
     "required": [],
-    "optional": ["status", "summary"],
+    "optional": [
+      "status",
+      "summary"
+    ],
     "defaults": {
       "status": "completed"
     },
@@ -17,7 +20,10 @@
       "status": {
         "description": "Completion status",
         "type": "string",
-        "enum": ["completed", "failed"],
+        "enum": [
+          "completed",
+          "failed"
+        ],
         "default": "completed"
       },
       "summary": {
@@ -29,25 +35,33 @@
   },
   "output": {
     "description": "Parent memory updated with completion status",
-    "artifacts": ["parent memory update"]
+    "artifacts": [
+      "parent memory update"
+    ]
   },
   "guidance": {
-    "prerequisites": ["This must be a sub-process with a parent reference"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "This must be a sub-process with a parent reference"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Check if Sub-Process: Read own memory.json 'Sub-Process State' section; check 'Parent Process' field; if 'None' or not a sub-process, skip this step",
       "Read Parent Memory: Locate parent process directory from parent reference; read parent's memory.json",
       "Update Parent's Child Sub-Processes Table: Find this sub-process entry; update status from 'running' to 'completed' (or 'failed'); add completion summary if provided",
-      "Write Parent Memory: Save updated parent memory.json; parent will see completion when it continues"
+      "Write Parent Memory: Update parent process with child completion status; parent will see completion when it continues"
     ],
     "files": {
-      "read": ["Own memory.json (get parent reference)", "Parent memory.json"],
+      "read": [
+        "Own memory.json (get parent reference)",
+        "Parent memory.json"
+      ],
       "create": [],
-      "update": ["Parent memory.json (update child status)"]
+      "update": []
     },
     "tools": [
-      "read_file - Read memory files",
-      "search_replace - Update parent memory"
+      "read_file - Read memory files"
     ],
     "bestPractices": [
       "Always check if this is a sub-process first",
@@ -113,10 +127,10 @@
     },
     {
       "number": 6,
-      "name": "Write updated parent memory",
-      "description": "Save the updated parent memory file",
+      "name": "Update parent memory via skill",
+      "description": "Use process-state-update skill to update parent memory with child completion status",
       "actions": [
-        "Write updated parent memory.json",
+        "Use process-state-update skill to update parent's child sub-process status to completed",
         "Parent will detect completion at sync points via process-continue"
       ]
     },
@@ -127,7 +141,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -137,7 +150,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Own memory.json (parent reference), Parent memory.json (child entry)",
-    "writeTo": "Parent memory.json (update Child Sub-Processes table)",
+    "writeTo": "Parent process child completion status",
     "fields": []
   },
   "notes": {
@@ -145,8 +158,9 @@
     "skipCondition": "Skip if process has no parent (is a root process)"
   },
   "references": {
-    "relatedSteps": ["spawn-sub-process"],
+    "relatedSteps": [
+      "spawn-sub-process"
+    ],
     "usedInTemplates": []
   }
 }
-

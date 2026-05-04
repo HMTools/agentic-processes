@@ -62,14 +62,9 @@ Present clear summary of:
 
 ### 6. Update Current State
 
-Update process state to reflect resumption using `process_manager.py`:
-```
-Bash(python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-current-state \
-  --process-dir <process directory> \
-  --step-id <next step UUID> \
-  --step-name "<step name>" \
-  --summary "Resuming process")
-```
+Update process state to reflect resumption using the `process-state-update` skill:
+- Set the current step to the next incomplete step
+- Include step ID, step name, and resumption summary
 
 ### 7. Proceed with Step Delegation
 
@@ -78,8 +73,8 @@ Bash(python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-current-state \
 - Wait for subagent completion (foreground execution)
 - Verify step completed successfully
 - **Handle approval checkpoints**: If step has `approvalRequired: true`, present deliverables and wait for approval
-- **Handle user corrections**: Log via `process_manager.py log-interaction`, delegate correction to subagent, re-present
-- After step completion, update process state and offer to continue
+- **Handle user corrections**: Log interaction via `process-state-update` skill, delegate correction to subagent, re-present
+- After step completion, update process state and proceed to the next step
 
 ## State Restoration
 

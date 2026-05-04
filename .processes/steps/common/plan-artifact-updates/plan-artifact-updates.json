@@ -8,8 +8,15 @@
     "lastUpdated": "2026-02-06"
   },
   "parameters": {
-    "required": ["artifactType", "artifactPath", "updateDescription"],
-    "optional": ["changeScope", "preserveActiveConsumers"],
+    "required": [
+      "artifactType",
+      "artifactPath",
+      "updateDescription"
+    ],
+    "optional": [
+      "changeScope",
+      "preserveActiveConsumers"
+    ],
     "defaults": {
       "changeScope": null,
       "preserveActiveConsumers": true
@@ -18,7 +25,11 @@
       "artifactType": {
         "description": "Type of artifact being updated",
         "type": "string",
-        "enum": ["template", "step", "process"]
+        "enum": [
+          "template",
+          "step",
+          "process"
+        ]
       },
       "artifactPath": {
         "description": "Path to the artifact (relative to project root)",
@@ -33,7 +44,10 @@
       "changeScope": {
         "description": "Scope of changes: minor (small fixes) or major (structural changes). If omitted, agent determines from analysis.",
         "type": "string",
-        "enum": ["minor", "major"],
+        "enum": [
+          "minor",
+          "major"
+        ],
         "default": null
       },
       "preserveActiveConsumers": {
@@ -45,8 +59,15 @@
   },
   "output": {
     "description": "Detailed update plan document for user approval",
-    "artifacts": ["update-plan.md"],
-    "memoryUpdates": ["backwardCompatibility", "activeConsumersCheck", "changeDesign", "updatePlanRef"]
+    "artifacts": [
+      "update-plan.md"
+    ],
+    "memoryUpdates": [
+      "backwardCompatibility",
+      "activeConsumersCheck",
+      "changeDesign",
+      "updatePlanRef"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -54,7 +75,9 @@
       "Analysis baseline (currentStructure) is available in memory.json from prior step",
       "updateDescription is available in process parameters"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: validate params → review requirements → load analysis → prompt compatibility → check consumers → design changes → (Q&A if needed) → create plan → review plan → present for approval",
@@ -68,8 +91,10 @@
         "memory.json (previous step's artifact analysis)",
         "Artifact files for reference during change design"
       ],
-      "create": ["update-plan.md (in process folder)"],
-      "update": ["memory.json (current step section with plan details)"]
+      "create": [
+        "update-plan.md (in process folder)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read memory, artifact files",
@@ -89,7 +114,13 @@
   },
   "artifactTypeConfig": {
     "template": {
-      "changeTargets": ["steps array", "parameters (required/optional)", "metadata", "flow diagram", "MD documentation"],
+      "changeTargets": [
+        "steps array",
+        "parameters (required/optional)",
+        "metadata",
+        "flow diagram",
+        "MD documentation"
+      ],
       "consumerCheck": {
         "description": "Search for active processes using this template",
         "searchPath": ".user-processes/active/",
@@ -102,7 +133,13 @@
       ]
     },
     "step": {
-      "changeTargets": ["substeps", "guidance (actions, files, tools, best practices)", "dependencies", "references", "memory usage"],
+      "changeTargets": [
+        "substeps",
+        "guidance (actions, files, tools, best practices)",
+        "dependencies",
+        "references",
+        "memory usage"
+      ],
       "consumerCheck": {
         "description": "Search for templates referencing this step",
         "searchPath": ".processes/templates/",
@@ -115,7 +152,12 @@
       ]
     },
     "process": {
-      "changeTargets": ["step configuration", "parameters", "subprocess state", "metadata"],
+      "changeTargets": [
+        "step configuration",
+        "parameters",
+        "subprocess state",
+        "metadata"
+      ],
       "consumerCheck": {
         "description": "Check for parent/child process relationships",
         "searchPattern": "Read process.json subProcessState for parent and child references"
@@ -267,7 +309,6 @@
       "actions": [
         "Verify: Was log.json updated for user interactions (backward compatibility prompt, Q&A, approval)?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -277,20 +318,35 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters (artifactType, artifactPath, updateDescription) and previous step's analysis (currentStructure)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: backwardCompatibility decision, activeConsumersCheck results, changeDesign details, updatePlanRef path",
       "Decisions Made: Backward compatibility decision, change design choices, scope determination"
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "optionalComponents": ["qa-session.md"],
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "optionalComponents": [
+      "qa-session.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["read_file", "write", "grep", "list_dir"]
+    "requiredTools": [
+      "read_file",
+      "write",
+      "grep",
+      "list_dir"
+    ]
   },
   "references": {
-    "relatedSteps": ["analyze-current-artifact-state", "init-process-principles", "end-process-validation"],
-    "usedInTemplates": ["update-process-template"]
+    "relatedSteps": [
+      "analyze-current-artifact-state",
+      "init-process-principles",
+      "end-process-validation"
+    ],
+    "usedInTemplates": [
+      "update-process-template"
+    ]
   }
 }

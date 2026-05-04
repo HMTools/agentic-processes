@@ -8,8 +8,13 @@
     "lastUpdated": "2026-02-05"
   },
   "parameters": {
-    "required": ["artifactType", "artifactPath"],
-    "optional": ["focusArea"],
+    "required": [
+      "artifactType",
+      "artifactPath"
+    ],
+    "optional": [
+      "focusArea"
+    ],
     "defaults": {
       "focusArea": null
     },
@@ -17,7 +22,11 @@
       "artifactType": {
         "description": "Type of artifact to analyze",
         "type": "string",
-        "enum": ["template", "step", "process"]
+        "enum": [
+          "template",
+          "step",
+          "process"
+        ]
       },
       "artifactPath": {
         "description": "Path to the artifact to analyze (relative to project root)",
@@ -40,7 +49,14 @@
   "output": {
     "description": "Baseline analysis of artifact structure recorded to memory",
     "artifacts": [],
-    "memoryUpdates": ["artifactType", "artifactPath", "artifactName", "focusArea", "currentStructure", "baselineTimestamp"]
+    "memoryUpdates": [
+      "artifactType",
+      "artifactPath",
+      "artifactName",
+      "focusArea",
+      "currentStructure",
+      "baselineTimestamp"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -48,7 +64,9 @@
       "Artifact must exist (relevant files based on type)",
       "Artifact type must be specified"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: validate params → locate files → load files → parse structure → record baseline",
@@ -66,23 +84,54 @@
         "memory.json (process parameters)"
       ],
       "create": [],
-      "update": ["memory.json (current step section with analysis results)"]
+      "update": []
     },
     "artifactTypeFiles": {
       "template": {
-        "required": ["{artifactPath}.json"],
-        "optional": ["{artifactPath}.md"],
-        "parseTargets": ["steps array", "parameters (required/optional)", "metadata", "flow"]
+        "required": [
+          "{artifactPath}.json"
+        ],
+        "optional": [
+          "{artifactPath}.md"
+        ],
+        "parseTargets": [
+          "steps array",
+          "parameters (required/optional)",
+          "metadata",
+          "flow"
+        ]
       },
       "step": {
-        "required": ["{artifactPath}/{stepName}.json"],
-        "optional": ["{artifactPath}/{stepName}.md"],
-        "parseTargets": ["substeps", "guidance", "dependencies", "memoryFileUsage", "references"]
+        "required": [
+          "{artifactPath}/{stepName}.json"
+        ],
+        "optional": [
+          "{artifactPath}/{stepName}.md"
+        ],
+        "parseTargets": [
+          "substeps",
+          "guidance",
+          "dependencies",
+          "memoryFileUsage",
+          "references"
+        ]
       },
       "process": {
-        "required": ["{artifactPath}/process.json"],
-        "optional": ["{artifactPath}/process.md", "{artifactPath}/memory.json", "{artifactPath}/log.json"],
-        "parseTargets": ["steps list", "currentState", "subProcessState", "parameters", "status"]
+        "required": [
+          "{artifactPath}/process.json"
+        ],
+        "optional": [
+          "{artifactPath}/process.md",
+          "{artifactPath}/memory.json",
+          "{artifactPath}/log.json"
+        ],
+        "parseTargets": [
+          "steps list",
+          "currentState",
+          "subProcessState",
+          "parameters",
+          "status"
+        ]
       }
     },
     "tools": [
@@ -159,7 +208,7 @@
       "name": "Record Baseline to Memory",
       "description": "Write analysis results to memory.json",
       "actions": [
-        "Update memory.json current step section with:",
+        "Record:",
         "  - artifactType: type analyzed",
         "  - artifactPath: path analyzed",
         "  - artifactName: name extracted from artifact",
@@ -175,7 +224,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -185,19 +233,30 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters (artifactType, artifactPath, focusArea)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: artifactType, artifactPath, artifactName, focusArea, currentStructure, baselineTimestamp",
       "Decisions Made: Focus area interpretation (if applicable)"
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["read_file", "list_dir", "grep"]
+    "requiredTools": [
+      "read_file",
+      "list_dir",
+      "grep"
+    ]
   },
   "references": {
-    "relatedSteps": ["init-process-principles", "end-process-validation"],
-    "usedInTemplates": ["update-process-template"]
+    "relatedSteps": [
+      "init-process-principles",
+      "end-process-validation"
+    ],
+    "usedInTemplates": [
+      "update-process-template"
+    ]
   }
 }

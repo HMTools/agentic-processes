@@ -9,15 +9,23 @@
   },
   "output": {
     "description": "Detailed plan files for each high-level step",
-    "artifacts": ["plans/{user-story-name}/step-{n}-{step-name}.md"],
-    "memoryUpdates": ["detailedPlansIndex", "approvalStatus", "approvalTimestamp"]
+    "artifacts": [
+      "plans/{user-story-name}/step-{n}-{step-name}.md"
+    ],
+    "memoryUpdates": [
+      "detailedPlansIndex",
+      "approvalStatus",
+      "approvalTimestamp"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "High-level plan approved (from create-high-level-plan step)",
       "All required process-steps exist in .processes/steps/ library"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [],
     "specificActions": [
       "Load High-Level Plan: Read approved high-level plan from plans/{user-story-name}/plan.md",
@@ -35,14 +43,15 @@
         "memory.json (previous step section with plan directory)",
         ".processes/steps/{category}/{step-name}/ (to verify process-steps exist)"
       ],
-      "create": ["plans/{user-story-name}/step-{n}-{step-name}.md (one per high-level step)"],
-      "update": ["memory.json (current step section with plans index and approval status)"]
+      "create": [
+        "plans/{user-story-name}/step-{n}-{step-name}.md (one per high-level step)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read high-level plan and memory",
       "list_dir - Verify process-steps exist",
-      "write - Create detailed plan files",
-      "search_replace - Update memory.json"
+      "write - Create detailed plan files"
     ],
     "bestPractices": [
       "Never assume technical details - add Q&A if step-specific info is missing",
@@ -160,7 +169,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -170,7 +178,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section (high-level plan path, approval status)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Detailed plans index (step, file, process-step, status, approval date)",
       "Decisions Made: Process-step selections, complexity ratings",
@@ -181,12 +189,30 @@
   "qaGuidance": {
     "whenToAdd": "When step-specific technical details are missing that are necessary for implementation",
     "categories": [
-      {"name": "API Contracts", "examples": "endpoint paths, request/response schemas, query parameters, headers"},
-      {"name": "Database Details", "examples": "collection names, field names and types, indexes, document structure"},
-      {"name": "Configuration", "examples": "environment variables, connection strings, API keys, feature flags"},
-      {"name": "Business Logic", "examples": "calculation formulas, validation rules, error handling, edge cases"},
-      {"name": "External Services", "examples": "integration endpoints, authentication methods, retry policies"},
-      {"name": "Technical Implementation", "examples": "library versions, code patterns, naming conventions"}
+      {
+        "name": "API Contracts",
+        "examples": "endpoint paths, request/response schemas, query parameters, headers"
+      },
+      {
+        "name": "Database Details",
+        "examples": "collection names, field names and types, indexes, document structure"
+      },
+      {
+        "name": "Configuration",
+        "examples": "environment variables, connection strings, API keys, feature flags"
+      },
+      {
+        "name": "Business Logic",
+        "examples": "calculation formulas, validation rules, error handling, edge cases"
+      },
+      {
+        "name": "External Services",
+        "examples": "integration endpoints, authentication methods, retry policies"
+      },
+      {
+        "name": "Technical Implementation",
+        "examples": "library versions, code patterns, naming conventions"
+      }
     ],
     "format": "Checkbox list with Question, Context (why needed), and Answer placeholder"
   },
@@ -201,7 +227,11 @@
   },
   "approvalWorkflow": {
     "approvalRequired": true,
-    "approvalTriggers": ["approved", "approve all", "LGTM"],
+    "approvalTriggers": [
+      "approved",
+      "approve all",
+      "LGTM"
+    ],
     "revisionLoop": "If changes requested, revise affected plans and re-present until approved",
     "exitCriteria": [
       "All detailed plans exist and are complete",
@@ -226,13 +256,29 @@
     "location": "plans/{user-story-name}/"
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["Approved high-level plan (plan.md)", "Process-steps in .processes/steps/"],
-    "requiredTools": ["read_file", "list_dir", "write", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "Approved high-level plan (plan.md)",
+      "Process-steps in .processes/steps/"
+    ],
+    "requiredTools": [
+      "read_file",
+      "list_dir",
+      "write",
+      "search_replace"
+    ]
   },
   "references": {
-    "relatedSteps": ["create-high-level-plan", "implement-controller-layer", "implement-service-layer", "implement-repository-layer"],
-    "usedInTemplates": ["develop-user-story"]
+    "relatedSteps": [
+      "create-high-level-plan",
+      "implement-controller-layer",
+      "implement-service-layer",
+      "implement-repository-layer"
+    ],
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }
-

@@ -64,8 +64,8 @@ Purpose: [What this step accomplishes]
 - Use when this step makes decisions that should be documented
 
 **Memory Usage for This Step:**
-- **Read from**: Step {N} section in memory.json - [What information to retrieve from which step]
-- **Write to**: Current step section in memory.json - [What information to store]
+- **Read from**: Previous steps - [What information to retrieve]
+- **Record**: [What information this step produces]
   - Information Produced: [What was created/discovered]
   - Decisions Made: [Technical/architectural decisions]
   - Files Modified/Created: [List of files changed]

@@ -101,7 +101,7 @@ The script writes `process.json`, `memory.json`, and `log.json` directly. Check 
 
 When a step has `approvalRequired: true` and the user provides corrections instead of simple approval:
 
-1. Log the correction immediately via `process_manager.py log-interaction`
+1. Log the correction immediately via the `process-state-update` skill
 2. Delegate correction processing to `step-executor` subagent
 3. Wait for subagent completion
 4. Present updated deliverables for re-approval

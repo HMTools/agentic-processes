@@ -9,15 +9,24 @@
   },
   "output": {
     "description": "Fix proposals document and approval status",
-    "artifacts": ["fix-proposals.md"],
-    "memoryUpdates": ["fixProposalsPath", "totalProposals", "approvalStatus", "approvedIssueIds"]
+    "artifacts": [
+      "fix-proposals.md"
+    ],
+    "memoryUpdates": [
+      "fixProposalsPath",
+      "totalProposals",
+      "approvalStatus",
+      "approvedIssueIds"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "Issues list from previous step (issues-list.json)",
       "Findings report from previous step"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Read issues from previous step, analyze each issue with context",
       "Create detailed fix proposals with what, how, and why",
@@ -32,14 +41,15 @@
         "findings-report.md (context from previous step)",
         "Files containing issues (to understand context)"
       ],
-      "create": ["fix-proposals.md (comprehensive fix proposals document)"],
-      "update": ["memory.json (current step section with proposals and approval status)", "log.json (actions taken, progress, user interactions)"]
+      "create": [
+        "fix-proposals.md (comprehensive fix proposals document)"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read memory, issues-list, findings, source files",
       "grep or codebase_search - Understand issue context",
-      "write - Create fix-proposals.md",
-      "search_replace - Update memory.json"
+      "write - Create fix-proposals.md"
     ],
     "bestPractices": [
       "Read issues systematically - process each issue in the list",
@@ -128,7 +138,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -138,28 +147,66 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section (issues list path, investigation context)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Fix proposals document path, Total proposals created, Approval status, List of approved issue IDs"
     ]
   },
   "proposalElements": [
-    {"name": "issueId", "description": "Reference to the identified issue"},
-    {"name": "location", "description": "File path, line number"},
-    {"name": "issueDescription", "description": "Brief description of the issue"},
-    {"name": "currentState", "description": "What exists now"},
-    {"name": "proposedFix", "description": "What should change"},
-    {"name": "fixInstructions", "description": "Step-by-step fix instructions"},
-    {"name": "rationale", "description": "Why this fix addresses the issue"}
+    {
+      "name": "issueId",
+      "description": "Reference to the identified issue"
+    },
+    {
+      "name": "location",
+      "description": "File path, line number"
+    },
+    {
+      "name": "issueDescription",
+      "description": "Brief description of the issue"
+    },
+    {
+      "name": "currentState",
+      "description": "What exists now"
+    },
+    {
+      "name": "proposedFix",
+      "description": "What should change"
+    },
+    {
+      "name": "fixInstructions",
+      "description": "Step-by-step fix instructions"
+    },
+    {
+      "name": "rationale",
+      "description": "Why this fix addresses the issue"
+    }
   ],
   "approvalRequired": true,
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.json", "issues-list.json", "findings-report.md"],
-    "requiredTools": ["read_file", "grep", "codebase_search", "write", "search_replace"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "memory.json",
+      "issues-list.json",
+      "findings-report.md"
+    ],
+    "requiredTools": [
+      "read_file",
+      "grep",
+      "codebase_search",
+      "write",
+      "search_replace"
+    ]
   },
   "references": {
-    "relatedSteps": ["review-verify-document", "apply-changes"],
-    "usedInTemplates": ["review-and-verify"]
+    "relatedSteps": [
+      "review-verify-document",
+      "apply-changes"
+    ],
+    "usedInTemplates": [
+      "review-and-verify"
+    ]
   }
 }

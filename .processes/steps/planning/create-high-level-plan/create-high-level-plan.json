@@ -9,12 +9,23 @@
   },
   "output": {
     "description": "High-level plan document with LLD and complexity-rated steps",
-    "artifacts": ["plans/{user-story-name}/plan.md"],
-    "memoryUpdates": ["planDirectoryPath", "qaStatus", "implementationSteps", "processStepsValidation"]
+    "artifacts": [
+      "plans/{user-story-name}/plan.md"
+    ],
+    "memoryUpdates": [
+      "planDirectoryPath",
+      "qaStatus",
+      "implementationSteps",
+      "processStepsValidation"
+    ]
   },
   "guidance": {
-    "prerequisites": ["User story context with title, description, and acceptance criteria"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "User story context with title, description, and acceptance criteria"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "specificActions": [
       "Gather Requirements: Extract user story title, description, and acceptance criteria; identify affected components (API, Service, Repository, etc.); understand the feature's purpose and goals",
       "Identify Missing Information: Check for external APIs, infrastructure setup, third-party libraries, business rules, data structures; list assumptions needing user confirmation; create Q&A section with specific questions - do not proceed with LLD until answers provided",
@@ -25,9 +36,13 @@
       "Present Plan for Approval: Present complete plan to user; wait for approval before proceeding; IMMEDIATELY log user interaction"
     ],
     "files": {
-      "read": ["User story context from process.md"],
-      "create": ["plans/{user-story-name}/plan.md"],
-      "update": ["memory.json", "log.json"]
+      "read": [
+        "User story context from process.md"
+      ],
+      "create": [
+        "plans/{user-story-name}/plan.md"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read user story context",
@@ -142,7 +157,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -152,7 +166,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "User story context from process.md",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Plan directory path, Q&A status, Implementation steps summary, Process-steps validation results",
       "Decisions Made: Complexity ratings, Process-step mappings",
@@ -160,18 +174,38 @@
     ]
   },
   "complexityScale": {
-    "low": {"range": "1-3", "description": "Straightforward implementation"},
-    "medium": {"range": "4-6", "description": "Some complexity, well-defined approach"},
-    "high": {"range": "7-9", "description": "Needs detailed breakdown, potential challenges"}
+    "low": {
+      "range": "1-3",
+      "description": "Straightforward implementation"
+    },
+    "medium": {
+      "range": "4-6",
+      "description": "Some complexity, well-defined approach"
+    },
+    "high": {
+      "range": "7-9",
+      "description": "Needs detailed breakdown, potential challenges"
+    }
   },
   "approvalRequired": true,
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["read_file", "codebase_search", "write", "list_dir"]
+    "requiredTools": [
+      "read_file",
+      "codebase_search",
+      "write",
+      "list_dir"
+    ]
   },
   "references": {
-    "relatedSteps": ["create-detailed-step-plans"],
-    "usedInTemplates": ["develop-user-story"]
+    "relatedSteps": [
+      "create-detailed-step-plans"
+    ],
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }

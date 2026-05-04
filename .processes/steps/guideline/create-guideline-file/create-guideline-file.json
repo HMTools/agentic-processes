@@ -9,8 +9,14 @@
   },
   "output": {
     "description": "Complete guideline markdown file with practical steps and examples",
-    "artifacts": [".user-processes/guidelines/{category}/how-to-{name}.md"],
-    "memoryUpdates": ["guidelineFilePath", "guidelineContent", "decisionsOnContent"]
+    "artifacts": [
+      ".user-processes/guidelines/{category}/how-to-{name}.md"
+    ],
+    "memoryUpdates": [
+      "guidelineFilePath",
+      "guidelineContent",
+      "decisionsOnContent"
+    ]
   },
   "guidance": {
     "prerequisites": [
@@ -18,7 +24,10 @@
       "Sources/examples identified for reference",
       "Understanding of what 'How to' question this answers"
     ],
-    "mandatoryComponents": ["mandatory-logging.md", "qa-session.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md",
+      "qa-session.md"
+    ],
     "userGuidelines": [],
     "specificActions": [
       "Follow the substeps below in sequence",
@@ -34,8 +43,10 @@
         ".user-processes/guidelines/README.md (format reference)",
         ".user-processes/guidelines/{category}/*.md (existing style)"
       ],
-      "create": [".user-processes/guidelines/{category}/how-to-{name}.md"],
-      "update": ["memory.json (current step section)"]
+      "create": [
+        ".user-processes/guidelines/{category}/how-to-{name}.md"
+      ],
+      "update": []
     },
     "tools": [
       "read_file - Read memory and existing guidelines",
@@ -137,7 +148,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -147,7 +157,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous step section - guidelineName, guidelineCategory, guidelinePurpose, sources",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: guidelineFilePath, guidelineContent summary",
       "Decisions Made: decisionsOnContent (examples chosen, detail level)",
@@ -155,13 +165,24 @@
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md", "qa-session.md"],
-    "requiredFiles": [".user-processes/guidelines/README.md"],
-    "requiredTools": ["read_file", "codebase_search", "list_dir", "write"]
+    "requiredComponents": [
+      "mandatory-logging.md",
+      "qa-session.md"
+    ],
+    "requiredFiles": [
+      ".user-processes/guidelines/README.md"
+    ],
+    "requiredTools": [
+      "read_file",
+      "codebase_search",
+      "list_dir",
+      "write"
+    ]
   },
   "references": {
     "relatedSteps": [],
-    "usedInTemplates": ["create-guideline"]
+    "usedInTemplates": [
+      "create-guideline"
+    ]
   }
 }
-

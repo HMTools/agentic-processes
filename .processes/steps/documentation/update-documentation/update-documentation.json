@@ -9,12 +9,24 @@
   },
   "output": {
     "description": "Created or updated flow documentation",
-    "artifacts": ["ai/docs/flows/{flow-name}.md", "ai/docs/components/{component-name}.md"],
-    "memoryUpdates": ["documentationType", "documentationPath", "changesDocumented"]
+    "artifacts": [
+      "ai/docs/flows/{flow-name}.md",
+      "ai/docs/components/{component-name}.md"
+    ],
+    "memoryUpdates": [
+      "documentationType",
+      "documentationPath",
+      "changesDocumented"
+    ]
   },
   "guidance": {
-    "prerequisites": ["Implementation step completed", "Code changes identified"],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "prerequisites": [
+      "Implementation step completed",
+      "Code changes identified"
+    ],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/docs/how-to-document-flows.md"
     ],
@@ -26,9 +38,17 @@
       "Ensure documentation is clear, concise, and follows existing patterns"
     ],
     "files": {
-      "read": ["memory.json (previous implementation step)", "ai/docs/flows/*.md (existing patterns)"],
-      "create": ["ai/docs/flows/{flow-name}.md (for new workflows)", "ai/docs/components/{component-name}.md (for new components)"],
-      "update": ["ai/docs/flows/{existing-flow}.md (for modified workflows)", "memory.json (current step section)"]
+      "read": [
+        "memory.json (previous implementation step)",
+        "ai/docs/flows/*.md (existing patterns)"
+      ],
+      "create": [
+        "ai/docs/flows/{flow-name}.md (for new workflows)",
+        "ai/docs/components/{component-name}.md (for new components)"
+      ],
+      "update": [
+        "ai/docs/flows/{existing-flow}.md (for modified workflows)"
+      ]
     },
     "tools": [
       "file_search - Find existing documentation: ai/docs/**/*.md",
@@ -50,10 +70,23 @@
     ],
     "documentationPatterns": {
       "flowDocument": {
-        "sections": ["Overview", "Step-by-step sequence with mermaid diagram", "Components involved and responsibilities", "Data transformations and validations", "Error handling and edge cases", "Integration points"]
+        "sections": [
+          "Overview",
+          "Step-by-step sequence with mermaid diagram",
+          "Components involved and responsibilities",
+          "Data transformations and validations",
+          "Error handling and edge cases",
+          "Integration points"
+        ]
       },
       "componentDocument": {
-        "sections": ["Overview", "Purpose", "Interface/API", "Usage examples", "Integration points"]
+        "sections": [
+          "Overview",
+          "Purpose",
+          "Interface/API",
+          "Usage examples",
+          "Integration points"
+        ]
       }
     }
   },
@@ -137,7 +170,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -147,7 +179,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Previous implementation step section in memory.json (what was implemented)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: Documentation type, Documentation path, Changes documented",
       "Decisions Made: Documentation scope (comprehensive/targeted/minimal)",
@@ -155,13 +187,23 @@
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
-    "requiredFiles": ["memory.json"],
-    "requiredTools": ["file_search", "read_file", "codebase_search", "write"]
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
+    "requiredFiles": [
+      "memory.json"
+    ],
+    "requiredTools": [
+      "file_search",
+      "read_file",
+      "codebase_search",
+      "write"
+    ]
   },
   "references": {
     "relatedSteps": [],
-    "usedInTemplates": ["develop-user-story"]
+    "usedInTemplates": [
+      "develop-user-story"
+    ]
   }
 }
-

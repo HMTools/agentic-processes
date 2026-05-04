@@ -6,7 +6,7 @@ INPUT=$(cat)
 
 SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
 PROJECT_DIR="$CLAUDE_PROJECT_DIR"
-FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]*' | head -1)
+TOOL_NAME=$(echo "$INPUT" | grep -oP '"tool_name"\s*:\s*"\K[^"]*' | head -1)
 FLAG_DIR=".claude"
 
 if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
@@ -20,6 +20,20 @@ if [ ! -f "$FLAG_FILE" ]; then
 fi
 
 # Flag exists — user message not yet logged
+
+# Block subagent spawning until interaction is logged
+if [ "$TOOL_NAME" = "Task" ]; then
+    cat << 'EOF'
+{
+  "decision": "block",
+  "reason": "Log the user interaction to log.json before spawning subagents (log-first enforced by hook)"
+}
+EOF
+    exit 0
+fi
+
+# For Write/StrReplace/Edit: check file path
+FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]*' | head -1)
 
 # Allow writes to log.json (this IS the log write)
 case "$FILE_PATH" in

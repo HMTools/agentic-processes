@@ -10,14 +10,22 @@
   "output": {
     "description": "User story details stored in memory",
     "artifacts": [],
-    "memoryUpdates": ["userStory.title", "userStory.description", "userStory.acceptanceCriteria", "userStory.source", "userStory.additionalContext"]
+    "memoryUpdates": [
+      "userStory.title",
+      "userStory.description",
+      "userStory.acceptanceCriteria",
+      "userStory.source",
+      "userStory.additionalContext"
+    ]
   },
   "guidance": {
     "prerequisites": [
       "userStoryId parameter available from process",
       "Process context established"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
+    "mandatoryComponents": [
+      "mandatory-logging.md"
+    ],
     "userGuidelines": [
       ".user-processes/guidelines/planning/how-to-get-user-story-parameters.md"
     ],
@@ -35,7 +43,7 @@
         ".user-processes/guidelines/planning/how-to-get-user-story-parameters.md (if exists)"
       ],
       "create": [],
-      "update": ["memory.json (current step section with userStory details)"]
+      "update": []
     },
     "tools": [
       "read_file - Read guideline file if exists",
@@ -122,7 +130,6 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Verify: Do modified process files conform to type definitions? (Principle 7 - see `.processes/steps/_components/operating-principles.md`)",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
@@ -132,7 +139,7 @@
   },
   "memoryFileUsage": {
     "readFrom": "Process parameters (userStoryId)",
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Step results and decisions",
     "fields": [
       "Information Produced: userStory object with title, description, acceptanceCriteria, source, additionalContext",
       "Decisions Made: Source method used (guideline vs manual)",
@@ -149,13 +156,21 @@
     ]
   },
   "dependencies": {
-    "requiredComponents": ["mandatory-logging.md"],
+    "requiredComponents": [
+      "mandatory-logging.md"
+    ],
     "requiredFiles": [],
-    "requiredTools": ["read_file", "list_dir"]
+    "requiredTools": [
+      "read_file",
+      "list_dir"
+    ]
   },
   "references": {
-    "relatedSteps": ["understand-context"],
-    "usedInTemplates": ["low-level-design-user-story"]
+    "relatedSteps": [
+      "understand-context"
+    ],
+    "usedInTemplates": [
+      "low-level-design-user-story"
+    ]
   }
 }
-
