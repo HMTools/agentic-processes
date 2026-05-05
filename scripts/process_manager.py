@@ -73,6 +73,15 @@ def _check_pending_log(process_dir: Path) -> None:
         )
 
 
+def _check_pending_approval(process_dir: Path) -> None:
+    """Block state-advancing commands while an approval checkpoint is active."""
+    pending_file = process_dir / "pending-interaction.json"
+    if pending_file.exists():
+        _error(
+            "Approval checkpoint pending — resolve the pending interaction before modifying process state"
+        )
+
+
 # --- Subcommand handlers ---
 
 
@@ -495,7 +504,7 @@ def main() -> None:
     p_pending.add_argument("--delete", action="store_true", help="Delete pending-interaction.json")
     p_pending.set_defaults(func=cmd_write_pending)
 
-    _GATED_COMMANDS = {
+    _LOG_GATED_COMMANDS = {
         "update-step-status",
         "update-current-state",
         "add-memory-entry",
@@ -503,9 +512,17 @@ def main() -> None:
         "write-pending",
     }
 
+    _APPROVAL_GATED_COMMANDS = {
+        "update-step-status",
+        "update-current-state",
+        "update-process-status",
+    }
+
     parsed = parser.parse_args()
-    if parsed.command in _GATED_COMMANDS:
+    if parsed.command in _LOG_GATED_COMMANDS:
         _check_pending_log(Path(parsed.process_dir))
+    if parsed.command in _APPROVAL_GATED_COMMANDS:
+        _check_pending_approval(Path(parsed.process_dir))
     try:
         parsed.func(parsed)
     except json.JSONDecodeError as e:

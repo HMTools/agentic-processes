@@ -46,10 +46,10 @@ if [ "$TOOL_NAME" = "Write" ] || [ "$TOOL_NAME" = "StrReplace" ] || [ "$TOOL_NAM
   esac
 fi
 
-# Allow Shell/Bash commands that reference pending-interaction.json
+# Allow Shell/Bash commands that call process_manager.py (approval resolution)
 if [ "$TOOL_NAME" = "Shell" ] || [ "$TOOL_NAME" = "Bash" ]; then
   case "$COMMAND" in
-    *pending-interaction.json*)
+    *process_manager.py*)
       exit 0
       ;;
   esac
