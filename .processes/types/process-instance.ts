@@ -20,8 +20,8 @@ import { ProcessId, StepId, StepRef, ProcessPath, ISOTimestamp } from "./shared-
  *     "templateCategory": "development",
  *     "created": "2026-01-20T14:30:22.000Z",
  *     "lastUpdated": "2026-01-20T15:45:00.000Z",
- *     "projectPath": "C:/Projects/MyApp",
- *     "processPath": ".user-processes/active/process-550e8400"
+ *     "projectPaths": ["C:/Projects/MyApp"],
+ *     "processPath": "~/.claude/agentic-processes/active/process-550e8400-a1b2c3"
  *   },
  *   "status": "running",
  *   "parameters": {
@@ -83,10 +83,10 @@ export interface ProcessMetadata {
   /** ISO 8601 timestamp when the process was last updated */
   lastUpdated: ISOTimestamp;
   
-  /** Absolute path to the project root directory - optional for backward compatibility */
-  projectPath?: string;
-  
-  /** Relative path to the process folder from project root - optional for backward compatibility */
+  /** Absolute paths to the project root directories this process operates on */
+  projectPaths?: string[];
+
+  /** Absolute path to the process folder (e.g., ~/.claude/agentic-processes/active/process-name-YYYYMMDD-shortid) */
   processPath?: ProcessPath;
 
   /**
@@ -211,7 +211,7 @@ export interface ParentProcessRef {
   /** Human-readable name of the parent process */
   name: string;
   
-  /** Path to the parent process folder (relative to project root) */
+  /** Absolute path to the parent process folder */
   processPath: ProcessPath;
   
   /** Step ID in the parent process to return to after this sub-process completes */

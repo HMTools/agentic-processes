@@ -34,7 +34,7 @@
       "artifactPath": {
         "description": "Path to the artifact (relative to project root)",
         "type": "string",
-        "example": ".processes/templates/infrastructure/update-process-template"
+        "example": "~/.claude/agentic-processes/templates/infrastructure/update-process-template"
       },
       "updateDescription": {
         "description": "Description of what changes are needed",
@@ -123,7 +123,7 @@
       ],
       "consumerCheck": {
         "description": "Search for active processes using this template",
-        "searchPath": ".user-processes/active/",
+        "searchPath": "~/.claude/agentic-processes/active/",
         "searchPattern": "Read process.json files and check metadata.template field"
       },
       "compatibilityConcerns": [
@@ -142,8 +142,8 @@
       ],
       "consumerCheck": {
         "description": "Search for templates referencing this step",
-        "searchPath": ".processes/templates/",
-        "searchPattern": "Search for @framework-step:{category}/{stepName} in template JSON files"
+        "searchPath": "~/.claude/agentic-processes/templates/",
+        "searchPattern": "Search for @step:{category}/{stepName} in template JSON files"
       },
       "compatibilityConcerns": [
         "Removing substeps may break templates that depend on specific outputs",
@@ -175,7 +175,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -232,8 +232,8 @@
       "description": "Search for consumers of this artifact based on its type",
       "actions": [
         "Based on `artifactType`, check for active consumers using artifactTypeConfig",
-        "For templates: search `.user-processes/active/` for processes using this template",
-        "For steps: search `.processes/templates/` for templates referencing this step via `@framework-step:{category}/{stepName}`",
+        "For templates: search `~/.claude/agentic-processes/active/` for processes using this template",
+        "For steps: search `~/.claude/agentic-processes/templates/` for templates referencing this step via `@step:{category}/{stepName}`",
         "For processes: check `subProcessState` for parent/child relationships",
         "Report findings to the user",
         "If `preserveActiveConsumers` is true, flag changes that would break consumers"
@@ -255,7 +255,7 @@
       "name": "Q&A Session (if needed)",
       "description": "Gather missing details from user if gaps found in change design",
       "conditional": true,
-      "component": ".processes/steps/_components/qa-session.md",
+      "component": "~/.claude/agentic-processes/steps/_components/qa-session.md",
       "actions": [
         "If any gaps or ambiguities exist in the planned changes, ask the user for clarification",
         "Use the qa-session component pattern",

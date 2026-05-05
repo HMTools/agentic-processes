@@ -26,8 +26,8 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/testing/how-to-write-integration-tests.md",
-      ".user-processes/guidelines/testing/how-to-generate-test-data.md"
+      "~/.claude/agentic-processes/guidelines/testing/how-to-write-integration-tests.md",
+      "~/.claude/agentic-processes/guidelines/testing/how-to-generate-test-data.md"
     ],
     "specificActions": [
       "Study Existing Test Patterns: Review similar integration tests; note mocking patterns and test data builders",
@@ -65,7 +65,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },

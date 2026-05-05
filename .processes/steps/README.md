@@ -33,17 +33,17 @@ Step JSON files include a `userGuidelines` field that references project-specifi
   "guidance": {
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/api-design/how-to-implement-controllers.md",
-      ".user-processes/guidelines/testing/how-to-write-unit-tests.md"
+      "~/.claude/agentic-processes/guidelines/api-design/how-to-implement-controllers.md",
+      "~/.claude/agentic-processes/guidelines/testing/how-to-write-unit-tests.md"
     ],
     ...
   }
 }
 ```
 
-Guidelines are stored in `.user-processes/guidelines/{category}/how-to-{action}.md`. They answer "How to do X?" questions with practical, action-oriented content. When executing steps, agents read these files if they exist to apply project-specific patterns.
+Guidelines are stored in `~/.claude/agentic-processes/guidelines/{category}/how-to-{action}.md`. They answer "How to do X?" questions with practical, action-oriented content. When executing steps, agents read these files if they exist to apply project-specific patterns.
 
-See [`.user-processes/guidelines/README.md`](../../.user-processes/guidelines/README.md) for the complete guidelines structure.
+See [`~/.claude/agentic-processes/guidelines/README.md`](../../~/.claude/agentic-processes/guidelines/README.md) for the complete guidelines structure.
 
 ### Using Components in Steps
 
@@ -52,8 +52,8 @@ See [`.user-processes/guidelines/README.md`](../../.user-processes/guidelines/RE
    ## Required Components
    - [mandatory-logging.md](_components/mandatory-logging.md) - Logging guidelines
    - [pre-implementation-patterns.md](_components/pre-implementation-patterns.md) - Pattern verification
-   - `.user-processes/guidelines/code-conventions.md` - Code conventions
-   - [Add other relevant project-specific guidelines from .user-processes/guidelines/]
+   - `~/.claude/agentic-processes/guidelines/code-conventions.md` - Code conventions
+   - [Add other relevant project-specific guidelines from ~/.claude/agentic-processes/guidelines/]
    ```
 
 2. **Include components where needed** using include markers:
@@ -77,18 +77,18 @@ See [`.user-processes/guidelines/README.md`](../../.user-processes/guidelines/RE
 
 ### In Templates
 
-Templates reference steps using the `@framework-step:category/step-name` syntax:
+Templates reference steps using the `@step:category/step-name` syntax:
 
 ```markdown
 ## Steps
 
 - [ ] Step 1: Analyze requirements for {{featureName}}
-  - **Step**: `@framework-step:common/analyze-requirements`
+  - **Step**: `@step:common/analyze-requirements`
   - **Context**:
     - `targetArea`: {{featureName}}
 
 - [ ] Step 2: Create technical design
-  - **Step**: `@framework-step:common/create-technical-design`
+  - **Step**: `@step:common/create-technical-design`
 ```
 
 ### In Process Instances

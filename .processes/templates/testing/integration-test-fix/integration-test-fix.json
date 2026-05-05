@@ -54,19 +54,19 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Principles loaded and confirmed"
     },
     {
       "number": 1,
       "name": "Capture test failure information",
-      "stepRef": "@framework-step:testing/capture-test-failure",
+      "stepRef": "@step:testing/capture-test-failure",
       "output": "Failure details in memory"
     },
     {
       "number": 2,
       "name": "Identify root cause",
-      "stepRef": "@framework-step:testing/diagnose-integration-test-failure",
+      "stepRef": "@step:testing/diagnose-integration-test-failure",
       "output": "Root cause analysis"
     },
     {
@@ -85,37 +85,37 @@
     {
       "number": 5,
       "name": "Implement fix",
-      "stepRef": "@framework-step:testing/implement-integration-test-fix",
+      "stepRef": "@step:testing/implement-integration-test-fix",
       "output": "Code changes applied"
     },
     {
       "number": 6,
       "name": "Verify test passes",
-      "stepRef": "@framework-step:testing/verify-test-passes",
+      "stepRef": "@step:testing/verify-test-passes",
       "output": "Test execution results"
     },
     {
       "number": 7,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Improvements implemented",
       "approvalRequired": true
     },
     {
       "number": 8,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report"
     }
   ],
   "references": {
     "steps": [
-      "@framework-step:testing/capture-test-failure",
-      "@framework-step:testing/diagnose-integration-test-failure",
-      "@framework-step:testing/implement-integration-test-fix",
-      "@framework-step:testing/verify-test-passes",
-      "@framework-step:learning/continuous-improvement",
-      "@framework-step:common/end-process-validation"
+      "@step:testing/capture-test-failure",
+      "@step:testing/diagnose-integration-test-failure",
+      "@step:testing/implement-integration-test-fix",
+      "@step:testing/verify-test-passes",
+      "@step:learning/continuous-improvement",
+      "@step:common/end-process-validation"
     ],
     "relatedTemplates": [],
     "dependencies": []

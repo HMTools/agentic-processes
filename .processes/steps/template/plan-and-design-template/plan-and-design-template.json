@@ -28,16 +28,16 @@
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: review requirements → check existing → purpose → use cases → check reusable steps → plan steps → identify parameters → design flow → create diagram",
-      "Before planning steps: Check existing generic steps in .processes/steps/planning/ and .processes/steps/common/",
+      "Before planning steps: Check existing generic steps in ~/.claude/agentic-processes/steps/planning/ and ~/.claude/agentic-processes/steps/common/",
       "When planning steps: Prefer reusable step categories",
       "When planning steps: Ensure each step represents actual work, not flow control",
       "Use camelCase for parameter names: featureName, targetBranch"
     ],
     "files": {
       "read": [
-        ".processes/templates/README.md",
-        ".processes/steps/planning/",
-        ".processes/steps/common/",
+        "~/.claude/agentic-processes/templates/README.md",
+        "~/.claude/agentic-processes/steps/planning/",
+        "~/.claude/agentic-processes/steps/common/",
         "Existing templates for patterns"
       ],
       "create": [],
@@ -86,7 +86,7 @@
       "description": "Embed Q&A within steps rather than creating standalone Q&A steps",
       "rationale": "Q&A naturally occurs during multiple steps - a standalone Q&A step is artificial and creates unnecessary process overhead",
       "pattern": "substep",
-      "sharedComponent": ".processes/steps/_components/qa-session.md",
+      "sharedComponent": "~/.claude/agentic-processes/steps/_components/qa-session.md",
       "whenToUse": [
         "Information gaps are discovered during step execution",
         "User clarification is needed before proceeding",
@@ -95,7 +95,7 @@
       "howToImplement": [
         "Do NOT create a standalone Q&A step in the template",
         "Instead, add Q&A as a substep within relevant steps",
-        "Reference the shared component: .processes/steps/_components/qa-session.md",
+        "Reference the shared component: ~/.claude/agentic-processes/steps/_components/qa-session.md",
         "Steps that commonly need Q&A: context understanding, information gathering, design creation"
       ],
       "stepJsonExample": {
@@ -109,7 +109,7 @@
             "number": 2,
             "name": "Q&A Session (if needed)",
             "description": "Use qa-session component to gather missing information",
-            "component": ".processes/steps/_components/qa-session.md",
+            "component": "~/.claude/agentic-processes/steps/_components/qa-session.md",
             "conditional": true
           }
         ]
@@ -158,7 +158,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -207,9 +207,9 @@
       "name": "Check existing reusable steps",
       "description": "Identify steps that can be reused",
       "actions": [
-        "Review .processes/steps/planning/ for planning steps",
-        "Review .processes/steps/common/ for utility steps",
-        "Review .processes/steps/investigation/ for analysis steps",
+        "Review ~/.claude/agentic-processes/steps/planning/ for planning steps",
+        "Review ~/.claude/agentic-processes/steps/common/ for utility steps",
+        "Review ~/.claude/agentic-processes/steps/investigation/ for analysis steps",
         "List existing steps that fit the workflow"
       ]
     },

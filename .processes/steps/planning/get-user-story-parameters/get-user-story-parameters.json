@@ -27,20 +27,20 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/planning/how-to-get-user-story-parameters.md"
+      "~/.claude/agentic-processes/guidelines/planning/how-to-get-user-story-parameters.md"
     ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: check guideline → execute guideline or manual entry → validate → request missing → store in memory",
       "This step uses guideline-based pattern: teams configure their preferred method",
-      "Guideline path: .user-processes/guidelines/planning/how-to-get-user-story-parameters.md",
+      "Guideline path: ~/.claude/agentic-processes/guidelines/planning/how-to-get-user-story-parameters.md",
       "If no guideline exists, prompt user for manual entry in structured format",
       "Required fields: title, description, acceptanceCriteria, source"
     ],
     "files": {
       "read": [
         "process.md (for userStoryId parameter)",
-        ".user-processes/guidelines/planning/how-to-get-user-story-parameters.md (if exists)"
+        "~/.claude/agentic-processes/guidelines/planning/how-to-get-user-story-parameters.md (if exists)"
       ],
       "create": [],
       "update": []
@@ -63,7 +63,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -72,7 +72,7 @@
       "name": "Check for user guideline",
       "description": "Look for team's guideline file that defines how to collect user story parameters",
       "actions": [
-        "Check if .user-processes/guidelines/planning/how-to-get-user-story-parameters.md exists",
+        "Check if ~/.claude/agentic-processes/guidelines/planning/how-to-get-user-story-parameters.md exists",
         "Note whether guideline is available for use"
       ]
     },

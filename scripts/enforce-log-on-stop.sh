@@ -6,9 +6,9 @@ export LANG=C.UTF-8
 INPUT=$(cat)
 
 SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
-PROJECT_DIR="$CLAUDE_PROJECT_DIR"
+AGENTIC_DIR="$HOME/.claude/agentic-processes"
 
-if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
+if [ -z "$SESSION_ID" ]; then
     exit 0
 fi
 
@@ -19,7 +19,7 @@ if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
 fi
 
 # Check pending-log flag
-FLAG_FILE="$PROJECT_DIR/.claude/pending-log-$SESSION_ID"
+FLAG_FILE="$AGENTIC_DIR/flags/pending-log-$SESSION_ID"
 if [ ! -f "$FLAG_FILE" ]; then
     exit 0
 fi

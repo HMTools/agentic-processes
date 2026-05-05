@@ -17,7 +17,7 @@ Trigger this skill when the user wants to:
 ## Key Concepts
 
 - **Process**: A structured workflow with defined steps, state tracking, and memory
-- **Template**: A reusable process definition in `.processes/templates/`
+- **Template**: A reusable process definition in `~/.claude/agentic-processes/templates/`
 - **Step**: An individual unit of work within a process
 - **Memory**: Persistent context across steps in `memory.json`
 - **Approval Checkpoint**: Steps requiring user approval before continuing
@@ -30,7 +30,7 @@ Trigger this skill when the user wants to:
 
 ## Process Templates
 
-Templates are located in `.processes/templates/`. Each template defines:
+Templates are located in `~/.claude/agentic-processes/templates/`. Each template defines:
 - Process steps and their sequence
 - Required and optional parameters
 - Approval checkpoints
@@ -40,12 +40,12 @@ Templates are located in `.processes/templates/`. Each template defines:
 
 1. **To start a new process**: Use the `/process-new` skill or ask to "start a process"
 2. **To continue a process**: Use the `/process-continue` skill with the process path
-3. **Active processes**: Check `.user-processes/active/` for running processes
+3. **Active processes**: Check `~/.claude/agentic-processes/active/` for running processes
 4. **Process state**: Each process has `process.json`, `memory.json`, and `log.json`
 
 ## File Locations
 
-- Templates: `.processes/templates/`
-- Active processes: `.user-processes/active/`
-- Framework types: `.processes/types/`
+- Templates: `~/.claude/agentic-processes/templates/`
+- Active processes: `~/.claude/agentic-processes/active/`
+- Framework types: `~/.claude/agentic-processes/types/`
 - Skills: `skills/`

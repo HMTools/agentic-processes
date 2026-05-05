@@ -29,7 +29,7 @@ You need to implement a new feature: "User Authentication" that allows users to 
    ```
 
 4. **Process Created**:
-   - Process instance created in `.user-processes/active/process-user-authentication-20250115/`
+   - Process instance created in `~/.claude/agentic-processes/active/process-user-authentication-20250115/`
    - Steps ready to execute
 
 ### Process Execution
@@ -70,7 +70,7 @@ You need to implement a new feature: "User Authentication" that allows users to 
 - Complete feature implementation
 - All tests passing
 - Documentation updated
-- Process moved to `.user-processes/completed/`
+- Process moved to `~/.claude/agentic-processes/completed/`
 
 ## Example 2: Fixing Integration Test Failures
 
@@ -133,8 +133,7 @@ You want to create a template for a specific workflow your team uses frequently.
 ### Template Creation
 
 1. **Create Template File**:
-   - Location: `.user-processes/templates/{category}/custom-workflow.md`
-   - Or for framework contributions: `.processes/templates/{category}/custom-workflow.md`
+   - Location: `~/.claude/agentic-processes/templates/{category}/custom-workflow.md`
 
 2. **Template Structure**:
    ```markdown
@@ -156,7 +155,7 @@ You want to create a template for a specific workflow your team uses frequently.
    
    ## Steps
    - [ ] Step 1: First step
-     - **Step**: `@framework-step:category/step-name`
+     - **Step**: `@step:category/step-name`
      - **Description**: Step description
      - **Output**: What this step produces
    
@@ -166,8 +165,7 @@ You want to create a template for a specific workflow your team uses frequently.
    ```
 
 3. **Reference Steps**:
-   - Use existing framework steps: `@framework-step:category/step-name`
-   - Use your own steps: `@user-step:category/step-name`
+   - Use `@step:category/step-name` syntax to reference any step
    - Create new steps if needed
 
 4. **Test Template**:
@@ -187,8 +185,7 @@ You need a step that doesn't exist in the steps library.
    - Determine appropriate category (api, service, data, testing, etc.)
 
 2. **Create Step File**:
-   - Location: `.user-processes/steps/{category}/step-name.md`
-   - Or for framework contributions: `.processes/steps/{category}/step-name.md`
+   - Location: `~/.claude/agentic-processes/steps/{category}/step-name.md`
 
 3. **Step Structure**:
    ```markdown
@@ -237,8 +234,7 @@ You need a step that doesn't exist in the steps library.
    ```
 
 4. **Reference in Template**:
-   - Use `@user-step:{category}/step-name` for user steps
-   - Use `@framework-step:{category}/step-name` for framework steps
+   - Use `@step:{category}/step-name` to reference the step
 
 ## Example 5: Resuming an Interrupted Process
 

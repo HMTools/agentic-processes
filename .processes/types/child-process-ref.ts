@@ -20,6 +20,6 @@ export interface ChildProcessRef {
   /** Step ID after which the parent should wait for this child to complete */
   syncPoint: SyncPoint;
   
-  /** Path to the child process folder (relative to project root) */
+  /** Absolute path to the child process folder */
   processPath: ProcessPath;
 }

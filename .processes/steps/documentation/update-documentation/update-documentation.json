@@ -28,7 +28,7 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/docs/how-to-document-flows.md"
+      "~/.claude/agentic-processes/guidelines/docs/how-to-document-flows.md"
     ],
     "specificActions": [
       "Review all code changes to identify if flows were affected",
@@ -96,7 +96,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },

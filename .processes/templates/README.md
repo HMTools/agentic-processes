@@ -6,14 +6,13 @@ This guide explains how to create new process templates for the Process Manageme
 
 Process templates are reusable markdown files that define common workflows. They provide a structured approach to recurring tasks and ensure consistency across the team.
 
-## Template Locations
+## Template Location
 
-Templates can be stored in two locations:
+All templates are stored in a single unified location:
 
-| Location | Description | Reference Syntax |
-|----------|-------------|------------------|
-| `.processes/templates/{category}/` | Framework-provided templates | `@framework-template:category/name` |
-| `.user-processes/templates/{category}/` | User-defined templates | `@user-template:category/name` |
+| Location | Reference Syntax |
+|----------|------------------|
+| `~/.claude/agentic-processes/templates/{category}/` | `@template:category/name` |
 
 ## Template Categories
 
@@ -82,10 +81,10 @@ graph TD
 ### Final Phase: Learning & Improvement
 
 - [ ] Step N: Continuous Improvement & Learning
-  - **Step**: `@framework-step:learning/continuous-improvement`
+  - **Step**: `@step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .user-processes/active/{process-name}/log.json
+    - `processLogPath`: ~/.claude/agentic-processes/active/{process-name}/log.json
     - `processName`: {{processName}}
     - `templateName`: [template-name]
   - **Output**: Analysis report, implemented improvements, updated templates/steps
@@ -531,10 +530,10 @@ This step is mandatory and should be added before the "Errors & Notes" section:
 ### Final Phase: Learning & Improvement
 
 - [ ] Step N: Continuous Improvement & Learning
-  - **Step**: `@framework-step:learning/continuous-improvement`
+  - **Step**: `@step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Context**:
-    - `processLogPath`: .user-processes/active/{process-name}/log.json
+    - `processLogPath`: ~/.claude/agentic-processes/active/{process-name}/log.json
     - `processName`: {{processName}}
     - `templateName`: [template-name]
   - **Output**: Analysis report, implemented improvements, updated templates/steps
@@ -557,7 +556,7 @@ This step is mandatory and should be added before the "Errors & Notes" section:
 5. Updates templates/steps/documentation
 6. Makes future processes more efficient
 
-See `@framework-step:learning/continuous-improvement` for detailed guidance on this step.
+See `@step:learning/continuous-improvement` for detailed guidance on this step.
 
 ## Getting Help
 

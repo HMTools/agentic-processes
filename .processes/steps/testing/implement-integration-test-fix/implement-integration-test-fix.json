@@ -26,8 +26,8 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/testing/how-to-write-integration-tests.md",
-      ".user-processes/guidelines/testing/how-to-mock-dependencies.md"
+      "~/.claude/agentic-processes/guidelines/testing/how-to-write-integration-tests.md",
+      "~/.claude/agentic-processes/guidelines/testing/how-to-mock-dependencies.md"
     ],
     "specificActions": [
       "Read previous step to understand what needs fixing",
@@ -69,7 +69,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },

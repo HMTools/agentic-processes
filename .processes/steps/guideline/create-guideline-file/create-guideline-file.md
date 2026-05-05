@@ -16,7 +16,7 @@ Use this step when you need to:
 - Write practical "How to" documentation for a specific action
 - Fill in a guideline that is referenced but doesn't exist yet
 
-**Output**: Guideline file at `.user-processes/guidelines/{category}/how-to-{name}.md`
+**Output**: Guideline file at `~/.claude/agentic-processes/guidelines/{category}/how-to-{name}.md`
 
 ## Quick Reference
 

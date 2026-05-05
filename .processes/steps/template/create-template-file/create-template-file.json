@@ -10,8 +10,8 @@
   "output": {
     "description": "Complete template file with all sections",
     "artifacts": [
-      ".processes/templates/{category}/{template-name}.md",
-      ".processes/templates/{category}/{template-name}.json"
+      "~/.claude/agentic-processes/templates/{category}/{template-name}.md",
+      "~/.claude/agentic-processes/templates/{category}/{template-name}.json"
     ],
     "memoryUpdates": [
       "templateFilePath",
@@ -28,25 +28,25 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/docs/how-to-document-flows.md"
+      "~/.claude/agentic-processes/guidelines/docs/how-to-document-flows.md"
     ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: create file → write user docs → write flow → write steps → create JSON → validate",
-      "Use kebab-case for filename: `.processes/templates/{category}/{template-name}.md`",
+      "Use kebab-case for filename: `~/.claude/agentic-processes/templates/{category}/{template-name}.md`",
       "MD file contains: Description, Purpose & Usage, Quick Reference, Flow diagram, Steps list",
       "JSON file contains: metadata, parameters, steps with full context, guidance",
-      "Each step references framework-step: @framework-step:category/step-name",
+      "Each step references framework-step: @step:category/step-name",
       "CRITICAL: Only create template files in this step. Do NOT create step files — missing steps are handled later by validate-process-steps-exist via sub-processes"
     ],
     "files": {
       "read": [
         "memory.json (template design from previous step)",
-        ".processes/templates/template-template.md (if exists)"
+        "~/.claude/agentic-processes/templates/template-template.md (if exists)"
       ],
       "create": [
-        ".processes/templates/{category}/{template-name}.md",
-        ".processes/templates/{category}/{template-name}.json"
+        "~/.claude/agentic-processes/templates/{category}/{template-name}.md",
+        "~/.claude/agentic-processes/templates/{category}/{template-name}.json"
       ],
       "update": []
     },
@@ -57,14 +57,14 @@
     ],
     "bestPractices": [
       "Always include continuous improvement as final step with approvalRequired: true",
-      "Use @framework-step:category/step-name for all step references",
+      "Use @step:category/step-name for all step references",
       "Keep parameters section clear with required vs optional",
       "Ensure flow diagram matches step sequence",
       "Include memory file configuration",
-      "NEVER create step files (.processes/steps/) directly in this step. This step creates TEMPLATE files only. New steps must be created via the create-process-step-template sub-process in the validate-process-steps-exist step."
+      "NEVER create step files (~/.claude/agentic-processes/steps/) directly in this step. This step creates TEMPLATE files only. New steps must be created via the create-process-step-template sub-process in the validate-process-steps-exist step."
     ],
     "warnings": [
-      "CRITICAL: This step creates TEMPLATE files only (.processes/templates/). Do NOT create step files (.processes/steps/) here. If the template references steps that don't exist yet, they will be handled by the validate-process-steps-exist step which spawns create-process-step-template sub-processes for each missing step."
+      "CRITICAL: This step creates TEMPLATE files only (~/.claude/agentic-processes/templates/). Do NOT create step files (~/.claude/agentic-processes/steps/) here. If the template references steps that don't exist yet, they will be handled by the validate-process-steps-exist step which spawns create-process-step-template sub-processes for each missing step."
     ]
   },
   "substeps": [
@@ -73,7 +73,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -83,7 +83,7 @@
       "description": "Create the MD file in the templates directory",
       "actions": [
         "Create category directory if needed",
-        "Create file: .processes/templates/{category}/{template-name}.md"
+        "Create file: ~/.claude/agentic-processes/templates/{category}/{template-name}.md"
       ]
     },
     {
@@ -114,7 +114,7 @@
       "actions": [
         "Write Steps section",
         "For each step: checkbox, description, step reference",
-        "Use format: - [ ] Step N: Description (@framework-step:category/step-name)",
+        "Use format: - [ ] Step N: Description (@step:category/step-name)",
         "Include output for each step",
         "Add continuous improvement as final step with approvalRequired: true"
       ]
@@ -124,7 +124,7 @@
       "name": "Create JSON companion file",
       "description": "Create the agent-facing JSON with complete step definitions",
       "actions": [
-        "Create file: .processes/templates/{category}/{template-name}.json",
+        "Create file: ~/.claude/agentic-processes/templates/{category}/{template-name}.json",
         "Include metadata: type, name, category, title, purposeAndUsage",
         "Include parameters: required and optional arrays",
         "Include steps array with full context for each step",

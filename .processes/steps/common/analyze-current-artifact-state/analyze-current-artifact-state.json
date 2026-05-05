@@ -31,7 +31,7 @@
       "artifactPath": {
         "description": "Path to the artifact to analyze (relative to project root)",
         "type": "string",
-        "example": ".processes/templates/infrastructure/create-process-step-template"
+        "example": "~/.claude/agentic-processes/templates/infrastructure/create-process-step-template"
       },
       "focusArea": {
         "description": "Free-form description of what aspect to focus on. Agent interprets dynamically. If omitted, full analysis is performed.",
@@ -154,7 +154,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },

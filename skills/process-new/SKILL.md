@@ -28,18 +28,19 @@ Create a new process from a template with parameter substitution and step resolu
 
 **CRITICAL RULE**: You MUST always use an existing process template. **NEVER** skip templates or do work directly without a template.
 
-- Always use a template from `.processes/templates/`
+- Always use a template from `~/.claude/agentic-processes/templates/`
 - Never create files directly without a template
 - If no template exists: inform the user, list what templates exist, stop and wait
 
-### Plugin Architecture
+### Unified Architecture
 
 | Location | Contains |
 |----------|----------|
-| **Plugin Location** | Templates (`.processes/templates/`), steps (`.processes/steps/`), framework code |
-| **User's Project** | Application code, `.user-processes/` (process instances live here) |
+| `~/.claude/agentic-processes/templates/` | All process templates |
+| `~/.claude/agentic-processes/steps/` | All step definitions |
+| `~/.claude/agentic-processes/active/` | Running process instances |
 
-**NEVER create process instances in the plugin location.**
+All process-related files live under `~/.claude/agentic-processes/`.
 
 ## Command Behavior
 
@@ -47,12 +48,12 @@ When `/process-new` is invoked:
 
 ### 1. Check for Existing Processes
 
-- Check `.user-processes/active/` for similar processes
+- Check `~/.claude/agentic-processes/active/` for similar processes
 - If found, ask if user wants to resume or create new
 
 ### 2. List Available Templates
 
-- Display templates from `.processes/templates/`
+- Display templates from `~/.claude/agentic-processes/templates/`
 - Read both `.json` and `.md` files for each template
 - Show purposes and required parameters from JSON
 - If no template fits: inform user and stop
@@ -65,7 +66,7 @@ When `/process-new` is invoked:
 
 ### 4. Resolve Step References
 
-- Scan template for `@framework-step:category/step-name` references
+- Scan template for `@step:category/step-name` references
 - Keep references as references (don't expand)
 - Read step's `.json` file for complete guidance when executing
 

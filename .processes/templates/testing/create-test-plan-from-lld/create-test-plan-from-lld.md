@@ -65,7 +65,7 @@ flowchart TD
 ## Steps
 
 ### Step 0: Init Process Principles
-**Step Reference**: `@framework-step:common/init-process-principles`  
+**Step Reference**: `@step:common/init-process-principles`  
 **Approval Required**: No
 
 Load and confirm the 8 operating principles for this process execution.
@@ -75,7 +75,7 @@ Load and confirm the 8 operating principles for this process execution.
 ---
 
 ### Step 1: Understand LLD Context
-**Step Reference**: `@framework-step:planning/understand-context`  
+**Step Reference**: `@step:planning/understand-context`  
 **Approval Required**: No
 
 Parse and understand the LLD document to identify the scope for test planning:
@@ -89,7 +89,7 @@ Parse and understand the LLD document to identify the scope for test planning:
 ---
 
 ### Step 2: Gather Test Requirements
-**Step Reference**: `@framework-step:testing/gather-test-requirements`  
+**Step Reference**: `@step:testing/gather-test-requirements`  
 **Approval Required**: No
 
 Extract and organize test-specific requirements from the LLD:
@@ -104,7 +104,7 @@ Extract and organize test-specific requirements from the LLD:
 ---
 
 ### Step 3: Create Test Plan
-**Step Reference**: `@framework-step:testing/create-test-plan`  
+**Step Reference**: `@step:testing/create-test-plan`  
 **Approval Required**: Yes
 
 Analyze test scope and create the complete test plan document:
@@ -127,7 +127,7 @@ Analyze test scope and create the complete test plan document:
 ---
 
 ### Step 4: Sync to Test Management Tool
-**Step Reference**: `@framework-step:testing/sync-test-management`  
+**Step Reference**: `@step:testing/sync-test-management`  
 **Approval Required**: Conditional (based on guideline configuration)
 
 Push test cases to external test management tool (Azure DevOps, Zephyr, TestRail, etc.).
@@ -139,7 +139,7 @@ Push test cases to external test management tool (Azure DevOps, Zephyr, TestRail
 ---
 
 ### Step 5: Continuous Improvement
-**Step Reference**: `@framework-step:learning/continuous-improvement`  
+**Step Reference**: `@step:learning/continuous-improvement`  
 **Approval Required**: Yes
 
 Review the process execution and capture learnings:
@@ -152,7 +152,7 @@ Review the process execution and capture learnings:
 ---
 
 ### Step 6: End Process Validation
-**Step Reference**: `@framework-step:common/end-process-validation`  
+**Step Reference**: `@step:common/end-process-validation`  
 **Approval Required**: No
 
 Final compliance check to ensure all process requirements were met.

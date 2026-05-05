@@ -31,8 +31,8 @@
       "pre-implementation-patterns.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/api-design/how-to-handle-authentication.md",
-      ".user-processes/guidelines/implementation/how-to-handle-errors.md"
+      "~/.claude/agentic-processes/guidelines/api-design/how-to-handle-authentication.md",
+      "~/.claude/agentic-processes/guidelines/implementation/how-to-handle-errors.md"
     ],
     "specificActions": [
       "Study Existing Patterns: Search for similar API clients, authentication patterns, HTTP client wrapper usage",
@@ -80,7 +80,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },

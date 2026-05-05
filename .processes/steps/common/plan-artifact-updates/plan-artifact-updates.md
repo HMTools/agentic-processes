@@ -38,8 +38,8 @@ Use this step when:
 
 | Artifact Type | Change Targets | Consumer Check |
 |---------------|----------------|----------------|
-| template | Steps array, parameters, metadata, flow diagram, MD docs | Active processes in `.user-processes/active/` |
-| step | Substeps, guidance, dependencies, references, memory usage | Templates referencing via `@framework-step:` |
+| template | Steps array, parameters, metadata, flow diagram, MD docs | Active processes in `~/.claude/agentic-processes/active/` |
+| step | Substeps, guidance, dependencies, references, memory usage | Templates referencing via `@step:` |
 | process | Step config, parameters, subprocess state, metadata | Parent/child process relationships |
 
 ### Backward Compatibility

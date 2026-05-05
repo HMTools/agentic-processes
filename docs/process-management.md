@@ -234,11 +234,11 @@ Place sync points where parent needs sub-process results:
 ### How It Works
 
 ```
-1. SPAWN: Parent uses @framework-step:common/spawn-sub-process
+1. SPAWN: Parent uses @step:common/spawn-sub-process
    ├── Creates sub-process with parent reference
    └── Records child in parent's memory
 
-2. NOTIFY: When sub-process completes, uses @framework-step:common/notify-parent-complete
+2. NOTIFY: When sub-process completes, uses @step:common/notify-parent-complete
    └── Updates parent's memory with completion status (push model)
 
 3. SYNC: At sync points, process-continue checks parent's own memory
@@ -248,14 +248,14 @@ Place sync points where parent needs sub-process results:
 
 ### Creating Sub-Processes
 
-Use `@framework-step:common/spawn-sub-process` with:
+Use `@step:common/spawn-sub-process` with:
 - `template`: Template for sub-process
 - `parameters`: Parameters to pass
 - `syncPoint`: When to wait ("immediate", "step-N", "end")
 
 ### Notifying Parent
 
-At end of sub-process, use `@framework-step:common/notify-parent-complete`:
+At end of sub-process, use `@step:common/notify-parent-complete`:
 - Updates parent's memory with completion status
 - No polling needed - parent just reads its own memory at sync points
 

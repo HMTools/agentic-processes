@@ -33,9 +33,9 @@
       "pre-implementation-patterns.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/implementation/how-to-implement-services.md",
-      ".user-processes/guidelines/implementation/how-to-use-dependency-injection.md",
-      ".user-processes/guidelines/implementation/how-to-handle-errors.md"
+      "~/.claude/agentic-processes/guidelines/implementation/how-to-implement-services.md",
+      "~/.claude/agentic-processes/guidelines/implementation/how-to-use-dependency-injection.md",
+      "~/.claude/agentic-processes/guidelines/implementation/how-to-handle-errors.md"
     ],
     "specificActions": [
       "Parse Components List: Get component specifications from context parameters",
@@ -82,7 +82,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },

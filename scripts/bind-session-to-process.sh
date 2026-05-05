@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PostToolUse hook: bind session_id to active process directory
-# When agent writes/edits any file in .user-processes/active/*/,
+# When agent writes/edits any file in ~/.claude/agentic-processes/active/*/,
 # write the session_id to a .session file in that process directory
 export LANG=C.UTF-8
 
@@ -18,9 +18,9 @@ fi
 NORMALIZED_PATH=$(printf '%s' "$FILE_PATH" | tr '\\' '/' | sed 's|//*|/|g')
 
 # Only act on files inside active process directories
-if [[ "$NORMALIZED_PATH" == */.user-processes/active/*/* ]]; then
+if [[ "$NORMALIZED_PATH" == */.claude/agentic-processes/active/*/* ]]; then
     # Extract the process directory (up to the process folder name)
-    PROCESS_DIR=$(echo "$NORMALIZED_PATH" | sed 's|\(.*/.user-processes/active/[^/]*\)/.*|\1|')
+    PROCESS_DIR=$(echo "$NORMALIZED_PATH" | sed 's|\(.*/.claude/agentic-processes/active/[^/]*\)/.*|\1|')
     if [ -d "$PROCESS_DIR" ]; then
         SESSION_FILE="$PROCESS_DIR/.session"
         # Only write session ID when .session content is empty (or file doesn't exist)

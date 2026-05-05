@@ -20,7 +20,7 @@ Use this step when you need to:
 | Action | Tool |
 |--------|------|
 | Read high-level plan | `read_file` on plan.md |
-| Verify process-steps exist | `list_dir` on .processes/steps/ |
+| Verify process-steps exist | `list_dir` on ~/.claude/agentic-processes/steps/ |
 | Create detailed plan files | `write` |
 | Update memory | `search_replace` |
 

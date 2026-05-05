@@ -51,9 +51,7 @@ Templates define reusable workflows with:
 - Process flow diagrams
 - Sequential step definitions
 
-**Locations**:
-- Framework templates: `.processes/templates/{category}/`
-- User templates: `.user-processes/templates/{category}/`
+**Location**: `~/.claude/agentic-processes/templates/{category}/`
 
 **Structure**:
 ```markdown
@@ -66,7 +64,7 @@ Required Parameters: param1, param2
 # Process: {{processName}}
 ## Steps
 - [ ] Step 1: Description
-  - **Step**: `@framework-step:category/step-name`
+  - **Step**: `@step:category/step-name`
 ```
 
 ### 3. Steps
@@ -79,9 +77,7 @@ Steps are modular, self-contained definitions with:
 - Substeps
 - Examples
 
-**Locations**:
-- Framework steps: `.processes/steps/{category}/`
-- User steps: `.user-processes/steps/{category}/`
+**Location**: `~/.claude/agentic-processes/steps/{category}/`
 
 **Categories**:
 - `api/` - API layer steps
@@ -101,7 +97,7 @@ Process instances are created from templates and contain:
 - Memory file (`memory.json`) - Persistent information shared across steps
 - Log file (`log.json`) - Detailed execution log
 
-**Location**: `.user-processes/{state}/process-{name}-{YYYYMMDD}/`
+**Location**: `~/.claude/agentic-processes/{state}/process-{name}-{YYYYMMDD}-{shortid}/`
 
 **States**:
 - `active/` - Currently running
@@ -166,13 +162,12 @@ graph TD
 When a process is created from a template:
 
 1. **Template Reading**: Read template file
-2. **Reference Scanning**: Find all step references (`@framework-step:` and `@user-step:`)
+2. **Reference Scanning**: Find all step references (`@step:category/name`)
 3. **Step Loading**: For each reference:
-   - `@framework-step:category/name` → read from `.processes/steps/{category}/{name}.md`
-   - `@user-step:category/name` → read from `.user-processes/steps/{category}/{name}.md`
+   - `@step:category/name` → read from `~/.claude/agentic-processes/steps/{category}/{name}.json`
    - Extract relevant sections (Description, Output, Guidance)
 4. **Context Application**: Apply context parameters from template
-5. **Process Creation**: Create process instance in `.user-processes/active/`
+5. **Process Creation**: Create process instance in `~/.claude/agentic-processes/active/`
 
 ## State Management
 
@@ -242,19 +237,21 @@ AGENTS.md                            # Agent discovery
 ├── types/                           # TypeScript types
 └── prompts/                         # Entry prompts
 
-# User Resources (.user-processes/ in user's project)
-.user-processes/
+# Runtime Location (~/.claude/agentic-processes/)
+~/.claude/agentic-processes/
+├── templates/                       # All process templates
+├── steps/                           # All step definitions
+├── types/                           # TypeScript types + schema.json
+├── guidelines/                      # Project-specific guidelines
+├── flags/                           # Runtime flag files
 ├── active/                          # Running processes
-│   └── process-{name}-{date}/
+│   └── process-{name}-{date}-{id}/
 │       ├── process.json             # Primary state
 │       ├── process.md               # Documentation
 │       ├── memory.json              # Cross-step info
 │       └── log.json                 # Execution log
 ├── completed/                       # Finished processes
-├── failed/                          # Failed processes
-├── templates/                       # User templates
-├── steps/                           # User steps
-└── guidelines/                      # Project guidelines
+└── failed/                          # Failed processes
 ```
 
 ## Design Principles
@@ -298,15 +295,15 @@ Steps are executed by subagents for:
 
 ### Adding Your Own Templates
 
-1. Create template file in `.user-processes/templates/{category}/`
+1. Create template file in `~/.claude/agentic-processes/templates/{category}/`
 2. Follow template structure
-3. Reference steps using `@framework-step:` or `@user-step:` prefix
+3. Reference steps using `@step:category/step-name` syntax
 4. Add mermaid flow diagram
 
 ### Adding Your Own Steps
 
-1. Create step file in `.user-processes/steps/{category}/`
-2. Follow step template (see `.processes/steps/step-template.md`)
+1. Create step file in `~/.claude/agentic-processes/steps/{category}/`
+2. Follow step template (see `~/.claude/agentic-processes/steps/step-template.md`)
 3. Include all required sections
 4. Add examples and guidance
 

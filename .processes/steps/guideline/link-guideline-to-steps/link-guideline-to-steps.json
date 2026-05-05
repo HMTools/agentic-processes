@@ -10,7 +10,7 @@
   "output": {
     "description": "Updated step JSON files with new userGuidelines entries",
     "artifacts": [
-      "Updated .processes/steps/{category}/{step-name}.json files"
+      "Updated ~/.claude/agentic-processes/steps/{category}/{step-name}.json files"
     ],
     "memoryUpdates": [
       "stepsUpdated",
@@ -40,7 +40,7 @@
     "files": {
       "read": [
         "memory.json (guideline path from previous step)",
-        ".processes/steps/**/*.json (all step JSON files for analysis)"
+        "~/.claude/agentic-processes/steps/**/*.json (all step JSON files for analysis)"
       ],
       "update": [
         "Step JSON files that user confirms"
@@ -66,7 +66,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -86,7 +86,7 @@
       "name": "Identify target steps",
       "description": "Analyze step JSON files to find relevant steps, then confirm with user",
       "actions": [
-        "Scan all step JSON files in .processes/steps/ (all categories)",
+        "Scan all step JSON files in ~/.claude/agentic-processes/steps/ (all categories)",
         "Read and analyze each step's content to determine relevance:",
         "- Check metadata.purposeAndUsage - does it relate to the guideline topic?",
         "- Check guidance.specificActions - would this guideline help?",
@@ -149,7 +149,7 @@
       "qa-session.md"
     ],
     "requiredFiles": [
-      "Step JSON files in .processes/steps/"
+      "Step JSON files in ~/.claude/agentic-processes/steps/"
     ],
     "requiredTools": [
       "read_file",

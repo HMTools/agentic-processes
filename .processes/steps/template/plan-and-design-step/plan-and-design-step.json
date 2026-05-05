@@ -35,12 +35,12 @@
       "Emphasize simplicity: avoid over-engineering, keep designs focused",
       "Use generic step references: reference 'previous step' not specific numbers",
       "Steps only produce outputs: don't include flow control logic in steps",
-      "Check .processes/steps/README.md for available categories"
+      "Check ~/.claude/agentic-processes/steps/README.md for available categories"
     ],
     "files": {
       "read": [
-        ".processes/steps/README.md",
-        ".processes/steps/step-template.md",
+        "~/.claude/agentic-processes/steps/README.md",
+        "~/.claude/agentic-processes/steps/step-template.md",
         "Existing steps in relevant category"
       ],
       "create": [
@@ -72,7 +72,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -137,7 +137,7 @@
         "Plan user documentation sections",
         "Plan guidance content (specific actions, tools, files)",
         "Define expected output and memory updates",
-        "Check .processes/steps/_components/ for applicable shared components (qa-session, mandatory-logging, etc.)"
+        "Check ~/.claude/agentic-processes/steps/_components/ for applicable shared components (qa-session, mandatory-logging, etc.)"
       ]
     },
     {

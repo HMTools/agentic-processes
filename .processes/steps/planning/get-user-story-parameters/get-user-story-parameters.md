@@ -36,7 +36,7 @@ Collect user story details (title, description, acceptance criteria) from a user
 |--------|---------|
 | Category | planning |
 | Pattern | Guideline-based |
-| Guideline | `.user-processes/guidelines/planning/how-to-get-user-story-parameters.md` |
+| Guideline | `~/.claude/agentic-processes/guidelines/planning/how-to-get-user-story-parameters.md` |
 | Fallback | Manual entry via user prompt |
 | Required Fields | title, description, acceptanceCriteria, source |
 
@@ -60,7 +60,7 @@ flowchart TD
 
 ### Substeps
 
-- [ ] **Substep 1**: Check for user guideline - Look for `.user-processes/guidelines/planning/how-to-get-user-story-parameters.md`
+- [ ] **Substep 1**: Check for user guideline - Look for `~/.claude/agentic-processes/guidelines/planning/how-to-get-user-story-parameters.md`
 - [ ] **Substep 2**: Execute guideline or request manual entry - Get user story details using available method
 - [ ] **Substep 3**: Validate required fields - Ensure title, description, acceptanceCriteria, source are present
 - [ ] **Substep 4**: Request missing information (conditional) - Ask for any missing required fields

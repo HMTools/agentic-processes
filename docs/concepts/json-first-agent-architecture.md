@@ -28,8 +28,8 @@ Transform the agentic process system from a dual-file approach (where both JSON 
 ### targetFiles
 
 Apply this concept to all files in:
-- `.processes/steps/**/*.json` and `.processes/steps/**/*.md`
-- `.processes/templates/**/*.json` and `.processes/templates/**/*.md`
+- `~/.claude/agentic-processes/steps/**/*.json` and `~/.claude/agentic-processes/steps/**/*.md`
+- `~/.claude/agentic-processes/templates/**/*.json` and `~/.claude/agentic-processes/templates/**/*.md`
 - `commands/**/*.md`
 - `docs/**/*.json` and `docs/**/*.md`
 
@@ -189,7 +189,7 @@ When to use this step:
     {
       "number": 1,
       "name": "Step name",
-      "stepRef": "@framework-step:category/step-name",
+      "stepRef": "@step:category/step-name",
       "description": "Full description of what this step does in the context of this template",
       "context": {
         "param1": "{{param1}}",
@@ -209,7 +209,7 @@ When to use this step:
     "keyFields": ["Approved plan", "Decisions made"]
   },
   "references": {
-    "steps": ["@framework-step:category/step1"],
+    "steps": ["@step:category/step1"],
     "relatedTemplates": [],
     "dependencies": []
   }
@@ -487,6 +487,6 @@ flowchart TD
 ## Notes
 
 - The `_components/` folder files are referenced by steps but don't follow the same dual-file pattern - they may need separate consideration
-- Process instance files (`process.md`, `memory.json`, `log.json` in `.user-processes/`) follow a different pattern and are not part of this migration
+- Process instance files (`process.md`, `memory.json`, `log.json` in `~/.claude/agentic-processes/`) follow a different pattern and are not part of this migration
 - The templates for memory and log files (`memory-template.md`, `log-template.md`) should be kept as MD-only since they're used to initialize process instances
 

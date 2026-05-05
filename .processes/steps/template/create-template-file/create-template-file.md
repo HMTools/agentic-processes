@@ -2,7 +2,7 @@
 
 ## Description
 
-Create a template file in `.processes/templates/{category}/` with proper filename and all required sections. Includes user documentation in MD and complete step definitions in JSON.
+Create a template file in `~/.claude/agentic-processes/templates/{category}/` with proper filename and all required sections. Includes user documentation in MD and complete step definitions in JSON.
 
 ## Purpose & Usage
 

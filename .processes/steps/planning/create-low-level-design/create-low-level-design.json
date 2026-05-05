@@ -30,7 +30,7 @@
       "qa-session.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/planning/how-to-write-low-level-design.md"
+      "~/.claude/agentic-processes/guidelines/planning/how-to-write-low-level-design.md"
     ],
     "specificActions": [
       "Follow the substeps below in sequence",
@@ -43,7 +43,7 @@
     "files": {
       "read": [
         "memory.json (context from Steps 2, 3, 4)",
-        ".user-processes/guidelines/planning/how-to-write-low-level-design.md"
+        "~/.claude/agentic-processes/guidelines/planning/how-to-write-low-level-design.md"
       ],
       "create": [
         "plans/{user-story-name}/lld.md"
@@ -70,7 +70,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -89,7 +89,7 @@
       "name": "Check for LLD guideline",
       "description": "Look for team's LLD guideline file",
       "actions": [
-        "Check if .user-processes/guidelines/planning/how-to-write-low-level-design.md exists",
+        "Check if ~/.claude/agentic-processes/guidelines/planning/how-to-write-low-level-design.md exists",
         "If exists: Proceed to substep 3",
         "If not exists: Skip to substep 4 (use default structure)"
       ]
@@ -110,7 +110,7 @@
       "name": "Create LLD document",
       "description": "Follow guideline to create the LLD document",
       "actions": [
-        "Follow guideline workflow at .user-processes/guidelines/planning/how-to-write-low-level-design.md",
+        "Follow guideline workflow at ~/.claude/agentic-processes/guidelines/planning/how-to-write-low-level-design.md",
         "If no guideline exists: Use default structure as fallback"
       ],
       "guidelineDefines": [

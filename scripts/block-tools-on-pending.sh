@@ -5,18 +5,18 @@ export LANG=C.UTF-8
 INPUT=$(cat)
 
 SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
-PROJECT_DIR="$CLAUDE_PROJECT_DIR"
+AGENTIC_DIR="$HOME/.claude/agentic-processes"
 TOOL_NAME=$(echo "$INPUT" | grep -oP '"tool_name"\s*:\s*"\K[^"]*' | head -1)
 FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]*' | head -1)
 COMMAND=$(echo "$INPUT" | grep -oP '"command"\s*:\s*"\K[^"]*' | head -1)
 
-if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
+if [ -z "$SESSION_ID" ]; then
     exit 0
 fi
 
 # Find the active process folder by matching .session file
 PENDING_FILE=""
-for SESSION_FILE in "$PROJECT_DIR"/.user-processes/active/*/.session; do
+for SESSION_FILE in "$AGENTIC_DIR"/active/*/.session; do
     if [ -f "$SESSION_FILE" ] && [ "$(cat "$SESSION_FILE" 2>/dev/null)" = "$SESSION_ID" ]; then
         PROCESS_DIR=$(dirname "$SESSION_FILE")
         PENDING_FILE="$PROCESS_DIR/pending-interaction.json"

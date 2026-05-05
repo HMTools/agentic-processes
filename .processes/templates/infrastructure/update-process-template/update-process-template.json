@@ -37,39 +37,39 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Principles loaded and confirmed"
     },
     {
       "number": 1,
       "name": "Analyze Current Artifact State",
-      "stepRef": "@framework-step:common/analyze-current-artifact-state",
+      "stepRef": "@step:common/analyze-current-artifact-state",
       "output": "Baseline analysis of artifact structure recorded to memory"
     },
     {
       "number": 2,
       "name": "Plan Artifact Updates",
-      "stepRef": "@framework-step:common/plan-artifact-updates",
+      "stepRef": "@step:common/plan-artifact-updates",
       "output": "update-plan.md with proposed changes",
       "approvalRequired": true
     },
     {
       "number": 3,
       "name": "Apply Artifact Updates",
-      "stepRef": "@framework-step:common/apply-artifact-updates",
+      "stepRef": "@step:common/apply-artifact-updates",
       "output": "Modified artifact JSON and MD files with verified changes"
     },
     {
       "number": 4,
       "name": "Review and Validate Artifact Updates",
-      "stepRef": "@framework-step:common/review-and-validate-artifact-updates",
+      "stepRef": "@step:common/review-and-validate-artifact-updates",
       "output": "review-report.md with plan compliance, quality assessment, and validation results",
       "approvalRequired": true
     },
     {
       "number": 5,
       "name": "Validate Process Steps Exist",
-      "stepRef": "@framework-step:template/validate-process-steps-exist",
+      "stepRef": "@step:template/validate-process-steps-exist",
       "output": "Validation report",
       "subProcessTrigger": {
         "condition": "missing steps found",
@@ -82,27 +82,27 @@
     {
       "number": 6,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Improvements implemented",
       "approvalRequired": true
     },
     {
       "number": 7,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report"
     }
   ],
   "references": {
     "steps": [
-      "@framework-step:common/init-process-principles",
-      "@framework-step:common/analyze-current-artifact-state",
-      "@framework-step:common/plan-artifact-updates",
-      "@framework-step:common/apply-artifact-updates",
-      "@framework-step:common/review-and-validate-artifact-updates",
-      "@framework-step:template/validate-process-steps-exist",
-      "@framework-step:learning/continuous-improvement",
-      "@framework-step:common/end-process-validation"
+      "@step:common/init-process-principles",
+      "@step:common/analyze-current-artifact-state",
+      "@step:common/plan-artifact-updates",
+      "@step:common/apply-artifact-updates",
+      "@step:common/review-and-validate-artifact-updates",
+      "@step:template/validate-process-steps-exist",
+      "@step:learning/continuous-improvement",
+      "@step:common/end-process-validation"
     ],
     "relatedTemplates": ["create-process-template", "create-process-step-template"],
     "dependencies": []

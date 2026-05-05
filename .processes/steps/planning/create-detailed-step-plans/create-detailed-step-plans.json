@@ -21,7 +21,7 @@
   "guidance": {
     "prerequisites": [
       "High-level plan approved (from create-high-level-plan step)",
-      "All required process-steps exist in .processes/steps/ library"
+      "All required process-steps exist in ~/.claude/agentic-processes/steps/ library"
     ],
     "mandatoryComponents": [
       "mandatory-logging.md"
@@ -41,7 +41,7 @@
       "read": [
         "plans/{user-story-name}/plan.md (approved high-level plan)",
         "memory.json (previous step section with plan directory)",
-        ".processes/steps/{category}/{step-name}/ (to verify process-steps exist)"
+        "~/.claude/agentic-processes/steps/{category}/{step-name}/ (to verify process-steps exist)"
       ],
       "create": [
         "plans/{user-story-name}/step-{n}-{step-name}.md (one per high-level step)"
@@ -68,7 +68,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -113,7 +113,7 @@
       "description": "Link each detailed plan to the process-step that will execute it",
       "actions": [
         "Identify appropriate process-step (e.g., @step:api/implement-controller-layer)",
-        "Verify process-step exists in .processes/steps/",
+        "Verify process-step exists in ~/.claude/agentic-processes/steps/",
         "Add Linked Process Step section with reference and description",
         "If process-step doesn't exist: Flag for creation before proceeding"
       ]
@@ -218,7 +218,7 @@
   },
   "processStepLinking": {
     "format": "@step:category/step-name",
-    "validation": "Verify step exists in .processes/steps/{category}/{step-name}/",
+    "validation": "Verify step exists in ~/.claude/agentic-processes/steps/{category}/{step-name}/",
     "examples": [
       "@step:api/implement-controller-layer",
       "@step:service/implement-service-layer",
@@ -261,7 +261,7 @@
     ],
     "requiredFiles": [
       "Approved high-level plan (plan.md)",
-      "Process-steps in .processes/steps/"
+      "Process-steps in ~/.claude/agentic-processes/steps/"
     ],
     "requiredTools": [
       "read_file",

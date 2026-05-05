@@ -21,8 +21,8 @@ You will receive:
 
 ## Execution Protocol
 
-1. **Validate template exists** in `.processes/templates/`
-2. **Create process directory**: `.user-processes/active/process-{name}-{YYYYMMDD}/`
+1. **Validate template exists** in `~/.claude/agentic-processes/templates/`
+2. **Create process directory**: `~/.claude/agentic-processes/active/process-{name}-{YYYYMMDD}-{shortid}/`
 3. **Create process files** using the `process-new` skill:
    - Use the `process-new` skill to create all state files (process.json, memory.json, log.json)
    - Never use Write/Edit tools directly on process state files

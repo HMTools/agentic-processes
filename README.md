@@ -36,7 +36,7 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 ### Modular Architecture
 - **Templates**: Define reusable workflows with placeholders
 - **Steps**: Self-contained step definitions with rich guidance
-- **Step References**: Compose processes using `@framework-step:category/step-name` or `@user-step:category/step-name` syntax
+- **Step References**: Compose processes using `@step:category/step-name` syntax
 - **Pluggable Resources**: Add your own templates, steps, components, and guidelines
 
 ### State Persistence
@@ -135,22 +135,20 @@ A **process** is an instance of a workflow created from a template. It tracks:
 - Memory and context
 - Audit log of all actions
 
-Processes are stored in `.user-processes/` (in your project):
-- `.user-processes/active/` - Currently running processes
-- `.user-processes/completed/` - Finished processes
-- `.user-processes/failed/` - Failed processes
+Processes are stored in `~/.claude/agentic-processes/`:
+- `~/.claude/agentic-processes/active/` - Currently running processes
+- `~/.claude/agentic-processes/completed/` - Finished processes
+- `~/.claude/agentic-processes/failed/` - Failed processes
 
 ### Templates
 
 **Templates** define reusable workflows with:
 - Parameter placeholders (`{{paramName}}`)
-- Step references (`@framework-step:category/step-name` or `@user-step:category/step-name`)
+- Step references (`@step:category/step-name`)
 - Process flow diagrams (mermaid)
 - Sequential step definitions
 
-Templates are stored in:
-- **Framework templates**: `.processes/templates/{category}/`
-- **User templates**: `.user-processes/templates/{category}/`
+Templates are stored in `~/.claude/agentic-processes/templates/{category}/`.
 
 ### Steps
 
@@ -162,22 +160,18 @@ Templates are stored in:
 - Substeps breakdown
 - Examples and common pitfalls
 
-Steps are stored in:
-- **Framework steps**: `.processes/steps/{category}/`
-- **User steps**: `.user-processes/steps/{category}/`
+Steps are stored in `~/.claude/agentic-processes/steps/{category}/`.
 
 ### Step References
 
-Templates reference steps using explicit prefixes:
+Templates reference steps using unified syntax:
 
 ```markdown
-# Framework steps (from .processes/steps/)
 - [ ] Step 1: Implement feature
-  - **Step**: `@framework-step:api/implement-controller-layer`
+  - **Step**: `@step:api/implement-controller-layer`
 
-# User steps (from .user-processes/steps/)
 - [ ] Step 2: Apply project conventions
-  - **Step**: `@user-step:my-category/my-custom-step`
+  - **Step**: `@step:my-category/my-custom-step`
 ```
 
 ## Documentation
@@ -217,16 +211,16 @@ Templates reference steps using explicit prefixes:
 
 ### Adding Your Own Templates
 
-1. Create template file in `.user-processes/templates/{category}/`
-2. Follow template structure (see `.processes/templates/README.md`)
+1. Create template file in `~/.claude/agentic-processes/templates/{category}/`
+2. Follow template structure (see `~/.claude/agentic-processes/templates/README.md`)
 3. Include parameter placeholders
-4. Reference steps using `@framework-step:` or `@user-step:` syntax
+4. Reference steps using `@step:category/step-name` syntax
 5. Add mermaid flow diagram
 
 ### Adding Your Own Steps
 
-1. Create step file in `.user-processes/steps/{category}/`
-2. Follow step template (see `.processes/steps/step-template.md`)
+1. Create step file in `~/.claude/agentic-processes/steps/{category}/`
+2. Follow step template (see `~/.claude/agentic-processes/steps/step-template.md`)
 3. Include all required sections:
    - Description
    - Output

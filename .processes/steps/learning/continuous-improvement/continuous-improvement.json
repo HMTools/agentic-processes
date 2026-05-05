@@ -40,12 +40,12 @@
     ],
     "files": {
       "read": [
-        ".user-processes/active/{process-name}/log.json"
+        "~/.claude/agentic-processes/active/{process-name}/log.json"
       ],
       "create": [],
       "update": [
-        "Process templates in .processes/templates/",
-        "Process steps in .processes/steps/",
+        "Process templates in ~/.claude/agentic-processes/templates/",
+        "Process steps in ~/.claude/agentic-processes/steps/",
         "Documentation in docs/"
       ]
     },
@@ -73,7 +73,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -82,7 +82,7 @@
       "name": "Read Process Log (Comprehensive Analysis)",
       "description": "Load and comprehensively parse ALL sections of the process execution log",
       "actions": [
-        "Load process log from .user-processes/active/{process-name}/log.json",
+        "Load process log from ~/.claude/agentic-processes/active/{process-name}/log.json",
         "COMPREHENSIVE ANALYSIS - Analyze ALL of the following log sections:",
         "- steps[].userInteractions: Every user interaction, request, correction, and feedback",
         "- steps[].problemsEncountered: Issues that occurred during each step",

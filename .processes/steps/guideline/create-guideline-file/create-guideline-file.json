@@ -10,7 +10,7 @@
   "output": {
     "description": "Complete guideline markdown file with practical steps and examples",
     "artifacts": [
-      ".user-processes/guidelines/{category}/how-to-{name}.md"
+      "~/.claude/agentic-processes/guidelines/{category}/how-to-{name}.md"
     ],
     "memoryUpdates": [
       "guidelineFilePath",
@@ -40,11 +40,11 @@
     "files": {
       "read": [
         "memory.json (context from previous step)",
-        ".user-processes/guidelines/README.md (format reference)",
-        ".user-processes/guidelines/{category}/*.md (existing style)"
+        "~/.claude/agentic-processes/guidelines/README.md (format reference)",
+        "~/.claude/agentic-processes/guidelines/{category}/*.md (existing style)"
       ],
       "create": [
-        ".user-processes/guidelines/{category}/how-to-{name}.md"
+        "~/.claude/agentic-processes/guidelines/{category}/how-to-{name}.md"
       ],
       "update": []
     },
@@ -80,7 +80,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -90,7 +90,7 @@
       "description": "Review the context and parameters gathered in the previous step",
       "actions": [
         "Read memory.json for guideline parameters (name, category, purpose)",
-        "Confirm the guideline file path: .user-processes/guidelines/{category}/how-to-{name}.md",
+        "Confirm the guideline file path: ~/.claude/agentic-processes/guidelines/{category}/how-to-{name}.md",
         "Review any sources or patterns identified",
         "If context incomplete: Use Q&A Session component to gather missing information from user"
       ]
@@ -122,7 +122,7 @@
       "name": "Write Guideline File",
       "description": "Create the actual guideline markdown file",
       "actions": [
-        "Create the file at .user-processes/guidelines/{category}/how-to-{name}.md",
+        "Create the file at ~/.claude/agentic-processes/guidelines/{category}/how-to-{name}.md",
         "Write clear, actionable content",
         "Include practical examples (code snippets, configurations)",
         "Keep content concise but comprehensive",
@@ -170,7 +170,7 @@
       "qa-session.md"
     ],
     "requiredFiles": [
-      ".user-processes/guidelines/README.md"
+      "~/.claude/agentic-processes/guidelines/README.md"
     ],
     "requiredTools": [
       "read_file",

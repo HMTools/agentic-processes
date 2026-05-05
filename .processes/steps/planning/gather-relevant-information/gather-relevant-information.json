@@ -28,13 +28,13 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/planning/how-to-gather-relevant-information.md"
+      "~/.claude/agentic-processes/guidelines/planning/how-to-gather-relevant-information.md"
     ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: check guideline → identify sources → collect from docs → collect from code → validate → request missing (if needed) → store in memory",
       "This step uses guideline-based pattern: teams configure their preferred method for gathering information",
-      "Guideline path: .user-processes/guidelines/planning/how-to-gather-relevant-information.md",
+      "Guideline path: ~/.claude/agentic-processes/guidelines/planning/how-to-gather-relevant-information.md",
       "If no guideline exists, identify sources based on process context and collect manually",
       "Organize gathered information by source type: documentation, codePatterns, specifications, additionalContext"
     ],
@@ -42,7 +42,7 @@
       "read": [
         "process.md (for context on what information to gather)",
         "memory.json (for context from previous steps)",
-        ".user-processes/guidelines/planning/how-to-gather-relevant-information.md (if exists)"
+        "~/.claude/agentic-processes/guidelines/planning/how-to-gather-relevant-information.md (if exists)"
       ],
       "create": [],
       "update": []
@@ -68,7 +68,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -77,7 +77,7 @@
       "name": "Check for user guideline",
       "description": "Look for team's guideline file that defines how to gather relevant information",
       "actions": [
-        "Check if .user-processes/guidelines/planning/how-to-gather-relevant-information.md exists",
+        "Check if ~/.claude/agentic-processes/guidelines/planning/how-to-gather-relevant-information.md exists",
         "Note whether guideline is available for use"
       ]
     },

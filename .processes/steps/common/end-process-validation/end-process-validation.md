@@ -41,7 +41,7 @@ After compliance validation passes, the following completion actions are perform
 | Status Update | `process.json` status set to "completed" |
 | Timestamp | `log.json` metadata.completed set to current time |
 | Artifact Cleanup | Delete all files except `process.json`, `memory.json`, `log.json` |
-| Directory Migration | Process moved from `.user-processes/active/` to `.user-processes/completed/` |
+| Directory Migration | Process moved from `~/.claude/agentic-processes/active/` to `~/.claude/agentic-processes/completed/` |
 
 **Note**: If violations are found, the process does NOT proceed to completion steps. Violations must be resolved first.
 

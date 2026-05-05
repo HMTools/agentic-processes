@@ -2,7 +2,7 @@
 
 ## Description
 
-Create a step file in `.processes/steps/{category}/` with proper filename and all required sections. The step must be self-contained and follow the JSON-first architecture where JSON contains all agent guidance and MD contains user documentation.
+Create a step file in `~/.claude/agentic-processes/steps/{category}/` with proper filename and all required sections. The step must be self-contained and follow the JSON-first architecture where JSON contains all agent guidance and MD contains user documentation.
 
 ## Purpose & Usage
 

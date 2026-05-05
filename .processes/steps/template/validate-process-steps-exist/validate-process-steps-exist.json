@@ -29,14 +29,14 @@
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: read template → extract references → check existence → create report → handle missing",
-      "Reference format: @framework-step:category/step-name",
-      "Step file location: .processes/steps/{category}/{step-name}.md",
+      "Reference format: @step:category/step-name",
+      "Step file location: ~/.claude/agentic-processes/steps/{category}/{step-name}.md",
       "If missing steps found: either spawn sub-processes or PAUSE for manual creation"
     ],
     "files": {
       "read": [
         "Template file to validate",
-        ".processes/steps/{category}/{step-name}.md for each reference"
+        "~/.claude/agentic-processes/steps/{category}/{step-name}.md for each reference"
       ],
       "create": [],
       "update": []
@@ -60,7 +60,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
@@ -79,7 +79,7 @@
       "name": "Extract step references",
       "description": "Find all @framework-step references in the template",
       "actions": [
-        "Search for @framework-step:category/step-name pattern",
+        "Search for @step:category/step-name pattern",
         "Create list of all referenced steps",
         "Note the category and name for each reference"
       ]
@@ -89,8 +89,8 @@
       "name": "Check step existence",
       "description": "Verify each referenced step exists",
       "actions": [
-        "For each reference, check .processes/steps/{category}/{step-name}.md exists",
-        "Also verify .processes/steps/{category}/{step-name}.json exists",
+        "For each reference, check ~/.claude/agentic-processes/steps/{category}/{step-name}.md exists",
+        "Also verify ~/.claude/agentic-processes/steps/{category}/{step-name}.json exists",
         "Mark as valid if both files exist",
         "Mark as missing if either file doesn't exist"
       ]
@@ -163,8 +163,8 @@
     "defaultSyncPoint": "immediate"
   },
   "referenceFormat": {
-    "pattern": "@framework-step:category/step-name",
-    "location": ".processes/steps/category/step-name.md"
+    "pattern": "@step:category/step-name",
+    "location": "~/.claude/agentic-processes/steps/category/step-name.md"
   },
   "dependencies": {
     "requiredComponents": [

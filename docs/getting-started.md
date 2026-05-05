@@ -26,10 +26,11 @@ claude --plugin-dir /path/to/agentic-processes
 
 ### After Installation
 
-No manual setup required - the `.user-processes/` directory is created automatically in your project when you start your first process. Folders are created on-demand:
-- `active/` - created when a process starts
-- `completed/` - created when a process completes
-- `templates/`, `steps/`, etc. - created when you add custom resources
+After installing the plugin, run the install script to copy templates, steps, and types to `~/.claude/agentic-processes/`:
+```bash
+bash /path/to/agentic-processes/scripts/install.sh
+```
+Runtime directories (`active/`, `completed/`, `failed/`, `flags/`) are created on-demand.
 
 ## Your First Process
 
@@ -63,7 +64,7 @@ Provide the requested information.
 The system will:
 1. Resolve all step references
 2. Substitute all parameters
-3. Create process instance in `.user-processes/active/process-{name}-{YYYYMMDD}/`
+3. Create process instance in `~/.claude/agentic-processes/active/process-{name}-{YYYYMMDD}/`
 4. Display the process with steps ready to execute
 
 ### Step 5: Begin Work
@@ -129,9 +130,9 @@ The system will:
 ### Process States
 
 Processes can be in three states:
-- **Running**: Currently active, in `.user-processes/active/`
-- **Completed**: Finished successfully, moved to `.user-processes/completed/`
-- **Failed**: Encountered errors, moved to `.user-processes/failed/`
+- **Running**: Currently active, in `~/.claude/agentic-processes/active/`
+- **Completed**: Finished successfully, moved to `~/.claude/agentic-processes/completed/`
+- **Failed**: Encountered errors, moved to `~/.claude/agentic-processes/failed/`
 
 ## Key Concepts
 
@@ -139,13 +140,11 @@ Processes can be in three states:
 
 Templates define reusable workflows:
 - Use parameter placeholders: `{{paramName}}`
-- Reference steps: `@framework-step:category/step-name` or `@user-step:category/step-name`
+- Reference steps: `@step:category/step-name`
 - Include flow diagrams
 - Define sequential steps
 
-Templates are available from:
-- **Framework**: `.processes/templates/{category}/`
-- **User**: `.user-processes/templates/{category}/`
+Templates are stored in `~/.claude/agentic-processes/templates/{category}/`.
 
 ### Steps
 
@@ -155,19 +154,15 @@ Steps are modular building blocks:
 - Flow diagrams for complex steps
 - Substeps for detailed breakdown
 
-Steps are available from:
-- **Framework**: `.processes/steps/{category}/`
-- **User**: `.user-processes/steps/{category}/`
+Steps are stored in `~/.claude/agentic-processes/steps/{category}/`.
 
 ### Step References
 
-Templates reference steps using explicit prefixes:
+Templates reference steps using unified syntax:
 ```markdown
-- **Step**: `@framework-step:api/implement-controller-layer`  # Framework step
-- **Step**: `@user-step:my-category/my-custom-step`           # User step
+- **Step**: `@step:api/implement-controller-layer`
+- **Step**: `@step:my-category/my-custom-step`
 ```
-
-The prefix makes it clear where each resource comes from.
 
 ## Common Workflows
 

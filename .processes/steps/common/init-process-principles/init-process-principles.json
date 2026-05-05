@@ -8,7 +8,7 @@
     "lastUpdated": "2026-01-31"
   },
   "principlesRef": "@component:operating-principles",
-  "principlesPath": ".processes/steps/_components/operating-principles.md",
+  "principlesPath": "~/.claude/agentic-processes/steps/_components/operating-principles.md",
   "output": {
     "description": "Confirmation that operating principles are loaded and understood",
     "artifacts": [],
@@ -18,14 +18,14 @@
     "prerequisites": [],
     "mandatoryComponents": ["operating-principles.md"],
     "specificActions": [
-      "Read `.processes/steps/_components/operating-principles.md` to load the principles",
+      "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` to load the principles",
       "Internalize all principles from the 'principles' array",
       "Output each principle name and rule",
       "Output confirmation: '✓ Operating principles loaded and understood'",
       "Record: principlesLoaded confirmation"
     ],
     "files": {
-      "read": [".processes/steps/_components/operating-principles.md"],
+      "read": ["~/.claude/agentic-processes/steps/_components/operating-principles.md"],
       "create": [],
       "update": []
     },
@@ -43,7 +43,7 @@
       "name": "Load Operating Principles",
       "description": "Read the shared operating principles component",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md`",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md`",
         "Extract the 'principles' array from the component"
       ]
     },
@@ -76,13 +76,13 @@
     "fields": ["principlesLoaded: true", "timestamp"]
   },
   "dependencies": {
-    "requiredComponents": [".processes/steps/_components/operating-principles.md"],
+    "requiredComponents": ["~/.claude/agentic-processes/steps/_components/operating-principles.md"],
     "requiredFiles": [],
     "requiredTools": []
   },
   "references": {
     "relatedSteps": ["end-process-validation"],
     "usedInTemplates": ["ALL process templates"],
-    "sharedComponent": ".processes/steps/_components/operating-principles.md"
+    "sharedComponent": "~/.claude/agentic-processes/steps/_components/operating-principles.md"
   }
 }

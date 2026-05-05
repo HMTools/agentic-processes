@@ -17,17 +17,17 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Principles loaded and confirmed"
     },
     {
       "number": 1,
       "name": "Identify missing guidelines",
-      "stepRef": "@framework-step:investigation/identify-files",
+      "stepRef": "@step:investigation/identify-files",
       "output": "identified-files.json with list of missing guidelines",
       "approvalRequired": true,
       "context": {
-        "scope": "Find all guideline files referenced in .processes/steps that don't exist in .user-processes/guidelines",
+        "scope": "Find all guideline files referenced in ~/.claude/agentic-processes/steps that don't exist in ~/.claude/agentic-processes/guidelines",
         "searchApproach": "grep for userGuidelines in step JSON files, then check existence of each referenced path",
         "outputFormat": "Array of {path, guidelineName, category, referencedBy} objects"
       }
@@ -35,7 +35,7 @@
     {
       "number": 2,
       "name": "Create guidelines (batch)",
-      "stepRef": "@framework-step:common/spawn-sub-process",
+      "stepRef": "@step:common/spawn-sub-process",
       "output": "Created guideline files",
       "subProcessConfig": {
         "template": "create-guideline",
@@ -53,14 +53,14 @@
     {
       "number": 3,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Improvements implemented",
       "approvalRequired": true
     },
     {
       "number": 4,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report"
     }
   ],
@@ -68,15 +68,15 @@
     "step1ScanningLogic": {
       "description": "How to identify missing guidelines",
       "actions": [
-        "Use grep to find all 'userGuidelines' references in .processes/steps/**/*.json",
+        "Use grep to find all 'userGuidelines' references in ~/.claude/agentic-processes/steps/**/*.json",
         "Parse each reference to extract the guideline path",
         "Check if the file exists at the referenced path",
         "Group missing guidelines by category",
         "Present findings to user for approval"
       ],
       "grepPattern": "userGuidelines",
-      "searchPath": ".processes/steps/",
-      "guidelineBasePath": ".user-processes/guidelines/"
+      "searchPath": "~/.claude/agentic-processes/steps/",
+      "guidelineBasePath": "~/.claude/agentic-processes/guidelines/"
     },
     "step2BatchCreation": {
       "description": "How to create guidelines in batch",
@@ -91,9 +91,9 @@
   },
   "references": {
     "steps": [
-      "@framework-step:investigation/identify-files",
-      "@framework-step:common/spawn-sub-process",
-      "@framework-step:learning/continuous-improvement"
+      "@step:investigation/identify-files",
+      "@step:common/spawn-sub-process",
+      "@step:learning/continuous-improvement"
     ],
     "relatedTemplates": ["create-guideline"],
     "dependencies": []

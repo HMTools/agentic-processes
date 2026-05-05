@@ -63,10 +63,7 @@ def _check_pending_log(process_dir: Path) -> None:
     session_id = session_file.read_text(encoding="utf-8").strip()
     if not session_id:
         return
-    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "")
-    if not project_dir:
-        return
-    flag_file = Path(project_dir) / ".claude" / f"pending-log-{session_id}"
+    flag_file = Path.home() / ".claude" / "agentic-processes" / "flags" / f"pending-log-{session_id}"
     if flag_file.exists():
         _error(
             "User interaction not yet logged — call log-interaction before modifying process state"
@@ -335,11 +332,7 @@ def cmd_log_interaction(args: argparse.Namespace) -> None:
     if session_file.exists():
         session_id = session_file.read_text(encoding="utf-8").strip()
         if session_id:
-            project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "")
-            if project_dir:
-                flag_file = Path(project_dir) / ".claude" / f"pending-log-{session_id}"
-            else:
-                flag_file = Path(".claude") / f"pending-log-{session_id}"
+            flag_file = Path.home() / ".claude" / "agentic-processes" / "flags" / f"pending-log-{session_id}"
             if flag_file.exists():
                 flag_file.unlink()
 

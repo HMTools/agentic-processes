@@ -36,10 +36,10 @@ The agent operating principles that govern all process execution. Contains princ
 
 ## Guidelines Files
 
-Guidelines are project-specific patterns and conventions stored in `.user-processes/guidelines/`. They are organized by domain category:
+Guidelines are project-specific patterns and conventions stored in `~/.claude/agentic-processes/guidelines/`. They are organized by domain category:
 
 ```
-.user-processes/guidelines/
+~/.claude/agentic-processes/guidelines/
 ├── api-design/           # Controller, auth, versioning patterns
 ├── data-access/          # Repository, MongoDB, transactions
 ├── implementation/       # Service layer, DI, error handling
@@ -57,8 +57,8 @@ Guidelines are referenced in step JSON files via the `userGuidelines` field:
   "guidance": {
     "mandatoryComponents": ["mandatory-logging.md"],
     "userGuidelines": [
-      ".user-processes/guidelines/api-design/how-to-implement-controllers.md",
-      ".user-processes/guidelines/api-design/how-to-handle-authentication.md"
+      "~/.claude/agentic-processes/guidelines/api-design/how-to-implement-controllers.md",
+      "~/.claude/agentic-processes/guidelines/api-design/how-to-handle-authentication.md"
     ],
     ...
   }

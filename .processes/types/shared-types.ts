@@ -24,15 +24,15 @@ export type StepId = string;
 export type ISOTimestamp = string;
 
 /**
- * Relative path to a process directory from the project root.
- * Example: ".user-processes/active/process-abc123"
+ * Absolute path to a process directory.
+ * Example: "~/.claude/agentic-processes/active/process-abc123-a1b2c3"
  */
 export type ProcessPath = string;
 
 /**
  * Reference to a step definition.
- * Format: "@framework-step:category/step-name" or "@user-step:category/step-name"
- * Example: "@framework-step:planning/understand-context"
+ * Format: "@step:category/step-name"
+ * Example: "@step:planning/understand-context"
  */
 export type StepRef = string;
 

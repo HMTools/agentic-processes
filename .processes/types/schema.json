@@ -20,8 +20,8 @@
         "templateCategory": { "type": "string" },
         "created": { "type": "string", "format": "date-time" },
         "lastUpdated": { "type": "string", "format": "date-time" },
-        "projectPath": { "type": "string" },
-        "processPath": { "type": "string" }
+        "projectPaths": { "type": "array", "items": { "type": "string" } },
+        "processPath": { "type": "string", "description": "Absolute path to process folder" }
       },
       "additionalProperties": false
     },

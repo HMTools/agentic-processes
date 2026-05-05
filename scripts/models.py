@@ -1,5 +1,5 @@
 """
-Python dataclass models mirroring TypeScript types from .processes/types/.
+Python dataclass models mirroring TypeScript types from ~/.claude/agentic-processes/types/.
 Provides serialization (to_dict/from_dict) and factory methods for all process file structures.
 """
 
@@ -47,7 +47,7 @@ class ProcessMetadata:
     created: str
     lastUpdated: str
     templateCategory: Optional[str] = None
-    projectPath: Optional[str] = None
+    projectPaths: Optional[list[str]] = None
     processPath: Optional[str] = None
 
     def to_dict(self) -> dict:
@@ -58,20 +58,26 @@ class ProcessMetadata:
         }
         if self.templateCategory is not None:
             d["templateCategory"] = self.templateCategory
-        if self.projectPath is not None:
-            d["projectPath"] = self.projectPath
+        if self.projectPaths is not None:
+            d["projectPaths"] = self.projectPaths
         if self.processPath is not None:
             d["processPath"] = self.processPath
         return d
 
     @classmethod
     def from_dict(cls, data: dict) -> ProcessMetadata:
+        # Backward compat: read legacy projectPath (string) as projectPaths (list)
+        project_paths = data.get("projectPaths")
+        if project_paths is None:
+            old_val = data.get("projectPath")
+            if old_val is not None:
+                project_paths = [old_val]
         return cls(
             template=data["template"],
             created=data["created"],
             lastUpdated=data["lastUpdated"],
             templateCategory=data.get("templateCategory"),
-            projectPath=data.get("projectPath"),
+            projectPaths=project_paths,
             processPath=data.get("processPath"),
         )
 
@@ -278,7 +284,7 @@ class ProcessInstance:
         template: str,
         parameters: dict[str, str],
         steps: list[ProcessStep],
-        project_path: str,
+        project_paths: list[str],
         process_path: str,
         template_category: Optional[str] = None,
         parent_process: Optional[ParentProcessRef] = None,
@@ -297,7 +303,7 @@ class ProcessInstance:
                 templateCategory=template_category,
                 created=now,
                 lastUpdated=now,
-                projectPath=project_path,
+                projectPaths=project_paths,
                 processPath=process_path,
             ),
             status=ProcessStatus.RUNNING,

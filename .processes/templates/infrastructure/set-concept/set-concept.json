@@ -24,7 +24,7 @@
       "targetFiles": {
         "description": "Files or patterns to apply the concept to",
         "type": "string",
-        "example": "All markdown files in .processes/"
+        "example": "All markdown files in ~/.claude/agentic-processes/"
       },
       "existingState": {
         "description": "Description of current state before implementation",
@@ -52,69 +52,69 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Principles loaded and confirmed"
     },
     {
       "number": 1,
       "name": "Understand concept",
-      "stepRef": "@framework-step:planning/understand-context",
+      "stepRef": "@step:planning/understand-context",
       "output": "Context documentation",
       "approvalRequired": true
     },
     {
       "number": 2,
       "name": "Identify target files",
-      "stepRef": "@framework-step:investigation/identify-files",
+      "stepRef": "@step:investigation/identify-files",
       "output": "List of target files in identified-files.json"
     },
     {
       "number": 3,
       "name": "Analyze existing state",
-      "stepRef": "@framework-step:investigation/review-verify-document",
+      "stepRef": "@step:investigation/review-verify-document",
       "output": "Findings report"
     },
     {
       "number": 4,
       "name": "Design implementation plan",
-      "stepRef": "@framework-step:planning/design-implementation-plan",
+      "stepRef": "@step:planning/design-implementation-plan",
       "output": "Implementation plan with change proposals",
       "approvalRequired": true
     },
     {
       "number": 5,
       "name": "Apply changes",
-      "stepRef": "@framework-step:common/apply-changes",
+      "stepRef": "@step:common/apply-changes",
       "output": "Modified and newly created files"
     },
     {
       "number": 6,
       "name": "Verify implementation",
-      "stepRef": "@framework-step:investigation/review-verify-document",
+      "stepRef": "@step:investigation/review-verify-document",
       "output": "Verification report"
     },
     {
       "number": 7,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Improvements implemented",
       "approvalRequired": true
     },
     {
       "number": 8,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report"
     }
   ],
   "references": {
     "steps": [
-      "@framework-step:planning/understand-context",
-      "@framework-step:investigation/identify-files",
-      "@framework-step:investigation/review-verify-document",
-      "@framework-step:planning/design-implementation-plan",
-      "@framework-step:common/apply-changes",
-      "@framework-step:learning/continuous-improvement"
+      "@step:planning/understand-context",
+      "@step:investigation/identify-files",
+      "@step:investigation/review-verify-document",
+      "@step:planning/design-implementation-plan",
+      "@step:common/apply-changes",
+      "@step:learning/continuous-improvement"
     ],
     "relatedTemplates": ["review-and-verify"],
     "dependencies": []

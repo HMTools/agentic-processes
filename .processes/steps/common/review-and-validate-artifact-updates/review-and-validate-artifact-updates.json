@@ -27,7 +27,7 @@
       "artifactPath": {
         "description": "Path to the artifact (relative to project root)",
         "type": "string",
-        "example": ".processes/templates/infrastructure/update-process-template"
+        "example": "~/.claude/agentic-processes/templates/infrastructure/update-process-template"
       }
     }
   },
@@ -104,8 +104,8 @@
       "validationChecks": [
         "Valid JSON structure with required top-level fields (type, name, metadata, steps, parameters, flow)",
         "steps array present with valid structure (id, number, name, status, stepRef)",
-        "Step references use @framework-step:category/name format",
-        "Referenced steps exist in .processes/steps/ directory",
+        "Step references use @step:category/name format",
+        "Referenced steps exist in ~/.claude/agentic-processes/steps/ directory",
         "Parameters defined with required/optional/defaults/definitions",
         "Mermaid diagram in MD is syntactically valid",
         "Mermaid diagram reflects actual step sequence"
@@ -127,7 +127,7 @@
         "Valid JSON structure with required top-level fields (type, name, category, metadata, output, guidance, substeps, flow, memoryFileUsage, dependencies, references)",
         "substeps array present and numbered sequentially",
         "guidance has specificActions, files, tools, bestPractices",
-        "Self-contained: no @framework-step: references in step content",
+        "Self-contained: no @step: references in step content",
         "Mermaid diagram in MD matches substep flow",
         "Filename follows kebab-case convention",
         "dependencies and references sections present"
@@ -208,7 +208,7 @@
         "question": "Does the implementation align with framework best practices?",
         "examples": [
           "README.md conventions",
-          "Type definitions in .processes/types/",
+          "Type definitions in ~/.claude/agentic-processes/types/",
           "Step template structure"
         ]
       }
@@ -237,7 +237,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },

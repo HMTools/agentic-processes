@@ -10,8 +10,8 @@
   "output": {
     "description": "Complete step file with all sections",
     "artifacts": [
-      ".processes/steps/{category}/{step-name}.md",
-      ".processes/steps/{category}/{step-name}.json"
+      "~/.claude/agentic-processes/steps/{category}/{step-name}.md",
+      "~/.claude/agentic-processes/steps/{category}/{step-name}.json"
     ],
     "memoryUpdates": [
       "stepFilePath",
@@ -28,12 +28,12 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/docs/how-to-document-flows.md"
+      "~/.claude/agentic-processes/guidelines/docs/how-to-document-flows.md"
     ],
     "specificActions": [
       "Follow the substeps below in sequence",
       "Workflow: create directory → write header → write user docs → write flow → create JSON → validate",
-      "Use kebab-case for filename: `.processes/steps/{category}/{step-name}.md`",
+      "Use kebab-case for filename: `~/.claude/agentic-processes/steps/{category}/{step-name}.md`",
       "MD file contains: Description, Purpose & Usage, Quick Reference, Flow diagram",
       "JSON file contains: all guidance, substeps, tools, dependencies",
       "Reference step-template.md for structure guidance"
@@ -41,11 +41,11 @@
     "files": {
       "read": [
         "memory.json (step design from previous step)",
-        ".processes/steps/step-template.md"
+        "~/.claude/agentic-processes/steps/step-template.md"
       ],
       "create": [
-        ".processes/steps/{category}/{step-name}.md",
-        ".processes/steps/{category}/{step-name}.json"
+        "~/.claude/agentic-processes/steps/{category}/{step-name}.md",
+        "~/.claude/agentic-processes/steps/{category}/{step-name}.json"
       ],
       "update": []
     },
@@ -74,16 +74,16 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
     {
       "number": 1,
       "name": "Create category directory if needed",
-      "description": "Ensure the category directory exists in .processes/steps/",
+      "description": "Ensure the category directory exists in ~/.claude/agentic-processes/steps/",
       "actions": [
-        "Check if .processes/steps/{category}/ exists",
+        "Check if ~/.claude/agentic-processes/steps/{category}/ exists",
         "Create directory if it doesn't exist"
       ]
     },
@@ -93,7 +93,7 @@
       "description": "Create the user-facing MD file with all documentation sections",
       "actions": [
         "Review 1-2 existing step MD files in the same or similar category for format reference",
-        "Create file: .processes/steps/{category}/{step-name}.md",
+        "Create file: ~/.claude/agentic-processes/steps/{category}/{step-name}.md",
         "Write Description section",
         "Write Purpose & Usage section with output summary",
         "Write Quick Reference table",
@@ -105,7 +105,7 @@
       "name": "Create JSON companion file",
       "description": "Create the agent-facing JSON file with complete guidance",
       "actions": [
-        "Create file: .processes/steps/{category}/{step-name}.json",
+        "Create file: ~/.claude/agentic-processes/steps/{category}/{step-name}.json",
         "Include metadata: type, name, category, title, purposeAndUsage, lastUpdated",
         "Include output: description, artifacts, memoryUpdates",
         "Include guidance: prerequisites, mandatoryComponents, specificActions, files, tools, bestPractices",

@@ -37,7 +37,7 @@ Collect relevant information from various sources (documentation, code patterns,
 |--------|---------|
 | Category | planning |
 | Pattern | Guideline-based |
-| Guideline | `.user-processes/guidelines/planning/how-to-gather-relevant-information.md` |
+| Guideline | `~/.claude/agentic-processes/guidelines/planning/how-to-gather-relevant-information.md` |
 | Fallback | Manual source identification and collection |
 | Source Types | documentation, codePatterns, specifications, smeInput |
 
@@ -64,7 +64,7 @@ flowchart TD
 
 ### Substeps
 
-- [ ] **Substep 1**: Check for user guideline - Look for `.user-processes/guidelines/planning/how-to-gather-relevant-information.md`
+- [ ] **Substep 1**: Check for user guideline - Look for `~/.claude/agentic-processes/guidelines/planning/how-to-gather-relevant-information.md`
 - [ ] **Substep 2**: Identify information sources - Determine what sources to collect from based on guideline or context
 - [ ] **Substep 3**: Collect from documentation sources - Gather relevant documentation, specs, architecture decisions
 - [ ] **Substep 4**: Collect from codebase sources - Search for patterns, similar implementations, conventions

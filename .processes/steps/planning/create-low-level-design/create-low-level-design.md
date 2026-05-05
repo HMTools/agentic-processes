@@ -23,11 +23,11 @@ Use this step when you need to:
 | Action | Tool |
 |--------|------|
 | Read context | `read_file` on memory.json |
-| Check guideline | `read_file` on `.user-processes/guidelines/planning/how-to-write-low-level-design.md` |
+| Check guideline | `read_file` on `~/.claude/agentic-processes/guidelines/planning/how-to-write-low-level-design.md` |
 | Create LLD | `write` |
 | Search patterns | `codebase_search` |
 
-**Guideline**: `.user-processes/guidelines/planning/how-to-write-low-level-design.md`
+**Guideline**: `~/.claude/agentic-processes/guidelines/planning/how-to-write-low-level-design.md`
 
 **Prerequisites**:
 - User story context (from understand-context step)

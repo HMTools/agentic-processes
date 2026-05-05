@@ -5,15 +5,14 @@ export LANG=C.UTF-8
 INPUT=$(cat)
 
 SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
-PROJECT_DIR="$CLAUDE_PROJECT_DIR"
+AGENTIC_DIR="$HOME/.claude/agentic-processes"
 TOOL_NAME=$(echo "$INPUT" | grep -oP '"tool_name"\s*:\s*"\K[^"]*' | head -1)
-FLAG_DIR=".claude"
 
-if [ -z "$SESSION_ID" ] || [ -z "$PROJECT_DIR" ]; then
+if [ -z "$SESSION_ID" ]; then
     exit 0
 fi
 
-FLAG_FILE="$PROJECT_DIR/$FLAG_DIR/pending-log-$SESSION_ID"
+FLAG_FILE="$AGENTIC_DIR/flags/pending-log-$SESSION_ID"
 
 if [ ! -f "$FLAG_FILE" ]; then
   exit 0
@@ -47,7 +46,7 @@ NORMALIZED_PATH=$(printf '%s' "$FILE_PATH" | tr '\\' '/' | sed 's|//*|/|g')
 
 # Block writes to process files until log is written
 case "$NORMALIZED_PATH" in
-    */.user-processes/active/*)
+    */.claude/agentic-processes/active/*)
         cat << 'EOF'
 {
   "decision": "block",

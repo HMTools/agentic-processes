@@ -28,7 +28,7 @@ When `/process-continue` is invoked:
 
 ### 1. Discover Active Processes (MANDATORY)
 
-- Search `.user-processes/active/` for all active processes
+- Search `~/.claude/agentic-processes/active/` for all active processes
 - **If no processes exist**: Inform user, suggest `/process-new`, NEVER proceed to work directly
 - If multiple processes exist, list them with name, date, current step, progress, last updated
 - If only one process exists, proceed directly

@@ -37,26 +37,26 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Principles loaded and confirmed"
     },
     {
       "number": 1,
       "name": "Plan and design template",
-      "stepRef": "@framework-step:template/plan-and-design-template",
+      "stepRef": "@step:template/plan-and-design-template",
       "output": "Requirements document, design artifacts, mermaid diagram",
       "approvalRequired": true
     },
     {
       "number": 2,
       "name": "Create template file",
-      "stepRef": "@framework-step:template/create-template-file",
+      "stepRef": "@step:template/create-template-file",
       "output": "Complete template file with validation reports"
     },
     {
       "number": 3,
       "name": "Validate process-steps exist",
-      "stepRef": "@framework-step:template/validate-process-steps-exist",
+      "stepRef": "@step:template/validate-process-steps-exist",
       "output": "Validation report",
       "subProcessTrigger": {
         "condition": "missing steps found",
@@ -69,24 +69,24 @@
     {
       "number": 4,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Improvements implemented",
       "approvalRequired": true
     },
     {
       "number": 5,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report"
     }
   ],
   "references": {
     "steps": [
-      "@framework-step:template/plan-and-design-template",
-      "@framework-step:template/create-template-file",
-      "@framework-step:template/validate-process-steps-exist",
-      "@framework-step:learning/continuous-improvement",
-      "@framework-step:common/end-process-validation"
+      "@step:template/plan-and-design-template",
+      "@step:template/create-template-file",
+      "@step:template/validate-process-steps-exist",
+      "@step:learning/continuous-improvement",
+      "@step:common/end-process-validation"
     ],
     "relatedTemplates": ["create-process-step-template"],
     "dependencies": []

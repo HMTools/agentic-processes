@@ -50,7 +50,7 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Operating principles loaded and confirmed",
       "approvalRequired": false,
       "reused": true
@@ -58,7 +58,7 @@
     {
       "number": 1,
       "name": "Understand Investigation Context",
-      "stepRef": "@framework-step:planning/understand-context",
+      "stepRef": "@step:planning/understand-context",
       "output": "Context documentation with research question, repositories list, and investigation scope",
       "approvalRequired": true,
       "reused": true,
@@ -67,7 +67,7 @@
     {
       "number": 2,
       "name": "Parse Repository List",
-      "stepRef": "@framework-step:multi-repo/parse-repository-list",
+      "stepRef": "@step:multi-repo/parse-repository-list",
       "output": "repositories-list.json with each repository entry containing: name, source, type (remote/local), subProcessId (null), subProcessPath (null), status (pending)",
       "approvalRequired": false,
       "reused": false,
@@ -77,7 +77,7 @@
     {
       "number": 3,
       "name": "Investigate Repositories (Subprocess Loop)",
-      "stepRef": "@framework-step:common/spawn-sub-process",
+      "stepRef": "@step:common/spawn-sub-process",
       "output": "Spawned subprocesses for each repository; repositories-list.json updated with subProcessId, subProcessPath, and status for each entry",
       "approvalRequired": false,
       "reused": true,
@@ -97,7 +97,7 @@
     {
       "number": 4,
       "name": "Aggregate and Synthesize Findings",
-      "stepRef": "@framework-step:multi-repo/aggregate-and-synthesize-findings",
+      "stepRef": "@step:multi-repo/aggregate-and-synthesize-findings",
       "output": "comparative-analysis.md with common patterns, differences, unique implementations, anomalies, and cross-cutting recommendations",
       "approvalRequired": true,
       "reused": false,
@@ -108,7 +108,7 @@
     {
       "number": 5,
       "name": "Create Investigation Report",
-      "stepRef": "@framework-step:investigation/create-research-report",
+      "stepRef": "@step:investigation/create-research-report",
       "output": "investigation-report.md (or .json based on outputFormat) with executive summary, per-repository findings, comparative analysis, recommendations, and conclusion",
       "approvalRequired": false,
       "reused": true,
@@ -118,7 +118,7 @@
     {
       "number": 6,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Improvements implemented to template, step definitions, or process",
       "approvalRequired": true,
       "reused": true
@@ -126,7 +126,7 @@
     {
       "number": 7,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report confirming all steps completed, all artifacts present, and process files valid",
       "approvalRequired": false,
       "reused": true
@@ -195,18 +195,18 @@
   },
   "references": {
     "steps": [
-      "@framework-step:common/init-process-principles",
-      "@framework-step:planning/understand-context",
-      "@framework-step:multi-repo/parse-repository-list",
-      "@framework-step:common/spawn-sub-process",
-      "@framework-step:multi-repo/aggregate-and-synthesize-findings",
-      "@framework-step:investigation/create-research-report",
-      "@framework-step:learning/continuous-improvement",
-      "@framework-step:common/end-process-validation"
+      "@step:common/init-process-principles",
+      "@step:planning/understand-context",
+      "@step:multi-repo/parse-repository-list",
+      "@step:common/spawn-sub-process",
+      "@step:multi-repo/aggregate-and-synthesize-findings",
+      "@step:investigation/create-research-report",
+      "@step:learning/continuous-improvement",
+      "@step:common/end-process-validation"
     ],
     "newStepsRequired": [
-      "@framework-step:multi-repo/parse-repository-list",
-      "@framework-step:multi-repo/aggregate-and-synthesize-findings"
+      "@step:multi-repo/parse-repository-list",
+      "@step:multi-repo/aggregate-and-synthesize-findings"
     ],
     "relatedTemplates": [
       "investigate-single-repo"

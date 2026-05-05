@@ -22,13 +22,13 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Principles loaded and confirmed"
     },
     {
       "number": 1,
       "name": "Get User Story Parameters",
-      "stepRef": "@framework-step:planning/get-user-story-parameters",
+      "stepRef": "@step:planning/get-user-story-parameters",
       "output": "User story details: title, description, acceptance criteria",
       "guideline": true,
       "approvalRequired": false,
@@ -37,7 +37,7 @@
     {
       "number": 2,
       "name": "Understand User Story Context",
-      "stepRef": "@framework-step:planning/understand-context",
+      "stepRef": "@step:planning/understand-context",
       "output": "Context documentation with requirements, scope, success criteria",
       "guideline": false,
       "approvalRequired": true
@@ -45,7 +45,7 @@
     {
       "number": 3,
       "name": "Gather Relevant Information",
-      "stepRef": "@framework-step:planning/gather-relevant-information",
+      "stepRef": "@step:planning/gather-relevant-information",
       "output": "Collected information from various sources",
       "guideline": true,
       "approvalRequired": false,
@@ -54,7 +54,7 @@
     {
       "number": 4,
       "name": "Analyze Current System",
-      "stepRef": "@framework-step:planning/analyze-affected-system",
+      "stepRef": "@step:planning/analyze-affected-system",
       "output": "System analysis report, affected components map, dependencies",
       "feedbackLoop": {
         "condition": "Need more information",
@@ -65,7 +65,7 @@
     {
       "number": 5,
       "name": "Create Low-Level Design Document",
-      "stepRef": "@framework-step:planning/create-low-level-design",
+      "stepRef": "@step:planning/create-low-level-design",
       "output": "Complete LLD document at plans/{user-story-name}/lld.md",
       "guideline": true,
       "approvalRequired": true,
@@ -79,14 +79,14 @@
     {
       "number": 6,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Process improvements implemented",
       "approvalRequired": true
     },
     {
       "number": 7,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report"
     }
   ],
@@ -107,12 +107,12 @@
   },
   "references": {
     "steps": [
-      "@framework-step:planning/get-user-story-parameters",
-      "@framework-step:planning/understand-context",
-      "@framework-step:planning/gather-relevant-information",
-      "@framework-step:planning/analyze-affected-system",
-      "@framework-step:planning/create-low-level-design",
-      "@framework-step:learning/continuous-improvement"
+      "@step:planning/get-user-story-parameters",
+      "@step:planning/understand-context",
+      "@step:planning/gather-relevant-information",
+      "@step:planning/analyze-affected-system",
+      "@step:planning/create-low-level-design",
+      "@step:learning/continuous-improvement"
     ],
     "relatedTemplates": ["develop-user-story"],
     "dependencies": []

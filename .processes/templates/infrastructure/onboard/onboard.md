@@ -53,19 +53,19 @@ flowchart TD
 ## Steps
 
 - [ ] **Step 1: Identify missing guidelines**
-  - **Step**: `@framework-step:investigation/identify-files`
-  - **Description**: Scan `.processes/steps/` for `userGuidelines` references and identify which referenced guidelines don't exist in `.user-processes/guidelines/`
+  - **Step**: `@step:investigation/identify-files`
+  - **Description**: Scan `~/.claude/agentic-processes/steps/` for `userGuidelines` references and identify which referenced guidelines don't exist in `~/.claude/agentic-processes/guidelines/`
   - **Output**: `identified-files.json` containing list of missing guidelines
   - **Approval Required**: Yes - review list before proceeding
 
 - [ ] **Step 2: Create guidelines (batch)**
   - **Step**: Spawns `create-guideline` sub-processes
   - **Description**: For each approved missing guideline, spawn a `create-guideline` sub-process
-  - **Output**: Created guideline files in `.user-processes/guidelines/{category}/`
+  - **Output**: Created guideline files in `~/.claude/agentic-processes/guidelines/{category}/`
   - **Sync**: Immediate (one guideline at a time)
 
 - [ ] **Step 3: Continuous Improvement**
-  - **Step**: `@framework-step:learning/continuous-improvement`
+  - **Step**: `@step:learning/continuous-improvement`
   - **Description**: Analyze process log and implement improvements for future iterations
   - **Output**: Improvements implemented
 
@@ -74,9 +74,9 @@ flowchart TD
 ### Step 1: Scanning Logic
 
 The `identify-files` step uses the following approach:
-1. Grep for `userGuidelines` in all `.processes/steps/**/*.json` files
+1. Grep for `userGuidelines` in all `~/.claude/agentic-processes/steps/**/*.json` files
 2. Extract the guideline paths from the references
-3. Check if each referenced guideline exists in `.user-processes/guidelines/`
+3. Check if each referenced guideline exists in `~/.claude/agentic-processes/guidelines/`
 4. Output list of missing guidelines grouped by category
 
 ### Step 2: Batch Creation

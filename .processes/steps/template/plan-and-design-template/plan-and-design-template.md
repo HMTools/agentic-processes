@@ -23,7 +23,7 @@ Use this step when you need to:
 
 | Design Consideration | Guidance |
 |---------------------|----------|
-| Reusable steps | Check `.processes/steps/planning/` and `.processes/steps/common/` |
+| Reusable steps | Check `~/.claude/agentic-processes/steps/planning/` and `~/.claude/agentic-processes/steps/common/` |
 | Parameter naming | Use camelCase: `featureName`, `targetBranch` |
 | Final step | Always include continuous improvement |
 

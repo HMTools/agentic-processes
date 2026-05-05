@@ -1,5 +1,5 @@
 /**
- * Schema for memory.json files in process instances (.user-processes/[id]/memory.json)
+ * Schema for memory.json files in process instances (~/.claude/agentic-processes/active/[id]/memory.json)
  * 
  * Tracks step information, decisions, and cross-references during process execution.
  */

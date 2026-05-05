@@ -2,7 +2,7 @@
 
 ## Description
 
-Analyze a template to identify which process-steps are referenced and verify they exist in `.processes/steps/`.
+Analyze a template to identify which process-steps are referenced and verify they exist in `~/.claude/agentic-processes/steps/`.
 
 ## Purpose & Usage
 
@@ -17,7 +17,7 @@ Use this step when you need to:
 
 | Reference Format | Location |
 |------------------|----------|
-| `@framework-step:category/step-name` | `.processes/steps/category/step-name.md` |
+| `@step:category/step-name` | `~/.claude/agentic-processes/steps/category/step-name.md` |
 
 | If Missing Steps | Action |
 |-----------------|--------|

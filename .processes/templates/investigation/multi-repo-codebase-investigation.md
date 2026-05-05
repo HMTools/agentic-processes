@@ -57,31 +57,31 @@ graph TD
 
 ## Steps
 
-- [ ] Step 0: Init Process Principles (@framework-step:common/init-process-principles)
+- [ ] Step 0: Init Process Principles (@step:common/init-process-principles)
   - Output: Operating principles loaded and confirmed
 
-- [ ] Step 1: Understand Investigation Context (@framework-step:planning/understand-context)
+- [ ] Step 1: Understand Investigation Context (@step:planning/understand-context)
   - Output: Context documentation with research question, repositories, and scope
   - Approval: Required before proceeding
 
-- [ ] Step 2: Parse Repository List (@framework-step:multi-repo/parse-repository-list)
+- [ ] Step 2: Parse Repository List (@step:multi-repo/parse-repository-list)
   - Output: `repositories-list.json` with each repo's name, source, type (remote/local), and tracking fields
 
-- [ ] Step 3: Investigate Repositories - Subprocess Loop (@framework-step:common/spawn-sub-process)
+- [ ] Step 3: Investigate Repositories - Subprocess Loop (@step:common/spawn-sub-process)
   - Sub-Process Template: `investigate-single-repo`
   - Output: Completed sub-processes for each repository; `repositories-list.json` updated with subprocess IDs and statuses
   - Note: Each subprocess handles clone (if remote), investigation, and cleanup autonomously
 
-- [ ] Step 4: Aggregate and Synthesize Findings - SYNC POINT (@framework-step:multi-repo/aggregate-and-synthesize-findings)
+- [ ] Step 4: Aggregate and Synthesize Findings - SYNC POINT (@step:multi-repo/aggregate-and-synthesize-findings)
   - Output: `comparative-analysis.md` with cross-repository patterns, differences, and recommendations
   - Approval: Required before proceeding to report creation
 
-- [ ] Step 5: Create Investigation Report (@framework-step:investigation/create-research-report)
+- [ ] Step 5: Create Investigation Report (@step:investigation/create-research-report)
   - Output: `investigation-report.{md|json}` with executive summary, per-repository findings, comparative analysis, and recommendations
 
-- [ ] Step 6: Continuous Improvement (@framework-step:learning/continuous-improvement)
+- [ ] Step 6: Continuous Improvement (@step:learning/continuous-improvement)
   - Output: Improvements implemented to the template and process
   - Approval: Required
 
-- [ ] Step 7: End Process Validation (@framework-step:common/end-process-validation)
+- [ ] Step 7: End Process Validation (@step:common/end-process-validation)
   - Output: Compliance report confirming all steps completed and artifacts present

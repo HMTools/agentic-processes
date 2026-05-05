@@ -1,5 +1,5 @@
 /**
- * Schema for template definition files (.processes/templates/[id]/*.json)
+ * Schema for template definition files (~/.claude/agentic-processes/templates/[id]/*.json)
  * 
  * Defines the enriched JSON structure for agent guidance in the JSON-First
  * Agent Architecture. This type represents the SOURCE OF TRUTH for template

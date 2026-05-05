@@ -1,5 +1,5 @@
 /**
- * Schema for step definition files (.processes/steps/[id]/*.json)
+ * Schema for step definition files (~/.claude/agentic-processes/steps/[id]/*.json)
  * 
  * Defines the enriched JSON structure for agent guidance in the JSON-First
  * Agent Architecture. This type represents the SOURCE OF TRUTH for step

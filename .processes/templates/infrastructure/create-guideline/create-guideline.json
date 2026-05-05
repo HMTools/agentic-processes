@@ -43,58 +43,58 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "output": "Principles loaded and confirmed"
     },
     {
       "number": 1,
       "name": "Understand context",
-      "stepRef": "@framework-step:planning/understand-context",
+      "stepRef": "@step:planning/understand-context",
       "output": "Context documented in memory.json",
       "approvalRequired": false
     },
     {
       "number": 2,
       "name": "Create guideline file",
-      "stepRef": "@framework-step:guideline/create-guideline-file",
+      "stepRef": "@step:guideline/create-guideline-file",
       "output": "Complete guideline file",
       "approvalRequired": true
     },
     {
       "number": 3,
       "name": "Link guideline to steps",
-      "stepRef": "@framework-step:guideline/link-guideline-to-steps",
+      "stepRef": "@step:guideline/link-guideline-to-steps",
       "output": "Updated step files",
       "optional": true
     },
     {
       "number": 4,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "output": "Improvements implemented",
       "approvalRequired": true
     },
     {
       "number": 5,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "output": "Compliance report"
     }
   ],
   "references": {
     "steps": [
-      "@framework-step:planning/understand-context",
-      "@framework-step:guideline/create-guideline-file",
-      "@framework-step:guideline/link-guideline-to-steps",
-      "@framework-step:learning/continuous-improvement",
-      "@framework-step:common/end-process-validation"
+      "@step:planning/understand-context",
+      "@step:guideline/create-guideline-file",
+      "@step:guideline/link-guideline-to-steps",
+      "@step:learning/continuous-improvement",
+      "@step:common/end-process-validation"
     ],
     "relatedTemplates": ["create-process-step-template"],
     "dependencies": []
   },
   "guidelineFormat": {
     "filename": "how-to-{guidelineName}.md",
-    "location": ".user-processes/guidelines/{guidelineCategory}/",
+    "location": "~/.claude/agentic-processes/guidelines/{guidelineCategory}/",
     "structure": {
       "title": "# How to {Action}",
       "content": "Practical steps and examples to answer the 'How to' question",

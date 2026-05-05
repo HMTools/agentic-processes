@@ -50,7 +50,7 @@
     {
       "number": 0,
       "name": "Init Process Principles",
-      "stepRef": "@framework-step:common/init-process-principles",
+      "stepRef": "@step:common/init-process-principles",
       "description": "Load and confirm the 8 operating principles for this process execution",
       "output": "Principles loaded and confirmed",
       "approvalRequired": false
@@ -58,7 +58,7 @@
     {
       "number": 1,
       "name": "Understand LLD Context",
-      "stepRef": "@framework-step:planning/understand-context",
+      "stepRef": "@step:planning/understand-context",
       "description": "Parse and understand the LLD document to identify scope for test planning. Extract feature overview, technical implementation details, component interactions, data flows, API contracts, and integration points.",
       "context": {
         "contextSource": "LLD document at {{lldPath}}",
@@ -70,7 +70,7 @@
     {
       "number": 2,
       "name": "Gather Test Requirements",
-      "stepRef": "@framework-step:testing/gather-test-requirements",
+      "stepRef": "@step:testing/gather-test-requirements",
       "description": "Extract and organize test-specific requirements from the LLD: acceptance criteria, edge cases, boundary conditions, integration points, test data requirements, error handling scenarios.",
       "output": "Test requirements in memory",
       "approvalRequired": false
@@ -78,7 +78,7 @@
     {
       "number": 3,
       "name": "Create Test Plan",
-      "stepRef": "@framework-step:testing/create-test-plan",
+      "stepRef": "@step:testing/create-test-plan",
       "description": "Analyze test scope and create the complete test plan document. Includes: analyzing scope, determining required test cases, checking for existing test cases (using guideline), creating/updating test cases, and compiling the test plan document.",
       "output": "Test plan document at plans/{user-story-name}/test-plan.md",
       "approvalRequired": true,
@@ -91,7 +91,7 @@
     {
       "number": 4,
       "name": "Sync to Test Management Tool",
-      "stepRef": "@framework-step:testing/sync-test-management",
+      "stepRef": "@step:testing/sync-test-management",
       "description": "Push test cases to external test management tool (Azure DevOps, Zephyr, TestRail) based on guideline configuration.",
       "output": "Sync report with test case IDs and status",
       "conditional": "Only executes if sync is configured in how-to-sync-test-management.md guideline",
@@ -101,7 +101,7 @@
     {
       "number": 5,
       "name": "Continuous Improvement",
-      "stepRef": "@framework-step:learning/continuous-improvement",
+      "stepRef": "@step:learning/continuous-improvement",
       "description": "Review the process execution and capture learnings: what worked well, what could be improved, suggested enhancements to guidelines or process.",
       "output": "Improvements documented",
       "approvalRequired": true
@@ -109,7 +109,7 @@
     {
       "number": 6,
       "name": "End Process Validation",
-      "stepRef": "@framework-step:common/end-process-validation",
+      "stepRef": "@step:common/end-process-validation",
       "description": "Final compliance check to ensure all process requirements were met.",
       "output": "Compliance report",
       "approvalRequired": false
@@ -133,13 +133,13 @@
   },
   "references": {
     "steps": [
-      "@framework-step:common/init-process-principles",
-      "@framework-step:planning/understand-context",
-      "@framework-step:testing/gather-test-requirements",
-      "@framework-step:testing/create-test-plan",
-      "@framework-step:testing/sync-test-management",
-      "@framework-step:learning/continuous-improvement",
-      "@framework-step:common/end-process-validation"
+      "@step:common/init-process-principles",
+      "@step:planning/understand-context",
+      "@step:testing/gather-test-requirements",
+      "@step:testing/create-test-plan",
+      "@step:testing/sync-test-management",
+      "@step:learning/continuous-improvement",
+      "@step:common/end-process-validation"
     ],
     "relatedTemplates": [
       "low-level-design-user-story",

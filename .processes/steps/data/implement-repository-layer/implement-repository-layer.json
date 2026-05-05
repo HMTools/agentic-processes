@@ -28,8 +28,8 @@
       "mandatory-logging.md"
     ],
     "userGuidelines": [
-      ".user-processes/guidelines/data-access/how-to-implement-repositories.md",
-      ".user-processes/guidelines/data-access/how-to-use-mongodb.md"
+      "~/.claude/agentic-processes/guidelines/data-access/how-to-implement-repositories.md",
+      "~/.claude/agentic-processes/guidelines/data-access/how-to-use-mongodb.md"
     ],
     "specificActions": [
       "Review Requirements: Understand entity and operations needed",
@@ -72,7 +72,7 @@
       "name": "Init-Step: Confirm Principles",
       "description": "Recall operating principles before starting this step",
       "actions": [
-        "Read `.processes/steps/_components/operating-principles.md` and recall all principles",
+        "Read `~/.claude/agentic-processes/steps/_components/operating-principles.md` and recall all principles",
         "Output: '✓ Principles confirmed for this step'"
       ]
     },
