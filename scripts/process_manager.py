@@ -116,7 +116,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
         template=template_name,
         parameters=params,
         steps=steps,
-        project_path=args.project_path or str(Path.cwd()),
+        project_paths=[args.project_path or str(Path.cwd())],
         process_path=str(process_dir),
         template_category=template_category,
     )
