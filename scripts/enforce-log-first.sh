@@ -32,7 +32,7 @@ EOF
 fi
 
 # For Write/StrReplace/Edit: check file path
-FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]*' | head -1)
+FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K(?:\\\\.|[^"])*' | head -1)
 
 # Allow writes to log.json (this IS the log write)
 case "$FILE_PATH" in

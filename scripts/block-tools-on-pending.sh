@@ -7,8 +7,8 @@ INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
 AGENTIC_DIR="$HOME/.claude/agentic-processes"
 TOOL_NAME=$(echo "$INPUT" | grep -oP '"tool_name"\s*:\s*"\K[^"]*' | head -1)
-FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]*' | head -1)
-COMMAND=$(echo "$INPUT" | grep -oP '"command"\s*:\s*"\K[^"]*' | head -1)
+FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K(?:\\\\.|[^"])*' | head -1)
+COMMAND=$(echo "$INPUT" | grep -oP '"command"\s*:\s*"\K(?:\\\\.|[^"])*' | head -1)
 
 if [ -z "$SESSION_ID" ]; then
     exit 0
@@ -47,7 +47,7 @@ if [ "$TOOL_NAME" = "Write" ] || [ "$TOOL_NAME" = "StrReplace" ] || [ "$TOOL_NAM
 fi
 
 # Allow Shell/Bash commands that call process_manager.py (approval resolution)
-if [ "$TOOL_NAME" = "Shell" ] || [ "$TOOL_NAME" = "Bash" ]; then
+if [ "$TOOL_NAME" = "Shell" ] || [ "$TOOL_NAME" = "Bash" ] || [ "$TOOL_NAME" = "PowerShell" ]; then
   case "$COMMAND" in
     *process_manager.py*)
       exit 0
