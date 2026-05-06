@@ -5,7 +5,8 @@ export LANG=C.UTF-8
 
 INPUT=$(cat)
 
-SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+eval "$(echo "$INPUT" | python3 "$SCRIPT_DIR/parse_hook_input.py" session_id stop_hook_active)"
 AGENTIC_DIR="$HOME/.claude/agentic-processes"
 
 if [ -z "$SESSION_ID" ]; then
@@ -13,7 +14,6 @@ if [ -z "$SESSION_ID" ]; then
 fi
 
 # Infinite loop guard: if Stop hook already blocked once, allow stop
-STOP_HOOK_ACTIVE=$(echo "$INPUT" | grep -oP '"stop_hook_active"\s*:\s*\K[a-z]*' | head -1)
 if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
     exit 0
 fi

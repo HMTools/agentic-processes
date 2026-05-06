@@ -3,12 +3,10 @@
 export LANG=C.UTF-8
 
 INPUT=$(cat)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"\K[^"]*' | head -1)
+eval "$(echo "$INPUT" | python3 "$SCRIPT_DIR/parse_hook_input.py" session_id tool_name file_path command)"
 AGENTIC_DIR="$HOME/.claude/agentic-processes"
-TOOL_NAME=$(echo "$INPUT" | grep -oP '"tool_name"\s*:\s*"\K[^"]*' | head -1)
-FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K(?:\\\\.|[^"])*' | head -1)
-COMMAND=$(echo "$INPUT" | grep -oP '"command"\s*:\s*"\K(?:\\\\.|[^"])*' | head -1)
 
 if [ -z "$SESSION_ID" ]; then
     exit 0

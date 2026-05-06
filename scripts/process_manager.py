@@ -513,7 +513,8 @@ def main() -> None:
 
     parsed = parser.parse_args()
     if parsed.command in _LOG_GATED_COMMANDS:
-        _check_pending_log(Path(parsed.process_dir))
+        if not (parsed.command == "write-pending" and getattr(parsed, "delete", False)):
+            _check_pending_log(Path(parsed.process_dir))
     if parsed.command in _APPROVAL_GATED_COMMANDS:
         _check_pending_approval(Path(parsed.process_dir))
     try:
