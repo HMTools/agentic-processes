@@ -28,16 +28,17 @@ Create a new process from a template with parameter substitution and step resolu
 
 **CRITICAL RULE**: You MUST always use an existing process template. **NEVER** skip templates or do work directly without a template.
 
-- Always use a template from `~/.claude/agentic-processes/templates/`
+- Always use a template from `~/.claude/agentic-processes/templates/processes/`
 - Never create files directly without a template
 - If no template exists: inform the user, list what templates exist, stop and wait
+- If no templates found at all, suggest running `/process-template-sync` to fetch templates from configured git sources.
 
 ### Unified Architecture
 
 | Location | Contains |
 |----------|----------|
-| `~/.claude/agentic-processes/templates/` | All process templates |
-| `~/.claude/agentic-processes/steps/` | All step definitions |
+| `~/.claude/agentic-processes/templates/processes/` | All process templates |
+| `~/.claude/agentic-processes/templates/steps/` | All step definitions |
 | `~/.claude/agentic-processes/active/` | Running process instances |
 
 All process-related files live under `~/.claude/agentic-processes/`.
@@ -53,7 +54,7 @@ When `/process-new` is invoked:
 
 ### 2. List Available Templates
 
-- Display templates from `~/.claude/agentic-processes/templates/`
+- Display templates from `~/.claude/agentic-processes/templates/processes/`
 - Read both `.json` and `.md` files for each template
 - Show purposes and required parameters from JSON
 - If no template fits: inform user and stop
@@ -67,6 +68,7 @@ When `/process-new` is invoked:
 ### 4. Resolve Step References
 
 - Scan template for `@step:category/step-name` references
+- Resolve step references to `~/.claude/agentic-processes/templates/steps/{category}/{name}/{name}.json`
 - Keep references as references (don't expand)
 - Read step's `.json` file for complete guidance when executing
 

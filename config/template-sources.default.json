@@ -1,0 +1,15 @@
+{
+  "sources": [
+    {
+      "name": "official",
+      "url": "https://github.com/user/agentic-process-templates.git",
+      "branch": "main",
+      "enabled": true,
+      "priority": 100
+    }
+  ],
+  "settings": {
+    "autoSyncOnStale": false,
+    "staleDurationMinutes": 1440
+  }
+}

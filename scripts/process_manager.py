@@ -172,6 +172,15 @@ def cmd_update_step_status(args: argparse.Namespace) -> None:
     if not found:
         _error(f"Step {args.step_id} not found")
 
+    if new_status == StepStatus.COMPLETED:
+        log_path = process_dir / "log.json"
+        if log_path.exists():
+            log_data = read_json(log_path)
+            log = LogFile.from_dict(log_data)
+            if log.executionMetrics:
+                log.executionMetrics["stepsCompleted"] = log.executionMetrics.get("stepsCompleted", 0) + 1
+                write_json(log_path, log.to_dict())
+
     process.metadata.lastUpdated = now
     write_json(process_path, process.to_dict())
     _ok("process.json")

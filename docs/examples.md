@@ -133,7 +133,7 @@ You want to create a template for a specific workflow your team uses frequently.
 ### Template Creation
 
 1. **Create Template File**:
-   - Location: `~/.claude/agentic-processes/templates/{category}/custom-workflow.md`
+   - Location: `~/.claude/agentic-processes/templates/processes/{category}/custom-workflow.md`
 
 2. **Template Structure**:
    ```markdown
@@ -185,7 +185,7 @@ You need a step that doesn't exist in the steps library.
    - Determine appropriate category (api, service, data, testing, etc.)
 
 2. **Create Step File**:
-   - Location: `~/.claude/agentic-processes/steps/{category}/step-name.md`
+   - Location: `~/.claude/agentic-processes/templates/steps/{category}/step-name.md`
 
 3. **Step Structure**:
    ```markdown
@@ -389,5 +389,4 @@ graph TD
 For more information, see:
 - [Getting Started](getting-started.md)
 - [Architecture](architecture.md)
-- [Core System](../core/README.md)
 

@@ -28,8 +28,8 @@ Transform the agentic process system from a dual-file approach (where both JSON 
 ### targetFiles
 
 Apply this concept to all files in:
-- `~/.claude/agentic-processes/steps/**/*.json` and `~/.claude/agentic-processes/steps/**/*.md`
-- `~/.claude/agentic-processes/templates/**/*.json` and `~/.claude/agentic-processes/templates/**/*.md`
+- `~/.claude/agentic-processes/templates/steps/**/*.json` and `~/.claude/agentic-processes/templates/steps/**/*.md`
+- `~/.claude/agentic-processes/templates/processes/**/*.json` and `~/.claude/agentic-processes/templates/processes/**/*.md`
 - `commands/**/*.md`
 - `docs/**/*.json` and `docs/**/*.md`
 

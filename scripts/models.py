@@ -1,5 +1,5 @@
 """
-Python dataclass models mirroring TypeScript types from ~/.claude/agentic-processes/types/.
+Python dataclass models mirroring TypeScript types from types/ (at plugin root, via CLAUDE_PLUGIN_ROOT/types/).
 Provides serialization (to_dict/from_dict) and factory methods for all process file structures.
 """
 
@@ -644,6 +644,94 @@ class LogFile:
                 "totalSteps": total_steps,
                 "stepsCompleted": 0,
                 "currentStep": first_step_id,
+            },
+        )
+
+
+# --- Template Source types ---
+
+@dataclass
+class TemplateSource:
+    name: str
+    url: str
+    branch: str = "main"
+    enabled: bool = True
+    priority: int = 100
+    lastSynced: Optional[str] = None
+
+    def to_dict(self) -> dict:
+        d: dict[str, Any] = {
+            "name": self.name,
+            "url": self.url,
+            "branch": self.branch,
+            "enabled": self.enabled,
+            "priority": self.priority,
+        }
+        if self.lastSynced is not None:
+            d["lastSynced"] = self.lastSynced
+        return d
+
+    @classmethod
+    def from_dict(cls, data: dict) -> TemplateSource:
+        return cls(
+            name=data["name"],
+            url=data["url"],
+            branch=data.get("branch", "main"),
+            enabled=data.get("enabled", True),
+            priority=data.get("priority", 100),
+            lastSynced=data.get("lastSynced"),
+        )
+
+    @classmethod
+    def create(
+        cls,
+        name: str,
+        url: str,
+        branch: str = "main",
+        enabled: bool = True,
+        priority: int = 100,
+    ) -> TemplateSource:
+        return cls(
+            name=name,
+            url=url,
+            branch=branch,
+            enabled=enabled,
+            priority=priority,
+        )
+
+
+@dataclass
+class TemplateSourcesConfig:
+    sources: list[TemplateSource]
+    settings: dict[str, Any]
+
+    def to_dict(self) -> dict:
+        return {
+            "sources": [s.to_dict() for s in self.sources],
+            "settings": self.settings,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> TemplateSourcesConfig:
+        return cls(
+            sources=[TemplateSource.from_dict(s) for s in data.get("sources", [])],
+            settings=data.get("settings", {
+                "autoSyncOnStale": False,
+                "staleDurationMinutes": 1440,
+            }),
+        )
+
+    @classmethod
+    def create(
+        cls,
+        sources: Optional[list[TemplateSource]] = None,
+        settings: Optional[dict[str, Any]] = None,
+    ) -> TemplateSourcesConfig:
+        return cls(
+            sources=sources or [],
+            settings=settings or {
+                "autoSyncOnStale": False,
+                "staleDurationMinutes": 1440,
             },
         )
 

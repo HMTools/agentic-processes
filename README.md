@@ -14,6 +14,13 @@ Or use a local plugin directory:
 claude --plugin-dir /path/to/agentic-processes
 ```
 
+After installation, sync templates from configured git sources:
+```
+/process-template-sync
+```
+
+This fetches process and step templates to `~/.claude/agentic-processes/templates/` and creates all required runtime directories.
+
 ## Overview
 
 The Agentic Process System enables structured, repeatable workflows for complex development tasks. It provides:
@@ -23,6 +30,7 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 - **State Management**: Persistent process state with checkboxes, timestamps, and audit logs
 - **AI Integration**: Seamless integration with Claude Code
 - **Process Tracking**: Resume interrupted processes, track progress, and maintain context across sessions
+- **Git-Based Template Sources**: Templates fetched from configurable git repositories, enabling team sharing and versioning
 
 ## Key Features
 
@@ -38,6 +46,7 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 - **Steps**: Self-contained step definitions with rich guidance
 - **Step References**: Compose processes using `@step:category/step-name` syntax
 - **Pluggable Resources**: Add your own templates, steps, components, and guidelines
+- **Git-Based Sources**: Configure multiple git repositories as template sources
 
 ### State Persistence
 - Process state stored in JSON and markdown files
@@ -46,14 +55,23 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 - No data loss between sessions
 
 ### AI Integration
-- Commands: `/process-new`, `/process-continue`
+- Commands: `/process-new`, `/process-continue`, `/process-template-sync`
 - Strict process adherence to prevent deviation
 - Proactive guidance for next steps
 - Subagent delegation for context isolation
 
 ## Quick Start
 
-### 1. Create a New Process
+### 1. Sync Templates
+
+After installing the plugin, fetch templates from git sources:
+```
+/process-template-sync
+```
+
+This clones configured template repositories and populates `~/.claude/agentic-processes/templates/` with process and step templates.
+
+### 2. Create a New Process
 
 Use the command:
 ```
@@ -62,12 +80,12 @@ Use the command:
 
 The system will:
 1. Check for existing similar processes
-2. List available templates
+2. List available templates from `~/.claude/agentic-processes/templates/processes/`
 3. Collect required parameters
-4. Resolve step references
+4. Resolve step references from `~/.claude/agentic-processes/templates/steps/`
 5. Create process instance with expanded steps
 
-### 2. Continue an Existing Process
+### 3. Continue an Existing Process
 
 To resume a process:
 ```
@@ -79,7 +97,7 @@ The system will:
 2. Show current progress
 3. Resume from the last incomplete step
 
-### 3. Process Structure
+### 4. Process Structure
 
 A process consists of:
 - **Process File** (`process.json`): Primary state and machine-readable data
@@ -98,30 +116,26 @@ agentic-processes/                    # Plugin root
 │   └── process-spawner.md
 ├── hooks/
 │   └── hooks.json                    # Unified hook configuration
-├── scripts/                          # Hook scripts
-│   ├── check-approval-stop.sh
-│   ├── block-tools-on-pending.sh
-│   ├── block-todo-tools.sh
-│   ├── enforce-log-first.sh
-│   ├── create-log-flag.sh
-│   └── bind-session-to-process.sh
+├── scripts/                          # Hook and utility scripts
+│   ├── process_manager.py            # Process state management
+│   ├── template_manager.py           # Git-based template operations
+│   ├── models.py                     # Shared data models
+│   └── ...hook scripts...
 ├── skills/
-│   ├── agentic-processes/
-│   │   └── SKILL.md                  # Main framework skill
 │   ├── process-new/
 │   │   └── SKILL.md                  # Start a new process from a template
 │   ├── process-continue/
 │   │   └── SKILL.md                  # Continue an existing process
-│   └── process-state-update/
-│       └── SKILL.md                  # Update process state files
+│   ├── process-state-update/
+│   │   └── SKILL.md                  # Update process state files
+│   └── process-template-sync/
+│       └── SKILL.md                  # Manage template sources and sync
+├── config/
+│   └── template-sources.default.json # Default template source configuration
+├── types/                            # TypeScript types + schema.json
 ├── assets/
 │   └── logo.svg                      # Plugin branding
 ├── AGENTS.md                         # Agent discovery file
-├── .processes/                       # Framework core
-│   ├── templates/                    # Process templates
-│   ├── steps/                        # Step definitions
-│   ├── types/                        # TypeScript types + schema.json (shared source of truth)
-│   └── prompts/                      # Entry prompts
 └── docs/                             # Documentation
 ```
 
@@ -148,7 +162,7 @@ Processes are stored in `~/.claude/agentic-processes/`:
 - Process flow diagrams (mermaid)
 - Sequential step definitions
 
-Templates are stored in `~/.claude/agentic-processes/templates/{category}/`.
+Templates are synced to `~/.claude/agentic-processes/templates/processes/{category}/` from configured git sources.
 
 ### Steps
 
@@ -160,7 +174,7 @@ Templates are stored in `~/.claude/agentic-processes/templates/{category}/`.
 - Substeps breakdown
 - Examples and common pitfalls
 
-Steps are stored in `~/.claude/agentic-processes/steps/{category}/`.
+Steps are synced to `~/.claude/agentic-processes/templates/steps/{category}/` from configured git sources.
 
 ### Step References
 
@@ -174,13 +188,66 @@ Templates reference steps using unified syntax:
   - **Step**: `@step:my-category/my-custom-step`
 ```
 
+## Template Sources
+
+Templates are distributed via git repositories, not bundled with the plugin. This enables:
+
+- **Versioned templates**: Pin to a branch or tag for stability
+- **Team sharing**: Host custom templates in private repos
+- **Multiple sources**: Combine official and custom template repos
+- **Independent updates**: Update templates without updating the plugin
+
+### Configuration
+
+Template sources are configured in `~/.claude/agentic-processes/config/template-sources.json`:
+
+```json
+{
+  "sources": [
+    {
+      "name": "official",
+      "url": "https://github.com/HM/agentic-process-templates.git",
+      "branch": "main",
+      "enabled": true,
+      "priority": 100
+    }
+  ]
+}
+```
+
+### Managing Sources
+
+Use `/process-template-sync` to:
+- **Sync**: Fetch latest templates from all configured sources
+- **Add source**: Register a new git repository as a template source
+- **Remove source**: Unregister a template source
+- **List sources**: View configured sources and their status
+- **Status**: Check sync state and installed template counts
+
+### Runtime Layout
+
+After syncing, templates are available at:
+```
+~/.claude/agentic-processes/
+├── config/
+│   └── template-sources.json          # Source configuration
+├── cache/
+│   └── sources/{name}/                # Git clone cache per source
+├── templates/
+│   ├── processes/{category}/          # Process templates
+│   └── steps/{category}/             # Step templates
+├── active/                            # Running processes
+├── completed/                         # Finished processes
+├── failed/                            # Failed processes
+├── flags/                             # Runtime flags
+└── guidelines/                        # Project-specific guidelines
+```
+
 ## Documentation
 
 - [Getting Started](docs/getting-started.md) - Detailed quick start guide
 - [Architecture](docs/architecture.md) - System architecture deep dive
 - [Examples](docs/examples.md) - More usage examples
-- [Templates Guide](.processes/templates/README.md) - Template authoring
-- [Steps Guide](.processes/steps/README.md) - Step creation guide
 
 ## Roadmap
 
@@ -193,8 +260,10 @@ Templates reference steps using unified syntax:
 - dynamic processes / templates
 - simple `do` template / - dynamic built workflow that checks for exist steps and with final step for saving steps, guidelines and process
 - imrove continuous learning step - guide it to find things so in the future everything will be one-shot, also guide it to find improvements for better token cost effective, and context management effective
-- move processes files to .claude/agentic-processes directory
 - Q&A session skill - same hook as pending-interactions, and special ui implementation - q&a hook blocks also pending-interactions, pending-interactions not blocking q&a
+- set different llm model for different steps (in config)
+- change steps to be defaulted as process template scope (related to specific template), with allowing to set global steps
+- replace with better way - _components and _framework
 
 ### Agentic Processes UI
 - improve dashboard - processses connectivity
@@ -209,26 +278,26 @@ Templates reference steps using unified syntax:
 
 ## Contributing
 
-### Adding Your Own Templates
+### Contributing to Official Templates
 
-1. Create template file in `~/.claude/agentic-processes/templates/{category}/`
-2. Follow template structure (see `~/.claude/agentic-processes/templates/README.md`)
-3. Include parameter placeholders
-4. Reference steps using `@step:category/step-name` syntax
-5. Add mermaid flow diagram
+Official templates live in the [agentic-process-templates](https://github.com/HM/agentic-process-templates) repository. To contribute:
 
-### Adding Your Own Steps
+1. Fork the templates repository
+2. Create or modify templates under `templates/processes/{category}/`
+3. Create or modify steps under `templates/steps/{category}/`
+4. Submit a pull request
 
-1. Create step file in `~/.claude/agentic-processes/steps/{category}/`
-2. Follow step template (see `~/.claude/agentic-processes/steps/step-template.md`)
-3. Include all required sections:
-   - Description
-   - Output
-   - Guidance
-   - Flow diagram
-   - Substeps
-   - Examples
-   - Common pitfalls
+### Adding Custom Templates Locally
+
+For local/team-specific templates, add a custom git source:
+
+1. Create a git repo with the standard template structure (`templates/processes/`, `templates/steps/`)
+2. Use `/process-template-sync` to add the repo as a source
+3. Sync to install the templates
+
+### Template Authoring
+
+Process templates use parameter placeholders (`{{paramName}}`) and reference steps using `@step:category/step-name` syntax. Step templates include description, output, guidance, flow diagrams, substeps, examples, and common pitfalls.
 
 ## License
 

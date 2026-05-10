@@ -16,10 +16,15 @@ agentic-processes/                    # Plugin root
 ├── agents/                           # Auto-discovered agents
 ├── commands/                         # Auto-discovered commands
 ├── hooks/hooks.json                  # Hook configuration
-├── scripts/                          # Hook scripts
+├── scripts/                          # Hook and utility scripts
+│   ├── process_manager.py            # Process state management
+│   ├── template_manager.py           # Git-based template operations
+│   └── ...hook scripts...
 ├── skills/                           # Skills for AI discoverability
-├── AGENTS.md                         # Agent discovery file
-└── .processes/                       # Framework core
+├── config/                           # Default configuration files
+│   └── template-sources.default.json
+├── types/                            # TypeScript types + schema.json
+└── AGENTS.md                         # Agent discovery file
 ```
 
 ### Component Auto-Discovery
@@ -51,7 +56,7 @@ Templates define reusable workflows with:
 - Process flow diagrams
 - Sequential step definitions
 
-**Location**: `~/.claude/agentic-processes/templates/{category}/`
+**Location**: `~/.claude/agentic-processes/templates/processes/{category}/` (synced from git sources)
 
 **Structure**:
 ```markdown
@@ -77,17 +82,22 @@ Steps are modular, self-contained definitions with:
 - Substeps
 - Examples
 
-**Location**: `~/.claude/agentic-processes/steps/{category}/`
+**Location**: `~/.claude/agentic-processes/templates/steps/{category}/` (synced from git sources)
 
 **Categories**:
 - `api/` - API layer steps
+- `common/` - Common/shared steps
 - `data/` - Data layer steps
 - `service/` - Service layer steps
 - `testing/` - Testing steps
 - `planning/` - Planning steps
 - `documentation/` - Documentation steps
 - `external-services/` - External service steps
+- `guideline/` - Guideline steps
+- `investigation/` - Investigation steps
 - `learning/` - Learning/improvement steps
+- `multi-repo/` - Multi-repo steps
+- `template/` - Template authoring steps
 
 ### 4. Process Instances
 
@@ -164,7 +174,7 @@ When a process is created from a template:
 1. **Template Reading**: Read template file
 2. **Reference Scanning**: Find all step references (`@step:category/name`)
 3. **Step Loading**: For each reference:
-   - `@step:category/name` → read from `~/.claude/agentic-processes/steps/{category}/{name}.json`
+   - `@step:category/name` → read from `~/.claude/agentic-processes/templates/steps/{category}/{name}/{name}.json`
    - Extract relevant sections (Description, Output, Guidance)
 4. **Context Application**: Apply context parameters from template
 5. **Process Creation**: Create process instance in `~/.claude/agentic-processes/active/`
@@ -208,9 +218,11 @@ Memory state is maintained in `memory.json`:
 
 ## Integration Points
 
-**Commands**: Auto-discovered from `commands/` directory
-- `process-new.md` - Process creation command
-- `process-continue.md` - Process continuation command
+**Skills**: Auto-discovered from `skills/` directory
+- `process-new/SKILL.md` - Process creation
+- `process-continue/SKILL.md` - Process continuation
+- `process-state-update/SKILL.md` - State file updates
+- `process-template-sync/SKILL.md` - Template source management
 
 **Agents**: Auto-discovered from `agents/` and `AGENTS.md`
 - `step-executor.md` - Step execution subagent
@@ -218,7 +230,7 @@ Memory state is maintained in `memory.json`:
 
 **Hooks**: Configured in `hooks/hooks.json`
 
-**Task Tool Delegation**: Commands include instructions for using the Task tool to invoke subagents.
+**Task Tool Delegation**: Skills include instructions for using the Task tool to invoke subagents.
 
 ## File Structure
 
@@ -228,20 +240,30 @@ Memory state is maintained in `memory.json`:
 agents/                              # Subagents
 commands/                            # Commands
 hooks/hooks.json                     # Hook configuration
-scripts/                             # Hook scripts
-skills/agentic-processes/SKILL.md   # Main skill
+scripts/                             # Hook and utility scripts
+├── process_manager.py               # Process state management
+├── template_manager.py              # Git-based template operations
+├── models.py                        # Shared data models
+└── ...hook scripts...
+skills/
+├── process-new/SKILL.md             # Start new process
+├── process-continue/SKILL.md        # Continue existing process
+├── process-state-update/SKILL.md    # Update process state
+└── process-template-sync/SKILL.md   # Manage template sources
+config/
+└── template-sources.default.json    # Default template source config
+types/                               # TypeScript types + schema.json
 AGENTS.md                            # Agent discovery
-.processes/                          # Framework core
-├── templates/                       # Process templates
-├── steps/                           # Step definitions
-├── types/                           # TypeScript types
-└── prompts/                         # Entry prompts
 
 # Runtime Location (~/.claude/agentic-processes/)
 ~/.claude/agentic-processes/
-├── templates/                       # All process templates
-├── steps/                           # All step definitions
-├── types/                           # TypeScript types + schema.json
+├── config/
+│   └── template-sources.json        # User's template source config
+├── cache/
+│   └── sources/{name}/              # Git clone cache per source
+├── templates/
+│   ├── processes/{category}/        # Process templates (synced)
+│   └── steps/{category}/            # Step templates (synced)
 ├── guidelines/                      # Project-specific guidelines
 ├── flags/                           # Runtime flag files
 ├── active/                          # Running processes
@@ -291,21 +313,43 @@ Steps are executed by subagents for:
 - Clear responsibility boundaries
 - Consistent execution patterns
 
+## Git-Based Template Sources
+
+Templates are distributed via git repositories rather than bundled with the plugin. This architecture enables versioning, team sharing, and independent template updates.
+
+### Template Sync Flow
+
+```mermaid
+graph TD
+    A[User runs /process-template-sync] --> B[template_manager.py sync]
+    B --> C[Read config/template-sources.json]
+    C --> D{For each enabled source}
+    D --> E[Clone or pull git repo to cache/]
+    E --> F[Copy templates/processes/ to runtime]
+    E --> G[Copy templates/steps/ to runtime]
+    F --> H[Templates available for /process-new]
+    G --> H
+```
+
+### Source Configuration
+
+Sources are configured in `~/.claude/agentic-processes/config/template-sources.json`. Each source specifies a git URL, branch, and priority. When multiple sources provide the same template, the higher-priority source wins.
+
+### Cache Strategy
+
+Each source is shallow-cloned to `~/.claude/agentic-processes/cache/sources/{source-name}/`. The cache is separate from the installed templates, so a failed sync cannot corrupt the working set.
+
 ## Extension Points
 
-### Adding Your Own Templates
+### Adding Custom Template Sources
 
-1. Create template file in `~/.claude/agentic-processes/templates/{category}/`
-2. Follow template structure
-3. Reference steps using `@step:category/step-name` syntax
-4. Add mermaid flow diagram
+1. Create a git repo with the standard structure: `templates/processes/` and `templates/steps/`
+2. Use `/process-template-sync` to add it as a source
+3. Sync to install the templates alongside official ones
 
-### Adding Your Own Steps
+### Contributing to Official Templates
 
-1. Create step file in `~/.claude/agentic-processes/steps/{category}/`
-2. Follow step template (see `~/.claude/agentic-processes/steps/step-template.md`)
-3. Include all required sections
-4. Add examples and guidance
+Official templates are maintained in the [agentic-process-templates](https://github.com/HM/agentic-process-templates) repository. Fork, modify, and submit pull requests.
 
 ### Custom Hooks
 

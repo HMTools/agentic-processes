@@ -26,11 +26,12 @@ claude --plugin-dir /path/to/agentic-processes
 
 ### After Installation
 
-After installing the plugin, run the install script to copy templates, steps, and types to `~/.claude/agentic-processes/`:
-```bash
-bash /path/to/agentic-processes/scripts/install.sh
+After installing the plugin, sync templates from configured git sources:
 ```
-Runtime directories (`active/`, `completed/`, `failed/`, `flags/`) are created on-demand.
+/process-template-sync
+```
+
+This fetches process and step templates to `~/.claude/agentic-processes/templates/` and creates all required runtime directories (`active/`, `completed/`, `failed/`, `flags/`, `guidelines/`, etc.).
 
 ## Your First Process
 
@@ -144,7 +145,7 @@ Templates define reusable workflows:
 - Include flow diagrams
 - Define sequential steps
 
-Templates are stored in `~/.claude/agentic-processes/templates/{category}/`.
+Templates are synced to `~/.claude/agentic-processes/templates/processes/{category}/` from configured git sources.
 
 ### Steps
 
@@ -154,7 +155,7 @@ Steps are modular building blocks:
 - Flow diagrams for complex steps
 - Substeps for detailed breakdown
 
-Steps are stored in `~/.claude/agentic-processes/steps/{category}/`.
+Steps are synced to `~/.claude/agentic-processes/templates/steps/{category}/` from configured git sources.
 
 ### Step References
 
@@ -194,11 +195,31 @@ Templates reference steps using unified syntax:
 4. **Check State**: Review current state section to understand progress
 5. **Follow Guidance**: Step guidance provides detailed instructions
 
+## Setting Up Template Sources
+
+Template sources are git repositories that provide process and step templates. The default configuration includes the official templates repo, but you can add custom sources.
+
+### Viewing Configured Sources
+
+Use `/process-template-sync` and choose "list sources" to see all configured template sources.
+
+### Adding a Custom Source
+
+Use `/process-template-sync` and choose "add source" to register a new git repository as a template source. Provide:
+- **name**: A short identifier for the source
+- **url**: The git clone URL
+- **branch**: The branch to track (default: `main`)
+- **priority**: Lower number = higher priority when resolving conflicts
+
+### Syncing Templates
+
+Run `/process-template-sync` periodically to fetch the latest templates from all enabled sources.
+
 ## Next Steps
 
 - Read [Architecture Guide](architecture.md) for system details
 - Check [Examples](examples.md) for more use cases
-- Explore [Templates](../.processes/templates/README.md) and [Steps](../.processes/steps/README.md)
+- Explore templates by running `/process-template-sync` then browsing `~/.claude/agentic-processes/templates/`
 
 ## Getting Help
 

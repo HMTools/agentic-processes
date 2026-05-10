@@ -15,10 +15,12 @@
   ],
   "references": {
     "relatedDocs": ["getting-started", "process-management", "examples"],
-    "templatesLocation": "~/.claude/agentic-processes/templates/",
-    "stepsLocation": "~/.claude/agentic-processes/steps/",
+    "templatesLocation": "~/.claude/agentic-processes/templates/processes/",
+    "stepsLocation": "~/.claude/agentic-processes/templates/steps/",
     "commandsLocation": "commands/",
-    "typesLocation": "~/.claude/agentic-processes/types/"
+    "typesLocation": "types/",
+    "configLocation": "~/.claude/agentic-processes/config/",
+    "cacheLocation": "~/.claude/agentic-processes/cache/"
   }
 }
 
