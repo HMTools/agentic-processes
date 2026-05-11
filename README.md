@@ -263,7 +263,7 @@ After syncing, templates are available at:
 - Q&A session skill - same hook as pending-interactions, and special ui implementation - q&a hook blocks also pending-interactions, pending-interactions not blocking q&a
 - set different llm model for different steps (in config)
 - change steps to be defaulted as process template scope (related to specific template), with allowing to set global steps
-- replace with better way - _components and _framework
+- replace with better way - _components
 
 ### Agentic Processes UI
 - improve dashboard - processses connectivity

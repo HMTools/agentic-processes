@@ -264,6 +264,9 @@ def cmd_add_log_entry(args: argparse.Namespace) -> None:
     actions = json.loads(args.actions) if args.actions else []
     reasoning = json.loads(args.reasoning) if args.reasoning else None
     files_modified = json.loads(args.files_modified) if args.files_modified else None
+    problems = json.loads(args.problems) if args.problems else None
+    decisions = json.loads(args.decisions) if args.decisions else None
+    performance_notes = json.loads(args.performance_notes) if args.performance_notes else None
 
     now = _now_iso()
 
@@ -281,6 +284,18 @@ def cmd_add_log_entry(args: argparse.Namespace) -> None:
             if entry.filesModified is None:
                 entry.filesModified = []
             entry.filesModified.extend(files_modified)
+        if problems:
+            if entry.problemsEncountered is None:
+                entry.problemsEncountered = []
+            entry.problemsEncountered.extend(problems)
+        if decisions:
+            if entry.decisionsMade is None:
+                entry.decisionsMade = []
+            entry.decisionsMade.extend(decisions)
+        if performance_notes:
+            if entry.performanceNotes is None:
+                entry.performanceNotes = []
+            entry.performanceNotes.extend(performance_notes)
         if isinstance(entry.timestamp, dict):
             entry.timestamp["updatedAt"] = now
         else:
@@ -291,6 +306,9 @@ def cmd_add_log_entry(args: argparse.Namespace) -> None:
             actionsTaken=actions if actions else None,
             agentReasoning=reasoning,
             filesModified=files_modified,
+            problemsEncountered=problems,
+            decisionsMade=decisions,
+            performanceNotes=performance_notes,
         )
 
     if log.executionMetrics:
@@ -471,6 +489,9 @@ def main() -> None:
     p_log.add_argument("--actions", help="JSON array of actions taken")
     p_log.add_argument("--reasoning", help="JSON array of agent reasoning")
     p_log.add_argument("--files-modified", help="JSON array of files modified")
+    p_log.add_argument("--problems", help="JSON array of problems encountered")
+    p_log.add_argument("--decisions", help="JSON array of decisions made")
+    p_log.add_argument("--performance-notes", help="JSON array of performance notes")
     p_log.set_defaults(func=cmd_add_log_entry)
 
     # log-interaction

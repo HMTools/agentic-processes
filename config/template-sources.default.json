@@ -2,7 +2,7 @@
   "sources": [
     {
       "name": "official",
-      "url": "https://github.com/user/agentic-process-templates.git",
+      "url": "https://github.com/HMTools/agentic-process-templates.git",
       "branch": "main",
       "enabled": true,
       "priority": 100

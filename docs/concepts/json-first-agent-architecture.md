@@ -488,5 +488,4 @@ flowchart TD
 
 - The `_components/` folder files are referenced by steps but don't follow the same dual-file pattern - they may need separate consideration
 - Process instance files (`process.md`, `memory.json`, `log.json` in `~/.claude/agentic-processes/`) follow a different pattern and are not part of this migration
-- The templates for memory and log files (`memory-template.md`, `log-template.md`) should be kept as MD-only since they're used to initialize process instances
 

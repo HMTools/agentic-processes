@@ -20,7 +20,6 @@
       "Read(//c/Projects/HM/agentic-processes-ui/$HOME/**)",
       "Read(//c/Projects/HM/agentic-processes-ui/$USERPROFILE/**)",
       "Bash(find /c/Projects/HM/agentic-processes -type d -name *flag* -o -name .claude)",
-
       "Bash(node test_hook.js)",
       "Bash(xxd hook_test_input.json)",
       "Bash(ls:*)",
@@ -37,16 +36,10 @@
       "PowerShell(1..10 | ForEach-Object { [guid]::NewGuid\\(\\).ToString\\(\\) })",
       "PowerShell(New-Item *)",
       "Bash(python scripts/process_manager.py create-process --help)",
-
-
       "Bash(Get-ChildItem -Path \"C:\\\\Projects\\\\HM\\\\agentic-processes\" -Force)",
       "Bash(Select-Object Mode, Name)",
-
-
       "Bash(Get-Content *)",
       "Bash(xargs -I {} head -80 {})",
-
-
       "Bash(python *)",
       "Bash(Get-Process -Name \"claude*\" -ErrorAction SilentlyContinue)",
       "Bash(Select-Object Id, ProcessName, StartTime, CPU)",
@@ -74,10 +67,18 @@
       "PowerShell(Copy-Item *)",
       "Bash(Select-Object -ExpandProperty Name)",
       "Bash(dir C:\\\\Projects\\\\HM\\\\agentic-processes\\\\config *)",
-      "Bash(dir *)"
+      "Bash(dir *)",
+      "PowerShell(python \"C:\\\\Projects\\\\HM\\\\agentic-processes\\\\scripts\\\\process_manager.py\" add-log-entry --process-dir \"C:\\\\Users\\\\matanha\\\\.claude\\\\agentic-processes\\\\active\\\\process-set-concept-framework-template-necessity-20260510\" --step-id \"cd13bc1a-a049-40db-bb19-7bc6b77a2d89\" --actions $actions --reasoning $reasoning --files-modified $files)",
+      "PowerShell($actions = '[\"MOD-001: Simplified template_manager.py processes block\", \"DEL-001: Deleted _framework/ directory\", \"MOD-002: Removed _framework/ from templates README\", \"MOD-003: Removed template reference from architecture doc\", \"MOD-004: Updated TODO in framework README\", \"Verified all changes applied correctly\", \"Created changes-applied.md report\"]')",
+      "PowerShell($reasoning = '[\"Applied in phase order: code, deletion, docs\", \"Verified each change after application\"]')",
+      "PowerShell($files = '[\"template_manager.py\", \"_framework/ \\(deleted\\)\", \"agentic-process-templates/README.md\", \"json-first-agent-architecture.md\", \"agentic-processes/README.md\"]')",
+      "PowerShell(python \"C:\\\\Projects\\\\HM\\\\agentic-processes\\\\scripts\\\\process_manager.py\" add-log-entry --process-dir \"C:\\\\Users\\\\matanha\\\\.claude\\\\agentic-processes\\\\active\\\\process-set-concept-framework-template-necessity-20260510\" --step-id \"cd13bc1a-a049-40db-bb19-7bc6b77a2d89\" --actions '[\"Applied all 5 approved changes: MOD-001 MOD-002 MOD-003 MOD-004 DEL-001\"]' --reasoning '[\"Applied in phased order to avoid broken intermediate states\"]' --files-modified '[\"template_manager.py\"]')",
+      "Bash(mkdir -p \"C:/Users/matanha/.claude/agentic-processes/completed/\")",
+      "Bash(mv \"C:/Users/matanha/.claude/agentic-processes/active/process-set-concept-framework-template-necessity-20260510\" \"C:/Users/matanha/.claude/agentic-processes/completed/process-set-concept-framework-template-necessity-20260510\")"
     ],
     "additionalDirectories": [
-      "C:\\Projects\\HM\\agentic-processes-ui"
+      "C:\\Projects\\HM\\agentic-processes-ui",
+      "C:\\Projects\\HM\\agentic-process-templates"
     ]
   }
 }

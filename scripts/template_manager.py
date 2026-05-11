@@ -211,18 +211,9 @@ def _copy_templates(source_dir: Path, kind: str, installed: dict[str, str]) -> l
                 shutil.copy2(item, dest / item.name)
 
     if kind == "processes":
-        # Copy _framework and loose files
+        # Copy loose files (e.g., README.md)
         for item in sorted(src.iterdir()):
-            if item.is_dir() and item.name.startswith("_"):
-                rel_path = item.name
-                if rel_path in installed:
-                    continue
-                dest_path = dest / item.name
-                if dest_path.exists():
-                    shutil.rmtree(dest_path)
-                shutil.copytree(item, dest_path)
-                copied.append(rel_path)
-            elif item.is_file():
+            if item.is_file():
                 shutil.copy2(item, dest / item.name)
 
     return copied
