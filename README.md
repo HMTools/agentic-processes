@@ -264,6 +264,7 @@ After syncing, templates are available at:
 - set different llm model for different steps (in config)
 - change steps to be defaulted as process template scope (related to specific template), with allowing to set global steps
 - replace with better way - _components
+- remove the view only md files (instead create a skill that allows the user to generate view page from jsons)
 
 ### Agentic Processes UI
 - improve dashboard - processses connectivity

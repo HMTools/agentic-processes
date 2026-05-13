@@ -103,13 +103,83 @@ export interface QASessionMemory {
 export interface QAConfig {
   /** Whether this step supports Q&A sessions */
   enabled: boolean;
-  
+
   /** When Q&A should be triggered */
   trigger: 'on_gaps' | 'always' | 'manual';
-  
+
   /** Default questions to ask (can be extended dynamically) */
   defaultQuestions?: QAQuestion[];
-  
+
   /** Whether to allow proceeding with partial answers */
   allowPartialAnswers: boolean;
+}
+
+/**
+ * Status of an individual question in a Q&A session file
+ */
+export type QuestionStatus = 'unanswered' | 'answered' | 'refined' | 'completed';
+
+/**
+ * Overall status of a Q&A session file
+ * Derived from individual question statuses:
+ * - 'pending': All questions unanswered
+ * - 'partial': Some questions answered, some unanswered
+ * - 'completed': All questions answered or completed
+ */
+export type SessionStatus = 'pending' | 'partial' | 'completed';
+
+/**
+ * A single iteration of an answer to a question
+ */
+export interface AnswerIteration {
+  /** The answer text */
+  answer: string;
+
+  /** When this answer iteration was provided (ISO-8601 format) */
+  timestamp: ISOTimestamp;
+
+  /** Iteration number (1 for first answer, increments with refinements) */
+  iteration: number;
+}
+
+/**
+ * Extended question type for Q&A session files
+ * Includes status tracking and answer history
+ */
+export interface QASessionQuestion extends QAQuestion {
+  /** Current status of this question */
+  status: QuestionStatus;
+
+  /** History of all answer iterations for this question */
+  answerHistory: AnswerIteration[];
+}
+
+/**
+ * Q&A session file structure
+ * Stored as JSON file in process directory to persist Q&A state
+ * across conversation boundaries and enable file-based interaction flows
+ */
+export interface QASessionFile {
+  /** File type identifier */
+  type: 'qa-session';
+
+  /** ID of the step this Q&A session belongs to */
+  stepId: string;
+
+  /** Name of the step this Q&A session belongs to */
+  stepName: string;
+
+  /** When this Q&A session was created (ISO-8601 format) */
+  timestamp: ISOTimestamp;
+
+  /** All questions in this session with their current status */
+  questions: QASessionQuestion[];
+
+  /**
+   * Overall session status (derived from question statuses)
+   * - 'pending': All questions are 'unanswered'
+   * - 'partial': Mix of answered and unanswered questions
+   * - 'completed': All questions are 'answered', 'refined', or 'completed'
+   */
+  status: SessionStatus;
 }

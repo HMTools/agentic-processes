@@ -25,10 +25,25 @@ if [ ! -f "$FLAG_FILE" ]; then
 fi
 
 # Flag exists — user interaction not yet logged
-cat << 'EOF'
+# Find process for better error message
+PROCESS_DIR=""
+for SESSION_FILE in "$AGENTIC_DIR"/active/*/.session; do
+    if [ -f "$SESSION_FILE" ] && [ "$(cat "$SESSION_FILE" 2>/dev/null)" = "$SESSION_ID" ]; then
+        PROCESS_DIR=$(dirname "$SESSION_FILE")
+        break
+    fi
+done
+
+cat << EOF
 {
   "decision": "block",
-  "reason": "User interaction not yet logged. Call process_manager.py log-interaction to record this interaction in log.json before stopping."
+  "reason": "User interaction not yet logged.
+
+You cannot stop until the user interaction from this turn is logged.
+
+Process: $PROCESS_DIR
+
+Log the interaction first using log-interaction, then you can stop."
 }
 EOF
 exit 0

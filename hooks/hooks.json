@@ -73,6 +73,10 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/create-log-flag.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-qa-session.sh"
           }
         ]
       }
