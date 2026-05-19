@@ -1,40 +1,61 @@
 ---
 name: process-state-update
-description: Update process state files (process.json, memory.json, log.json, pending-interaction.json) via Python scripts. Used by step-executor during execution.
+description: Update process state files (process.json, memory.json, log.json, pending-interaction.json) via Python scripts. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, create approval checkpoints, or modify any process state file. Never use Write/Edit tools on process state files. Used by step-executor and process-continue agents.
 ---
 
 # Process State Update
 
-Update process state files via `process_manager.py`. All operations write files directly — the agent never uses Write/Edit on process state files.
+**Critical**: All process state mutations must go through `process_manager.py`. Never use Write/Edit tools on process state files — doing so will corrupt the process state.
 
 ## When to Use
 
-- Updating step status during execution
-- Recording memory entries after completing work
-- Logging actions and user interactions
-- Creating or deleting pending interaction files for approval checkpoints
+Use this skill whenever you need to:
+- Update step status (pending → in_progress → completed)
+- Record memory entries after completing work
+- Log actions, reasoning, and user interactions
+- Create or delete pending interaction files for approval checkpoints
+- Update process-wide status or observations
 
-## Available Operations
+If you're working in the agentic-processes framework and need to modify any `.json` file in a process directory, you MUST use this skill.
 
-All operations are invoked via:
+## Locating the Script
+
+The `process_manager.py` script is located at: `C:/Projects/HM/agentic-processes/scripts/process_manager.py`
+
+**For Bash**: Use forward slashes and the `/c/` drive prefix:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py <subcommand> ...
 ```
-Bash(python3 ${PLUGIN_ROOT}/scripts/process_manager.py <subcommand> --process-dir <dir> ...)
+
+**For PowerShell**: Use the full Windows path with forward slashes:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" <subcommand> ...
 ```
 
-Check stdout for `{"status": "ok", ...}` or `{"status": "error", "message": "..."}`.
+Both `python` and `python3` work in this environment. Always check stdout for `{"status": "ok", ...}` or `{"status": "error", "message": "..."}`.
 
 ---
+
+## Available Operations
 
 ### update-step-status
 
 Change a step's status in `process.json`. Automatically sets `startedAt` when moving to `in_progress` and `completedAt` when moving to `completed`.
 
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py update-step-status \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --step-id "abc-123-uuid" \
+  --status in_progress
 ```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-step-status \
-  --process-dir <dir> \
-  --step-id <UUID> \
-  --status <pending|in_progress|completed|skipped|awaiting_approval>
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-step-status --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --status in_progress
 ```
+
+Valid statuses: `pending`, `in_progress`, `completed`, `skipped`, `awaiting_approval`
 
 ---
 
@@ -42,13 +63,18 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-step-status \
 
 Update the active step pointer in `process.json`.
 
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py update-current-state \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --step-id "abc-123-uuid" \
+  --step-name "Verify Changes" \
+  --summary "Reviewing applied changes for correctness"
 ```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-current-state \
-  --process-dir <dir> \
-  --step-id <UUID> \
-  --step-name "<name>" \
-  --summary "<brief summary>" \
-  --details "<optional extended details>"
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-current-state --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --step-name "Verify Changes" --summary "Reviewing applied changes"
 ```
 
 ---
@@ -57,16 +83,23 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-current-state \
 
 Add or update a step entry in `memory.json`. If the step already exists, new info/decisions/files are appended.
 
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py add-memory-entry \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --step-id "abc-123-uuid" \
+  --name "Analyze Requirements" \
+  --info '{"approach": "reviewed user docs", "constraints": "must preserve API compatibility"}' \
+  --decisions '["Use incremental migration", "Maintain backward compatibility"]' \
+  --files '["api.py", "migration.md"]'
 ```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py add-memory-entry \
-  --process-dir <dir> \
-  --step-id <UUID> \
-  --name "<step name>" \
-  --info '{"key": "value"}' \
-  --decisions '["decision 1", "decision 2"]' \
-  --files '["file1.py", "file2.md"]' \
-  --status <optional status>
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" add-memory-entry --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --name "Analyze Requirements" --info '{\"approach\": \"reviewed user docs\"}' --decisions '[\"Use incremental migration\"]' --files '[\"api.py\"]'
 ```
+
+**Note**: In PowerShell, escape inner quotes with backslash: `'{\"key\": \"value\"}'`
 
 ---
 
@@ -74,13 +107,14 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py add-memory-entry \
 
 Append actions and reasoning to a step entry in `log.json`.
 
-```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py add-log-entry \
-  --process-dir <dir> \
-  --step-id <UUID> \
-  --actions '["action 1", "action 2"]' \
-  --reasoning '["reasoning 1"]' \
-  --files-modified '["file1.py"]'
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py add-log-entry \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --step-id "abc-123-uuid" \
+  --actions '["Modified API endpoint", "Updated tests", "Added migration script"]' \
+  --reasoning '["Preserve backward compatibility", "Cover new edge cases"]' \
+  --files-modified '["api.py", "test_api.py", "migrate.py"]'
 ```
 
 ---
@@ -89,35 +123,56 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py add-log-entry \
 
 Log a user interaction in `log.json`. Also clears the `pending-log` flag (integrates with `enforce-log-first` hook).
 
-```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py log-interaction \
-  --process-dir <dir> \
-  --step-id <UUID> \
-  --request "<what the user said>" \
-  --reason "<why they said it>" \
-  --response "<what the agent did>"
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py log-interaction \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --step-id "abc-123-uuid" \
+  --request "User asked to skip validation step" \
+  --reason "User is confident changes are correct" \
+  --response "Skipped validation, moved to deployment"
 ```
 
-Optional flags: `--for-improvement`, `--potential-improvement "<text>"`
+Optional flags: `--for-improvement`, `--potential-improvement "Add auto-validation option"`
 
 ---
 
 ### write-pending
 
-Create or delete `pending-interaction.json` for approval checkpoints.
+**CRITICAL: Use this operation to create approval checkpoints. DO NOT create `pending-interaction.json` files directly with Write/Edit/PowerShell. That violates the core principle of this skill and will corrupt the process state.**
 
-Create:
-```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py write-pending \
-  --process-dir <dir> \
-  --options '[{"id": "approve", "label": "Approve", "isDefault": true}, {"id": "reject", "label": "Reject"}]'
+Create or delete `pending-interaction.json` for approval checkpoints. This operation ensures the correct schema and structure.
+
+**Create approval checkpoint (Bash)**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py write-pending \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --options '[{"id": "approve", "label": "Approve Changes", "isDefault": true}, {"id": "reject", "label": "Reject"}, {"id": "modify", "label": "Request Modifications"}]'
 ```
 
-Delete:
+**Create approval checkpoint (PowerShell)**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" write-pending --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --options '[{\"id\": \"approve\", \"label\": \"Apply Migration\", \"isDefault\": true}, {\"id\": \"reject\", \"label\": \"Cancel\"}]'
 ```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py write-pending \
-  --process-dir <dir> \
+
+**Delete pending interaction (Bash)**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py write-pending \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
   --delete
+```
+
+**Example: Database migration approval**
+```bash
+# CORRECT: Use write-pending operation
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py write-pending \
+  --process-dir "/c/Users/matanha/.claude/agentic-processes/active/process-db-migration" \
+  --options '[{"id": "approve", "label": "Apply Migration", "isDefault": true}, {"id": "review", "label": "Review Scripts First"}, {"id": "reject", "label": "Cancel Migration"}]'
+
+# WRONG: Do NOT create the file directly
+# [X] DO NOT DO THIS: echo '{"options": [...]}' > pending-interaction.json
+# [X] DO NOT DO THIS: ConvertTo-Json | Out-File pending-interaction.json
+# [X] DO NOT DO THIS: Write tool on pending-interaction.json
 ```
 
 ---
@@ -126,11 +181,14 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py write-pending \
 
 Change the top-level process status in `process.json`.
 
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py update-process-status \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --status completed
 ```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-process-status \
-  --process-dir <dir> \
-  --status <running|completed|failed|paused>
-```
+
+Valid statuses: `running`, `completed`, `failed`, `paused`
 
 ---
 
@@ -138,13 +196,13 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-process-status \
 
 Append entries to the `processWideObservations` section of `log.json`. Used by steps like `apply-changes`, `review-verify-document`, and `continuous-improvement` to record cross-step patterns and recommendations.
 
-```
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py update-log-observations \
-  --process-dir <dir> \
-  --patterns '["pattern 1", "pattern 2"]' \
-  --feedback '["user feedback summary"]' \
-  --metrics '{"key": "value"}' \
-  --recommendations '["recommendation 1"]'
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py update-log-observations \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --patterns '["Repeated file conflicts", "User prefers incremental changes"]' \
+  --feedback '["User requested more detailed logging"]' \
+  --recommendations '["Add conflict detection earlier", "Implement auto-merge for simple conflicts"]'
 ```
 
 All flags are optional — only provided fields are appended/merged.
@@ -153,6 +211,52 @@ All flags are optional — only provided fields are appended/merged.
 
 ## Important Rules
 
-- **Never use Write/Edit** directly on `process.json`, `memory.json`, `log.json`, or `pending-interaction.json`
-- Always check stdout for the result status after each command
-- All JSON string arguments must be properly escaped for the shell
+1. **Never use Write/Edit** directly on `process.json`, `memory.json`, `log.json`, or `pending-interaction.json` — always use this skill's operations
+2. **Always check stdout** for the result status after each command: `{"status": "ok"}` means success
+3. **Escape JSON properly** in PowerShell: use `'{\"key\": \"value\"}'` with backslash-escaped inner quotes
+4. **Use correct path format**: Bash uses `/c/` prefix, PowerShell uses `C:/`
+5. **The script path is fixed**: Always use `C:/Projects/HM/agentic-processes/scripts/process_manager.py` (or `/c/Projects/...` in Bash)
+
+---
+
+## Common Mistakes (DO NOT DO THESE)
+
+### [WRONG] Creating pending-interaction.json directly
+**WRONG:**
+```powershell
+# DO NOT create the file with PowerShell/Write/Edit
+$json = @{options = @(...)} | ConvertTo-Json
+$json | Out-File "pending-interaction.json"  # [X] WRONG!
+```
+
+**CORRECT:**
+```bash
+# ALWAYS use write-pending operation
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py write-pending \
+  --process-dir "..." \
+  --options '[...]'
+```
+
+### [WRONG] Using relative paths
+**WRONG:**
+```bash
+python scripts/process_manager.py ...  # [X] Breaks if not in project root
+```
+
+**CORRECT:**
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py ...  # [OK] Always works
+```
+
+### [WRONG] Using Write/Edit on process state files
+**WRONG:**
+```python
+# DO NOT use Write tool on process.json/memory.json/log.json
+Write(file_path="process.json", content="...")  # [X] CORRUPTS STATE!
+```
+
+**CORRECT:**
+```bash
+# ALWAYS use the appropriate process_manager.py operation
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py add-memory-entry ...
+```
