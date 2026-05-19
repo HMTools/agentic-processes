@@ -74,7 +74,15 @@
       "PowerShell($files = '[\"template_manager.py\", \"_framework/ \\(deleted\\)\", \"agentic-process-templates/README.md\", \"json-first-agent-architecture.md\", \"agentic-processes/README.md\"]')",
       "PowerShell(python \"C:\\\\Projects\\\\HM\\\\agentic-processes\\\\scripts\\\\process_manager.py\" add-log-entry --process-dir \"C:\\\\Users\\\\matanha\\\\.claude\\\\agentic-processes\\\\active\\\\process-set-concept-framework-template-necessity-20260510\" --step-id \"cd13bc1a-a049-40db-bb19-7bc6b77a2d89\" --actions '[\"Applied all 5 approved changes: MOD-001 MOD-002 MOD-003 MOD-004 DEL-001\"]' --reasoning '[\"Applied in phased order to avoid broken intermediate states\"]' --files-modified '[\"template_manager.py\"]')",
       "Bash(mkdir -p \"C:/Users/matanha/.claude/agentic-processes/completed/\")",
-      "Bash(mv \"C:/Users/matanha/.claude/agentic-processes/active/process-set-concept-framework-template-necessity-20260510\" \"C:/Users/matanha/.claude/agentic-processes/completed/process-set-concept-framework-template-necessity-20260510\")"
+      "Bash(mv \"C:/Users/matanha/.claude/agentic-processes/active/process-set-concept-framework-template-necessity-20260510\" \"C:/Users/matanha/.claude/agentic-processes/completed/process-set-concept-framework-template-necessity-20260510\")",
+      "Read(//c/Users/matanha/**)",
+      "Bash(find .claude -type d -name \".git\")",
+      "Bash(chmod +x *)",
+      "Bash(bash -n \"C:\\\\Projects\\\\HM\\\\agentic-processes\\\\scripts\\\\enforce-log-first.sh\")",
+      "Bash(bash -n \"C:\\\\Projects\\\\HM\\\\agentic-processes\\\\scripts\\\\enforce-log-on-stop.sh\")",
+      "Bash(git commit -m ' *)",
+      "Bash(mkdir -p __TRACKED_VAR__/.claude/agentic-processes/completed)",
+      "Bash(mv __TRACKED_VAR__/.claude/agentic-processes/active/json-qa-session-feature-20260512 __TRACKED_VAR__/.claude/agentic-processes/completed/)"
     ],
     "additionalDirectories": [
       "C:\\Projects\\HM\\agentic-processes-ui",

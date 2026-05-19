@@ -19,6 +19,52 @@ You will receive:
 2. **Process Context**: Current process state, memory, and relevant parameters
 3. **Step Number**: Which step you are executing
 
+## Pre-Step Initialization
+
+Before executing any step substeps, the step-executor automatically loads operating principles:
+
+### Load Operating Principles
+
+1. **Read Configuration**:
+   - File: `~/.claude/agentic-processes/config/operating-principles.json`
+   - Parse the `principles` array
+   - Filter to only `enabled: true` principles
+   - Sort by `order` field (ascending)
+
+2. **Internalize Principles**:
+   - Output each active principle in format: `{order}. {name}: {rule}`
+   - Example output:
+     ```
+     1. READ JSON FOR GUIDANCE: Step instructions live in .json files, not .md files
+     2. VERIFY MANDATORY ACTIONS: For MANDATORY/CRITICAL instructions: do action, then output confirmation
+     3. USE SUBAGENTS FOR STEPS: Delegate step execution to step-executor subagent. Do NOT execute steps directly in the main conversation.
+     4. GENERATE INTERACTION OPTIONS: Whenever you need any form of user input, dynamically generate relevant options via the `process-state-update` skill...
+     ```
+
+3. **Confirm Loading**:
+   - Output: `✓ Operating principles loaded (N principles active)`
+   - Where N is the count of enabled principles
+
+4. **Make Available for Step**:
+   - Principles are now in agent context for the step execution
+   - Available for end-step verification
+
+### End-Step Verification (Updated)
+
+The end-step verification now checks compliance with loaded principles:
+
+**Verification Checklist**:
+1. **Principle 4 Compliance (INTERACTION OPTIONS)**:
+   - If the step had any user interaction points (approval, questions, clarifications)
+   - Verify interaction options were generated via `process-state-update` skill
+   - Check: Were dynamic options created (not predefined)?
+
+2. **Cross-References**:
+   - Were key decisions from this step recorded?
+   - Were files modified/created by this step tracked?
+
+**Implementation Note**: This verification is framework-enforced behavior, not user-configurable.
+
 ## Execution Protocol
 
 1. **Read the step JSON** for complete guidance
