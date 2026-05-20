@@ -192,6 +192,55 @@ Valid statuses: `running`, `completed`, `failed`, `paused`
 
 ---
 
+### register-child-process
+
+Register a child sub-process in the parent's `process.json` `subProcessState.childProcesses` array.
+Used when spawning sub-processes to make parent-child relationships visible in the UI diagram.
+
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py register-child-process \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/parent-process" \
+  --child-id "child-uuid" \
+  --child-name "Child Process Name" \
+  --child-status running \
+  --spawned-at-step "step-uuid-that-spawned" \
+  --sync-point "step-uuid-where-parent-waits" \
+  --child-process-path "/c/Users/username/.claude/agentic-processes/active/child-process"
+```
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" register-child-process --process-dir "C:/Users/username/.claude/agentic-processes/active/parent-process" --child-id "child-uuid" --child-name "Child Process Name" --child-status running --spawned-at-step "step-uuid-that-spawned" --sync-point "step-uuid-where-parent-waits" --child-process-path "C:/Users/username/.claude/agentic-processes/active/child-process"
+```
+
+**Important**: `--spawned-at-step` must be the step's UUID (not its number) — the UI diagram matches by step UUID.
+
+If a child with the same ID already exists, its entry is updated rather than duplicated.
+
+---
+
+### update-child-status
+
+Update the status of a child sub-process in the parent's `process.json`. Used when a child process completes or fails to keep the parent's diagram in sync.
+
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py update-child-status \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/parent-process" \
+  --child-id "child-uuid" \
+  --child-status completed
+```
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-child-status --process-dir "C:/Users/username/.claude/agentic-processes/active/parent-process" --child-id "child-uuid" --child-status completed
+```
+
+Valid statuses: `running`, `completed`, `failed`, `paused`
+
+---
+
 ### update-log-observations
 
 Append entries to the `processWideObservations` section of `log.json`. Used by steps like `apply-changes`, `review-verify-document`, and `continuous-improvement` to record cross-step patterns and recommendations.

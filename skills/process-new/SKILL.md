@@ -115,9 +115,11 @@ When a step has `approvalRequired: true` and the user provides corrections inste
 When invoked from within an active process (spawning a sub-process):
 
 1. Detect parent context (active parent process path, spawn step)
-2. Delegate to process-spawner subagent with template path, parameters, and parent context
-3. The script's `--parent-process-path` arg sets up the parent-child relationship
-4. Return control to parent process after creation
+2. Read parent's process.json to get parent ID and name
+3. Delegate to process-spawner subagent with template path, parameters, and parent context
+4. The script's `--parent-process-path`, `--parent-id`, `--parent-name`, and `--return-to-step` args set up the parent reference in the child's process.json
+5. Use `register-child-process` to add this child to the parent's process.json (required for UI diagram)
+6. Return control to parent process after creation
 
 ## JSON-First Architecture
 

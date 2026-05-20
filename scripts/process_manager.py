@@ -2,20 +2,22 @@
 Process Manager CLI — handles all process file mutations via direct Python file I/O.
 
 Subcommands:
-  create-process       Create all process files (process.json, memory.json, log.json)
-  update-step-status   Change a step's status in process.json
-  update-current-state Update the active step in process.json
-  add-memory-entry     Add or update a step entry in memory.json
-  add-log-entry        Append actions to a step entry in log.json
-  log-interaction      Log a user interaction in log.json (+ clear pending-log flag)
+  create-process           Create all process files (process.json, memory.json, log.json)
+  update-step-status       Change a step's status in process.json
+  update-current-state     Update the active step in process.json
+  add-memory-entry         Add or update a step entry in memory.json
+  add-log-entry            Append actions to a step entry in log.json
+  log-interaction          Log a user interaction in log.json (+ clear pending-log flag)
   update-process-status    Change process status (running/completed/failed/paused)
+  register-child-process   Register a child subprocess in parent's process.json
+  update-child-status      Update a child's status in parent's process.json
   update-log-observations  Update processWideObservations in log.json
-  write-pending        Create or delete pending-interaction.json
-  create-qa-session    Create Q&A session with questions
-  update-qa-answer     Add or update answer for a question
-  complete-qa-question Mark question as completed
-  complete-qa-session  Archive session and delete file
-  get-qa-session       Read current Q&A session
+  write-pending            Create or delete pending-interaction.json
+  create-qa-session        Create Q&A session with questions
+  update-qa-answer         Add or update answer for a question
+  complete-qa-question     Mark question as completed
+  complete-qa-session      Archive session and delete file
+  get-qa-session           Read current Q&A session
 """
 
 from __future__ import annotations
@@ -29,10 +31,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from models import (
+    ChildProcessRef,
     LogFile,
     LogStepEntry,
     MemoryFile,
     MemoryStepEntry,
+    ParentProcessRef,
     PendingInteractionFile,
     InteractionOption,
     ProcessCurrentState,
@@ -41,6 +45,7 @@ from models import (
     ProcessStatus,
     ProcessStep,
     StepStatus,
+    SubProcessState,
     UserInteraction,
     read_json,
     write_json,
@@ -254,6 +259,26 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             approvalRequired=step_def.get("approvalRequired"),
         ))
 
+    parent_process = None
+    if args.parent_process_path:
+        if args.parent_id and args.parent_name:
+            parent_process = ParentProcessRef(
+                id=args.parent_id,
+                name=args.parent_name,
+                processPath=args.parent_process_path,
+                returnToStep=args.return_to_step or "",
+            )
+        else:
+            parent_path = Path(args.parent_process_path) / "process.json"
+            if parent_path.exists():
+                parent_data = read_json(parent_path)
+                parent_process = ParentProcessRef(
+                    id=parent_data["id"],
+                    name=parent_data["name"],
+                    processPath=args.parent_process_path,
+                    returnToStep=args.return_to_step or "",
+                )
+
     process = ProcessInstance.create(
         name=args.name or template_name,
         template=template_name,
@@ -262,6 +287,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
         project_paths=[args.project_path or str(Path.cwd())],
         process_path=str(process_dir),
         template_category=template_category,
+        parent_process=parent_process,
     )
 
     first_step_id = steps[0].id if steps else ""
@@ -522,6 +548,74 @@ def cmd_update_process_status(args: argparse.Namespace) -> None:
     process.status = ProcessStatus(args.status)
     process.metadata.lastUpdated = _now_iso()
 
+    write_json(process_path, process.to_dict())
+    _ok("process.json")
+
+
+def cmd_register_child_process(args: argparse.Namespace) -> None:
+    process_dir = Path(args.process_dir)
+    process_path = process_dir / "process.json"
+
+    if not process_path.exists():
+        _error(f"process.json not found in {process_dir}")
+
+    data = read_json(process_path)
+    process = ProcessInstance.from_dict(data)
+
+    child_ref = ChildProcessRef(
+        id=args.child_id,
+        name=args.child_name,
+        status=ProcessStatus(args.child_status),
+        spawnedAtStep=args.spawned_at_step,
+        syncPoint=args.sync_point,
+        processPath=args.child_process_path,
+    )
+
+    if process.subProcessState is None:
+        process.subProcessState = SubProcessState(
+            parentProcess=None,
+            childProcesses=[child_ref],
+        )
+    else:
+        existing_ids = {c.id for c in process.subProcessState.childProcesses}
+        if child_ref.id not in existing_ids:
+            process.subProcessState.childProcesses.append(child_ref)
+        else:
+            for i, c in enumerate(process.subProcessState.childProcesses):
+                if c.id == child_ref.id:
+                    process.subProcessState.childProcesses[i] = child_ref
+                    break
+
+    process.metadata.lastUpdated = _now_iso()
+    write_json(process_path, process.to_dict())
+    _ok("process.json")
+
+
+def cmd_update_child_status(args: argparse.Namespace) -> None:
+    process_dir = Path(args.process_dir)
+    process_path = process_dir / "process.json"
+
+    if not process_path.exists():
+        _error(f"process.json not found in {process_dir}")
+
+    data = read_json(process_path)
+    process = ProcessInstance.from_dict(data)
+
+    if process.subProcessState is None:
+        _error("No subProcessState found on this process")
+
+    new_status = ProcessStatus(args.child_status)
+    found = False
+    for child in process.subProcessState.childProcesses:
+        if child.id == args.child_id:
+            child.status = new_status
+            found = True
+            break
+
+    if not found:
+        _error(f"Child process {args.child_id} not found in subProcessState.childProcesses")
+
+    process.metadata.lastUpdated = _now_iso()
     write_json(process_path, process.to_dict())
     _ok("process.json")
 
@@ -838,6 +932,9 @@ def main() -> None:
     p_create.add_argument("--project-path", help="Absolute project path")
     p_create.add_argument("--process-dir", required=True, help="Process directory path")
     p_create.add_argument("--parent-process-path", help="Parent process path (for sub-processes)")
+    p_create.add_argument("--parent-id", help="Parent process UUID")
+    p_create.add_argument("--parent-name", help="Parent process name")
+    p_create.add_argument("--return-to-step", help="Step ID in parent to return to after child completes")
     p_create.set_defaults(func=cmd_create_process)
 
     # update-step-status
@@ -895,6 +992,31 @@ def main() -> None:
     p_pstatus.add_argument("--process-dir", required=True)
     p_pstatus.add_argument("--status", required=True, choices=[s.value for s in ProcessStatus])
     p_pstatus.set_defaults(func=cmd_update_process_status)
+
+    # register-child-process
+    p_register_child = subparsers.add_parser("register-child-process",
+        help="Register a child subprocess in parent's process.json")
+    p_register_child.add_argument("--process-dir", required=True, help="Parent process directory")
+    p_register_child.add_argument("--child-id", required=True, help="Child process UUID")
+    p_register_child.add_argument("--child-name", required=True, help="Child process name")
+    p_register_child.add_argument("--child-status", required=True,
+        choices=[s.value for s in ProcessStatus], help="Child process status")
+    p_register_child.add_argument("--spawned-at-step", required=True,
+        help="Step UUID in parent that spawned this child")
+    p_register_child.add_argument("--sync-point", required=True,
+        help="Step UUID where parent waits for child")
+    p_register_child.add_argument("--child-process-path", required=True,
+        help="Absolute path to child process directory")
+    p_register_child.set_defaults(func=cmd_register_child_process)
+
+    # update-child-status
+    p_update_child = subparsers.add_parser("update-child-status",
+        help="Update a child's status in parent's process.json")
+    p_update_child.add_argument("--process-dir", required=True, help="Parent process directory")
+    p_update_child.add_argument("--child-id", required=True, help="Child process UUID")
+    p_update_child.add_argument("--child-status", required=True,
+        choices=[s.value for s in ProcessStatus], help="New status for child")
+    p_update_child.set_defaults(func=cmd_update_child_status)
 
     # update-log-observations
     p_obs = subparsers.add_parser("update-log-observations", help="Update processWideObservations in log.json")

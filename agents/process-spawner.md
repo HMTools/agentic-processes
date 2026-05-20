@@ -29,8 +29,25 @@ You will receive:
    - Write `process.md` directly (it's documentation, not state)
 
 4. **Handle sub-process creation** (if parent context provided):
-   - Use the `process-new` skill with parent process path context
+   - Read parent's process.json to get parent ID, name, and the spawning step's UUID
+   - Use the `process-new` skill with parent process path context AND parent metadata:
+     - `--parent-process-path`: parent directory path
+     - `--parent-id`: parent's process ID (from parent process.json)
+     - `--parent-name`: parent's process name (from parent process.json)
+     - `--return-to-step`: the sync-point step UUID in parent where execution returns
    - Use the `process-state-update` skill to register child in parent's memory
+   - **Register child in parent's process.json** (required for UI diagram):
+     ```
+     python process_manager.py register-child-process \
+       --process-dir <parent-process-dir> \
+       --child-id <new-child-process-id> \
+       --child-name <child-process-name> \
+       --child-status running \
+       --spawned-at-step <step-UUID-that-triggered-spawn> \
+       --sync-point <sync-point-step-UUID> \
+       --child-process-path <child-process-dir>
+     ```
+     **Important**: `--spawned-at-step` must be the step's UUID (not its number).
 
 5. **Return process info**:
    - Process ID
