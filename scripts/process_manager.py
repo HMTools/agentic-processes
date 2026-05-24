@@ -213,8 +213,23 @@ def _check_pending_log(process_dir: Path) -> None:
         return
     flag_file = Path.home() / ".claude" / "agentic-processes" / "flags" / f"pending-log-{session_id}"
     if flag_file.exists():
+        step_id = "<active-step-id>"
+        try:
+            pdata = json.loads((process_dir / "process.json").read_text(encoding="utf-8"))
+            step_id = pdata.get("currentState", {}).get("activeStepId", step_id)
+        except Exception:
+            pass
+        script_path = Path(__file__)
         _error(
-            "User interaction not yet logged — call log-interaction before modifying process state"
+            "User interaction not yet logged — call log-interaction before modifying process state.\n\n"
+            "Command:\n"
+            f"  python3 {script_path} log-interaction \\\n"
+            f"    --process-dir \"{process_dir}\" \\\n"
+            f"    --step-id \"{step_id}\" \\\n"
+            "    --request \"User requested: [describe what user asked]\" \\\n"
+            "    --reason \"User feedback on [topic]\" \\\n"
+            "    --response \"Action taken: [what you're doing]\"\n\n"
+            "After logging, the flag is cleared and you can proceed."
         )
 
 
@@ -222,8 +237,15 @@ def _check_pending_approval(process_dir: Path) -> None:
     """Block state-advancing commands while an approval checkpoint is active."""
     pending_file = process_dir / "pending-interaction.json"
     if pending_file.exists():
+        script_path = Path(__file__)
         _error(
-            "Approval checkpoint pending — resolve the pending interaction before modifying process state"
+            "Approval checkpoint pending — resolve the pending interaction before modifying process state.\n\n"
+            "To resolve:\n"
+            f"  1. Read the pending interaction: Read {pending_file}\n"
+            "  2. Process the user's response and determine their choice\n"
+            f"  3. Delete the checkpoint:\n"
+            f"       python3 {script_path} write-pending --process-dir \"{process_dir}\" --delete\n\n"
+            "After deleting pending-interaction.json, state-advancing commands are unblocked."
         )
 
 
@@ -665,7 +687,16 @@ def cmd_write_pending(args: argparse.Namespace) -> None:
     # Check if Q&A session exists (Q&A blocks pending-interactions)
     qa_session_path = process_dir / "qa-session.json"
     if qa_session_path.exists():
-        _error("Cannot create pending-interaction while Q&A session is active. Please complete the Q&A session first.")
+        script_path = Path(__file__)
+        _error(
+            "Cannot create pending-interaction while Q&A session is active.\n\n"
+            "Complete the Q&A session first:\n"
+            f"  1. Check session status: python3 {script_path} get-qa-session --process-dir \"{process_dir}\"\n"
+            f"  2. Answer remaining questions: python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" --question-id \"<id>\" --answer \"<text>\"\n"
+            f"  3. Complete each question: python3 {script_path} complete-qa-question --process-dir \"{process_dir}\" --question-id \"<id>\"\n"
+            f"  4. Archive the session: python3 {script_path} complete-qa-session --process-dir \"{process_dir}\"\n\n"
+            "After the session is archived, you can create the pending interaction."
+        )
 
     if not args.options:
         _error("--options is required when creating pending-interaction.json")
@@ -684,7 +715,15 @@ def cmd_create_qa_session(args: argparse.Namespace) -> None:
     qa_session_path = process_dir / "qa-session.json"
 
     if qa_session_path.exists():
-        _error("Q&A session already exists. Complete current session before creating a new one.")
+        script_path = Path(__file__)
+        _error(
+            "Q&A session already exists. Complete current session before creating a new one.\n\n"
+            "To complete the existing session:\n"
+            f"  1. Review it: python3 {script_path} get-qa-session --process-dir \"{process_dir}\"\n"
+            f"  2. Answer remaining questions: python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" --question-id \"<id>\" --answer \"<text>\"\n"
+            f"  3. Complete each question: python3 {script_path} complete-qa-question --process-dir \"{process_dir}\" --question-id \"<id>\"\n"
+            f"  4. Archive: python3 {script_path} complete-qa-session --process-dir \"{process_dir}\""
+        )
 
     questions_data = json.loads(args.questions)
     if not isinstance(questions_data, list):
@@ -735,7 +774,14 @@ def cmd_update_qa_answer(args: argparse.Namespace) -> None:
     qa_session_path = process_dir / "qa-session.json"
 
     if not qa_session_path.exists():
-        _error("No active Q&A session found")
+        script_path = Path(__file__)
+        _error(
+            f"No active Q&A session found in {process_dir}.\n\n"
+            "Create one first with:\n"
+            f"  python3 {script_path} create-qa-session --process-dir \"{process_dir}\" "
+            "--step-id \"<step-id>\" --step-name \"<step-name>\" "
+            "--questions '[{\"id\": \"q1\", \"topic\": \"...\", \"question\": \"...\", \"priority\": \"required\"}]'"
+        )
 
     qa_session = read_json(qa_session_path)
     now = _now_iso()
@@ -781,7 +827,7 @@ def cmd_complete_qa_question(args: argparse.Namespace) -> None:
     qa_session_path = process_dir / "qa-session.json"
 
     if not qa_session_path.exists():
-        _error("No active Q&A session found")
+        _error(f"No active Q&A session found in {process_dir}. Cannot complete question without an active session.")
 
     qa_session = read_json(qa_session_path)
 
@@ -797,7 +843,14 @@ def cmd_complete_qa_question(args: argparse.Namespace) -> None:
 
     # Verify answerHistory is not empty
     if not question['answerHistory']:
-        _error("Cannot complete unanswered question. Provide at least one answer first.")
+        script_path = Path(__file__)
+        _error(
+            f"Cannot complete unanswered question '{args.question_id}'. Provide at least one answer first.\n\n"
+            "Command to answer:\n"
+            f"  python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" "
+            f"--question-id \"{args.question_id}\" --answer \"<answer text>\"\n\n"
+            "After answering, retry the complete-qa-question command."
+        )
 
     # Mark as completed
     question['status'] = 'completed'
@@ -817,7 +870,7 @@ def cmd_complete_qa_session(args: argparse.Namespace) -> None:
     qa_session_path = process_dir / "qa-session.json"
 
     if not qa_session_path.exists():
-        _error("No active Q&A session found")
+        _error(f"No active Q&A session found in {process_dir}. Cannot archive without an active session.")
 
     qa_session = read_json(qa_session_path)
 
@@ -827,7 +880,15 @@ def cmd_complete_qa_session(args: argparse.Namespace) -> None:
 
     if incomplete_required:
         question_ids = [q['id'] for q in incomplete_required]
-        _error(f"Cannot complete session: required questions not completed: {', '.join(question_ids)}")
+        script_path = Path(__file__)
+        ids_str = ', '.join(question_ids)
+        _error(
+            f"Cannot complete session: required questions not completed: {ids_str}\n\n"
+            "For each incomplete question, answer it then mark it complete:\n"
+            f"  python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" --question-id \"<id>\" --answer \"<text>\"\n"
+            f"  python3 {script_path} complete-qa-question --process-dir \"{process_dir}\" --question-id \"<id>\"\n\n"
+            "After all required questions are completed, retry complete-qa-session."
+        )
 
     # Create log entry
     log_path = process_dir / "log.json"

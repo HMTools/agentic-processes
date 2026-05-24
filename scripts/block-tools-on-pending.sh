@@ -53,11 +53,14 @@ if [ "$TOOL_NAME" = "Shell" ] || [ "$TOOL_NAME" = "Bash" ] || [ "$TOOL_NAME" = "
   esac
 fi
 
+# Extract step ID for actionable error message
+STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStepId',''))" 2>/dev/null)
+
 # Block everything else
-cat << 'EOF'
+cat << EOF
 {
   "decision": "block",
-  "reason": "Approval checkpoint pending — waiting for user approval before continuing"
+  "reason": "Approval checkpoint active — most tools are blocked until you resolve the pending interaction.\n\nThe user has already responded. Process their response now.\n\nSteps to resolve:\n  1. Read the pending interaction to see what options were presented:\n       Read $PENDING_FILE\n\n  2. Process the user's response and determine their choice\n\n  3. Delete the pending interaction file:\n       python3 $SCRIPT_DIR/process_manager.py write-pending \\\\\n         --process-dir \"$PROCESS_DIR\" \\\\\n         --delete\n\n  4. Update the step status based on the user's choice:\n       python3 $SCRIPT_DIR/process_manager.py update-step-status \\\\\n         --process-dir \"$PROCESS_DIR\" \\\\\n         --step-id \"$STEP_ID\" \\\\\n         --status completed\n\nAllowed while checkpoint is active: Read, Glob, Grep, and process_manager.py commands.\nAfter deleting pending-interaction.json, all tools are unblocked."
 }
 EOF
 exit 0

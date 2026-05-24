@@ -194,7 +194,7 @@ def _copy_templates(source_dir: Path, kind: str, installed: dict[str, str]) -> l
             shutil.copytree(template, dest_path)
             copied.append(rel_path)
 
-    # Also copy _components and other top-level non-category items for steps
+    # Also copy top-level non-category items for steps (e.g., underscore-prefixed folders)
     if kind == "steps":
         for item in sorted(src.iterdir()):
             if item.is_dir() and item.name.startswith("_"):

@@ -259,19 +259,17 @@ After syncing, templates are available at:
 - git managment - branches, tagging, work trees
 - dynamic processes / templates
 - simple `do` template / - dynamic built workflow that checks for exist steps and with final step for saving steps, guidelines and process
-- imrove continuous learning step - guide it to find things so in the future everything will be one-shot, also guide it to find improvements for better token cost effective, and context management effective
-- Q&A session skill - same hook as pending-interactions, and special ui implementation - q&a hook blocks also pending-interactions, pending-interactions not blocking q&a
+- improve continuous learning step - guide it to find things so in the future everything will be one-shot, also guide it to find improvements for better token cost effective, and context management effective
 - set different llm model for different steps (in config)
-- change steps to be defaulted as process template scope (related to specific template), with allowing to set global steps
-- replace with better way - _components
+- change steps to be defaulted as process template scope (related to specific template), with allowing to set global steps (maybe)
+- step-level shared behaviors (previously _components) - now handled by hooks and skills
 - remove the view only md files (instead create a skill that allows the user to generate view page from jsons)
 
 ### Agentic Processes UI
-- improve dashboard - processses connectivity
 - add the option of using `Channel` mcp - and not directly writing to cli
 - Web-based deployment (beyond Electron)
-- steps inner flow live diagrams
-- create a persist way to see which files been modified
+- steps inner flow live diagrams (active-step)
+- create a persist way to see which files been modified (currently we see only what in process instance folder)
 - add more super easy UX ways for reviewing processes (maybe not md)
 
 ### Agentic Processes Server - TBD

@@ -48,10 +48,22 @@ if grep -qE '"status"[[:space:]]*:[[:space:]]*"in[_-]progress"' "$PROCESS_JSON_F
 fi
 
 if [ "$HAS_APPROVAL_STEP" = true ]; then
-    cat << 'EOF'
+    # Extract step info for actionable error
+    STEP_INFO=$(python3 -c "
+import json
+data = json.load(open('$PROCESS_JSON_FILE'))
+for s in data.get('steps', []):
+    if s.get('status') in ('in_progress', 'in-progress') and s.get('approvalRequired'):
+        print(s.get('id','') + '|' + s.get('name',''))
+        break
+" 2>/dev/null)
+    APPROVAL_STEP_ID=$(echo "$STEP_INFO" | cut -d'|' -f1)
+    APPROVAL_STEP_NAME=$(echo "$STEP_INFO" | cut -d'|' -f2)
+
+    cat << EOF
 {
   "decision": "block",
-  "reason": "Approval checkpoint skipped -- present deliverable and write pending-interaction.json before stopping"
+  "reason": "Approval checkpoint required — step \"$APPROVAL_STEP_NAME\" (ID: $APPROVAL_STEP_ID) has approvalRequired: true but no pending-interaction.json exists.\n\nBefore stopping, you must:\n  1. Present your deliverables to the user\n  2. Create the approval checkpoint using process-state-update skill:\n       python3 $SCRIPT_DIR/process_manager.py write-pending \\\\\n         --process-dir \"$PROCESS_DIR\" \\\\\n         --options '[{\"id\": \"approve\", \"label\": \"Approve\", \"isDefault\": true}, {\"id\": \"reject\", \"label\": \"Reject\"}, {\"id\": \"modify\", \"label\": \"Request Changes\"}]'\n\nAfter creating the checkpoint, stopping is allowed."
 }
 EOF
     exit 0

@@ -27,9 +27,13 @@ fi
 # Flag exists — user interaction not yet logged
 # Find process for better error message
 PROCESS_DIR=""
+STEP_ID=""
 for SESSION_FILE in "$AGENTIC_DIR"/active/*/.session; do
     if [ -f "$SESSION_FILE" ] && [ "$(cat "$SESSION_FILE" 2>/dev/null)" = "$SESSION_ID" ]; then
         PROCESS_DIR=$(dirname "$SESSION_FILE")
+        if [ -f "$PROCESS_DIR/process.json" ]; then
+            STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStepId',''))" 2>/dev/null)
+        fi
         break
     fi
 done
@@ -37,13 +41,7 @@ done
 cat << EOF
 {
   "decision": "block",
-  "reason": "User interaction not yet logged.
-
-You cannot stop until the user interaction from this turn is logged.
-
-Process: $PROCESS_DIR
-
-Log the interaction first using log-interaction, then you can stop."
+  "reason": "User interaction not yet logged.\n\nYou cannot stop until the user interaction from this turn is logged.\n\nCommand to log:\n  python3 $SCRIPT_DIR/process_manager.py log-interaction \\\\\n    --process-dir \"$PROCESS_DIR\" \\\\\n    --step-id \"$STEP_ID\" \\\\\n    --request \"User requested: [describe what user asked]\" \\\\\n    --reason \"User feedback on [topic]\" \\\\\n    --response \"Action taken: [what you're doing]\"\n\nAfter logging, the flag will be cleared and you can stop."
 }
 EOF
 exit 0

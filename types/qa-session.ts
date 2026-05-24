@@ -2,7 +2,7 @@
  * Types for Q&A sessions used when agents need to gather
  * missing information from users before proceeding.
  * 
- * Used by: qa-session.md component
+ * Used by: process-QnA-session skill
  * Stored in: log.json (qaSession) and memory.json (steps.stepN.qaSession)
  */
 

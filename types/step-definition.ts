@@ -45,8 +45,6 @@ export interface StepDefinition {
   guidance: {
     /** What must be true before starting this step */
     prerequisites: string[];
-    /** Component files to include (e.g., "mandatory-logging.md") */
-    mandatoryComponents: string[];
     /** Specific actions the agent should take */
     specificActions: string[];
     /** Files the step works with */

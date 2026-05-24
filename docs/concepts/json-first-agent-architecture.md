@@ -86,9 +86,6 @@ Complete schema containing everything the agent needs:
     "prerequisites": [
       "What must be true before starting"
     ],
-    "mandatoryComponents": [
-      "mandatory-logging.md"
-    ],
     "specificActions": [
       "Action 1: Detailed description of what to do",
       "Action 2: Another action with specifics"
@@ -255,7 +252,6 @@ The concept is fully implemented when:
 ### excludePatterns
 
 Exclude the following from processing:
-- `**/_components/**` - Component files (may need separate handling)
 - `**/step-template.md` - Template file for creating new steps
 - `**/README.md` - README files have different structure
 - `**/*-template.md` and `**/*-template.json` - Memory and log templates
@@ -403,7 +399,6 @@ flowchart TB
       "Authentication requirements defined",
       "Service layer contracts available"
     ],
-    "mandatoryComponents": ["mandatory-logging.md"],
     "specificActions": [
       "Determine Endpoint Category - Identify the appropriate controller category based on API consumers",
       "Create Request DTOs - Define input models in Contracts/Requests/",
@@ -486,6 +481,5 @@ flowchart TD
 
 ## Notes
 
-- The `_components/` folder files are referenced by steps but don't follow the same dual-file pattern - they may need separate consideration
 - Process instance files (`process.md`, `memory.json`, `log.json` in `~/.claude/agentic-processes/`) follow a different pattern and are not part of this migration
 

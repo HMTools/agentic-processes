@@ -41,10 +41,23 @@ fi
 
 # Check if there are any pending steps remaining
 if grep -qE '"status"[[:space:]]*:[[:space:]]*"pending"' "$PROCESS_JSON_FILE"; then
-    cat << 'EOF'
+    # Extract next pending step info
+    NEXT_STEP_INFO=$(python3 -c "
+import json
+data = json.load(open('$PROCESS_JSON_FILE'))
+for s in data.get('steps', []):
+    if s.get('status') == 'pending':
+        print(str(s.get('number','')) + '|' + s.get('id','') + '|' + s.get('name',''))
+        break
+" 2>/dev/null)
+    NEXT_STEP_NUMBER=$(echo "$NEXT_STEP_INFO" | cut -d'|' -f1)
+    NEXT_STEP_ID=$(echo "$NEXT_STEP_INFO" | cut -d'|' -f2)
+    NEXT_STEP_NAME=$(echo "$NEXT_STEP_INFO" | cut -d'|' -f3)
+
+    cat << EOF
 {
   "decision": "block",
-  "reason": "Process has remaining steps — continue executing. Only stop at approval checkpoints (write pending-interaction.json) or after all steps are complete."
+  "reason": "Process has remaining steps — cannot stop yet.\n\nNext step to execute: Step $NEXT_STEP_NUMBER — \"$NEXT_STEP_NAME\" (ID: $NEXT_STEP_ID)\nProcess dir: $PROCESS_DIR\n\nContinue by delegating the next step to the step-executor subagent.\nOnly stop at approval checkpoints (after creating pending-interaction.json via process_manager.py write-pending) or after all steps are complete."
 }
 EOF
     exit 0
