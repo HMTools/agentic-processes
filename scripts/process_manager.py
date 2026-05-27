@@ -281,6 +281,24 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             approvalRequired=step_def.get("approvalRequired"),
         ))
 
+    # --- Auto-inject framework steps ---
+    framework_steps_dir = Path(__file__).parent.parent / "framework-steps"
+    FRAMEWORK_STEPS = ["continuous-improvement", "end-process-validation"]
+
+    for fs_name in FRAMEWORK_STEPS:
+        step_json_path = framework_steps_dir / fs_name / f"{fs_name}.json"
+        if not step_json_path.exists():
+            continue
+        step_data = read_json(step_json_path)
+        steps.append(ProcessStep(
+            id=_new_uuid(),
+            number=len(steps),
+            name=step_data.get("metadata", {}).get("title", fs_name),
+            status=StepStatus.PENDING,
+            stepRef=f"@framework-step:{fs_name}",
+            approvalRequired=step_data.get("approvalRequired"),
+        ))
+
     parent_process = None
     if args.parent_process_path:
         if args.parent_id and args.parent_name:

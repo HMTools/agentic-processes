@@ -1,6 +1,7 @@
 ---
 name: process-state-update
 description: Update process state files (process.json, memory.json, log.json, pending-interaction.json) via Python scripts. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, create approval checkpoints, or modify any process state file. Never use Write/Edit tools on process state files. Used by step-executor and process-continue agents.
+user-invocable: false
 ---
 
 # Process State Update

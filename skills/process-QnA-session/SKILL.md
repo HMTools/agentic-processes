@@ -1,6 +1,7 @@
 ---
 name: process-QnA-session
 description: Conduct structured Q&A sessions with users to gather missing information during process execution. Supports iterative refinement, priority tracking, and both CLI and UI interactions.
+user-invocable: false
 ---
 
 # Process Q&A Session

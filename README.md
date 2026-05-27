@@ -114,6 +114,11 @@ agentic-processes/                    # Plugin root
 ├── agents/                           # Root-level agents (auto-discovered)
 │   ├── step-executor.md
 │   └── process-spawner.md
+├── framework-steps/                  # Auto-injected framework-level steps
+│   ├── continuous-improvement/
+│   │   └── continuous-improvement.json
+│   └── end-process-validation/
+│       └── end-process-validation.json
 ├── hooks/
 │   └── hooks.json                    # Unified hook configuration
 ├── scripts/                          # Hook and utility scripts
@@ -175,6 +180,15 @@ Templates are synced to `~/.claude/agentic-processes/templates/processes/{catego
 - Examples and common pitfalls
 
 Steps are synced to `~/.claude/agentic-processes/templates/steps/{category}/` from configured git sources.
+
+### Framework Steps
+
+**Framework steps** are cross-cutting workflow steps that are automatically injected into every process by `process_manager.py` at creation time. Template authors do not need to include them. Currently, two framework steps are auto-appended as the final steps of every process:
+
+- **Continuous Improvement** (`@framework-step:continuous-improvement`) — Captures learnings, improvements, and patterns discovered during process execution.
+- **End Process Validation** (`@framework-step:end-process-validation`) — Validates that all process deliverables are complete and correct before closing.
+
+Framework step definitions live in `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`.
 
 ### Step References
 
@@ -252,10 +266,14 @@ After syncing, templates are available at:
 ## Roadmap
 
 ### Agentic Processes (Framework Plugin)
+- Change process instances to be indepedendent from resolving, specifically steps should exist in the instance folder so we will support later dynamic processes and not requiring resolving dynamically
+- verification checklist for each step with (can be done by hook or by low cost model)
+- change memory files from single file to multiple files
+- use dynamic context injection in the `continue-process` skill
 - finish session hook - empty .session file
 - improve pending-interactions - add to where each option is sending to (next step, some prev step) - framework + ui
 - events - event on different life cycle acts of the processes - can be framework (global) level and template level - multiple subscriptions can be assigned to each event listener (can be also on the server app)
-- hook that blocks framework file changes by the agent- so only skills using python can change them
+- hook that blocks framework file changes by the agent - so only skills using python can change them
 - git managment - branches, tagging, work trees
 - dynamic processes / templates
 - simple `do` template / - dynamic built workflow that checks for exist steps and with final step for saving steps, guidelines and process
@@ -264,6 +282,12 @@ After syncing, templates are available at:
 - change steps to be defaulted as process template scope (related to specific template), with allowing to set global steps (maybe)
 - step-level shared behaviors (previously _components) - now handled by hooks and skills
 - remove the view only md files (instead create a skill that allows the user to generate view page from jsons)
+- cost analysis of processes and steps
+- graphify
+- triggers (ci, cd)
+- use full skills frontmatter capabilities
+- step executor skill
+- ~~migrate end process verification step like migrated continous learning~~ **DONE** — Both Continuous Improvement and End Process Validation are now framework-level auto-injected steps via `framework-steps/`
 
 ### Agentic Processes UI
 - add the option of using `Channel` mcp - and not directly writing to cli
@@ -271,6 +295,7 @@ After syncing, templates are available at:
 - steps inner flow live diagrams (active-step)
 - create a persist way to see which files been modified (currently we see only what in process instance folder)
 - add more super easy UX ways for reviewing processes (maybe not md)
+- template creator via chat (with dynamic preview ui)
 
 ### Agentic Processes Server - TBD
 - Template marketplace — discover and share community templates

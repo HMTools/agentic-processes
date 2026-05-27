@@ -1,6 +1,7 @@
 ---
 name: process-template-sync
 description: Manage template sources and sync templates from configured git repositories. Fetch, update, and configure git-based template sources.
+disable-model-invocation: true
 ---
 
 # Process Template Sync

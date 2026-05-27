@@ -1,6 +1,7 @@
 ---
 name: process-new
 description: Start a new process from a template. Creates process directory and all state files via Python scripts.
+disable-model-invocation: true
 ---
 
 # Process New
@@ -72,6 +73,8 @@ When `/process-new` is invoked:
 - Keep references as references (don't expand)
 - Read step's `.json` file for complete guidance when executing
 
+> **Framework steps**: Steps using the `@framework-step:name` prefix are auto-injected by `process_manager.py` at process creation time. They resolve to `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`. Template authors do not include these steps — they are appended automatically.
+
 ### 5. Create Process Instance (MANDATORY)
 
 **Session Binding**: Before creating process files, bind the session:
@@ -90,6 +93,8 @@ Bash(python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-process \
 ```
 
 The script writes `process.json`, `memory.json`, and `log.json` directly. Check stdout for success/error.
+
+> **Auto-injected framework steps**: The script automatically appends **Continuous Improvement** and **End Process Validation** steps after the template's steps. These are defined in `framework-steps/` and use the `@framework-step:` prefix. Template authors should not include them manually.
 
 **Create `process.md`**: Write the user-readable documentation with substituted placeholders (this is the only file the agent Writes directly — it's documentation, not state).
 

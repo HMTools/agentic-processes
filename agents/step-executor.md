@@ -67,6 +67,15 @@ The end-step verification now checks compliance with loaded principles:
 
 ## Execution Protocol
 
+### Step Reference Resolution
+
+Step references in process definitions resolve as follows:
+
+- **`@step:category/name`** resolves to `~/.claude/agentic-processes/templates/steps/{category}/{name}/{name}.json` — these are template-defined steps authored by template creators.
+- **`@framework-step:name`** resolves to `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json` — these are framework-level steps auto-injected by `process_manager.py` at process creation time. They represent cross-cutting concerns (Continuous Improvement, End Process Validation) and appear as the final steps of every process.
+
+### Execution Steps
+
 1. **Read the step JSON** for complete guidance
 2. **Execute substeps** in sequence according to the step definition
 3. **Update process files** using the `process-state-update` skill:
