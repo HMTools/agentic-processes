@@ -234,30 +234,50 @@ Place sync points where parent needs sub-process results:
 ### How It Works
 
 ```
-1. SPAWN: Parent uses @step:common/spawn-sub-process
+1. DECLARE: Template step includes subProcessTrigger or subProcessConfig metadata
+   ├── Declares which sub-process template to spawn
+   ├── Declares parameters to pass
+   └── Declares sync point (immediate, deferred, end)
+
+2. SPAWN: The step-executor reads the metadata and invokes process-spawner
    ├── Creates sub-process with parent reference
-   └── Records child in parent's memory
+   └── Records child in parent's subProcessState
 
-2. NOTIFY: When sub-process completes, uses @step:common/notify-parent-complete
-   └── Updates parent's memory with completion status (push model)
+3. COMPLETE: When sub-process finishes, process_manager.py auto-notifies parent
+   ├── update-process-status --status completed --summary "..."
+   ├── Automatically updates child status in parent's process.json
+   └── Adds completion summary to parent's memory.json
 
-3. SYNC: At sync points, process-continue checks parent's own memory
+4. SYNC: At sync points, process-continue checks parent's subProcessState
    ├── If children complete: proceed
    └── If children pending: wait or offer to continue sub-process
 ```
 
-### Creating Sub-Processes
+### Declaring Sub-Processes in Templates
 
-Use `@step:common/spawn-sub-process` with:
+Template steps declare sub-process spawning via metadata:
+
+**`subProcessTrigger`** (single sub-process):
 - `template`: Template for sub-process
 - `parameters`: Parameters to pass
 - `syncPoint`: When to wait ("immediate", "step-N", "end")
 
-### Notifying Parent
+**`subProcessConfig`** (batch/iterative sub-processes):
+- `template`: Template for each sub-process
+- `sync`: When to wait
+- `iterateOver`: Data source for iteration
+- `parameterMapping`: How to map iteration data to parameters
 
-At end of sub-process, use `@step:common/notify-parent-complete`:
-- Updates parent's memory with completion status
-- No polling needed - parent just reads its own memory at sync points
+### Parent Notification (Automatic)
+
+Parent notification is handled automatically by `process_manager.py`. When a sub-process completes:
+- `update-process-status --status completed --summary "..."` is called
+- The script detects the parent reference in `subProcessState.parentProcess`
+- It updates the child's status in the parent's `process.json`
+- It adds the completion summary to the parent's `memory.json`
+- No explicit notification step is needed in templates
+
+The `--summary` argument is **required** for sub-processes. If omitted, the script returns a descriptive error explaining what to provide.
 
 ### Example: Delegation Pattern
 

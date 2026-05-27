@@ -266,6 +266,8 @@ After syncing, templates are available at:
 ## Roadmap
 
 ### Agentic Processes (Framework Plugin)
+- add `stepType` with enum `spawn` (subprocess) `direct` (regular step template) and also show it in the UI, think if we can also connect in case of spawn what is the process template target so we will be able to show it also in the ui
+- replace `guidelines` with `flavors` (not a must), and make it `compile` time so the process instance files will have the flavor in it on creation so the active process will not need to take it into account
 - Change process instances to be indepedendent from resolving, specifically steps should exist in the instance folder so we will support later dynamic processes and not requiring resolving dynamically
 - verification checklist for each step with (can be done by hook or by low cost model)
 - change memory files from single file to multiple files
@@ -287,7 +289,6 @@ After syncing, templates are available at:
 - triggers (ci, cd)
 - use full skills frontmatter capabilities
 - step executor skill
-- ~~migrate end process verification step like migrated continous learning~~ **DONE** — Both Continuous Improvement and End Process Validation are now framework-level auto-injected steps via `framework-steps/`
 
 ### Agentic Processes UI
 - add the option of using `Channel` mcp - and not directly writing to cli

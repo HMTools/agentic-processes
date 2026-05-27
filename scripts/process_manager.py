@@ -585,7 +585,66 @@ def cmd_update_process_status(args: argparse.Namespace) -> None:
     data = read_json(process_path)
     process = ProcessInstance.from_dict(data)
 
-    process.status = ProcessStatus(args.status)
+    new_status = ProcessStatus(args.status)
+
+    # Auto-notify parent when a sub-process completes
+    if new_status == ProcessStatus.COMPLETED and process.subProcessState and process.subProcessState.parentProcess:
+        parent_ref = process.subProcessState.parentProcess
+        summary = getattr(args, 'summary', None)
+
+        if not summary:
+            _error(
+                f"This process is a sub-process of '{parent_ref.name}' "
+                f"(path: {parent_ref.processPath}). "
+                f"When completing a sub-process, you must provide --summary "
+                f"describing what was accomplished. The parent process needs "
+                f"this summary to continue.\n\n"
+                f"Example: --summary \"Implemented feature X, created PR #123, all tests passing\""
+            )
+
+        try:
+            parent_process_path = Path(parent_ref.processPath) / "process.json"
+            if parent_process_path.exists():
+                parent_data = read_json(parent_process_path)
+                parent_process = ProcessInstance.from_dict(parent_data)
+
+                # Update child status in parent's process.json
+                if parent_process.subProcessState:
+                    for child in parent_process.subProcessState.childProcesses:
+                        if child.id == process.id:
+                            child.status = ProcessStatus.COMPLETED
+                            break
+
+                    parent_process.metadata.lastUpdated = _now_iso()
+                    write_json(parent_process_path, parent_process.to_dict())
+
+                # Add summary to parent's memory.json
+                parent_memory_path = Path(parent_ref.processPath) / "memory.json"
+                if parent_memory_path.exists():
+                    parent_memory_data = read_json(parent_memory_path)
+                    parent_memory = MemoryFile.from_dict(parent_memory_data)
+
+                    # Find the spawning step ID from parent's child reference
+                    spawn_step_id = None
+                    if parent_process.subProcessState:
+                        for child in parent_process.subProcessState.childProcesses:
+                            if child.id == process.id:
+                                spawn_step_id = child.spawnedAtStep
+                                break
+
+                    if spawn_step_id and spawn_step_id in parent_memory.steps:
+                        entry = parent_memory.steps[spawn_step_id]
+                        entry.informationProduced[f"childSummary_{process.id}"] = summary
+                        entry.updatedAt = _now_iso()
+                        parent_memory.metadata.lastUpdated = _now_iso()
+                        write_json(parent_memory_path, parent_memory.to_dict())
+
+                print(f"[auto-notify] Updated parent '{parent_ref.name}' with child completion and summary", file=sys.stderr)
+        except Exception as exc:
+            # Parent notification is best-effort -- child completion must not fail
+            print(f"[auto-notify] Warning: Could not notify parent '{parent_ref.name}': {exc}", file=sys.stderr)
+
+    process.status = new_status
     process.metadata.lastUpdated = _now_iso()
 
     write_json(process_path, process.to_dict())
@@ -1070,6 +1129,8 @@ def main() -> None:
     p_pstatus = subparsers.add_parser("update-process-status", help="Change process status")
     p_pstatus.add_argument("--process-dir", required=True)
     p_pstatus.add_argument("--status", required=True, choices=[s.value for s in ProcessStatus])
+    p_pstatus.add_argument("--summary", default=None,
+        help="Completion summary (required when completing a sub-process)")
     p_pstatus.set_defaults(func=cmd_update_process_status)
 
     # register-child-process

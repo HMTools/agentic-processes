@@ -19,7 +19,7 @@
     "relatedDocs": ["architecture", "getting-started", "examples"],
     "templates": ["set-concept", "develop-user-story", "create-process-template"],
     "prompts": ["process-new", "process-continue"],
-    "subProcessSteps": ["spawn-sub-process", "notify-parent-complete"]
+    "subProcessCapabilities": ["subProcessTrigger", "subProcessConfig", "auto-parent-notification"]
   }
 }
 

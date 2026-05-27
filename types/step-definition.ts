@@ -129,7 +129,7 @@ export interface StepDefinition {
     check: string;
   }>;
 
-  /** Step-specific parameters (for configurable steps like identify-files, spawn-sub-process) */
+  /** Step-specific parameters (for configurable steps like identify-files, review-verify-document) */
   parameters?: {
     required?: string[];
     optional?: string[];
