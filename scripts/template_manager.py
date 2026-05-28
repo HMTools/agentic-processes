@@ -345,6 +345,52 @@ def cmd_toggle_source(args: argparse.Namespace) -> None:
     })
 
 
+def cmd_update_source(args: argparse.Namespace) -> None:
+    """Update properties of an existing template source."""
+    config = _load_config()
+
+    target = None
+    for source in config.sources:
+        if source.name == args.name:
+            target = source
+            break
+
+    if target is None:
+        _error(f"Source '{args.name}' not found")
+
+    name_changed = False
+    cache_renamed = False
+
+    if args.new_name and args.new_name != target.name:
+        for s in config.sources:
+            if s.name == args.new_name:
+                _error(f"Source '{args.new_name}' already exists")
+
+        old_cache = CACHE_DIR / target.name
+        new_cache = CACHE_DIR / args.new_name
+        if old_cache.exists():
+            old_cache.rename(new_cache)
+            cache_renamed = True
+
+        target.name = args.new_name
+        name_changed = True
+
+    if args.url is not None:
+        target.url = args.url
+    if args.branch is not None:
+        target.branch = args.branch
+    if args.priority is not None:
+        target.priority = args.priority
+
+    _save_config(config)
+
+    _ok({
+        "source": target.to_dict(),
+        "nameChanged": name_changed,
+        "cacheRenamed": cache_renamed,
+    })
+
+
 def cmd_list_sources(args: argparse.Namespace) -> None:
     """List all configured template sources with status."""
     config = _load_config()
@@ -552,6 +598,15 @@ def main() -> None:
     p_toggle = subparsers.add_parser("toggle-source", help="Toggle a source enabled/disabled")
     p_toggle.add_argument("--name", required=True, help="Name of the source to toggle")
     p_toggle.set_defaults(func=cmd_toggle_source)
+
+    # update-source
+    p_update = subparsers.add_parser("update-source", help="Update properties of an existing template source")
+    p_update.add_argument("--name", required=True, help="Current name of the source to update")
+    p_update.add_argument("--new-name", default=None, help="New name for the source")
+    p_update.add_argument("--url", default=None, help="New git repository URL")
+    p_update.add_argument("--branch", default=None, help="New branch to track")
+    p_update.add_argument("--priority", type=int, default=None, help="New priority value")
+    p_update.set_defaults(func=cmd_update_source)
 
     # list-sources
     p_list = subparsers.add_parser("list-sources", help="List configured template sources")
