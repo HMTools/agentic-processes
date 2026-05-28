@@ -289,6 +289,7 @@ After syncing, templates are available at:
 - triggers (ci, cd)
 - use full skills frontmatter capabilities
 - step executor skill
+- replace template sources git with marketplaces (strongly driven by ui) git that the user can see which templates he needs to update and can install specific templates
 
 ### Agentic Processes UI
 - add the option of using `Channel` mcp - and not directly writing to cli

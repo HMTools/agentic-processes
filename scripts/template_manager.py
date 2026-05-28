@@ -322,6 +322,29 @@ def cmd_remove_source(args: argparse.Namespace) -> None:
     })
 
 
+def cmd_toggle_source(args: argparse.Namespace) -> None:
+    """Toggle the enabled flag on a template source."""
+    config = _load_config()
+
+    found = False
+    for source in config.sources:
+        if source.name == args.name:
+            source.enabled = not source.enabled
+            found = True
+            break
+
+    if not found:
+        _error(f"Source '{args.name}' not found")
+
+    _save_config(config)
+
+    _ok({
+        "name": args.name,
+        "enabled": source.enabled,
+        "totalSources": len(config.sources),
+    })
+
+
 def cmd_list_sources(args: argparse.Namespace) -> None:
     """List all configured template sources with status."""
     config = _load_config()
@@ -524,6 +547,11 @@ def main() -> None:
     p_remove = subparsers.add_parser("remove-source", help="Remove a template source")
     p_remove.add_argument("--name", required=True, help="Name of the source to remove")
     p_remove.set_defaults(func=cmd_remove_source)
+
+    # toggle-source
+    p_toggle = subparsers.add_parser("toggle-source", help="Toggle a source enabled/disabled")
+    p_toggle.add_argument("--name", required=True, help="Name of the source to toggle")
+    p_toggle.set_defaults(func=cmd_toggle_source)
 
     # list-sources
     p_list = subparsers.add_parser("list-sources", help="List configured template sources")
