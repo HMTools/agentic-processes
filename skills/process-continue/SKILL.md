@@ -77,7 +77,7 @@ Update process state to reflect resumption using the `process-state-update` skil
 - **Handle user corrections**: Log interaction via `process-state-update` skill, delegate correction to subagent, re-present
 - After step completion, update process state and proceed to the next step
 
-> **Framework-injected steps**: The last two steps of every process are framework-injected: **Continuous Improvement** and **End Process Validation**. These use the `@framework-step:name` stepRef format and resolve to `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`. They are appended automatically by `process_manager.py` at creation time and should be executed like any other step.
+> **Framework-injected steps**: The last two steps of every process are framework-injected: **Continuous Improvement** and **End Process Validation**. Their full definitions are embedded in `process.json` as `stepDefinition` (same as template steps). The `stepRef` field shows `@framework-step:{name}` as provenance. No file resolution needed.
 
 ## State Restoration
 

@@ -69,7 +69,7 @@ Required Parameters: param1, param2
 # Process: {{processName}}
 ## Steps
 - [ ] Step 1: Description
-  - **Step**: `@step:category/step-name`
+  - **Step**: `step-name` (references subfolder of the process template directory)
 ```
 
 ### 3. Steps
@@ -82,7 +82,7 @@ Steps are modular, self-contained definitions with:
 - Substeps
 - Examples
 
-**Location**: `~/.claude/agentic-processes/templates/steps/{category}/` (synced from git sources)
+**Location**: Steps are subfolders of their process template directory. The `templates/steps/` directory serves as a blueprint catalog for authoring reference only.
 
 **Categories**:
 - `api/` - API layer steps
@@ -171,11 +171,12 @@ graph TD
 
 When a process is created from a template:
 
-1. **Template Reading**: Read template file
-2. **Reference Scanning**: Find all step references (`@step:category/name`)
-3. **Step Loading**: For each reference:
-   - `@step:category/name` → read from `~/.claude/agentic-processes/templates/steps/{category}/{name}/{name}.json`
-   - Extract relevant sections (Description, Output, Guidance)
+1. **Template Reading**: Read template file from the process template directory
+2. **Step Resolution**: For each step with a `stepRef`:
+   - `stepRef` is a simple name (e.g., `"understand-context"`) referencing a subfolder of the template directory
+   - Resolution path: `{template_dir}/{stepRef}/{stepRef}.json`
+   - Framework steps use `@framework-step:name` and resolve from `framework-steps/` directory
+3. **Step Loading**: Read step JSON file and extract EmbeddedStepDefinition fields (output, guidance, substeps, flow, etc.)
 4. **Context Application**: Apply context parameters from template
 5. **Process Creation**: Create process instance in `~/.claude/agentic-processes/active/`
 

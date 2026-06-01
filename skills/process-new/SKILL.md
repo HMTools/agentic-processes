@@ -66,14 +66,14 @@ When `/process-new` is invoked:
 - Infer parameters from context when possible
 - Confirm optional parameters
 
-### 4. Resolve Step References
+### 4. Verify Step Definitions
 
-- Scan template for `@step:category/step-name` references
-- Resolve step references to `~/.claude/agentic-processes/templates/steps/{category}/{name}/{name}.json`
-- Keep references as references (don't expand)
-- Read step's `.json` file for complete guidance when executing
+- Each step's `stepRef` is a simple name (e.g., `"understand-context"`) referencing a subfolder of the process template directory
+- At process creation time, `process_manager.py` resolves `stepRef` by reading `{template_dir}/{stepRef}/{stepRef}.json` and embedding the step definition into the process instance
+- Steps with `stepRef: null` (e.g., sub-process spawner steps) are orchestrator steps with empty stepDefinition
+- Templates do NOT embed `stepDefinition` inline -- step definitions live in dedicated step subfolders
 
-> **Framework steps**: Steps using the `@framework-step:name` prefix are auto-injected by `process_manager.py` at process creation time. They resolve to `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`. Template authors do not include these steps — they are appended automatically.
+> **Framework steps**: Steps using the `@framework-step:name` prefix are auto-injected by `process_manager.py` at process creation time. Their full definitions are embedded in `process.json` as `stepDefinition`. Template authors do not include these steps -- they are appended automatically.
 
 ### 5. Create Process Instance (MANDATORY)
 

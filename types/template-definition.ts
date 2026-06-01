@@ -10,6 +10,7 @@
  */
 
 import { StepRef } from "./shared-types";
+import { EmbeddedStepDefinition } from "./step-definition";
 
 export interface TemplateDefinition {
   /** Discriminator field - always "template" */
@@ -64,8 +65,8 @@ export interface TemplateDefinition {
     description?: string;
     /** Context variables passed to the step */
     context?: Record<string, string>;
-    /** Expected output from this step */
-    output: string;
+    /** Expected output from this step (optional -- lives in step file) */
+    output?: string;
     /** Whether user must approve before proceeding */
     approvalRequired?: boolean;
     /** Actions to take after approval */
@@ -92,6 +93,8 @@ export interface TemplateDefinition {
     };
     /** Fallback behavior */
     fallback?: string;
+    /** Embedded step definition with full execution guidance (optional -- resolved at process creation time from step subfolders) */
+    stepDefinition?: EmbeddedStepDefinition;
   }>;
 
   /** Dynamic step generation rules (if applicable) */

@@ -141,7 +141,7 @@ Processes can be in three states:
 
 Templates define reusable workflows:
 - Use parameter placeholders: `{{paramName}}`
-- Reference steps: `@step:category/step-name`
+- Reference steps by simple name via `stepRef` (e.g., `"understand-context"`)
 - Include flow diagrams
 - Define sequential steps
 
@@ -149,21 +149,23 @@ Templates are synced to `~/.claude/agentic-processes/templates/processes/{catego
 
 ### Steps
 
-Steps are modular building blocks:
-- Self-contained definitions
-- Rich guidance and examples
-- Flow diagrams for complex steps
-- Substeps for detailed breakdown
+Steps are subfolders of their process template directory. Each step subfolder contains:
+- `{step-name}.json` -- complete step definition with guidance, substeps, flow
+- `{step-name}.md` -- brief documentation
 
-Steps are synced to `~/.claude/agentic-processes/templates/steps/{category}/` from configured git sources.
+The `templates/steps/` directory serves as a blueprint catalog for authoring reference only.
 
 ### Step References
 
-Templates reference steps using unified syntax:
-```markdown
-- **Step**: `@step:api/implement-controller-layer`
-- **Step**: `@step:my-category/my-custom-step`
+Templates reference steps using a simple name that maps to a sibling subfolder:
+```json
+{
+  "stepRef": "understand-context"
+}
 ```
+Resolution: `{template_dir}/understand-context/understand-context.json`
+
+Framework steps use the `@framework-step:name` prefix and resolve from the `framework-steps/` directory.
 
 ## Common Workflows
 

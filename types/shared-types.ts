@@ -31,8 +31,10 @@ export type ProcessPath = string;
 
 /**
  * Reference to a step definition.
- * Format: "@step:category/step-name"
- * Example: "@step:planning/understand-context"
+ * Format: Simple step name (e.g., "understand-context") referencing a subfolder
+ * of the process template directory, or null for orchestrator steps.
+ * Framework steps use "@framework-step:name".
+ * Legacy: "@step:category/step-name" may appear in active process instances.
  */
 export type StepRef = string;
 

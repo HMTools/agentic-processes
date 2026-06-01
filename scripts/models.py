@@ -120,6 +120,7 @@ class ProcessStep:
     completedAt: Optional[str] = None
     approvalRequired: Optional[bool] = None
     approved: Optional[bool] = None
+    stepDefinition: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         d: dict[str, Any] = {
@@ -137,6 +138,7 @@ class ProcessStep:
             d["approvalRequired"] = self.approvalRequired
         if self.approved is not None:
             d["approved"] = self.approved
+        d["stepDefinition"] = self.stepDefinition
         return d
 
     @classmethod
@@ -151,6 +153,7 @@ class ProcessStep:
             completedAt=data.get("completedAt"),
             approvalRequired=data.get("approvalRequired"),
             approved=data.get("approved"),
+            stepDefinition=data.get("stepDefinition", {}),
         )
 
 

@@ -67,16 +67,20 @@ The end-step verification now checks compliance with loaded principles:
 
 ## Execution Protocol
 
-### Step Reference Resolution
+### Step Definition Resolution
 
-Step references in process definitions resolve as follows:
+Step definitions are embedded directly in the process instance. Each step in `process.json` contains a `stepDefinition` field with full execution guidance.
 
-- **`@step:category/name`** resolves to `~/.claude/agentic-processes/templates/steps/{category}/{name}/{name}.json` — these are template-defined steps authored by template creators.
-- **`@framework-step:name`** resolves to `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json` — these are framework-level steps auto-injected by `process_manager.py` at process creation time. They represent cross-cutting concerns (Continuous Improvement, End Process Validation) and appear as the final steps of every process.
+To load step guidance:
+1. Read the current step's `stepDefinition` object from `process.json`
+2. The `stepDefinition` contains: `guidance` (instructions), `substeps` (work sequence), `output` (what to produce), `flow` (execution order), `memoryFileUsage` (memory patterns)
+3. The `stepRef` field is retained as provenance (e.g., `understand-context` or `@framework-step:continuous-improvement`) but is NOT used for file resolution at runtime
+
+No external file resolution is needed. The step-executor reads all instructions from the embedded definition in the process instance.
 
 ### Execution Steps
 
-1. **Read the step JSON** for complete guidance
+1. **Read the step's `stepDefinition` from `process.json`** for complete guidance
 2. **Execute substeps** in sequence according to the step definition
 3. **Update process files** using the `process-state-update` skill:
    - Never use Write/Edit tools directly on process.json, memory.json, log.json, or pending-interaction.json

@@ -155,7 +155,7 @@ You want to create a template for a specific workflow your team uses frequently.
    
    ## Steps
    - [ ] Step 1: First step
-     - **Step**: `@step:category/step-name`
+     - **Step**: `step-name` (references subfolder of the process template directory)
      - **Description**: Step description
      - **Output**: What this step produces
    
@@ -165,8 +165,8 @@ You want to create a template for a specific workflow your team uses frequently.
    ```
 
 3. **Reference Steps**:
-   - Use `@step:category/step-name` syntax to reference any step
-   - Create new steps if needed
+   - Use a simple step name (e.g., `"understand-context"`) as the `stepRef` -- it references a subfolder of the process template directory
+   - Create new steps as subfolders if needed
 
 4. **Test Template**:
    - Create a process from the template
@@ -185,7 +185,7 @@ You need a step that doesn't exist in the steps library.
    - Determine appropriate category (api, service, data, testing, etc.)
 
 2. **Create Step File**:
-   - Location: `~/.claude/agentic-processes/templates/steps/{category}/step-name.md`
+   - Location: `{process-template-dir}/step-name/step-name.json` and `{process-template-dir}/step-name/step-name.md`
 
 3. **Step Structure**:
    ```markdown

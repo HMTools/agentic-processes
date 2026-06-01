@@ -268,8 +268,7 @@ After syncing, templates are available at:
 ### Agentic Processes (Framework Plugin)
 - add `stepType` with enum `spawn` (subprocess) `direct` (regular step template) and also show it in the UI, think if we can also connect in case of spawn what is the process template target so we will be able to show it also in the ui
 - replace `guidelines` with `flavors` (not a must), and make it `compile` time so the process instance files will have the flavor in it on creation so the active process will not need to take it into account
-- Change process instances to be indepedendent from resolving, specifically steps should exist in the instance folder so we will support later dynamic processes and not requiring resolving dynamically
-- verification checklist for each step with (can be done by hook or by low cost model)
+- verification checklist for each step with (can be done by hook or by low cost model via subagent)
 - change memory files from single file to multiple files
 - use dynamic context injection in the `continue-process` skill
 - finish session hook - empty .session file
@@ -290,6 +289,7 @@ After syncing, templates are available at:
 - use full skills frontmatter capabilities
 - step executor skill
 - replace template sources git with marketplaces (strongly driven by ui) git that the user can see which templates he needs to update and can install specific templates
+- verif subagent (different cotnext window) as optional part of the delcaration of the step and not a dedicated step in the process
 
 ### Agentic Processes UI
 - add the option of using `Channel` mcp - and not directly writing to cli

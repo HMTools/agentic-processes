@@ -186,7 +186,7 @@ When to use this step:
     {
       "number": 1,
       "name": "Step name",
-      "stepRef": "@step:category/step-name",
+      "stepRef": "step-name",
       "description": "Full description of what this step does in the context of this template",
       "context": {
         "param1": "{{param1}}",

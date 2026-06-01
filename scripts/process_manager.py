@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -269,16 +270,43 @@ def cmd_create_process(args: argparse.Namespace) -> None:
     template_name = template_data.get("name", template_path.stem)
     template_category = template_data.get("category", None)
 
+    # --- Constants for step definition fields to embed ---
+    EMBED_FIELDS = ["output", "guidance", "substeps", "flow", "memoryFileUsage", "parameters"]
+    EXTRA_EMBED_FIELDS = ["improvementCategories", "prioritization", "workflow",
+                          "successCriteria", "complianceChecklist", "searchModes",
+                          "changeProposalFormat", "captureTypes"]
+
+    # --- Resolve template steps from subfolders ---
+    template_dir = template_path.parent
     steps_data = template_data.get("steps", [])
     steps = []
     for i, step_def in enumerate(steps_data):
+        step_ref = step_def.get("stepRef")
+        step_definition = {}
+
+        if step_ref:  # Non-null, non-empty stepRef
+            # Resolve step file from template directory subfolder
+            step_json_path = template_dir / step_ref / f"{step_ref}.json"
+            if step_json_path.exists():
+                step_data = read_json(step_json_path)
+                for f in EMBED_FIELDS + EXTRA_EMBED_FIELDS:
+                    if f in step_data:
+                        step_definition[f] = step_data[f]
+            else:
+                # Fallback: use inline stepDefinition if step file not found
+                step_definition = step_def.get("stepDefinition", {})
+        else:
+            # Null/empty stepRef: orchestrator step, keep empty definition
+            step_definition = step_def.get("stepDefinition", {})
+
         steps.append(ProcessStep(
             id=_new_uuid(),
             number=i,
             name=step_def.get("name", f"Step {i}"),
             status=StepStatus.PENDING,
-            stepRef=step_def.get("stepRef", ""),
+            stepRef=step_ref or "",
             approvalRequired=step_def.get("approvalRequired"),
+            stepDefinition=step_definition,
         ))
 
     # --- Auto-inject framework steps ---
@@ -290,6 +318,10 @@ def cmd_create_process(args: argparse.Namespace) -> None:
         if not step_json_path.exists():
             continue
         step_data = read_json(step_json_path)
+        step_definition = {}
+        for f in EMBED_FIELDS + EXTRA_EMBED_FIELDS:
+            if f in step_data:
+                step_definition[f] = step_data[f]
         steps.append(ProcessStep(
             id=_new_uuid(),
             number=len(steps),
@@ -297,6 +329,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             status=StepStatus.PENDING,
             stepRef=f"@framework-step:{fs_name}",
             approvalRequired=step_data.get("approvalRequired"),
+            stepDefinition=step_definition,
         ))
 
     parent_process = None
@@ -648,6 +681,34 @@ def cmd_update_process_status(args: argparse.Namespace) -> None:
     process.metadata.lastUpdated = _now_iso()
 
     write_json(process_path, process.to_dict())
+
+    # --- Relocate process directory based on new status ---
+    STATUS_DIRS = {
+        ProcessStatus.COMPLETED: "completed",
+        ProcessStatus.FAILED: "failed",
+        ProcessStatus.RUNNING: "active",
+        ProcessStatus.PAUSED: "active",
+    }
+    target_folder = STATUS_DIRS.get(new_status)
+    if target_folder:
+        agentic_root = process_dir.parent.parent  # e.g. ~/.claude/agentic-processes
+        current_folder = process_dir.parent.name   # e.g. "active"
+        if current_folder != target_folder:
+            target_parent = agentic_root / target_folder
+            target_parent.mkdir(parents=True, exist_ok=True)
+            new_process_dir = target_parent / process_dir.name
+            if new_process_dir.exists():
+                _error(f"Cannot relocate: target directory already exists: {new_process_dir}")
+            shutil.move(str(process_dir), str(new_process_dir))
+            # Update processPath in the moved process.json
+            new_process_path = new_process_dir / "process.json"
+            moved_data = read_json(new_process_path)
+            moved_data["metadata"]["processPath"] = str(new_process_dir)
+            write_json(new_process_path, moved_data)
+            json.dump({"status": "ok", "files_written": ["process.json"], "relocated_to": str(new_process_dir)}, sys.stdout)
+            print()
+            return
+
     _ok("process.json")
 
 
@@ -777,6 +838,23 @@ def cmd_write_pending(args: argparse.Namespace) -> None:
 
     if not args.options:
         _error("--options is required when creating pending-interaction.json")
+
+    # Guard: only allow pending-interaction on steps with approvalRequired
+    process_path = process_dir / "process.json"
+    if process_path.exists():
+        pdata = read_json(process_path)
+        active_step_id = pdata.get("currentState", {}).get("activeStepId", "")
+        for step in pdata.get("steps", []):
+            if step["id"] == active_step_id:
+                if not step.get("approvalRequired"):
+                    _error(
+                        f"Cannot create pending-interaction: step \"{step.get('name', '')}\" "
+                        f"(id: {active_step_id}) does not have approvalRequired: true.\n\n"
+                        "Pending interactions (approval checkpoints) are only allowed on steps "
+                        "that have approvalRequired set to true in the process template. "
+                        "This step should complete without user approval."
+                    )
+                break
 
     options_data = json.loads(args.options)
     options = [InteractionOption.from_dict(o) for o in options_data]

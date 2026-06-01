@@ -1,6 +1,7 @@
 import { ChildProcessRef } from "./child-process-ref";
 import { ProcessStatus, StepStatus } from "./process-status";
 import { ProcessId, StepId, StepRef, ProcessPath, ISOTimestamp } from "./shared-types";
+import { EmbeddedStepDefinition } from "./step-definition";
 
 /**
  * Complete process instance as stored in process.json.
@@ -145,6 +146,9 @@ export interface ProcessStep {
   
   /** Whether user approval has been granted (only relevant if approvalRequired is true) */
   approved?: boolean;
+
+  /** Embedded step definition with full execution guidance */
+  stepDefinition: EmbeddedStepDefinition;
 }
 
 /**

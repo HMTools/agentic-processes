@@ -171,3 +171,63 @@ export interface StepDefinition {
   /** Whether this step requires approval when used standalone */
   approvalRequired?: boolean;
 }
+
+/**
+ * Embedded step definition — the execution-relevant subset of StepDefinition
+ * that gets included inline within process templates and process instances.
+ *
+ * Excludes catalog/template concerns: type, name, category, metadata, references, dependencies.
+ * Retains stepRef on the parent ProcessStep as provenance.
+ */
+export interface EmbeddedStepDefinition {
+  output?: {
+    description: string;
+    artifacts: string[];
+    memoryUpdates: string[];
+  };
+
+  guidance: {
+    prerequisites: string[];
+    specificActions: string[];
+    files: {
+      read: string[];
+      create: string[];
+      update: string[];
+    };
+    tools: string[];
+    bestPractices: string[];
+  };
+
+  substeps: Array<{
+    number: number;
+    name: string;
+    description: string;
+    actions: string[];
+    conditional?: string;
+  }>;
+
+  flow?: {
+    description: string;
+  };
+
+  memoryFileUsage?: {
+    readFrom: string;
+    writeTo: string;
+    fields: string[];
+  };
+
+  parameters?: {
+    required?: string[];
+    optional?: string[];
+    defaults?: Record<string, unknown>;
+    definitions?: Record<string, {
+      type: string;
+      description: string;
+      enum?: string[];
+      default?: string | boolean;
+      example?: unknown;
+    }>;
+  };
+
+  [key: string]: unknown;
+}

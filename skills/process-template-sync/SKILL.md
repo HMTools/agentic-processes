@@ -32,7 +32,7 @@ Templates (process templates and step templates) live in external git repositori
 | Runtime Path | Contains |
 |-------------|----------|
 | `~/.claude/agentic-processes/templates/processes/` | Process templates (synced from git sources) |
-| `~/.claude/agentic-processes/templates/steps/` | Step definitions (synced from git sources) |
+| `~/.claude/agentic-processes/templates/steps/` | Reusable step blueprints (5 kept; most steps are embedded in process templates) |
 | `~/.claude/agentic-processes/cache/sources/` | Git clone cache per source |
 | `~/.claude/agentic-processes/config/template-sources.json` | Source configuration |
 
