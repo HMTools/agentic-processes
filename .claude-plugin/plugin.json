@@ -1,6 +1,6 @@
 {
   "name": "agentic-processes",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "Process automation framework for agentic coding environments. Define, execute, and manage structured workflows with state tracking and approval checkpoints.",
   "author": {
     "name": "HM",
