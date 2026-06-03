@@ -1,0 +1,19 @@
+{
+  "id": "RM-032",
+  "title": "Consider rebranding to DetA (Deterministic Agents)",
+  "description": "Evaluate renaming the project from Agentic Processes to DetA (Deterministic Agents) to better communicate the framework's core value: turning non-deterministic AI agent behavior into structured, repeatable, deterministic workflows.",
+  "type": "idea",
+  "status": "proposed",
+  "priority": "low",
+  "category": "framework",
+  "milestone": "backlog",
+  "effort": "",
+  "tags": [],
+  "dependencies": [],
+  "created": "2026-05-30",
+  "updated": "2026-05-30",
+  "author": "matanha@payoneer.com",
+  "notes": "",
+  "acceptance_criteria": [],
+  "illustration": "deploy-rocket"
+}

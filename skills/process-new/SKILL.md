@@ -102,7 +102,7 @@ The script writes `process.json`, `memory.json`, and `log.json` directly. Check 
 
 - Display summary
 - **Automatically execute Step 0** (Init Process Principles) — do NOT ask for confirmation
-- After Step 0, execute the next step via step-executor subagent
+- After Step 0, invoke the `step-executor-delegation` skill with the process directory and step ID to execute the next step
 - **CRITICAL**: `approvalRequired: true` means **post-execution approval of deliverables**. NEVER write `pending-interaction.json` or ask for user permission before a step runs.
 
 ## Handling User Corrections at Approval Checkpoints
@@ -110,8 +110,8 @@ The script writes `process.json`, `memory.json`, and `log.json` directly. Check 
 When a step has `approvalRequired: true` and the user provides corrections instead of simple approval:
 
 1. Log the correction immediately via the `process-state-update` skill
-2. Delegate correction processing to `step-executor` subagent
-3. Wait for subagent completion
+2. Re-invoke the `step-executor-delegation` skill with the corrections as the third argument: `step-executor-delegation "<process-dir>" "<step-id>" "<user corrections>"`
+3. Wait for skill/subagent completion
 4. Present updated deliverables for re-approval
 5. Repeat until user provides simple approval
 
@@ -134,6 +134,6 @@ When invoked from within an active process (spawning a sub-process):
 
 ## Subagent Delegation
 
-- **step-executor**: Execute individual steps in isolated context
+- **step-executor**: To execute a step, invoke the `step-executor-delegation` skill with the process directory and step ID. Do NOT call the Agent tool directly for step execution.
 - **process-spawner**: Create new processes/sub-processes in isolated context
-- Use the Agent tool with the appropriate `subagent_type`
+- Use the Agent tool with the appropriate `subagent_type` (except for step-executor — use the skill)

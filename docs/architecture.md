@@ -118,7 +118,7 @@ Process instances are created from templates and contain:
 
 The framework uses subagents for context isolation:
 
-- **step-executor**: Executes individual process steps in isolated context
+- **step-executor**: Executes individual process steps. Invoked via the `step-executor-delegation` skill (`context: fork`, `agent: step-executor`). The skill content is the only task message the step-executor receives — the orchestrator cannot add extra context.
 - **process-spawner**: Creates new processes/sub-processes in isolated context
 
 Subagent files are in `agents/` and are auto-discovered by Claude Code.
@@ -309,10 +309,10 @@ State is always persisted:
 
 ### 5. Subagent Delegation
 
-Steps are executed by subagents for:
-- Context isolation
-- Clear responsibility boundaries
-- Consistent execution patterns
+Steps are executed via the `step-executor-delegation` skill which forks into the step-executor subagent:
+- **Context isolation**: Enforced by `context: fork` — the skill content is the only task message. The orchestrator cannot add extra context.
+- **Clear responsibility boundaries**: The skill defines WHAT the step-executor receives. The step-executor.md defines HOW it behaves. The orchestrator handles the workflow around execution.
+- **Consistent execution patterns**: All step execution goes through one skill, regardless of which orchestrator (process-continue or process-new) triggers it.
 
 ## Git-Based Template Sources
 

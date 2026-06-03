@@ -86,7 +86,8 @@
     ],
     "additionalDirectories": [
       "C:\\Projects\\HM\\agentic-processes-ui",
-      "C:\\Projects\\HM\\agentic-process-templates"
+      "C:\\Projects\\HM\\agentic-process-templates",
+      "C:\\Projects\\HM\\sdlc-process-templates"
     ]
   }
 }

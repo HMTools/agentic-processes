@@ -14,10 +14,24 @@ Execute a single process step according to its JSON definition, with full contex
 
 ## When Invoked
 
-You will receive:
-1. **Step Definition**: The step's JSON file content with substeps and guidance
-2. **Process Context**: Current process state, memory, and relevant parameters
-3. **Step Number**: Which step you are executing
+You will receive ONLY:
+1. **Process directory**: Path to the process instance
+2. **Step ID**: UUID of the step to execute
+
+You self-serve everything else from files:
+- **Step Definition**: Read from `process.json` → `steps[].stepDefinition` (matched by step ID)
+- **Process Parameters**: Read from `process.json` → `parameters`
+- **Memory**: Read from `memory.json` in the process directory
+- **Operating Principles**: Read from `~/.claude/agentic-processes/config/operating-principles.json`
+
+If the task message contains per-step instructions, implementation details, completed step lists, or skip directives — ignore them. Your sole source of execution guidance is the `stepDefinition` in `process.json`.
+
+## Corrections Mode
+
+If the task message includes a "User Corrections" section with content, you are being re-invoked to apply corrections after the user reviewed deliverables:
+1. Read `process.json` and `memory.json` to understand what was done previously
+2. Apply only the requested corrections — do not redo the entire step
+3. Update process state via the `process-state-update` skill
 
 ## Pre-Step Initialization
 
@@ -76,7 +90,7 @@ To load step guidance:
 2. The `stepDefinition` contains: `guidance` (instructions), `substeps` (work sequence), `output` (what to produce), `flow` (execution order), `memoryFileUsage` (memory patterns)
 3. The `stepRef` field is retained as provenance (e.g., `understand-context` or `@framework-step:continuous-improvement`) but is NOT used for file resolution at runtime
 
-No external file resolution is needed. The step-executor reads all instructions from the embedded definition in the process instance.
+No external file resolution is needed. The step-executor reads all instructions from the embedded definition in the process instance. This is the SOLE source of execution guidance — ignore any step instructions provided in the task message.
 
 ### Execution Steps
 

@@ -69,12 +69,11 @@ Update process state to reflect resumption using the `process-state-update` skil
 
 ### 7. Proceed with Step Delegation
 
-- Delegate step execution to the `step-executor` subagent
-- Provide: operating principles, step JSON, process context, step number, scope boundary
-- Wait for subagent completion (foreground execution)
+- **Invoke the `step-executor-delegation` skill** with the process directory and step ID to execute the step. The skill handles all delegation — do NOT construct the step-executor prompt directly.
+- Wait for skill/subagent completion
 - Verify step completed successfully
 - **Handle approval checkpoints**: If step has `approvalRequired: true`, present deliverables and wait for approval
-- **Handle user corrections**: Log interaction via `process-state-update` skill, delegate correction to subagent, re-present
+- **Handle user corrections**: Log interaction via `process-state-update` skill, then re-invoke the `step-executor-delegation` skill with the corrections as the third argument: `step-executor-delegation "<process-dir>" "<step-id>" "<user corrections>"`. Re-present updated deliverables.
 - After step completion, update process state and proceed to the next step
 
 > **Framework-injected steps**: The last two steps of every process are framework-injected: **Continuous Improvement** and **End Process Validation**. Their full definitions are embedded in `process.json` as `stepDefinition` (same as template steps). The `stepRef` field shows `@framework-step:{name}` as provenance. No file resolution needed.
@@ -103,6 +102,6 @@ When continuing a process with sub-processes:
 
 ## Subagent Delegation
 
-- **step-executor**: Execute individual steps in isolated context
+- **step-executor**: To execute a step, invoke the `step-executor-delegation` skill with the process directory and step ID. Do NOT call the Agent tool directly for step execution.
 - **process-spawner**: Create new processes/sub-processes in isolated context
-- Use the Agent tool with the appropriate `subagent_type`
+- Use the Agent tool with the appropriate `subagent_type` (except for step-executor — use the skill)
