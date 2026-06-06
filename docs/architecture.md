@@ -103,7 +103,6 @@ Steps are modular, self-contained definitions with:
 
 Process instances are created from templates and contain:
 - Process file (`process.json`) - Machine-readable state for tooling/UI
-- Process doc (`process.md`) - Human-readable workflow definition
 - Memory file (`memory.json`) - Persistent information shared across steps
 - Log file (`log.json`) - Detailed execution log
 
@@ -270,7 +269,6 @@ AGENTS.md                            # Agent discovery
 ├── active/                          # Running processes
 │   └── process-{name}-{date}-{id}/
 │       ├── process.json             # Primary state
-│       ├── process.md               # Documentation
 │       ├── memory.json              # Cross-step info
 │       └── log.json                 # Execution log
 ├── completed/                       # Finished processes

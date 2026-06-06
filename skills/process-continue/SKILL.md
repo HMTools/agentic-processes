@@ -19,7 +19,7 @@ Continue an existing process from where it was left off.
 | Requirement | Description |
 |-------------|-------------|
 | Must have process | Never work outside a process |
-| Must restore state | Read process.json, process.md and memory.json |
+| Must restore state | Read process.json and memory.json |
 
 ---
 
@@ -45,7 +45,6 @@ WITHOUT session binding, all enforcement hooks will be **silently disabled** for
 ### 3. Read Process State
 
 - Read `process.json` (primary state)
-- Read `process.md` (user documentation)
 - Review completed steps and identify next incomplete step
 
 ### 4. Read Memory File
@@ -72,7 +71,15 @@ Update process state to reflect resumption using the `process-state-update` skil
 - **Invoke the `step-executor-delegation` skill** with the process directory and step ID to execute the step. The skill handles all delegation — do NOT construct the step-executor prompt directly.
 - Wait for skill/subagent completion
 - Verify step completed successfully
-- **Handle approval checkpoints**: If step has `approvalRequired: true`, present deliverables and wait for approval
+- **Handle approval checkpoints**: If step has `approvalRequired: true`, the following sequence is mandatory and enforced by the script:
+  1. Present deliverables to user
+  2. Create pending checkpoint via `write-pending`
+  3. Wait for user response (approve/reject/modify)
+  4. Log the user's response via `log-interaction`
+  5. Delete the pending checkpoint via `write-pending --delete`
+  6. Call `approve-step` via the `process-state-update` skill to record approval (sets `approved=true`)
+  7. Then call `update-step-status --status completed` (will succeed because `approved=true`)
+  - **Note**: Step 7 will fail with an error if step 6 was not called -- this is enforced by `process_manager.py`
 - **Handle user corrections**: Log interaction via `process-state-update` skill, then re-invoke the `step-executor-delegation` skill with the corrections as the third argument: `step-executor-delegation "<process-dir>" "<step-id>" "<user corrections>"`. Re-present updated deliverables.
 - After step completion, update process state and proceed to the next step
 
@@ -80,7 +87,7 @@ Update process state to reflect resumption using the `process-state-update` skil
 
 ## State Restoration
 
-Read `process.json`, `process.md` and `memory.json` to fully restore context:
+Read `process.json` and `memory.json` to fully restore context:
 - Current step and progress
 - Completed work and decisions made
 - Files created and important notes
@@ -94,11 +101,9 @@ When continuing a process with sub-processes:
 3. At sync points: if any sub-processes still "running", report; if all "completed", proceed
 4. Sub-processes notify parent by updating parent's memory — no polling needed
 
-## JSON-First Architecture
+## JSON-Only Architecture
 
-- **JSON files** (`.json`) contain all agent guidance
-- **MD files** (`.md`) contain user-friendly documentation only
-- Always read the `.json` file first for complete guidance
+All process and template data is stored exclusively in JSON files. No MD view files are created or required. The UI app handles user-facing presentation.
 
 ## Subagent Delegation
 

@@ -56,7 +56,7 @@ When `/process-new` is invoked:
 ### 2. List Available Templates
 
 - Display templates from `~/.claude/agentic-processes/templates/processes/`
-- Read both `.json` and `.md` files for each template
+- Read the `.json` file for each template
 - Show purposes and required parameters from JSON
 - If no template fits: inform user and stop
 
@@ -96,8 +96,6 @@ The script writes `process.json`, `memory.json`, and `log.json` directly. Check 
 
 > **Auto-injected framework steps**: The script automatically appends **Continuous Improvement** and **End Process Validation** steps after the template's steps. These are defined in `framework-steps/` and use the `@framework-step:` prefix. Template authors should not include them manually.
 
-**Create `process.md`**: Write the user-readable documentation with substituted placeholders (this is the only file the agent Writes directly — it's documentation, not state).
-
 ### 6. Start Process (Auto-Execute Step 0)
 
 - Display summary
@@ -126,11 +124,9 @@ When invoked from within an active process (spawning a sub-process):
 5. Use `register-child-process` to add this child to the parent's process.json (required for UI diagram)
 6. Return control to parent process after creation
 
-## JSON-First Architecture
+## JSON-Only Architecture
 
-- **JSON files** (`.json`) contain all agent guidance and machine-readable instructions
-- **MD files** (`.md`) contain user-friendly documentation only
-- Always read the `.json` file first for complete guidance
+All process and template data is stored exclusively in JSON files. No MD view files are created or required. The UI app handles user-facing presentation.
 
 ## Subagent Delegation
 

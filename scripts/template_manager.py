@@ -207,13 +207,17 @@ def _copy_templates(source_dir: Path, kind: str, installed: dict[str, str]) -> l
                 shutil.copytree(item, dest_path)
                 copied.append(rel_path)
             elif item.is_file():
-                # Copy loose files (e.g., README.md, step-template.md)
+                # Copy loose files, skip .md files (except README.md)
+                if item.suffix == '.md' and item.name != 'README.md':
+                    continue
                 shutil.copy2(item, dest / item.name)
 
     if kind == "processes":
-        # Copy loose files (e.g., README.md)
+        # Copy loose files, skip .md files (except README.md)
         for item in sorted(src.iterdir()):
             if item.is_file():
+                if item.suffix == '.md' and item.name != 'README.md':
+                    continue
                 shutil.copy2(item, dest / item.name)
 
     return copied

@@ -82,14 +82,6 @@ The primary state file contains:
 - All steps with status tracking
 - Parameters
 
-### Process Documentation (`process.md`)
-
-User-readable workflow documentation with:
-- Process description
-- Flow diagram
-- Step details
-- Notes and audit log
-
 ### Memory File (`memory.json`)
 
 Stores information shared across steps:

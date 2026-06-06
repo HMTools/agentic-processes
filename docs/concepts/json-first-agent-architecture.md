@@ -481,5 +481,5 @@ flowchart TD
 
 ## Notes
 
-- Process instance files (`process.md`, `memory.json`, `log.json` in `~/.claude/agentic-processes/`) follow a different pattern and are not part of this migration
+- Process instance files (`process.json`, `memory.json`, `log.json` in `~/.claude/agentic-processes/`) are the sole process state files (no MD view files)
 

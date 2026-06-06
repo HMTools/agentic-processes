@@ -25,8 +25,6 @@ You will receive:
 2. **Create process directory**: `~/.claude/agentic-processes/active/process-{name}-{YYYYMMDD}-{shortid}/`
 3. **Create process files** using the `process-new` skill:
    - Use the `process-new` skill to create all state files (process.json, memory.json, log.json)
-   - Never use Write/Edit tools directly on process state files
-   - Write `process.md` directly (it's documentation, not state)
 
 4. **Handle sub-process creation** (if parent context provided):
    - Read parent's process.json to get parent ID, name, and the spawning step's UUID

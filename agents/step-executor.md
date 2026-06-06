@@ -99,7 +99,7 @@ No external file resolution is needed. The step-executor reads all instructions 
 3. **Update process files** using the `process-state-update` skill:
    - Never use Write/Edit tools directly on process.json, memory.json, log.json, or pending-interaction.json
    - Use the `process-state-update` skill for all state mutations
-4. **Handle approval checkpoints**: If the step has `approvalRequired: true`, prepare deliverables and return to parent for user approval
+4. **Handle approval checkpoints**: If the step has `approvalRequired: true`, prepare deliverables and return to parent for user approval. After the approval checkpoint is resolved, call `approve-step` via the `process-state-update` skill before the step can be marked completed. This is enforced by `process_manager.py` -- calling `update-step-status --status completed` without first calling `approve-step` will fail with an error.
 5. **Return completion status** with:
    - Step output/artifacts created
    - Any issues encountered

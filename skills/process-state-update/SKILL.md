@@ -58,6 +58,44 @@ python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-step
 
 Valid statuses: `pending`, `in_progress`, `completed`, `skipped`, `awaiting_approval`
 
+**Note**: When completing a step with `approvalRequired: true`, the step must have `approved: true` set via `approve-step` first. Otherwise, `update-step-status --status completed` will fail with an error describing the required approval workflow.
+
+---
+
+### approve-step
+
+Record explicit approval for a step with `approvalRequired: true`. This is the **only** way to set `approved = true` on a step, and it is **required** before `update-step-status --status completed` will succeed on approval-required steps.
+
+**When to use**: After the user has approved at an approval checkpoint and the pending interaction has been resolved (deleted).
+
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py approve-step \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --step-id "abc-123-uuid"
+```
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" approve-step --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid"
+```
+
+**Error conditions**:
+- Step does not have `approvalRequired: true` -- cannot approve a non-approval step
+- `pending-interaction.json` still exists -- the approval checkpoint must be resolved first (user must respond, then call `write-pending --delete`)
+
+**Full Approval Workflow** (mandatory sequence for approval-required steps):
+```
+1. write-pending --options '[...]'          # Create approval checkpoint
+2. (wait for user response)                  # User approves/rejects/modifies
+3. log-interaction --request "..." ...       # Log the user's response
+4. write-pending --delete                    # Delete the checkpoint
+5. approve-step --step-id "..."              # Record approval (sets approved=true)
+6. update-step-status --status completed     # Complete the step (succeeds because approved=true)
+```
+
+This workflow is **enforced by the script** -- step 6 will fail if step 5 was not called.
+
 ---
 
 ### update-current-state
@@ -92,7 +130,7 @@ python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py add-memory-e
   --name "Analyze Requirements" \
   --info '{"approach": "reviewed user docs", "constraints": "must preserve API compatibility"}' \
   --decisions '["Use incremental migration", "Maintain backward compatibility"]' \
-  --files '["api.py", "migration.md"]'
+  --files '["api.py", "migration.sql"]'
 ```
 
 **PowerShell**:
@@ -106,7 +144,7 @@ python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" add-memory-
 
 ### add-log-entry
 
-Append actions and reasoning to a step entry in `log.json`.
+Append actions, reasoning, problems, decisions, and performance notes to a step entry in `log.json`.
 
 **Bash**:
 ```bash
@@ -115,8 +153,23 @@ python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py add-log-entr
   --step-id "abc-123-uuid" \
   --actions '["Modified API endpoint", "Updated tests", "Added migration script"]' \
   --reasoning '["Preserve backward compatibility", "Cover new edge cases"]' \
-  --files-modified '["api.py", "test_api.py", "migrate.py"]'
+  --files-modified '["api.py", "test_api.py", "migrate.py"]' \
+  --problems '["File conflict in api.py required manual resolution", "Test timeout on slow CI"]' \
+  --decisions '["Used incremental migration strategy", "Deferred index rebuild to off-hours"]' \
+  --performance-notes '["Step completed in 2 iterations instead of expected 1"]'
 ```
+
+**Available flags** (all optional — only provided fields are appended):
+| Flag | Description |
+|------|-------------|
+| `--actions` | JSON array of actions taken during the step |
+| `--reasoning` | JSON array of agent reasoning entries |
+| `--files-modified` | JSON array of file paths modified |
+| `--problems` | JSON array of problems encountered (feeds `continuous-improvement` analysis) |
+| `--decisions` | JSON array of decisions made during the step |
+| `--performance-notes` | JSON array of performance observations |
+
+**Important**: Use `--problems` to log any issues, errors, workarounds, or unexpected situations encountered during step execution. The `continuous-improvement` step reads `problemsEncountered` from the log to identify systemic issues and propose fixes.
 
 ---
 

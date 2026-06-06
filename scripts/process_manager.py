@@ -4,6 +4,7 @@ Process Manager CLI — handles all process file mutations via direct Python fil
 Subcommands:
   create-process           Create all process files (process.json, memory.json, log.json)
   update-step-status       Change a step's status in process.json
+  approve-step             Record explicit approval for steps with approvalRequired: true
   update-current-state     Update the active step in process.json
   add-memory-entry         Add or update a step entry in memory.json
   add-log-entry            Append actions to a step entry in log.json
@@ -403,6 +404,28 @@ def cmd_update_step_status(args: argparse.Namespace) -> None:
 
     for step in process.steps:
         if step.id == args.step_id:
+            # Approval gate: block completion of approval-required steps without explicit approval
+            if (
+                new_status == StepStatus.COMPLETED
+                and step.approvalRequired
+                and step.approved is not True
+            ):
+                script_path = Path(__file__)
+                _error(
+                    f"Step \"{step.name}\" requires explicit approval before completion.\n\n"
+                    "This step has approvalRequired: true but approved is not set.\n"
+                    "The approval workflow is:\n"
+                    f"  1. Create approval checkpoint:\n"
+                    f"       python3 {script_path} write-pending --process-dir \"{process_dir}\" --options '[...]'\n"
+                    f"  2. Wait for user to respond (approve/reject/modify)\n"
+                    f"  3. Delete the checkpoint:\n"
+                    f"       python3 {script_path} write-pending --process-dir \"{process_dir}\" --delete\n"
+                    f"  4. Record approval:\n"
+                    f"       python3 {script_path} approve-step --process-dir \"{process_dir}\" --step-id \"{step.id}\"\n"
+                    f"  5. Then retry:\n"
+                    f"       python3 {script_path} update-step-status --process-dir \"{process_dir}\" --step-id \"{step.id}\" --status completed\n"
+                )
+
             step.status = new_status
             if new_status == StepStatus.IN_PROGRESS and step.startedAt is None:
                 step.startedAt = now
@@ -420,10 +443,61 @@ def cmd_update_step_status(args: argparse.Namespace) -> None:
             log_data = read_json(log_path)
             log = LogFile.from_dict(log_data)
             if log.executionMetrics:
-                log.executionMetrics["stepsCompleted"] = log.executionMetrics.get("stepsCompleted", 0) + 1
+                # Compute actual count from process steps to avoid double-counting on retries
+                completed_count = sum(
+                    1 for s in process.steps if s.status == StepStatus.COMPLETED
+                )
+                log.executionMetrics["stepsCompleted"] = completed_count
                 write_json(log_path, log.to_dict())
 
     process.metadata.lastUpdated = now
+    write_json(process_path, process.to_dict())
+    _ok("process.json")
+
+
+def cmd_approve_step(args: argparse.Namespace) -> None:
+    """Record explicit approval for a step with approvalRequired: true."""
+    process_dir = Path(args.process_dir)
+    process_path = process_dir / "process.json"
+
+    if not process_path.exists():
+        _error(f"process.json not found in {process_dir}")
+
+    data = read_json(process_path)
+    process = ProcessInstance.from_dict(data)
+
+    found = False
+    for step in process.steps:
+        if step.id == args.step_id:
+            # Validation 1: step must have approvalRequired
+            if not step.approvalRequired:
+                _error(
+                    f"Step \"{step.name}\" does not have approvalRequired: true — "
+                    "only approval-required steps can be approved."
+                )
+
+            # Validation 2: pending-interaction.json must NOT exist
+            pending_file = process_dir / "pending-interaction.json"
+            if pending_file.exists():
+                script_path = Path(__file__)
+                _error(
+                    "Cannot approve step while pending-interaction.json exists.\n\n"
+                    "The approval checkpoint must be resolved first:\n"
+                    "  1. Process the user's response\n"
+                    f"  2. Delete the checkpoint:\n"
+                    f"       python3 {script_path} write-pending --process-dir \"{process_dir}\" --delete\n"
+                    f"  3. Then retry:\n"
+                    f"       python3 {script_path} approve-step --process-dir \"{process_dir}\" --step-id \"{step.id}\"\n"
+                )
+
+            step.approved = True
+            found = True
+            break
+
+    if not found:
+        _error(f"Step {args.step_id} not found")
+
+    process.metadata.lastUpdated = _now_iso()
     write_json(process_path, process.to_dict())
     _ok("process.json")
 
@@ -1160,6 +1234,13 @@ def main() -> None:
     p_step.add_argument("--status", required=True, choices=[s.value for s in StepStatus])
     p_step.set_defaults(func=cmd_update_step_status)
 
+    # approve-step
+    p_approve = subparsers.add_parser("approve-step",
+        help="Record explicit approval for steps with approvalRequired: true")
+    p_approve.add_argument("--process-dir", required=True)
+    p_approve.add_argument("--step-id", required=True, help="UUID of the step to approve")
+    p_approve.set_defaults(func=cmd_approve_step)
+
     # update-current-state
     p_state = subparsers.add_parser("update-current-state", help="Update active step")
     p_state.add_argument("--process-dir", required=True)
@@ -1285,6 +1366,7 @@ def main() -> None:
 
     _LOG_GATED_COMMANDS = {
         "update-step-status",
+        "approve-step",
         "update-current-state",
         "add-memory-entry",
         "update-process-status",

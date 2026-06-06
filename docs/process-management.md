@@ -72,7 +72,7 @@ Every user interaction must be logged in the current step's "User Interactions" 
 ### User Interactions
 1. **User Request**: "the `review-and-verify` template should be generic for investigations, the examples are just use cases"
    - **Reason**: Template description was too specific, making it seem like it only handles those two use cases when it should be generic
-   - **Agent Response**: Updated Description and Parameters sections in process.md to clarify template is generic for investigations/reviews/verifications, with examples listed as example use cases
+   - **Agent Response**: Updated Description and Parameters sections in process.json to clarify template is generic for investigations/reviews/verifications, with examples listed as example use cases
    - **Timestamp**: 2026-01-03 17:35:30
 ```
 
@@ -81,11 +81,6 @@ Every user interaction must be logged in the current step's "User Interactions" 
 ## Process State Management
 
 ### Current State Updates
-
-The `process.md` file's "Current State" section must be updated:
-- **When a step begins**: Update "Active Step" and "Current Action"
-- **When work progresses**: Update "Current Action" and "Details"
-- **When a step completes**: Mark step as complete `[x]` and update state
 
 ### Memory File Updates
 
@@ -106,26 +101,34 @@ The `log.json` file must be updated:
 
 ## Approval Checkpoints
 
-### Checking for Required Approvals
+### Script-Enforced Approval Gates
 
-Before completing ANY step, check if approval is required:
+Approval checkpoints are **enforced by `process_manager.py`**, not just by agent self-discipline. When a step has `approvalRequired: true`, calling `update-step-status --status completed` will **fail with an error** unless the step has `approved: true` set via the `approve-step` command.
+
+### Required Approval Workflow
+
+Before completing ANY step with `approvalRequired: true`, follow this mandatory sequence:
 
 1. **Check process.json** - Look for `"approvalRequired": true` on the current step
-2. **Check process.md** - Look for "Approval Required: Yes" in step description
-3. **If approval required**:
-   - Present deliverables to user
-   - Explicitly ask: "Do you approve? (approve/modify/reject)"
-   - **WAIT** - Do NOT proceed until user responds
-   - Log user response in log.json
-   - Only proceed if user approves
+2. **Present deliverables** to the user
+3. **Create approval checkpoint** via `write-pending` (creates `pending-interaction.json`)
+4. **WAIT** - Do NOT proceed until user responds
+5. **Log user response** in log.json via `log-interaction`
+6. **Delete the checkpoint** via `write-pending --delete`
+7. **Record approval** via `approve-step --step-id "..."` (sets `approved = true`)
+8. **Complete the step** via `update-step-status --status completed` (succeeds because `approved = true`)
+
+**Note**: Step 8 will be rejected by the script if step 7 was not called. This makes it structurally impossible to skip approval checkpoints.
 
 ### Workflow Checklist (Before Completing Step)
 
 - [ ] Check if step has `approvalRequired: true`
-- [ ] If yes: Stop and request approval
+- [ ] If yes: Present deliverables and create pending checkpoint
 - [ ] Wait for explicit user approval
-- [ ] Log approval in log.json
-- [ ] Then proceed to next step
+- [ ] Log the user's response via `log-interaction`
+- [ ] Delete the pending checkpoint via `write-pending --delete`
+- [ ] Call `approve-step` to record approval
+- [ ] Then call `update-step-status --status completed`
 
 ---
 
@@ -141,7 +144,6 @@ Before completing ANY step, check if approval is required:
    - See [Mandatory Logging Workflow](#mandatory-logging-workflow)
 
 3. **Update process state** (if in active process)
-   - Update `process.md` Current State section
    - Update `memory.json` with planned changes
    - Log action in `log.json`
 
@@ -155,10 +157,6 @@ Before completing ANY step, check if approval is required:
 2. **Update memory.json**
    - Add file to "Files Modified/Created" section
    - Document what was produced
-
-3. **Update process.md** (if step completed)
-   - Mark step as complete
-   - Update Current State
 
 ---
 
@@ -377,8 +375,7 @@ When user makes a request:
 
 ```
 [ ] 1. Log user interaction in log.json (User Interactions section)
-[ ] 2. Update process.md Current State (if needed)
-[ ] 3. Make necessary file changes
+[ ] 2. Make necessary file changes
 [ ] 4. Update log.json (Files Modified section)
 [ ] 5. Update memory.json (Files Modified/Created section)
 [ ] 6. Continue with work

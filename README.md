@@ -49,7 +49,7 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 - **Git-Based Sources**: Configure multiple git repositories as template sources
 
 ### State Persistence
-- Process state stored in JSON and markdown files
+- Process state stored in JSON files
 - Memory files for cross-step information sharing
 - Audit logs for complete history
 - No data loss between sessions
@@ -101,7 +101,6 @@ The system will:
 
 A process consists of:
 - **Process File** (`process.json`): Primary state and machine-readable data
-- **Process Doc** (`process.md`): User-readable workflow documentation
 - **Memory File** (`memory.json`): Persistent information shared across steps
 - **Log File** (`log.json`): Detailed execution log (auto-updated)
 
@@ -282,7 +281,7 @@ After syncing, templates are available at:
 - set different llm model for different steps (in config)
 - change steps to be defaulted as process template scope (related to specific template), with allowing to set global steps (maybe)
 - step-level shared behaviors (previously _components) - now handled by hooks and skills
-- remove the view only md files (instead create a skill that allows the user to generate view page from jsons)
+- ~~remove the view only md files~~ (DONE - JSON-only architecture implemented)
 - cost analysis of processes and steps
 - graphify
 - triggers (ci, cd)
