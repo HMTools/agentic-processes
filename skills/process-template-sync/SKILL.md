@@ -44,7 +44,7 @@ Each source has a name, git URL, branch, enabled flag, and priority. When multip
 
 All operations are invoked via:
 ```
-Bash(python3 ${PLUGIN_ROOT}/scripts/template_manager.py <subcommand> ...)
+Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py <subcommand> ...)
 ```
 
 Check stdout for JSON result with `"status": "ok"` or `"status": "error"`.
@@ -56,7 +56,7 @@ Check stdout for JSON result with `"status": "ok"` or `"status": "error"`.
 Initialize all runtime directories and create a default config if none exists.
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py init
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py init
 ```
 
 Creates: `active/`, `completed/`, `failed/`, `flags/`, `guidelines/`, `config/`, `cache/`, `templates/processes/`, `templates/steps/`.
@@ -68,7 +68,7 @@ Creates: `active/`, `completed/`, `failed/`, `flags/`, `guidelines/`, `config/`,
 Sync templates from all enabled sources (or a specific source). Automatically calls `init` first.
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py sync [--source <name>]
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py sync [--source <name>]
 ```
 
 For each enabled source:
@@ -84,7 +84,7 @@ For each enabled source:
 Add a new template source.
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py add-source \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py add-source \
   --name "<source name>" \
   --url "<git repo URL>" \
   --branch "<branch>" \
@@ -103,7 +103,7 @@ python3 ${PLUGIN_ROOT}/scripts/template_manager.py add-source \
 Remove a template source by name.
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py remove-source --name "<source name>"
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py remove-source --name "<source name>"
 ```
 
 This removes the source from config and deletes its cache. Templates already synced are not removed.
@@ -115,7 +115,7 @@ This removes the source from config and deletes its cache. Templates already syn
 List all configured template sources with their status.
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py list-sources
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py list-sources
 ```
 
 ---
@@ -125,7 +125,7 @@ python3 ${PLUGIN_ROOT}/scripts/template_manager.py list-sources
 Show sync status: last sync time per source, number of templates installed.
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py status
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py status
 ```
 
 ---
@@ -141,12 +141,12 @@ When no templates are available:
 ### Adding a Team Source
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py add-source \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py add-source \
   --name "team" \
   --url "https://github.com/my-org/my-templates.git" \
   --branch "main" \
   --priority 50
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py sync
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py sync
 ```
 
 A priority of 50 means team templates override official templates (priority 100) when names conflict.
@@ -154,7 +154,7 @@ A priority of 50 means team templates override official templates (priority 100)
 ### Updating Templates
 
 ```
-python3 ${PLUGIN_ROOT}/scripts/template_manager.py sync
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/template_manager.py sync
 ```
 
 This pulls the latest from all enabled sources and re-copies templates to the runtime paths.

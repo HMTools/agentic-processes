@@ -41,7 +41,7 @@ Do NOT use this skill when:
 
 All operations are invoked via:
 ```
-Bash(python3 ${PLUGIN_ROOT}/scripts/process_manager.py <subcommand> --process-dir <dir> ...)
+Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py <subcommand> --process-dir <dir> ...)
 ```
 
 Check stdout for `{"status": "ok", ...}` or `{"status": "error", "message": "..."}`.
@@ -72,7 +72,7 @@ Create a new Q&A session with one or more questions.
 
 **Example**:
 ```bash
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-session \
   --process-dir ~/.claude/agentic-processes/active/my-process-20260512 \
   --questions '[
     {
@@ -121,7 +121,7 @@ Add or update an answer for a specific question.
 
 **Example**:
 ```bash
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py answer-question \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py answer-question \
   --process-dir ~/.claude/agentic-processes/active/my-process-20260512 \
   --question-id q1 \
   --answer "PostgreSQL with TimescaleDB extension for time-series data"
@@ -153,7 +153,7 @@ Mark a question as completed (answer is satisfactory).
 
 **Example**:
 ```bash
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-question \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py complete-question \
   --process-dir ~/.claude/agentic-processes/active/my-process-20260512 \
   --question-id q1
 ```
@@ -182,7 +182,7 @@ Archive completed session and remove file.
 
 **Example**:
 ```bash
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py complete-session \
   --process-dir ~/.claude/agentic-processes/active/my-process-20260512
 ```
 
@@ -212,7 +212,7 @@ Read current Q&A session state.
 
 **Example**:
 ```bash
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py get-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py get-session \
   --process-dir ~/.claude/agentic-processes/active/my-process-20260512
 ```
 
@@ -457,7 +457,7 @@ If stuck with old incomplete session:
 
 ```bash
 # Agent identifies gap and creates session
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-session \
   --process-dir ~/.claude/agentic-processes/active/api-service-20260512 \
   --questions '[
     {
@@ -471,18 +471,18 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
   ]'
 
 # User answers via UI or CLI
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py answer-question \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py answer-question \
   --process-dir ~/.claude/agentic-processes/active/api-service-20260512 \
   --question-id db_choice \
   --answer "PostgreSQL"
 
 # Agent reviews answer, marks complete
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-question \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py complete-question \
   --process-dir ~/.claude/agentic-processes/active/api-service-20260512 \
   --question-id db_choice
 
 # Agent completes session
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py complete-session \
   --process-dir ~/.claude/agentic-processes/active/api-service-20260512
 
 # Agent continues implementation using PostgreSQL
@@ -496,7 +496,7 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-session \
 
 ```bash
 # Create session
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-session \
   --process-dir ~/.claude/agentic-processes/active/api-design-20260512 \
   --questions '[
     {
@@ -509,24 +509,24 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
   ]'
 
 # User provides initial answer
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py answer-question \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py answer-question \
   --process-dir ~/.claude/agentic-processes/active/api-design-20260512 \
   --question-id api_style \
   --answer "RESTful"
 
 # Agent asks for more detail in conversation
 # User refines answer
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py answer-question \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py answer-question \
   --process-dir ~/.claude/agentic-processes/active/api-design-20260512 \
   --question-id api_style \
   --answer "RESTful with HATEOAS constraints, JSON:API spec for responses"
 
 # Agent satisfied with detailed answer
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-question \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py complete-question \
   --process-dir ~/.claude/agentic-processes/active/api-design-20260512 \
   --question-id api_style
 
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py complete-session \
   --process-dir ~/.claude/agentic-processes/active/api-design-20260512
 ```
 
@@ -540,7 +540,7 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py complete-session \
 
 ```bash
 # First session - initial requirements
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-session \
   --process-dir ~/.claude/agentic-processes/active/feature-impl-20260512 \
   --questions '[
     {
@@ -559,7 +559,7 @@ python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
 # Agent discovers new ambiguity about queue backend
 
 # Second session - follow-up questions
-python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-session \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-session \
   --process-dir ~/.claude/agentic-processes/active/feature-impl-20260512 \
   --questions '[
     {

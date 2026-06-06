@@ -84,7 +84,7 @@ When `/process-new` is invoked:
 
 **Create Process Files**: Use the `process_manager.py` script:
 ```
-Bash(python3 ${PLUGIN_ROOT}/scripts/process_manager.py create-process \
+Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-process \
   --template-path <template.json path> \
   --name "<process name>" \
   --params '<JSON parameters>' \
