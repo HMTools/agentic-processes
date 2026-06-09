@@ -179,7 +179,7 @@
   },
   "memoryFileUsage": {
     "readFrom": [],
-    "writeTo": [],
+    "writeTo": ["improvements.json"],
     "fields": [
       "Improvements Identified: List with descriptions",
       "Improvements Implemented: Each with Change, Files Modified, User Approval, Impact",
