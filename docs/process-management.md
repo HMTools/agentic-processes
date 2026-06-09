@@ -84,7 +84,7 @@ Every user interaction must be logged in the current step's "User Interactions" 
 
 ### Memory File Updates
 
-The `memory.json` file must be updated:
+The `memory/ directory` file must be updated:
 - **At the start of each step**: Initialize step section
 - **As work progresses**: Document information produced, decisions made, files modified
 - **When step completes**: Finalize step section with all outputs
@@ -144,7 +144,7 @@ Before completing ANY step with `approvalRequired: true`, follow this mandatory 
    - See [Mandatory Logging Workflow](#mandatory-logging-workflow)
 
 3. **Update process state** (if in active process)
-   - Update `memory.json` with planned changes
+   - Update `memory/ directory` with planned changes
    - Log action in `log.json`
 
 ### After Modifying Any File
@@ -154,7 +154,7 @@ Before completing ANY step with `approvalRequired: true`, follow this mandatory 
    - Document what changed
    - Increment iteration count if file was modified multiple times
 
-2. **Update memory.json**
+2. **Update memory/ directory**
    - Add file to "Files Modified/Created" section
    - Document what was produced
 
@@ -188,7 +188,7 @@ When a user corrects something:
 3. **Understand the correction** - what needs to change and why
 4. **Make the change**
 5. **Update log.json** with what was changed
-6. **Update memory.json** with the file modification
+6. **Update memory/ directory** with the file modification
 7. **Continue** with the corrected approach
 
 ### Never Skip Logging
@@ -244,7 +244,7 @@ Place sync points where parent needs sub-process results:
 3. COMPLETE: When sub-process finishes, process_manager.py auto-notifies parent
    ├── update-process-status --status completed --summary "..."
    ├── Automatically updates child status in parent's process.json
-   └── Adds completion summary to parent's memory.json
+   └── Adds completion summary to parent's memory/ directory
 
 4. SYNC: At sync points, process-continue checks parent's subProcessState
    ├── If children complete: proceed
@@ -272,7 +272,7 @@ Parent notification is handled automatically by `process_manager.py`. When a sub
 - `update-process-status --status completed --summary "..."` is called
 - The script detects the parent reference in `subProcessState.parentProcess`
 - It updates the child's status in the parent's `process.json`
-- It adds the completion summary to the parent's `memory.json`
+- It adds the completion summary to the parent's `memory/ directory`
 - No explicit notification step is needed in templates
 
 The `--summary` argument is **required** for sub-processes. If omitted, the script returns a descriptive error explaining what to provide.
@@ -377,7 +377,7 @@ When user makes a request:
 [ ] 1. Log user interaction in log.json (User Interactions section)
 [ ] 2. Make necessary file changes
 [ ] 4. Update log.json (Files Modified section)
-[ ] 5. Update memory.json (Files Modified/Created section)
+[ ] 5. Update memory/ directory (Files Modified/Created section)
 [ ] 6. Continue with work
 ```
 

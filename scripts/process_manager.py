@@ -2,11 +2,12 @@
 Process Manager CLI — handles all process file mutations via direct Python file I/O.
 
 Subcommands:
-  create-process           Create all process files (process.json, memory.json, log.json)
+  create-process           Create process files (process.json, memory/_cross-references.json, log.json)
   update-step-status       Change a step's status in process.json
   approve-step             Record explicit approval for steps with approvalRequired: true
   update-current-state     Update the active step in process.json
-  add-memory-entry         Add or update a step entry in memory.json
+  add-memory-entry         Add or update a step entry in memory/<topic>.json
+  read-memory-topic        Read a memory topic file with access validation
   add-log-entry            Append actions to a step entry in log.json
   log-interaction          Log a user interaction in log.json (+ clear pending-log flag)
   update-process-status    Change process status (running/completed/failed/paused)
@@ -33,11 +34,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from models import (
+    ActiveStep,
+    ActiveStepSubstep,
     ChildProcessRef,
     LogFile,
     LogStepEntry,
-    MemoryFile,
-    MemoryStepEntry,
+    MemoryCrossReferences,
+    MemoryTopicEntry,
+    MemoryTopicFile,
     ParentProcessRef,
     PendingInteractionFile,
     InteractionOption,
@@ -218,7 +222,7 @@ def _check_pending_log(process_dir: Path) -> None:
         step_id = "<active-step-id>"
         try:
             pdata = json.loads((process_dir / "process.json").read_text(encoding="utf-8"))
-            step_id = pdata.get("currentState", {}).get("activeStepId", step_id)
+            step_id = pdata.get("currentState", {}).get("activeStep", {}).get("id", step_id)
         except Exception:
             pass
         script_path = Path(__file__)
@@ -366,12 +370,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
 
     first_step_id = steps[0].id if steps else ""
 
-    memory = MemoryFile.create(
-        process_id=process.id,
-        template=template_name,
-        current_step=first_step_id,
-        parent_process_path=args.parent_process_path,
-    )
+    cross_refs = MemoryCrossReferences.create()
 
     log = LogFile.create(
         process_id=process.id,
@@ -382,10 +381,12 @@ def cmd_create_process(args: argparse.Namespace) -> None:
     )
 
     write_json(process_dir / "process.json", process.to_dict())
-    write_json(process_dir / "memory.json", memory.to_dict())
+    memory_dir = process_dir / "memory"
+    memory_dir.mkdir(parents=True, exist_ok=True)
+    write_json(memory_dir / "_cross-references.json", cross_refs.to_dict())
     write_json(process_dir / "log.json", log.to_dict())
 
-    _ok("process.json", "memory.json", "log.json")
+    _ok("process.json", "memory/_cross-references.json", "log.json")
 
 
 def cmd_update_step_status(args: argparse.Namespace) -> None:
@@ -512,11 +513,22 @@ def cmd_update_current_state(args: argparse.Namespace) -> None:
     data = read_json(process_path)
     process = ProcessInstance.from_dict(data)
 
+    current_substep = None
+    if getattr(args, 'substep_number', None) is not None and getattr(args, 'substep_name', None) is not None:
+        current_substep = ActiveStepSubstep(
+            number=args.substep_number,
+            name=args.substep_name,
+        )
+
     process.currentState = ProcessCurrentState(
-        activeStepId=args.step_id,
-        activeStepName=args.step_name,
-        actionSummary=args.summary,
-        actionDetails=args.details,
+        activeStep=ActiveStep(
+            id=args.step_id,
+            name=args.step_name,
+            actionSummary=args.summary,
+            totalSubsteps=args.total_substeps if getattr(args, 'total_substeps', None) is not None else 0,
+            actionDetails=args.details,
+            currentSubstep=current_substep,
+        )
     )
     process.metadata.lastUpdated = _now_iso()
 
@@ -524,15 +536,88 @@ def cmd_update_current_state(args: argparse.Namespace) -> None:
     _ok("process.json")
 
 
+def cmd_update_active_substep(args: argparse.Namespace) -> None:
+    process_dir = Path(args.process_dir)
+    process_path = process_dir / "process.json"
+
+    if not process_path.exists():
+        _error(f"process.json not found in {process_dir}")
+
+    data = read_json(process_path)
+    process = ProcessInstance.from_dict(data)
+
+    process.currentState.activeStep.currentSubstep = ActiveStepSubstep(
+        number=args.substep_number,
+        name=args.substep_name,
+    )
+    if args.summary is not None:
+        process.currentState.activeStep.actionSummary = args.summary
+    process.metadata.lastUpdated = _now_iso()
+
+    write_json(process_path, process.to_dict())
+    _ok("process.json")
+
+
+def _resolve_step_name(process_dir: Path, step_id: str) -> str:
+    """Look up step name from process.json by step ID."""
+    process_path = process_dir / "process.json"
+    if process_path.exists():
+        pdata = read_json(process_path)
+        for step in pdata.get("steps", []):
+            if step["id"] == step_id:
+                return step.get("name", "")
+    return ""
+
+
+def _get_step_memory_usage(process_dir: Path, step_id: str) -> dict:
+    """Get memoryFileUsage for a step from process.json."""
+    process_path = process_dir / "process.json"
+    if process_path.exists():
+        pdata = read_json(process_path)
+        for step in pdata.get("steps", []):
+            if step["id"] == step_id:
+                step_def = step.get("stepDefinition", {})
+                return step_def.get("memoryFileUsage", {})
+    return {}
+
+
+def _validate_topic_access(process_dir: Path, step_id: str, topic: str, access_type: str) -> None:
+    """Validate that a step is allowed to read/write a specific topic.
+    access_type must be 'readFrom' or 'writeTo'.
+    _cross-references is always readable by any step."""
+    if topic == "_cross-references":
+        return  # Always allowed
+    usage = _get_step_memory_usage(process_dir, step_id)
+    allowed_topics = usage.get(access_type, [])
+    # If memoryFileUsage is not defined or is old-format string, skip validation
+    if not isinstance(allowed_topics, list):
+        return
+    # Empty list means no restrictions defined yet — allow access
+    if not allowed_topics:
+        return
+    topic_file = f"{topic}.json"
+    if topic_file not in allowed_topics and topic not in allowed_topics:
+        step_name = _resolve_step_name(process_dir, step_id)
+        access_label = "write to" if access_type == "writeTo" else "read from"
+        _error(
+            f'Step "{step_name}" is not allowed to {access_label} topic "{topic_file}". '
+            f"Allowed {access_type} topics: {allowed_topics}"
+        )
+
+
 def cmd_add_memory_entry(args: argparse.Namespace) -> None:
     process_dir = Path(args.process_dir)
-    memory_path = process_dir / "memory.json"
+    memory_dir = process_dir / "memory"
 
-    if not memory_path.exists():
-        _error(f"memory.json not found in {process_dir}")
+    if not memory_dir.exists():
+        _error(f"memory/ directory not found in {process_dir}")
 
-    data = read_json(memory_path)
-    memory = MemoryFile.from_dict(data)
+    topic = args.topic
+
+    # Validate topic access
+    _validate_topic_access(process_dir, args.step_id, topic, "writeTo")
+
+    topic_path = memory_dir / f"{topic}.json"
 
     info = json.loads(args.info) if args.info else {}
     decisions = json.loads(args.decisions) if args.decisions else []
@@ -540,31 +625,75 @@ def cmd_add_memory_entry(args: argparse.Namespace) -> None:
 
     now = _now_iso()
 
-    if args.step_id in memory.steps:
-        entry = memory.steps[args.step_id]
+    # Read or create topic file
+    if topic_path.exists():
+        data = read_json(topic_path)
+        topic_file = MemoryTopicFile.from_dict(data)
+    else:
+        topic_file = MemoryTopicFile.create(topic)
+
+    # Resolve step name from process.json
+    step_name = _resolve_step_name(process_dir, args.step_id)
+
+    if args.step_id in topic_file.entries:
+        entry = topic_file.entries[args.step_id]
         entry.informationProduced.update(info)
         entry.decisionsMade.extend(decisions)
         entry.filesModifiedCreated.extend(files_modified)
         entry.updatedAt = now
-        if args.status:
-            entry.status = StepStatus(args.status)
     else:
-        entry = MemoryStepEntry(
-            name=args.name,
+        entry = MemoryTopicEntry(
+            stepName=step_name,
             informationProduced=info,
             decisionsMade=decisions,
             filesModifiedCreated=files_modified,
-            status=StepStatus(args.status) if args.status else None,
-            startedAt=now,
             updatedAt=now,
         )
-        memory.steps[args.step_id] = entry
+        topic_file.entries[args.step_id] = entry
 
-    memory.metadata["lastUpdated"] = now
-    memory.metadata["currentStep"] = args.step_id
+    topic_file.lastUpdated = now
 
-    write_json(memory_path, memory.to_dict())
-    _ok("memory.json")
+    write_json(topic_path, topic_file.to_dict())
+
+    # Also update _cross-references.json with any new decisions and files
+    xref_path = memory_dir / "_cross-references.json"
+    if xref_path.exists():
+        xref_data = read_json(xref_path)
+        xref = MemoryCrossReferences.from_dict(xref_data)
+    else:
+        xref = MemoryCrossReferences.create()
+
+    if decisions:
+        xref.keyDecisions.extend(decisions)
+    if files_modified:
+        xref.filesModified.extend(files_modified)
+    write_json(xref_path, xref.to_dict())
+
+    _ok(f"memory/{topic}.json", "memory/_cross-references.json")
+
+
+def cmd_read_memory_topic(args: argparse.Namespace) -> None:
+    """Read a specific memory topic file with access validation."""
+    process_dir = Path(args.process_dir)
+    memory_dir = process_dir / "memory"
+
+    if not memory_dir.exists():
+        _error(f"memory/ directory not found in {process_dir}")
+
+    topic = args.topic
+
+    # Validate topic access
+    _validate_topic_access(process_dir, args.step_id, topic, "readFrom")
+
+    topic_path = memory_dir / f"{topic}.json"
+    if not topic_path.exists():
+        json.dump({"status": "ok", "topic": topic, "data": None}, sys.stdout)
+        print()
+        return
+
+    data = read_json(topic_path)
+    json.dump({"status": "ok", "topic": topic, "data": data}, sys.stdout)
+    print()
 
 
 def cmd_add_log_entry(args: argparse.Namespace) -> None:
@@ -725,11 +854,15 @@ def cmd_update_process_status(args: argparse.Namespace) -> None:
                     parent_process.metadata.lastUpdated = _now_iso()
                     write_json(parent_process_path, parent_process.to_dict())
 
-                # Add summary to parent's memory.json
-                parent_memory_path = Path(parent_ref.processPath) / "memory.json"
-                if parent_memory_path.exists():
-                    parent_memory_data = read_json(parent_memory_path)
-                    parent_memory = MemoryFile.from_dict(parent_memory_data)
+                # Add summary to parent's memory/sub-processes.json topic file
+                parent_memory_dir = Path(parent_ref.processPath) / "memory"
+                if parent_memory_dir.exists():
+                    topic_path = parent_memory_dir / "sub-processes.json"
+                    if topic_path.exists():
+                        topic_data = read_json(topic_path)
+                        topic_file = MemoryTopicFile.from_dict(topic_data)
+                    else:
+                        topic_file = MemoryTopicFile.create("sub-processes")
 
                     # Find the spawning step ID from parent's child reference
                     spawn_step_id = None
@@ -739,12 +872,21 @@ def cmd_update_process_status(args: argparse.Namespace) -> None:
                                 spawn_step_id = child.spawnedAtStep
                                 break
 
-                    if spawn_step_id and spawn_step_id in parent_memory.steps:
-                        entry = parent_memory.steps[spawn_step_id]
-                        entry.informationProduced[f"childSummary_{process.id}"] = summary
-                        entry.updatedAt = _now_iso()
-                        parent_memory.metadata.lastUpdated = _now_iso()
-                        write_json(parent_memory_path, parent_memory.to_dict())
+                    if spawn_step_id:
+                        now = _now_iso()
+                        if spawn_step_id in topic_file.entries:
+                            entry = topic_file.entries[spawn_step_id]
+                            entry.informationProduced[f"childSummary_{process.id}"] = summary
+                            entry.updatedAt = now
+                        else:
+                            step_name = _resolve_step_name(Path(parent_ref.processPath), spawn_step_id)
+                            topic_file.entries[spawn_step_id] = MemoryTopicEntry(
+                                stepName=step_name,
+                                informationProduced={f"childSummary_{process.id}": summary},
+                                updatedAt=now,
+                            )
+                        topic_file.lastUpdated = now
+                        write_json(topic_path, topic_file.to_dict())
 
                 print(f"[auto-notify] Updated parent '{parent_ref.name}' with child completion and summary", file=sys.stderr)
         except Exception as exc:
@@ -917,7 +1059,7 @@ def cmd_write_pending(args: argparse.Namespace) -> None:
     process_path = process_dir / "process.json"
     if process_path.exists():
         pdata = read_json(process_path)
-        active_step_id = pdata.get("currentState", {}).get("activeStepId", "")
+        active_step_id = pdata.get("currentState", {}).get("activeStep", {}).get("id", "")
         for step in pdata.get("steps", []):
             if step["id"] == active_step_id:
                 if not step.get("approvalRequired"):
@@ -1148,42 +1290,33 @@ def cmd_complete_qa_session(args: argparse.Namespace) -> None:
         log_dict['steps'][step_id]['qaSession'] = qa_log_entry
         write_json(log_path, log_dict)
 
-    # Create memory entry
-    memory_path = process_dir / "memory.json"
-    if memory_path.exists():
-        memory_data = read_json(memory_path)
-        memory = MemoryFile.from_dict(memory_data)
-
+    # Create memory entry in memory/qa-sessions.json topic file
+    memory_dir = process_dir / "memory"
+    if memory_dir.exists():
         step_id = qa_session['stepId']
         qa_memory_entry = create_qa_session_memory(qa_session)
 
-        if step_id in memory.steps:
-            # Add to existing step entry
-            pass
+        topic_path = memory_dir / "qa-sessions.json"
+        if topic_path.exists():
+            topic_data = read_json(topic_path)
+            topic_file = MemoryTopicFile.from_dict(topic_data)
         else:
-            # Create new memory entry
-            memory.steps[step_id] = MemoryStepEntry(
-                name=qa_session['stepName'],
-                informationProduced={},
-                decisionsMade=[],
-                filesModifiedCreated=[],
-                startedAt=qa_session['timestamp'],
-                updatedAt=_now_iso(),
+            topic_file = MemoryTopicFile.create("qa-sessions")
+
+        now = _now_iso()
+        if step_id in topic_file.entries:
+            entry = topic_file.entries[step_id]
+            entry.informationProduced["qaSession"] = qa_memory_entry
+            entry.updatedAt = now
+        else:
+            topic_file.entries[step_id] = MemoryTopicEntry(
+                stepName=qa_session['stepName'],
+                informationProduced={"qaSession": qa_memory_entry},
+                updatedAt=now,
             )
 
-        # Add qaSession to memory dict
-        memory_dict = memory.to_dict()
-        if step_id not in memory_dict['steps']:
-            memory_dict['steps'][step_id] = {
-                'name': qa_session['stepName'],
-                'informationProduced': {},
-                'decisionsMade': [],
-                'filesModifiedCreated': [],
-                'startedAt': qa_session['timestamp'],
-                'updatedAt': _now_iso(),
-            }
-        memory_dict['steps'][step_id]['qaSession'] = qa_memory_entry
-        write_json(memory_path, memory_dict)
+        topic_file.lastUpdated = now
+        write_json(topic_path, topic_file.to_dict())
 
     # Delete qa-session.json
     qa_session_path.unlink()
@@ -1248,18 +1381,35 @@ def main() -> None:
     p_state.add_argument("--step-name", required=True)
     p_state.add_argument("--summary", required=True)
     p_state.add_argument("--details", default=None)
+    p_state.add_argument("--total-substeps", type=int, default=None)
+    p_state.add_argument("--substep-number", type=int, default=None)
+    p_state.add_argument("--substep-name", default=None)
     p_state.set_defaults(func=cmd_update_current_state)
 
+    # update-active-substep
+    p_substep = subparsers.add_parser("update-active-substep", help="Update active substep within current step")
+    p_substep.add_argument("--process-dir", required=True)
+    p_substep.add_argument("--substep-number", type=int, required=True)
+    p_substep.add_argument("--substep-name", required=True)
+    p_substep.add_argument("--summary", default=None, help="Optionally update actionSummary")
+    p_substep.set_defaults(func=cmd_update_active_substep)
+
     # add-memory-entry
-    p_mem = subparsers.add_parser("add-memory-entry", help="Add/update step in memory")
+    p_mem = subparsers.add_parser("add-memory-entry", help="Add/update step in memory topic file")
     p_mem.add_argument("--process-dir", required=True)
     p_mem.add_argument("--step-id", required=True)
-    p_mem.add_argument("--name", required=True, help="Step name")
+    p_mem.add_argument("--topic", required=True, help="Topic file name (e.g., context, identified-files)")
     p_mem.add_argument("--info", help="JSON string of informationProduced")
     p_mem.add_argument("--decisions", help="JSON array of decisions")
     p_mem.add_argument("--files", help="JSON array of files modified/created")
-    p_mem.add_argument("--status", choices=[s.value for s in StepStatus])
     p_mem.set_defaults(func=cmd_add_memory_entry)
+
+    # read-memory-topic
+    p_read_mem = subparsers.add_parser("read-memory-topic", help="Read a memory topic file with access validation")
+    p_read_mem.add_argument("--process-dir", required=True)
+    p_read_mem.add_argument("--step-id", required=True, help="Step ID (for access validation)")
+    p_read_mem.add_argument("--topic", required=True, help="Topic name (e.g., context, _cross-references)")
+    p_read_mem.set_defaults(func=cmd_read_memory_topic)
 
     # add-log-entry
     p_log = subparsers.add_parser("add-log-entry", help="Append log entry")
@@ -1368,6 +1518,7 @@ def main() -> None:
         "update-step-status",
         "approve-step",
         "update-current-state",
+        "update-active-substep",
         "add-memory-entry",
         "update-process-status",
         "write-pending",
@@ -1376,6 +1527,7 @@ def main() -> None:
     _APPROVAL_GATED_COMMANDS = {
         "update-step-status",
         "update-current-state",
+        "update-active-substep",
         "update-process-status",
     }
 

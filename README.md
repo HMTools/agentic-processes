@@ -101,7 +101,7 @@ The system will:
 
 A process consists of:
 - **Process File** (`process.json`): Primary state and machine-readable data
-- **Memory File** (`memory.json`): Persistent information shared across steps
+- **Memory Directory** (`memory/`): Topic-based files for persistent information shared across steps
 - **Log File** (`log.json`): Detailed execution log (auto-updated)
 
 ## Plugin Structure

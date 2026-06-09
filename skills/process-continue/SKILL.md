@@ -19,7 +19,7 @@ Continue an existing process from where it was left off.
 | Requirement | Description |
 |-------------|-------------|
 | Must have process | Never work outside a process |
-| Must restore state | Read process.json and memory.json |
+| Must restore state | Read process.json and memory/ topic files |
 
 ---
 
@@ -47,9 +47,9 @@ WITHOUT session binding, all enforcement hooks will be **silently disabled** for
 - Read `process.json` (primary state)
 - Review completed steps and identify next incomplete step
 
-### 4. Read Memory File
+### 4. Read Memory Topic Files
 
-- Read `memory.json`
+- Read relevant topic files from the `memory/` directory
 - Summarize key information from previous steps
 
 ### 5. Summarize Current State
@@ -87,7 +87,7 @@ Update process state to reflect resumption using the `process-state-update` skil
 
 ## State Restoration
 
-Read `process.json` and `memory.json` to fully restore context:
+Read `process.json` and memory topic files from `memory/` to fully restore context:
 - Current step and progress
 - Completed work and decisions made
 - Files created and important notes
@@ -96,7 +96,7 @@ Read `process.json` and `memory.json` to fully restore context:
 
 When continuing a process with sub-processes:
 
-1. Read `memory.json` `subProcessState` section
+1. Read `process.json` `subProcessState` section
 2. Check `childSubProcesses` array for status
 3. At sync points: if any sub-processes still "running", report; if all "completed", proceed
 4. Sub-processes notify parent by updating parent's memory — no polling needed

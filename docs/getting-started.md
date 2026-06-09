@@ -82,7 +82,7 @@ The primary state file contains:
 - All steps with status tracking
 - Parameters
 
-### Memory File (`memory.json`)
+### Memory File (`memory/ directory`)
 
 Stores information shared across steps:
 - Information produced in each step
@@ -219,7 +219,7 @@ Run `/process-template-sync` periodically to fetch the latest templates from all
 
 If you encounter issues:
 1. Check the process's log.json for execution history
-2. Review memory.json for context
+2. Review memory/ directory for context
 3. Check the process.json for current state
 4. Consult the documentation files
 

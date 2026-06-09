@@ -178,8 +178,8 @@
     "description": "Read log → Analyze for improvements (with deep dive: trace execution, find ALL affected files) → Prioritize → For each: propose → implement → approve → Next → Summarize all"
   },
   "memoryFileUsage": {
-    "readFrom": "Process log (log.json)",
-    "writeTo": "Step results and decisions",
+    "readFrom": [],
+    "writeTo": [],
     "fields": [
       "Improvements Identified: List with descriptions",
       "Improvements Implemented: Each with Change, Files Modified, User Approval, Impact",

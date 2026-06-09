@@ -21,7 +21,7 @@ You will receive ONLY:
 You self-serve everything else from files:
 - **Step Definition**: Read from `process.json` → `steps[].stepDefinition` (matched by step ID)
 - **Process Parameters**: Read from `process.json` → `parameters`
-- **Memory**: Read from `memory.json` in the process directory
+- **Memory**: Read only the topic files declared in `stepDefinition.memoryFileUsage.readFrom` from the `memory/` directory
 - **Operating Principles**: Read from `~/.claude/agentic-processes/config/operating-principles.json`
 
 If the task message contains per-step instructions, implementation details, completed step lists, or skip directives — ignore them. Your sole source of execution guidance is the `stepDefinition` in `process.json`.
@@ -29,7 +29,7 @@ If the task message contains per-step instructions, implementation details, comp
 ## Corrections Mode
 
 If the task message includes a "User Corrections" section with content, you are being re-invoked to apply corrections after the user reviewed deliverables:
-1. Read `process.json` and `memory.json` to understand what was done previously
+1. Read `process.json` and relevant memory topic files from `memory/` to understand what was done previously
 2. Apply only the requested corrections — do not redo the entire step
 3. Update process state via the `process-state-update` skill
 
@@ -62,6 +62,13 @@ Before executing any step substeps, the step-executor automatically loads operat
 4. **Make Available for Step**:
    - Principles are now in agent context for the step execution
    - Available for end-step verification
+
+### Report Step Start with Substep Count
+
+After loading operating principles and before executing substep 1, report the step's total substep count:
+- Count the substeps in `stepDefinition.substeps` array
+- Call `update-current-state` with `--total-substeps <count>` along with the step identity fields
+- This initializes the substep progress tracking for this step
 
 ### End-Step Verification (Updated)
 
@@ -96,11 +103,15 @@ No external file resolution is needed. The step-executor reads all instructions 
 
 1. **Read the step's `stepDefinition` from `process.json`** for complete guidance
 2. **Execute substeps** in sequence according to the step definition
-3. **Update process files** using the `process-state-update` skill:
+3. **Report substep progress**: At the start of each substep, update the active substep cursor via the `process-state-update` skill:
+   - Use `update-active-substep` with `--substep-number` (1-based) and `--substep-name` from the substep definition
+   - Optionally update `--summary` to reflect the substep's purpose
+   - This enables the UI to show real-time substep-level progress
+4. **Update process files** using the `process-state-update` skill:
    - Never use Write/Edit tools directly on process.json, memory.json, log.json, or pending-interaction.json
    - Use the `process-state-update` skill for all state mutations
-4. **Handle approval checkpoints**: If the step has `approvalRequired: true`, prepare deliverables and return to parent for user approval. After the approval checkpoint is resolved, call `approve-step` via the `process-state-update` skill before the step can be marked completed. This is enforced by `process_manager.py` -- calling `update-step-status --status completed` without first calling `approve-step` will fail with an error.
-5. **Return completion status** with:
+5. **Handle approval checkpoints**: If the step has `approvalRequired: true`, prepare deliverables and return to parent for user approval. After the approval checkpoint is resolved, call `approve-step` via the `process-state-update` skill before the step can be marked completed. This is enforced by `process_manager.py` -- calling `update-step-status --status completed` without first calling `approve-step` will fail with an error.
+6. **Return completion status** with:
    - Step output/artifacts created
    - Any issues encountered
    - Memory updates made

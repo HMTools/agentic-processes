@@ -10,7 +10,7 @@
     {"name": "Overview", "description": "Introduction to process management"},
     {"name": "Creating Processes", "description": "How to create new processes"},
     {"name": "Running Processes", "description": "Executing and tracking process progress"},
-    {"name": "Memory Management", "description": "Using memory files for continuity"},
+    {"name": "Memory Management", "description": "Using topic-based memory files for continuity"},
     {"name": "Logging", "description": "Logging conventions and requirements"},
     {"name": "Sub-Processes", "description": "Creating and managing child processes for delegation or parallel work"},
     {"name": "Continuous Improvement", "description": "Learning from process execution"}

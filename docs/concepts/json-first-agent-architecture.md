@@ -107,7 +107,7 @@ Complete schema containing everything the agent needs:
     "steps": ["Step1", "Step2", "Decision", "Step3"]
   },
   "memoryFileUsage": {
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Current step section in memory/ directory",
     "fields": ["Information Produced", "Files Modified/Created", "Decisions Made"]
   },
   "dependencies": {
@@ -432,7 +432,7 @@ flowchart TB
     }
   ],
   "memoryFileUsage": {
-    "writeTo": "Current step section in memory.json",
+    "writeTo": "Current step section in memory/ directory",
     "fields": ["Information Produced", "Files Modified/Created"]
   }
 }
@@ -481,5 +481,5 @@ flowchart TD
 
 ## Notes
 
-- Process instance files (`process.json`, `memory.json`, `log.json` in `~/.claude/agentic-processes/`) are the sole process state files (no MD view files)
+- Process instance files (`process.json`, `memory/ directory`, `log.json` in `~/.claude/agentic-processes/`) are the sole process state files (no MD view files)
 

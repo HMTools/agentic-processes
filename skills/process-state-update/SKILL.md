@@ -1,6 +1,6 @@
 ---
 name: process-state-update
-description: Update process state files (process.json, memory.json, log.json, pending-interaction.json) via Python scripts. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, create approval checkpoints, or modify any process state file. Never use Write/Edit tools on process state files. Used by step-executor and process-continue agents.
+description: Update process state files (process.json, memory/<topic>.json, log.json, pending-interaction.json) via Python scripts. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, create approval checkpoints, or modify any process state file. Never use Write/Edit tools on process state files. Used by step-executor and process-continue agents.
 user-invocable: false
 ---
 
@@ -100,7 +100,7 @@ This workflow is **enforced by the script** -- step 6 will fail if step 5 was no
 
 ### update-current-state
 
-Update the active step pointer in `process.json`.
+Update the active step pointer in `process.json`. Supports optional substep tracking fields.
 
 **Bash**:
 ```bash
@@ -108,26 +108,64 @@ python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py update-curre
   --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
   --step-id "abc-123-uuid" \
   --step-name "Verify Changes" \
-  --summary "Reviewing applied changes for correctness"
+  --summary "Reviewing applied changes for correctness" \
+  --total-substeps 10 \
+  --substep-number 3 \
+  --substep-name "Review Each File Systematically"
 ```
 
 **PowerShell**:
 ```powershell
-python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-current-state --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --step-name "Verify Changes" --summary "Reviewing applied changes"
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-current-state --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --step-name "Verify Changes" --summary "Reviewing applied changes" --total-substeps 10
 ```
+
+**Optional substep args** (provide `--substep-number` and `--substep-name` together):
+| Flag | Description |
+|------|-------------|
+| `--total-substeps` | Total number of substeps in the step (integer) |
+| `--substep-number` | Current substep number, 1-based (integer) |
+| `--substep-name` | Name of the current substep (string) |
+
+---
+
+### update-active-substep
+
+Update only the active substep cursor within the current step, without re-specifying step identity fields. Use this for efficient substep-only updates when the step itself hasn't changed.
+
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py update-active-substep \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --substep-number 4 \
+  --substep-name "Categorize and Assign Severity to Issues" \
+  --summary "Categorizing issues found during review"
+```
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-active-substep --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --substep-number 4 --substep-name "Categorize and Assign Severity to Issues"
+```
+
+**Args**:
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--process-dir` | Yes | Process directory path |
+| `--substep-number` | Yes | Current substep number, 1-based (integer) |
+| `--substep-name` | Yes | Name of the current substep (string) |
+| `--summary` | No | Optionally update the actionSummary |
 
 ---
 
 ### add-memory-entry
 
-Add or update a step entry in `memory.json`. If the step already exists, new info/decisions/files are appended.
+Add or update a step entry in a memory topic file (`memory/<topic>.json`). If the step already exists in that topic file, new info/decisions/files are appended. Also updates `memory/_cross-references.json` with any new decisions and files.
 
 **Bash**:
 ```bash
 python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py add-memory-entry \
   --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
   --step-id "abc-123-uuid" \
-  --name "Analyze Requirements" \
+  --topic context \
   --info '{"approach": "reviewed user docs", "constraints": "must preserve API compatibility"}' \
   --decisions '["Use incremental migration", "Maintain backward compatibility"]' \
   --files '["api.py", "migration.sql"]'
@@ -135,10 +173,33 @@ python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py add-memory-e
 
 **PowerShell**:
 ```powershell
-python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" add-memory-entry --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --name "Analyze Requirements" --info '{\"approach\": \"reviewed user docs\"}' --decisions '[\"Use incremental migration\"]' --files '[\"api.py\"]'
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" add-memory-entry --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --topic context --info '{\"approach\": \"reviewed user docs\"}' --decisions '[\"Use incremental migration\"]' --files '[\"api.py\"]'
 ```
 
-**Note**: In PowerShell, escape inner quotes with backslash: `'{\"key\": \"value\"}'`
+**Topic naming convention**: lowercase, hyphen-separated, describes the data content. Examples: `context`, `identified-files`, `implementation-decisions`, `findings`, `qa-sessions`.
+
+**Note**: The `--topic` argument specifies which memory file to write to. The step name is auto-resolved from process.json. In PowerShell, escape inner quotes with backslash: `'{\"key\": \"value\"}'`
+
+---
+
+### read-memory-topic
+
+Read a specific memory topic file with access validation. The step's `memoryFileUsage.readFrom` is checked to ensure access is allowed. `_cross-references` is always readable.
+
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py read-memory-topic \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --step-id "abc-123-uuid" \
+  --topic context
+```
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" read-memory-topic --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid" --topic context
+```
+
+Returns `{"status": "ok", "topic": "context", "data": {...}}` or `{"status": "ok", "topic": "context", "data": null}` if file doesn't exist.
 
 ---
 
@@ -314,7 +375,7 @@ All flags are optional — only provided fields are appended/merged.
 
 ## Important Rules
 
-1. **Never use Write/Edit** directly on `process.json`, `memory.json`, `log.json`, or `pending-interaction.json` — always use this skill's operations
+1. **Never use Write/Edit** directly on `process.json`, `memory/*.json`, `log.json`, or `pending-interaction.json` — always use this skill's operations
 2. **Always check stdout** for the result status after each command: `{"status": "ok"}` means success
 3. **Escape JSON properly** in PowerShell: use `'{\"key\": \"value\"}'` with backslash-escaped inner quotes
 4. **Use correct path format**: Bash uses `/c/` prefix, PowerShell uses `C:/`

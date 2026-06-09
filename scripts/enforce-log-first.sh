@@ -61,7 +61,7 @@ if [ "$BLOCK_TOOL" = true ]; then
             PROCESS_DIR=$(dirname "$SESSION_FILE")
             # Try to get current step from process.json
             if [ -f "$PROCESS_DIR/process.json" ]; then
-                STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStepId',''))" 2>/dev/null)
+                STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStep',{}).get('id',''))" 2>/dev/null)
             fi
             break
         fi

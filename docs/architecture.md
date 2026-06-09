@@ -103,7 +103,7 @@ Steps are modular, self-contained definitions with:
 
 Process instances are created from templates and contain:
 - Process file (`process.json`) - Machine-readable state for tooling/UI
-- Memory file (`memory.json`) - Persistent information shared across steps
+- Memory directory (`memory/`) - Topic-based files for persistent information shared across steps
 - Log file (`log.json`) - Detailed execution log
 
 **Location**: `~/.claude/agentic-processes/{state}/process-{name}-{YYYYMMDD}-{shortid}/`
@@ -191,9 +191,16 @@ Process state is maintained in `process.json`:
   "id": "uuid",
   "status": "running",
   "currentState": {
-    "activeStepId": "uuid",
-    "activeStepName": "Step Name",
-    "actionSummary": "Working on specific task"
+    "activeStep": {
+      "id": "uuid",
+      "name": "Step Name",
+      "actionSummary": "Working on specific task",
+      "totalSubsteps": 10,
+      "currentSubstep": {
+        "number": 3,
+        "name": "Clarify Requirements"
+      }
+    }
   },
   "steps": [...]
 }
@@ -201,13 +208,25 @@ Process state is maintained in `process.json`:
 
 ### Memory State
 
-Memory state is maintained in `memory.json`:
+Memory state is maintained in the `memory/` directory with topic-based files:
 
+```
+memory/
+  _cross-references.json    # Aggregated decisions and files across all topics
+  context.json              # Context and requirements from understand-context step
+  identified-files.json     # File identification results
+  implementation-decisions.json  # Design and implementation plan data
+```
+
+Each topic file follows this structure:
 ```json
 {
-  "type": "memory-file",
-  "steps": {
+  "type": "memory-topic-file",
+  "topic": "context",
+  "lastUpdated": "2026-01-15T10:30:00.000Z",
+  "entries": {
     "step-uuid": {
+      "stepName": "Understand concept",
       "informationProduced": {},
       "decisionsMade": [],
       "filesModifiedCreated": []
@@ -269,7 +288,9 @@ AGENTS.md                            # Agent discovery
 ├── active/                          # Running processes
 │   └── process-{name}-{date}-{id}/
 │       ├── process.json             # Primary state
-│       ├── memory.json              # Cross-step info
+│       ├── memory/                  # Topic-based memory files
+│       │   ├── _cross-references.json
+│       │   └── <topic>.json
 │       └── log.json                 # Execution log
 ├── completed/                       # Finished processes
 └── failed/                          # Failed processes

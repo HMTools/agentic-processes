@@ -42,7 +42,7 @@
     "files": {
       "read": [
         "log.json",
-        "memory.json"
+        "memory/ (all topic files)"
       ],
       "create": [],
       "update": []
@@ -137,10 +137,10 @@
       "actions": [
         "Determine current process directory path (should be in ~/.claude/agentic-processes/active/)",
         "List all files in the process directory",
-        "Define allowlist of files to KEEP: [\"process.json\", \"memory.json\", \"log.json\"]",
-        "Delete all files NOT in the allowlist (*.md files, other *.json artifacts)",
-        "Verify only the three essential files remain in the directory",
-        "Output: '✓ Artifact files cleaned up - keeping only process.json, memory.json, log.json'",
+        "Define allowlist of items to KEEP: [\"process.json\", \"memory/\", \"log.json\"]",
+        "Delete all files NOT in the allowlist (*.md files, other *.json artifacts) — keep the memory/ directory intact",
+        "Verify only process.json, memory/ directory, and log.json remain",
+        "Output: '✓ Artifact files cleaned up - keeping only process.json, memory/, log.json'",
         "Check if ~/.claude/agentic-processes/completed/ directory exists; create it if not",
         "Move entire process directory from ~/.claude/agentic-processes/active/{process-id}/ to ~/.claude/agentic-processes/completed/{process-id}/",
         "Verify move was successful by checking new location exists",
@@ -152,8 +152,8 @@
     "description": "Read log → Check each principle → Document findings → Report → If compliant: Update status → Record timestamp → Move to completed"
   },
   "memoryFileUsage": {
-    "readFrom": "All previous steps in memory.json, full log.json",
-    "writeTo": "Compliance results and completion status",
+    "readFrom": [],
+    "writeTo": [],
     "fields": [
       "complianceValidated: true/false",
       "violations: []",

@@ -38,7 +38,7 @@ esac
 # Allow writes to process files
 if [ "$TOOL_NAME" = "Write" ] || [ "$TOOL_NAME" = "StrReplace" ] || [ "$TOOL_NAME" = "Edit" ]; then
   case "$FILE_PATH" in
-    *process.json|*log.json|*memory.json|*pending-interaction.json)
+    *process.json|*log.json|*memory.json|*/memory/*.json|*pending-interaction.json)
       exit 0
       ;;
   esac
@@ -54,7 +54,7 @@ if [ "$TOOL_NAME" = "Shell" ] || [ "$TOOL_NAME" = "Bash" ] || [ "$TOOL_NAME" = "
 fi
 
 # Extract step ID for actionable error message
-STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStepId',''))" 2>/dev/null)
+STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStep',{}).get('id',''))" 2>/dev/null)
 
 # Block everything else
 cat << EOF

@@ -92,7 +92,7 @@ Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-process \
   --project-path <absolute project path>)
 ```
 
-The script writes `process.json`, `memory.json`, and `log.json` directly. Check stdout for success/error.
+The script writes `process.json`, `memory/_cross-references.json`, and `log.json` directly. Check stdout for success/error.
 
 > **Auto-injected framework steps**: The script automatically appends **Continuous Improvement** and **End Process Validation** steps after the template's steps. These are defined in `framework-steps/` and use the `@framework-step:` prefix. Template authors should not include them manually.
 

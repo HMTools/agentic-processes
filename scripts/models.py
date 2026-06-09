@@ -83,30 +83,63 @@ class ProcessMetadata:
 
 
 @dataclass
-class ProcessCurrentState:
-    activeStepId: str
-    activeStepName: str
+class ActiveStepSubstep:
+    number: int
+    name: str
+
+    def to_dict(self) -> dict:
+        return {"number": self.number, "name": self.name}
+
+    @classmethod
+    def from_dict(cls, data: dict) -> ActiveStepSubstep:
+        return cls(number=data["number"], name=data["name"])
+
+
+@dataclass
+class ActiveStep:
+    id: str
+    name: str
     actionSummary: str
+    totalSubsteps: int
     actionDetails: Optional[str] = None
+    currentSubstep: Optional[ActiveStepSubstep] = None
 
     def to_dict(self) -> dict:
         d: dict[str, Any] = {
-            "activeStepId": self.activeStepId,
-            "activeStepName": self.activeStepName,
+            "id": self.id,
+            "name": self.name,
             "actionSummary": self.actionSummary,
+            "totalSubsteps": self.totalSubsteps,
         }
         if self.actionDetails is not None:
             d["actionDetails"] = self.actionDetails
+        if self.currentSubstep is not None:
+            d["currentSubstep"] = self.currentSubstep.to_dict()
         return d
 
     @classmethod
-    def from_dict(cls, data: dict) -> ProcessCurrentState:
+    def from_dict(cls, data: dict) -> ActiveStep:
+        cs = data.get("currentSubstep")
         return cls(
-            activeStepId=data["activeStepId"],
-            activeStepName=data["activeStepName"],
+            id=data["id"],
+            name=data["name"],
             actionSummary=data["actionSummary"],
+            totalSubsteps=data.get("totalSubsteps", 0),
             actionDetails=data.get("actionDetails"),
+            currentSubstep=ActiveStepSubstep.from_dict(cs) if cs else None,
         )
+
+
+@dataclass
+class ProcessCurrentState:
+    activeStep: ActiveStep
+
+    def to_dict(self) -> dict:
+        return {"activeStep": self.activeStep.to_dict()}
+
+    @classmethod
+    def from_dict(cls, data: dict) -> ProcessCurrentState:
+        return cls(activeStep=ActiveStep.from_dict(data["activeStep"]))
 
 
 @dataclass
@@ -312,10 +345,13 @@ class ProcessInstance:
             status=ProcessStatus.RUNNING,
             parameters=parameters,
             currentState=ProcessCurrentState(
-                activeStepId=steps[0].id if steps else "",
-                activeStepName=steps[0].name if steps else "",
-                actionSummary="Initializing process",
-                actionDetails="Process created, ready to begin",
+                activeStep=ActiveStep(
+                    id=steps[0].id if steps else "",
+                    name=steps[0].name if steps else "",
+                    actionSummary="Initializing process",
+                    totalSubsteps=len(steps[0].stepDefinition.get("substeps", [])) if steps else 0,
+                    actionDetails="Process created, ready to begin",
+                )
             ),
             steps=steps,
             subProcessState=sub_state,
@@ -372,30 +408,25 @@ class PendingInteractionFile:
         return cls(type="pending-interaction", options=options)
 
 
-# --- Memory File types ---
+# --- Memory File types (topic-based architecture) ---
 
 @dataclass
-class MemoryStepEntry:
-    name: str
+class MemoryTopicEntry:
+    """Entry for a single step's contribution to a topic file."""
+    stepName: str
     informationProduced: dict[str, Any] = field(default_factory=dict)
     decisionsMade: list[str] = field(default_factory=list)
     filesModifiedCreated: list[str] = field(default_factory=list)
-    status: Optional[StepStatus] = None
-    startedAt: Optional[str] = None
     updatedAt: Optional[str] = None
     notes: Optional[str] = None
 
     def to_dict(self) -> dict:
         d: dict[str, Any] = {
-            "name": self.name,
+            "stepName": self.stepName,
             "informationProduced": self.informationProduced,
             "decisionsMade": self.decisionsMade,
             "filesModifiedCreated": self.filesModifiedCreated,
         }
-        if self.status is not None:
-            d["status"] = self.status.value
-        if self.startedAt is not None:
-            d["startedAt"] = self.startedAt
         if self.updatedAt is not None:
             d["updatedAt"] = self.updatedAt
         if self.notes is not None:
@@ -403,90 +434,93 @@ class MemoryStepEntry:
         return d
 
     @classmethod
-    def from_dict(cls, data: dict) -> MemoryStepEntry:
-        status_val = data.get("status")
+    def from_dict(cls, data: dict) -> MemoryTopicEntry:
         return cls(
-            name=data["name"],
+            stepName=data.get("stepName", data.get("name", "")),
             informationProduced=data.get("informationProduced", {}),
             decisionsMade=data.get("decisionsMade", []),
             filesModifiedCreated=data.get("filesModifiedCreated", []),
-            status=StepStatus(status_val) if status_val else None,
-            startedAt=data.get("startedAt"),
             updatedAt=data.get("updatedAt"),
             notes=data.get("notes"),
         )
 
 
 @dataclass
-class MemoryFile:
+class MemoryTopicFile:
+    """Models a single topic file: memory/<topic>.json"""
     type: str
-    metadata: dict[str, Any]
-    subProcessState: dict[str, Any]
-    steps: dict[str, MemoryStepEntry]
-    crossReferences: dict[str, Any]
-    searchHelpers: dict[str, Any]
+    topic: str
+    lastUpdated: str
+    entries: dict[str, MemoryTopicEntry]
 
     def to_dict(self) -> dict:
         return {
             "type": self.type,
-            "metadata": self.metadata,
-            "subProcessState": {
-                "parentProcessPath": self.subProcessState.get("parentProcessPath"),
-                "childSubProcesses": [
-                    c if isinstance(c, dict) else c.to_dict()
-                    for c in self.subProcessState.get("childSubProcesses", [])
-                ],
-                "syncPoints": self.subProcessState.get("syncPoints", []),
-            },
-            "steps": {k: v.to_dict() for k, v in self.steps.items()},
-            "crossReferences": self.crossReferences,
-            "searchHelpers": self.searchHelpers,
+            "topic": self.topic,
+            "lastUpdated": self.lastUpdated,
+            "entries": {k: v.to_dict() for k, v in self.entries.items()},
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> MemoryFile:
-        steps = {}
-        for step_id, entry in data.get("steps", {}).items():
-            steps[step_id] = MemoryStepEntry.from_dict(entry)
+    def from_dict(cls, data: dict) -> MemoryTopicFile:
+        entries = {}
+        for step_id, entry in data.get("entries", {}).items():
+            entries[step_id] = MemoryTopicEntry.from_dict(entry)
         return cls(
-            type=data["type"],
-            metadata=data["metadata"],
-            subProcessState=data.get("subProcessState", {
-                "parentProcessPath": None,
-                "childSubProcesses": [],
-                "syncPoints": [],
-            }),
-            steps=steps,
-            crossReferences=data.get("crossReferences", {"keyDecisions": []}),
-            searchHelpers=data.get("searchHelpers", {"byCategory": {}}),
+            type=data.get("type", "memory-topic-file"),
+            topic=data.get("topic", ""),
+            lastUpdated=data.get("lastUpdated", ""),
+            entries=entries,
         )
 
     @classmethod
-    def create(
-        cls,
-        process_id: str,
-        template: str,
-        current_step: str,
-        parent_process_path: Optional[str] = None,
-    ) -> MemoryFile:
-        now = _now_iso()
+    def create(cls, topic: str) -> MemoryTopicFile:
         return cls(
-            type="memory-file",
-            metadata={
-                "process": process_id,
-                "template": template,
-                "created": now,
-                "lastUpdated": now,
-                "currentStep": current_step,
-            },
-            subProcessState={
-                "parentProcessPath": parent_process_path,
-                "childSubProcesses": [],
-                "syncPoints": [],
-            },
-            steps={},
-            crossReferences={"keyDecisions": [], "filesModified": [], "filesCreated": []},
-            searchHelpers={"byCategory": {}},
+            type="memory-topic-file",
+            topic=topic,
+            lastUpdated=_now_iso(),
+            entries={},
+        )
+
+
+@dataclass
+class MemoryCrossReferences:
+    """Models memory/_cross-references.json — aggregated data across all topics."""
+    type: str
+    keyDecisions: list[str] = field(default_factory=list)
+    filesModified: list[str] = field(default_factory=list)
+    filesCreated: list[str] = field(default_factory=list)
+    custom: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict:
+        d: dict[str, Any] = {
+            "type": self.type,
+            "keyDecisions": self.keyDecisions,
+            "filesModified": self.filesModified,
+            "filesCreated": self.filesCreated,
+        }
+        if self.custom:
+            d["custom"] = self.custom
+        return d
+
+    @classmethod
+    def from_dict(cls, data: dict) -> MemoryCrossReferences:
+        return cls(
+            type=data.get("type", "memory-cross-references"),
+            keyDecisions=data.get("keyDecisions", []),
+            filesModified=data.get("filesModified", []),
+            filesCreated=data.get("filesCreated", []),
+            custom=data.get("custom", {}),
+        )
+
+    @classmethod
+    def create(cls) -> MemoryCrossReferences:
+        return cls(
+            type="memory-cross-references",
+            keyDecisions=[],
+            filesModified=[],
+            filesCreated=[],
+            custom={},
         )
 
 

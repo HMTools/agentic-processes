@@ -30,10 +30,17 @@ import { EmbeddedStepDefinition } from "./step-definition";
  *     "userStoryDescription": "Implement login functionality"
  *   },
  *   "currentState": {
- *     "activeStepId": "a1b2c3d4-...",
- *     "activeStepName": "Create detailed step plans",
- *     "actionSummary": "Generating implementation plan",
- *     "actionDetails": "Analyzing high-level plan to create detailed steps"
+ *     "activeStep": {
+ *       "id": "a1b2c3d4-...",
+ *       "name": "Create detailed step plans",
+ *       "actionSummary": "Generating implementation plan",
+ *       "actionDetails": "Analyzing high-level plan to create detailed steps",
+ *       "totalSubsteps": 10,
+ *       "currentSubstep": {
+ *         "number": 3,
+ *         "name": "Clarify Requirements"
+ *       }
+ *     }
  *   },
  *   "steps": [...]
  * }
@@ -100,20 +107,42 @@ export interface ProcessMetadata {
 }
 
 /**
+ * Tracks which substep is currently executing within the active step.
+ * Only the cursor position is stored; completed/pending status is derived at render time.
+ */
+export interface ActiveStepSubstep {
+  /** 1-based substep number within the step */
+  number: number;
+  /** Name of the substep (e.g., "Gather Process Parameters") */
+  name: string;
+}
+
+/**
+ * Structured representation of the currently active step and its progress.
+ * Consolidates the former flat fields (activeStepId, activeStepName, actionSummary, actionDetails)
+ * into a single object and adds substep-level tracking.
+ */
+export interface ActiveStep {
+  /** UUID of the currently active step (was: activeStepId) */
+  id: StepId;
+  /** Name of the current step (was: activeStepName) */
+  name: string;
+  /** Brief summary of current action for UI status bars (was: actionSummary) */
+  actionSummary: string;
+  /** Extended details about the current action for tooltips/logs (was: actionDetails) */
+  actionDetails?: string;
+  /** Total number of substeps in this step (derived from stepDefinition.substeps) */
+  totalSubsteps: number;
+  /** Currently executing substep cursor (absent if step just started or has no substeps) */
+  currentSubstep?: ActiveStepSubstep;
+}
+
+/**
  * Current state of the process execution.
  */
 export interface ProcessCurrentState {
-  /** UUID of the currently active step */
-  activeStepId: StepId;
-  
-  /** Name of the current step */
-  activeStepName: string;
-  
-  /** Brief summary of current action (for UI status bars) */
-  actionSummary: string;
-  
-  /** Extended details about the current action (for tooltips/logs) */
-  actionDetails?: string;
+  /** Structured active step with progress tracking */
+  activeStep: ActiveStep;
 }
 
 /**

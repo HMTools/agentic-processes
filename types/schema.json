@@ -25,14 +25,33 @@
       },
       "additionalProperties": false
     },
+    "ActiveStepSubstep": {
+      "type": "object",
+      "required": ["number", "name"],
+      "properties": {
+        "number": { "type": "integer", "minimum": 1 },
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ActiveStep": {
+      "type": "object",
+      "required": ["id", "name", "actionSummary", "totalSubsteps"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string" },
+        "actionSummary": { "type": "string" },
+        "actionDetails": { "type": "string" },
+        "totalSubsteps": { "type": "integer", "minimum": 0 },
+        "currentSubstep": { "$ref": "#/$defs/ActiveStepSubstep" }
+      },
+      "additionalProperties": false
+    },
     "ProcessCurrentState": {
       "type": "object",
-      "required": ["activeStepId", "activeStepName", "actionSummary"],
+      "required": ["activeStep"],
       "properties": {
-        "activeStepId": { "type": "string", "format": "uuid" },
-        "activeStepName": { "type": "string" },
-        "actionSummary": { "type": "string" },
-        "actionDetails": { "type": "string" }
+        "activeStep": { "$ref": "#/$defs/ActiveStep" }
       },
       "additionalProperties": false
     },

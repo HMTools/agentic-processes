@@ -32,7 +32,7 @@ for SESSION_FILE in "$AGENTIC_DIR"/active/*/.session; do
     if [ -f "$SESSION_FILE" ] && [ "$(cat "$SESSION_FILE" 2>/dev/null)" = "$SESSION_ID" ]; then
         PROCESS_DIR=$(dirname "$SESSION_FILE")
         if [ -f "$PROCESS_DIR/process.json" ]; then
-            STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStepId',''))" 2>/dev/null)
+            STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStep',{}).get('id',''))" 2>/dev/null)
         fi
         break
     fi

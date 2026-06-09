@@ -37,7 +37,7 @@ export interface StepDefinition {
     description: string;
     /** Files or artifacts created */
     artifacts: string[];
-    /** Fields updated in memory.json */
+    /** Fields updated in memory topic files */
     memoryUpdates: string[];
   };
 
@@ -82,13 +82,13 @@ export interface StepDefinition {
     description: string;
   };
 
-  /** How this step uses the memory file */
+  /** How this step uses the memory topic files */
   memoryFileUsage: {
-    /** What to read from memory */
-    readFrom: string;
-    /** Where to write in memory */
-    writeTo: string;
-    /** Fields to include */
+    /** Topic files this step reads from (e.g., ["context.json", "identified-files.json"]) */
+    readFrom: string[];
+    /** Topic files this step writes to (e.g., ["findings.json"]) */
+    writeTo: string[];
+    /** Descriptive fields documenting what data is produced */
     fields: string[];
   };
 
@@ -211,8 +211,8 @@ export interface EmbeddedStepDefinition {
   };
 
   memoryFileUsage?: {
-    readFrom: string;
-    writeTo: string;
+    readFrom: string[];
+    writeTo: string[];
     fields: string[];
   };
 
