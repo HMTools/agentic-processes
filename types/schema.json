@@ -25,6 +25,17 @@
       },
       "additionalProperties": false
     },
+    "FileChange": {
+      "type": "object",
+      "required": ["path", "operation", "tool", "timestamp"],
+      "properties": {
+        "path": { "type": "string" },
+        "operation": { "type": "string", "enum": ["created", "edited", "deleted"] },
+        "tool": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
     "ActiveStepSubstep": {
       "type": "object",
       "required": ["number", "name"],
@@ -43,7 +54,11 @@
         "actionSummary": { "type": "string" },
         "actionDetails": { "type": "string" },
         "totalSubsteps": { "type": "integer", "minimum": 0 },
-        "currentSubstep": { "$ref": "#/$defs/ActiveStepSubstep" }
+        "currentSubstep": { "$ref": "#/$defs/ActiveStepSubstep" },
+        "filesChanged": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FileChange" }
+        }
       },
       "additionalProperties": false
     },

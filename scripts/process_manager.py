@@ -6,6 +6,7 @@ Subcommands:
   update-step-status       Change a step's status in process.json
   approve-step             Record explicit approval for steps with approvalRequired: true
   update-current-state     Update the active step in process.json
+  track-file-change        Track a file change in activeStep.filesChanged
   add-memory-entry         Add or update a step entry in memory/<topic>.json
   read-memory-topic        Read a memory topic file with access validation
   add-log-entry            Append actions to a step entry in log.json
@@ -37,6 +38,7 @@ from models import (
     ActiveStep,
     ActiveStepSubstep,
     ChildProcessRef,
+    FileChange,
     LogFile,
     LogStepEntry,
     MemoryCrossReferences,
@@ -524,16 +526,22 @@ def cmd_update_current_state(args: argparse.Namespace) -> None:
             name=args.substep_name,
         )
 
-    process.currentState = ProcessCurrentState(
-        activeStep=ActiveStep(
-            id=args.step_id,
-            name=args.step_name,
-            actionSummary=args.summary,
-            totalSubsteps=args.total_substeps if getattr(args, 'total_substeps', None) is not None else 0,
-            actionDetails=args.details,
-            currentSubstep=current_substep,
-        )
+    # Preserve filesChanged if same step
+    old_active = process.currentState.activeStep if process.currentState else None
+
+    new_active_step = ActiveStep(
+        id=args.step_id,
+        name=args.step_name,
+        actionSummary=args.summary,
+        totalSubsteps=args.total_substeps if getattr(args, 'total_substeps', None) is not None else 0,
+        actionDetails=args.details,
+        currentSubstep=current_substep,
     )
+
+    if old_active and old_active.id == args.step_id:
+        new_active_step.filesChanged = old_active.filesChanged
+
+    process.currentState = ProcessCurrentState(activeStep=new_active_step)
     process.metadata.lastUpdated = _now_iso()
 
     write_json(process_path, process.to_dict())
@@ -557,6 +565,41 @@ def cmd_update_active_substep(args: argparse.Namespace) -> None:
     if args.summary is not None:
         process.currentState.activeStep.actionSummary = args.summary
     process.metadata.lastUpdated = _now_iso()
+
+    write_json(process_path, process.to_dict())
+    _ok("process.json")
+
+
+def cmd_track_file_change(args: argparse.Namespace) -> None:
+    process_dir = Path(args.process_dir)
+    process_path = process_dir / "process.json"
+
+    if not process_path.exists():
+        _error(f"process.json not found in {process_dir}")
+
+    data = read_json(process_path)
+    process = ProcessInstance.from_dict(data)
+
+    file_change = FileChange(
+        path=args.file_path,
+        operation=args.operation,
+        tool=args.tool,
+        timestamp=_now_iso(),
+    )
+
+    if process.currentState.activeStep.filesChanged is None:
+        process.currentState.activeStep.filesChanged = []
+
+    # Upsert by path: if an entry with the same path exists, replace it
+    existing_idx = next(
+        (i for i, fc in enumerate(process.currentState.activeStep.filesChanged)
+         if fc.path == file_change.path),
+        None,
+    )
+    if existing_idx is not None:
+        process.currentState.activeStep.filesChanged[existing_idx] = file_change
+    else:
+        process.currentState.activeStep.filesChanged.append(file_change)
 
     write_json(process_path, process.to_dict())
     _ok("process.json")
@@ -1397,6 +1440,14 @@ def main() -> None:
     p_substep.add_argument("--substep-name", required=True)
     p_substep.add_argument("--summary", default=None, help="Optionally update actionSummary")
     p_substep.set_defaults(func=cmd_update_active_substep)
+
+    # track-file-change
+    p_track = subparsers.add_parser("track-file-change", help="Track a file change in activeStep")
+    p_track.add_argument("--process-dir", required=True)
+    p_track.add_argument("--file-path", required=True)
+    p_track.add_argument("--operation", required=True, choices=["created", "edited", "deleted"])
+    p_track.add_argument("--tool", required=True)
+    p_track.set_defaults(func=cmd_track_file_change)
 
     # add-memory-entry
     p_mem = subparsers.add_parser("add-memory-entry", help="Add/update step in memory topic file")

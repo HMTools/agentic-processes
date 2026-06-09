@@ -82,7 +82,8 @@
       "Bash(bash -n \"C:\\\\Projects\\\\HM\\\\agentic-processes\\\\scripts\\\\enforce-log-on-stop.sh\")",
       "Bash(git commit -m ' *)",
       "Bash(mkdir -p __TRACKED_VAR__/.claude/agentic-processes/completed)",
-      "Bash(mv __TRACKED_VAR__/.claude/agentic-processes/active/json-qa-session-feature-20260512 __TRACKED_VAR__/.claude/agentic-processes/completed/)"
+      "Bash(mv __TRACKED_VAR__/.claude/agentic-processes/active/json-qa-session-feature-20260512 __TRACKED_VAR__/.claude/agentic-processes/completed/)",
+      "Bash(powershell *)"
     ],
     "additionalDirectories": [
       "C:\\Projects\\HM\\agentic-processes-ui",

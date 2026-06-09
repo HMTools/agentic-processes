@@ -96,6 +96,31 @@ class ActiveStepSubstep:
 
 
 @dataclass
+class FileChange:
+    path: str
+    operation: str  # 'created' | 'edited' | 'deleted'
+    tool: str
+    timestamp: str
+
+    def to_dict(self) -> dict:
+        return {
+            "path": self.path,
+            "operation": self.operation,
+            "tool": self.tool,
+            "timestamp": self.timestamp,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> FileChange:
+        return cls(
+            path=data["path"],
+            operation=data["operation"],
+            tool=data["tool"],
+            timestamp=data["timestamp"],
+        )
+
+
+@dataclass
 class ActiveStep:
     id: str
     name: str
@@ -103,6 +128,7 @@ class ActiveStep:
     totalSubsteps: int
     actionDetails: Optional[str] = None
     currentSubstep: Optional[ActiveStepSubstep] = None
+    filesChanged: Optional[list] = None  # List[FileChange]
 
     def to_dict(self) -> dict:
         d: dict[str, Any] = {
@@ -115,11 +141,15 @@ class ActiveStep:
             d["actionDetails"] = self.actionDetails
         if self.currentSubstep is not None:
             d["currentSubstep"] = self.currentSubstep.to_dict()
+        if self.filesChanged is not None:
+            d["filesChanged"] = [fc.to_dict() for fc in self.filesChanged]
         return d
 
     @classmethod
     def from_dict(cls, data: dict) -> ActiveStep:
         cs = data.get("currentSubstep")
+        fc_list = data.get("filesChanged")
+        filesChanged = [FileChange.from_dict(fc) for fc in fc_list] if fc_list else None
         return cls(
             id=data["id"],
             name=data["name"],
@@ -127,6 +157,7 @@ class ActiveStep:
             totalSubsteps=data.get("totalSubsteps", 0),
             actionDetails=data.get("actionDetails"),
             currentSubstep=ActiveStepSubstep.from_dict(cs) if cs else None,
+            filesChanged=filesChanged,
         )
 
 

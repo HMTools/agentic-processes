@@ -156,6 +156,36 @@ python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-acti
 
 ---
 
+### track-file-change
+
+Track a file operation in `currentState.activeStep.filesChanged`. Called automatically by the PostToolUse hook -- agents do not call this directly. Uses upsert-by-path: at most one entry per unique file path, latest operation always wins.
+
+**Bash**:
+```bash
+python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py track-file-change \
+  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
+  --file-path "/c/Projects/myproject/src/app.ts" \
+  --operation edited \
+  --tool Edit
+```
+
+**PowerShell**:
+```powershell
+python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" track-file-change --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --file-path "C:/Projects/myproject/src/app.ts" --operation edited --tool Edit
+```
+
+**Args**:
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--process-dir` | Yes | Process directory path |
+| `--file-path` | Yes | Absolute path of the changed file |
+| `--operation` | Yes | One of: `created`, `edited`, `deleted` |
+| `--tool` | Yes | Tool name that performed the operation (Write, Edit, etc.) |
+
+**Note**: This is called by the PostToolUse hook script (`track-file-change.sh`), not by agents directly. The hook fires on every Write, Edit, or StrReplace tool use and records the file change in the active step.
+
+---
+
 ### add-memory-entry
 
 Add or update a step entry in a memory topic file (`memory/<topic>.json`). If the step already exists in that topic file, new info/decisions/files are appended. Also updates `memory/_cross-references.json` with any new decisions and files.

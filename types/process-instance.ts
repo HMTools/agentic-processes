@@ -118,6 +118,21 @@ export interface ActiveStepSubstep {
 }
 
 /**
+ * A record of a file operation performed during step execution.
+ * Tracked automatically by the PostToolUse hook.
+ */
+export interface FileChange {
+  /** Absolute file path */
+  path: string;
+  /** What happened to the file */
+  operation: 'created' | 'edited' | 'deleted';
+  /** Which tool performed it (Write, Edit, Bash) */
+  tool: string;
+  /** When it happened */
+  timestamp: string;
+}
+
+/**
  * Structured representation of the currently active step and its progress.
  * Consolidates the former flat fields (activeStepId, activeStepName, actionSummary, actionDetails)
  * into a single object and adds substep-level tracking.
@@ -135,6 +150,8 @@ export interface ActiveStep {
   totalSubsteps: number;
   /** Currently executing substep cursor (absent if step just started or has no substeps) */
   currentSubstep?: ActiveStepSubstep;
+  /** Files changed during this step's execution, tracked by PostToolUse hook */
+  filesChanged?: FileChange[];
 }
 
 /**
