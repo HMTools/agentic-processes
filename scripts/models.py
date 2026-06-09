@@ -154,6 +154,10 @@ class ProcessStep:
     approvalRequired: Optional[bool] = None
     approved: Optional[bool] = None
     stepDefinition: dict[str, Any] = field(default_factory=dict)
+    subProcessTrigger: Optional[dict[str, Any]] = None
+    loopBackTo: Optional[int] = None
+    loopCondition: Optional[str] = None
+    maxIterations: Optional[int] = None
 
     def to_dict(self) -> dict:
         d: dict[str, Any] = {
@@ -172,6 +176,14 @@ class ProcessStep:
         if self.approved is not None:
             d["approved"] = self.approved
         d["stepDefinition"] = self.stepDefinition
+        if self.subProcessTrigger is not None:
+            d["subProcessTrigger"] = self.subProcessTrigger
+        if self.loopBackTo is not None:
+            d["loopBackTo"] = self.loopBackTo
+        if self.loopCondition is not None:
+            d["loopCondition"] = self.loopCondition
+        if self.maxIterations is not None:
+            d["maxIterations"] = self.maxIterations
         return d
 
     @classmethod
@@ -187,6 +199,10 @@ class ProcessStep:
             approvalRequired=data.get("approvalRequired"),
             approved=data.get("approved"),
             stepDefinition=data.get("stepDefinition", {}),
+            subProcessTrigger=data.get("subProcessTrigger"),
+            loopBackTo=data.get("loopBackTo"),
+            loopCondition=data.get("loopCondition"),
+            maxIterations=data.get("maxIterations"),
         )
 
 

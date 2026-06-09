@@ -99,9 +99,92 @@ The script writes `process.json`, `memory/_cross-references.json`, and `log.json
 ### 6. Start Process (Auto-Execute Step 0)
 
 - Display summary
-- **Automatically execute Step 0** (Init Process Principles) — do NOT ask for confirmation
-- After Step 0, invoke the `step-executor-delegation` skill with the process directory and step ID to execute the next step
+- For each step (starting from step 0), check if it is a **sub-process orchestrator step** (see section below) or a regular step, and handle accordingly
 - **CRITICAL**: `approvalRequired: true` means **post-execution approval of deliverables**. NEVER write `pending-interaction.json` or ask for user permission before a step runs.
+
+### 7. Step Execution Loop
+
+For each step in the process, determine its type and execute accordingly:
+
+**Regular step** (has non-empty `stepDefinition`):
+- Invoke the `step-executor-delegation` skill with the process directory and step ID
+- Handle `approvalRequired` checkpoints (see Handling User Corrections below)
+- After completion, advance to the next step
+
+**Sub-process orchestrator step** (has `subProcessTrigger` AND empty `stepDefinition`):
+- Follow the **Sub-Process Step Handling** protocol below
+- Do NOT call `step-executor-delegation` for these steps — the step-executor cannot handle them
+
+### Sub-Process Step Handling
+
+When a step has `subProcessTrigger` in `process.json` and an empty `stepDefinition`, it is a sub-process orchestrator step. Instead of delegating to the step-executor, drive the child process directly:
+
+#### A. Resolve Template and Parameters
+
+1. Read `subProcessTrigger.template` (e.g., `"sdlc/plan-work-item"`)
+2. Resolve template path: `~/.claude/agentic-processes/templates/processes/{template}/{basename}.json`
+   - Example: `sdlc/plan-work-item` → `~/.claude/agentic-processes/templates/processes/sdlc/plan-work-item/plan-work-item.json`
+3. Resolve parameters: For each value in `subProcessTrigger.parameters`, replace `{{paramName}}` placeholders with actual values from the parent's `process.parameters`
+   - Example: `"{{workItemId}}"` with parent param `workItemId: "1274362"` → `"1274362"`
+
+#### B. Create Child Process
+
+1. Generate child directory: `~/.claude/agentic-processes/active/{child-name}-{YYYYMMDD}-{HHmmss}/`
+2. Read parent `process.json` to get parent ID and name
+3. Determine the `return-to-step`: the UUID of the **next** step after the current one in the parent process
+4. Create child process:
+   ```
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-process \
+     --template-path <resolved template path> \
+     --name "<step name>" \
+     --params '<resolved parameters JSON>' \
+     --process-dir <child directory> \
+     --project-path <same as parent> \
+     --parent-process-path <parent process directory> \
+     --parent-id <parent process ID> \
+     --parent-name <parent process name> \
+     --return-to-step <next parent step UUID>
+   ```
+
+#### C. Register Child in Parent
+
+```
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py register-child-process \
+  --process-dir <parent process directory> \
+  --child-id <child process ID from child process.json> \
+  --child-name <child process name> \
+  --child-status running \
+  --spawned-at-step <parent step UUID that has subProcessTrigger> \
+  --sync-point <parent step UUID (same step for syncPoint: "immediate")> \
+  --child-process-path <child process directory>
+```
+
+#### D. Bind Session to Child
+
+1. Write an empty `.session` file in the child process directory
+2. Verify the hook fills it with the session ID
+
+#### E. Drive Child Process Steps
+
+Read the child's `process.json`. For each child step in order:
+
+1. Check if the child step itself is a sub-process orchestrator step (recursive) or a regular step
+2. **Regular child step**: Call `step-executor-delegation "<child-process-dir>" "<child-step-id>"`
+3. Handle `approvalRequired` on child steps the same way as parent steps (present deliverables, wait for approval, handle corrections)
+4. After each child step completes, advance to the next child step
+
+#### F. Complete Child and Parent Step
+
+1. After all child steps are done, complete the child process:
+   ```
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-process-status \
+     --process-dir <child directory> \
+     --status completed \
+     --summary "<brief summary of what the child process accomplished>"
+   ```
+   This automatically updates the parent's `subProcessState.childProcesses` status.
+2. Mark the parent orchestrator step as completed
+3. Continue to the next parent step
 
 ## Handling User Corrections at Approval Checkpoints
 
@@ -112,17 +195,6 @@ When a step has `approvalRequired: true` and the user provides corrections inste
 3. Wait for skill/subagent completion
 4. Present updated deliverables for re-approval
 5. Repeat until user provides simple approval
-
-## Sub-Process Creation
-
-When invoked from within an active process (spawning a sub-process):
-
-1. Detect parent context (active parent process path, spawn step)
-2. Read parent's process.json to get parent ID and name
-3. Delegate to process-spawner subagent with template path, parameters, and parent context
-4. The script's `--parent-process-path`, `--parent-id`, `--parent-name`, and `--return-to-step` args set up the parent reference in the child's process.json
-5. Use `register-child-process` to add this child to the parent's process.json (required for UI diagram)
-6. Return control to parent process after creation
 
 ## JSON-Only Architecture
 

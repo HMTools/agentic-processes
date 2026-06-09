@@ -79,8 +79,9 @@ export interface TemplateDefinition {
     conditional?: string;
     /** Sub-process triggering configuration */
     subProcessTrigger?: {
-      condition: string;
+      condition?: string;
       template: string;
+      parameters?: Record<string, string>;
       forEach?: string;
       syncPoint: string;
     };

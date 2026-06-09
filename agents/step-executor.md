@@ -88,6 +88,10 @@ The end-step verification now checks compliance with loaded principles:
 
 ## Execution Protocol
 
+### Sub-Process Orchestrator Guard
+
+If the step's `stepDefinition` is empty (no guidance, no substeps) and the step has a `subProcessTrigger` field, this is a sub-process orchestrator step. It should have been handled by the parent process driver (process-new/process-continue), which detects `subProcessTrigger` and spawns child processes. Do NOT improvise or execute based on the step name. Return an error: "This step requires sub-process spawning. It should be driven by the parent orchestrator, not the step-executor."
+
 ### Step Definition Resolution
 
 Step definitions are embedded directly in the process instance. Each step in `process.json` contains a `stepDefinition` field with full execution guidance.

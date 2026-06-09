@@ -23,7 +23,7 @@ Execute the step identified below.
 6. Execute according to the stepDefinition's guidance, substeps, and flow
 7. Update process state via the `process-state-update` skill (use `--topic` for memory writes)
 
-If the stepDefinition is empty, use the step name and process parameters to determine what to do.
+If the stepDefinition is empty, this is a sub-process orchestrator step that should have been handled by process-new/process-continue (which detect `subProcessTrigger` and spawn child processes). Do NOT improvise or execute based on the step name. Return an error: "Empty stepDefinition — this is a sub-process orchestrator step. It must be driven by the parent process driver, not the step-executor."
 
 ## User Corrections
 $corrections

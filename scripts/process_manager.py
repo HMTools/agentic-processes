@@ -312,6 +312,10 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             stepRef=step_ref or "",
             approvalRequired=step_def.get("approvalRequired"),
             stepDefinition=step_definition,
+            subProcessTrigger=step_def.get("subProcessTrigger"),
+            loopBackTo=step_def.get("loopBackTo"),
+            loopCondition=step_def.get("loopCondition"),
+            maxIterations=step_def.get("maxIterations"),
         ))
 
     # --- Auto-inject framework steps ---
