@@ -742,7 +742,7 @@ body {
 <script>
 const ROADMAP = {
   "name": "Agentic Processes",
-  "generated": "2026-06-06T20:14:31.864081+00:00",
+  "generated": "2026-06-10T17:33:24.605550+00:00",
   "milestones": [
     {
       "name": "backlog",
@@ -812,25 +812,6 @@ const ROADMAP = {
       "notes": "",
       "acceptance_criteria": [],
       "illustration": "validation-check"
-    },
-    {
-      "id": "RM-004",
-      "title": "Change memory from single file to multiple files",
-      "description": "Split the memory.json monolith into multiple memory files for better modularity, reduced merge conflicts, and more granular access patterns.",
-      "type": "improvement",
-      "status": "proposed",
-      "priority": "high",
-      "category": "framework",
-      "milestone": "backlog",
-      "effort": "",
-      "tags": [],
-      "dependencies": [],
-      "created": "2026-05-29",
-      "updated": "2026-05-29",
-      "author": "matanha@payoneer.com",
-      "notes": "",
-      "acceptance_criteria": [],
-      "illustration": "memory-storage"
     },
     {
       "id": "RM-005",
@@ -1194,25 +1175,6 @@ const ROADMAP = {
       "illustration": "diagram-flow"
     },
     {
-      "id": "RM-028",
-      "title": "Persistent file modification tracking",
-      "description": "Create a persistent way to see which files have been modified across the entire process, not just what is in the process instance folder.",
-      "type": "improvement",
-      "status": "proposed",
-      "priority": "medium",
-      "category": "ui",
-      "milestone": "backlog",
-      "effort": "",
-      "tags": [],
-      "dependencies": [],
-      "created": "2026-05-29",
-      "updated": "2026-05-29",
-      "author": "matanha@payoneer.com",
-      "notes": "",
-      "acceptance_criteria": [],
-      "illustration": "file-document"
-    },
-    {
       "id": "RM-029",
       "title": "Better UX for reviewing processes",
       "description": "Add more super-easy UX ways for reviewing processes, potentially moving beyond markdown to richer interactive formats.",
@@ -1271,7 +1233,7 @@ const ROADMAP = {
     },
     {
       "id": "RM-032",
-      "title": "Consider rebranding to DetA (Deterministic Agents)",
+      "title": "Rebrand framework to Seder (Structured Deterministic Processes)",
       "description": "Evaluate renaming the project from Agentic Processes to DetA (Deterministic Agents) to better communicate the framework's core value: turning non-deterministic AI agent behavior into structured, repeatable, deterministic workflows.",
       "type": "idea",
       "status": "proposed",
@@ -1282,9 +1244,9 @@ const ROADMAP = {
       "tags": [],
       "dependencies": [],
       "created": "2026-05-30",
-      "updated": "2026-05-30",
+      "updated": "2026-06-10",
       "author": "matanha@payoneer.com",
-      "notes": "",
+      "notes": "Decided on name 'Seder' - Hebrew for 'order/sequence'. The Passover Seder metaphor maps perfectly: a template (Haggadah) defines ordered steps, encodes institutional knowledge across generations, supports pause and resume, and each step has specific instructions. Tagline direction: 'Deterministic AI workflows'. Previous candidates considered: DetA, Golem, Masa, Ordo, Grit, and ~60 others.",
       "acceptance_criteria": [],
       "illustration": "deploy-rocket"
     },
@@ -1332,9 +1294,99 @@ const ROADMAP = {
       "notes": "",
       "acceptance_criteria": [],
       "illustration": "dynamic-workflow"
+    },
+    {
+      "id": "RM-035",
+      "title": "Memory Visualization UX for Templates and Instances",
+      "description": "Add rich memory visualization views to both template and instance screens in the UI app. For templates: display a clear mapping of which steps read from or write to which memory files, giving template authors visibility into the memory flow across the process. For instances: show the same step-to-memory mapping plus deeper runtime details — current memory file contents, change history per step execution, diffs between memory states, and which step last modified each memory topic. The goal is to make memory a first-class, easily explorable part of the process UX rather than a hidden implementation detail.",
+      "type": "feature",
+      "status": "proposed",
+      "priority": "medium",
+      "category": "ui",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [
+        "ui",
+        "memory",
+        "templates",
+        "instances",
+        "ux"
+      ],
+      "dependencies": [],
+      "created": "2026-06-10",
+      "updated": "2026-06-10",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "memory-storage"
+    },
+    {
+      "id": "RM-036",
+      "title": "Create official framework wiki on Mintlify",
+      "description": "Build a public-facing documentation site for the Agentic Processes framework using Mintlify. Cover architecture, getting started guides, skill authoring, process templates, memory system, and API reference.",
+      "type": "documentation",
+      "status": "proposed",
+      "priority": "high",
+      "category": "framework",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [
+        "docs",
+        "mintlify",
+        "wiki"
+      ],
+      "dependencies": [],
+      "created": "2026-06-10",
+      "updated": "2026-06-10",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "file-document"
+    },
+    {
+      "id": "RM-037",
+      "title": "Host roadmap HTML on GitHub Pages",
+      "description": "Set up GitHub Pages hosting for ROADMAP.html so users can be directed to a live URL to view the full project roadmap, rather than needing local access to the repository.",
+      "type": "feature",
+      "status": "proposed",
+      "priority": "medium",
+      "category": "infrastructure",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [
+        "hosting",
+        "documentation"
+      ],
+      "dependencies": [],
+      "created": "2026-06-10",
+      "updated": "2026-06-10",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "deploy-rocket"
     }
   ],
   "archived": [
+    {
+      "id": "RM-004",
+      "title": "Change memory from single file to multiple files",
+      "description": "Split the memory.json monolith into multiple memory files for better modularity, reduced merge conflicts, and more granular access patterns.",
+      "type": "improvement",
+      "status": "proposed",
+      "priority": "high",
+      "category": "framework",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [],
+      "dependencies": [],
+      "created": "2026-05-29",
+      "updated": "2026-05-29",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "memory-storage",
+      "_archived": true
+    },
     {
       "id": "RM-015",
       "title": "Default steps to template scope",
@@ -1413,6 +1465,26 @@ const ROADMAP = {
       "notes": "",
       "acceptance_criteria": [],
       "illustration": "step-executor",
+      "_archived": true
+    },
+    {
+      "id": "RM-028",
+      "title": "Persistent file modification tracking",
+      "description": "Create a persistent way to see which files have been modified across the entire process, not just what is in the process instance folder.",
+      "type": "improvement",
+      "status": "proposed",
+      "priority": "medium",
+      "category": "ui",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [],
+      "dependencies": [],
+      "created": "2026-05-29",
+      "updated": "2026-05-29",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "file-document",
       "_archived": true
     }
   ]

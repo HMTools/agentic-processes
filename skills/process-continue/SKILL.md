@@ -89,6 +89,8 @@ For each step, determine its type and execute accordingly:
   7. Then call `update-step-status --status completed` (will succeed because `approved=true`)
   - **Note**: Step 7 will fail with an error if step 6 was not called -- this is enforced by `process_manager.py`
 
+**Never call `approve-step` based on a conversational response.** A user saying "yes" to a mid-step question (assumption validation, clarification, follow-up) is NOT approval of the step's deliverable. Only call `approve-step` after: (1) the deliverable file is fully created/updated, (2) you presented it with explicit approval options via `write-pending`, and (3) the user's response directly addresses the deliverable approval.
+
 **Handle user corrections**: Log interaction via `process-state-update` skill, then re-invoke the `step-executor-delegation` skill with the corrections as the third argument: `step-executor-delegation "<process-dir>" "<step-id>" "<user corrections>"`. Re-present updated deliverables.
 
 After step completion, update process state and proceed to the next step.

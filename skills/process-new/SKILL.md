@@ -186,7 +186,27 @@ Read the child's `process.json`. For each child step in order:
 2. Mark the parent orchestrator step as completed
 3. Continue to the next parent step
 
-## Handling User Corrections at Approval Checkpoints
+## Handling Approval Checkpoints
+
+### Distinguishing mid-step answers from deliverable approval
+
+**Never call `approve-step` based on a conversational response.** A user saying "yes" to a mid-step question (assumption validation, clarification, follow-up) is NOT approval of the step's deliverable.
+
+Only call `approve-step` after ALL of these conditions are met:
+1. The step's deliverable file has been fully created/updated (e.g., `step0-context.md`, `implementation-plan.md`)
+2. You presented the deliverable to the user with explicit approval options (approve/reject/modify) via `write-pending`
+3. The user's response directly addresses the deliverable approval — not a follow-up question, assumption confirmation, or clarification
+
+**Examples of what is NOT approval:**
+- User confirms an assumption → mid-step answer, continue the step
+- User answers a clarifying question → mid-step answer, continue the step
+- User says "yes" to a suggested approach → mid-step answer, continue the step
+
+**Examples of what IS approval:**
+- User says "approved" / "approve all" after reviewing the deliverable file
+- User selects "Approve" from the pending-interaction options
+
+### Handling corrections at approval checkpoints
 
 When a step has `approvalRequired: true` and the user provides corrections instead of simple approval:
 

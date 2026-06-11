@@ -1,0 +1,22 @@
+{
+  "id": "RM-037",
+  "title": "Host roadmap HTML on GitHub Pages",
+  "description": "Set up GitHub Pages hosting for ROADMAP.html so users can be directed to a live URL to view the full project roadmap, rather than needing local access to the repository.",
+  "type": "feature",
+  "status": "proposed",
+  "priority": "medium",
+  "category": "infrastructure",
+  "milestone": "backlog",
+  "effort": "",
+  "tags": [
+    "hosting",
+    "documentation"
+  ],
+  "dependencies": [],
+  "created": "2026-06-10",
+  "updated": "2026-06-10",
+  "author": "matanha@payoneer.com",
+  "notes": "",
+  "acceptance_criteria": [],
+  "illustration": "deploy-rocket"
+}
