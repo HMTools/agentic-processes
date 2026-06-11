@@ -264,6 +264,8 @@ After syncing, templates are available at:
 
 ## Roadmap
 
+View the full interactive roadmap: [https://hmtools.github.io/agentic-processes/](https://hmtools.github.io/agentic-processes/)
+
 ### Agentic Processes (Framework Plugin)
 - add `stepType` with enum `spawn` (subprocess) `direct` (regular step template) and also show it in the UI, think if we can also connect in case of spawn what is the process template target so we will be able to show it also in the ui
 - replace `guidelines` with `flavors` (not a must), and make it `compile` time so the process instance files will have the flavor in it on creation so the active process will not need to take it into account
