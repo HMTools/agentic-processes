@@ -67,12 +67,13 @@ When `/process-new` is invoked:
 
 ### 4. Verify Step Definitions
 
-- Each step's `stepRef` is a simple name (e.g., `"understand-context"`) referencing a subfolder of the process template directory
-- At process creation time, `process_manager.py` resolves `stepRef` by reading `{template_dir}/{stepRef}/{stepRef}.json` and embedding the step definition into the process instance
+- Each step's `stepRef` is a UUID matching the `id` field of a step definition JSON file in a subdirectory of the template directory
+- At process creation time, `process_manager.py` resolves `stepRef` by scanning template subdirectories for step definition files with a matching `id` field and embedding the step definition into the process instance
+- The `stepRefName` companion field provides human-readable display text (e.g., `"understand-context"`) -- it is never used for resolution
 - Steps with `stepRef: null` (e.g., sub-process spawner steps) are orchestrator steps with empty stepDefinition
 - Templates do NOT embed `stepDefinition` inline -- step definitions live in dedicated step subfolders
 
-> **Framework steps**: Steps using the `@framework-step:name` prefix are auto-injected by `process_manager.py` at process creation time. Their full definitions are embedded in `process.json` as `stepDefinition`. Template authors do not include these steps -- they are appended automatically.
+> **Framework steps**: Framework steps are auto-injected by `process_manager.py` at process creation time. They are identified by `"type": "framework-step"` in their JSON definition and use plain UUID `stepRef` values (no prefix). Their full definitions are embedded in `process.json` as `stepDefinition`. Template authors do not include these steps -- they are appended automatically.
 
 ### 5. Create Process Instance (MANDATORY)
 
@@ -93,7 +94,7 @@ Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-process \
 
 The script writes `process.json`, `memory/_cross-references.json`, and `log.json` directly. Check stdout for success/error.
 
-> **Auto-injected framework steps**: The script automatically appends **Continuous Improvement** and **End Process Validation** steps after the template's steps. These are defined in `framework-steps/` and use the `@framework-step:` prefix. Template authors should not include them manually.
+> **Auto-injected framework steps**: The script automatically appends **Continuous Improvement** and **End Process Validation** steps after the template's steps. These are defined in `framework-steps/` and use plain UUID `stepRef` values. Framework steps are distinguished by `"type": "framework-step"` in their definition. Template authors should not include them manually.
 
 ### 6. Start Process (Auto-Execute Step 0)
 
@@ -120,9 +121,8 @@ When a step has `subProcessTrigger` in `process.json` and an empty `stepDefiniti
 
 #### A. Resolve Template and Parameters
 
-1. Read `subProcessTrigger.template` (e.g., `"sdlc/plan-work-item"`)
-2. Resolve template path: `~/.claude/agentic-processes/templates/processes/{template}/{basename}.json`
-   - Example: `sdlc/plan-work-item` → `~/.claude/agentic-processes/templates/processes/sdlc/plan-work-item/plan-work-item.json`
+1. Read `subProcessTrigger.template` (a UUID matching a template's `id` field). The `templateName` companion field (e.g., `"sdlc/plan-work-item"`) provides human-readable context.
+2. Resolve template path: scan `~/.claude/agentic-processes/templates/processes/` subdirectories for a template JSON file whose `id` field matches the UUID
 3. Resolve parameters: For each value in `subProcessTrigger.parameters`, replace `{{paramName}}` placeholders with actual values from the parent's `process.parameters`
    - Example: `"{{workItemId}}"` with parent param `workItemId: "1274362"` → `"1274362"`
 

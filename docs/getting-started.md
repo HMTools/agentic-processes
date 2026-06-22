@@ -128,7 +128,7 @@ Processes can be in three states:
 
 Templates define reusable workflows:
 - Use parameter placeholders: `{{paramName}}`
-- Reference steps by simple name via `stepRef` (e.g., `"understand-context"`)
+- Reference steps by UUID via `stepRef`, with `stepRefName` as human-readable companion
 - Include flow diagrams
 - Define sequential steps
 
@@ -141,15 +141,16 @@ Steps are subdirectories of their process template directory. Each step subdirec
 
 ### Step References
 
-Templates reference steps using a simple name that maps to a sibling subfolder:
+Templates reference steps using a UUID that matches the `id` field of the step definition:
 ```json
 {
-  "stepRef": "understand-context"
+  "stepRef": "28047be4-e7c5-4152-8329-2929982ad042",
+  "stepRefName": "understand-context"
 }
 ```
-Resolution: `{template_dir}/understand-context/understand-context.json`
+Resolution: scan template subdirectories for a step definition JSON file whose `id` field matches the UUID. The `stepRefName` is a human-readable companion for display only -- never used for resolution.
 
-Framework steps use the `@framework-step:name` prefix and resolve from the `framework-steps/` directory.
+Framework steps use plain UUID `stepRef` values and are identified by `"type": "framework-step"` in their definition.
 
 ## Common Workflows
 

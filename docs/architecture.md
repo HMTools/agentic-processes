@@ -69,7 +69,7 @@ Required Parameters: param1, param2
 # Process: {{processName}}
 ## Steps
 - [ ] Step 1: Description
-  - **Step**: `step-name` (references subfolder of the process template directory)
+  - **Step**: `step-name` (resolved via UUID-based stepRef)
 ```
 
 ### 3. Steps
@@ -82,7 +82,7 @@ Steps are modular, self-contained definitions with:
 - Substeps
 - Examples
 
-**Location**: Steps are subdirectories of their process template directory: `{template-dir}/{stepRef}/{stepRef}.json`
+**Location**: Steps are subdirectories of their process template directory (e.g., `{template-dir}/understand-context/understand-context.json`). Each step definition has a unique `id` field (UUID v4) and templates reference steps by UUID via `stepRef`.
 
 ### 4. Process Instances
 
@@ -157,9 +157,10 @@ When a process is created from a template:
 
 1. **Template Reading**: Read template file from the process template directory
 2. **Step Resolution**: For each step with a `stepRef`:
-   - `stepRef` is a simple name (e.g., `"understand-context"`) referencing a subfolder of the template directory
-   - Resolution path: `{template_dir}/{stepRef}/{stepRef}.json`
-   - Framework steps use `@framework-step:name` and resolve from `framework-steps/` directory
+   - `stepRef` is a UUID matching the `id` field of a step definition JSON file in a subdirectory of the template directory
+   - Resolution: scan template subdirectories for step definition files with a matching `id` field (UUID-only lookup, no name-based fallback)
+   - The `stepRefName` companion field provides a human-readable name (e.g., `"understand-context"`) for display only
+   - Framework steps are identified by `"type": "framework-step"` in their definition and use plain UUID `stepRef` values
 3. **Step Loading**: Read step JSON file and extract EmbeddedStepDefinition fields (output, guidance, substeps, flow, etc.)
 4. **Context Application**: Apply context parameters from template
 5. **Process Creation**: Create process instance in `~/.claude/agentic-processes/active/`

@@ -78,11 +78,26 @@
         "number": { "type": "integer", "minimum": 0 },
         "name": { "type": "string" },
         "status": { "$ref": "#/$defs/StepStatus" },
-        "stepRef": { "type": "string" },
+        "stepRef": { "type": ["string", "null"], "description": "Step definition UUID, or null for orchestrator steps" },
+        "stepRefName": { "type": "string", "description": "Human-readable companion name for stepRef (display-only)" },
         "startedAt": { "type": "string", "format": "date-time" },
         "completedAt": { "type": "string", "format": "date-time" },
         "approvalRequired": { "type": "boolean" },
         "approved": { "type": "boolean" },
+        "loopBackTo": { "type": "string", "description": "Step name to loop back to when loopCondition is met" },
+        "loopCondition": { "type": "string", "description": "Condition expression for looping back" },
+        "maxIterations": { "type": "integer", "description": "Maximum number of loop iterations" },
+        "subProcessTrigger": {
+          "type": "object",
+          "properties": {
+            "condition": { "type": "string" },
+            "template": { "type": "string", "description": "Template UUID" },
+            "templateName": { "type": "string", "description": "Human-readable companion name (display-only)" },
+            "parameters": { "type": "object", "additionalProperties": { "type": "string" } },
+            "forEach": { "type": "string" },
+            "syncPoint": { "type": "string" }
+          }
+        },
         "stepDefinition": { "type": "object", "description": "Embedded step execution definition" }
       },
       "additionalProperties": false

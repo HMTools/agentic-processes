@@ -30,11 +30,24 @@ export type ISOTimestamp = string;
 export type ProcessPath = string;
 
 /**
+ * UUID of a step definition file. Used as the authoritative identifier
+ * for cross-referencing step definitions across templates and processes.
+ * Format: Standard UUID v4
+ */
+export type StepDefinitionId = string;
+
+/**
+ * UUID of a process template file. Used as the authoritative identifier
+ * for cross-referencing templates (e.g., in subProcessTrigger.template
+ * and references.relatedTemplates).
+ * Format: Standard UUID v4
+ */
+export type TemplateId = string;
+
+/**
  * Reference to a step definition.
- * Format: Simple step name (e.g., "understand-context") referencing a subfolder
- * of the process template directory, or null for orchestrator steps.
- * Framework steps use "@framework-step:name".
- * Legacy: "@step:category/step-name" may appear in active process instances.
+ * Format: UUID of the step definition, or null for orchestrator steps.
+ * All steps (including framework steps) use plain UUIDs.
  */
 export type StepRef = string;
 

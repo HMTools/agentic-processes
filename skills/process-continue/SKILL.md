@@ -93,7 +93,7 @@ Step approval is user-only. The agent does not approve steps -- the user approve
 
 After step completion, update process state and proceed to the next step.
 
-> **Framework-injected steps**: The last two steps of every process are framework-injected: **Continuous Improvement** and **End Process Validation**. Their full definitions are embedded in `process.json` as `stepDefinition` (same as template steps). The `stepRef` field shows `@framework-step:{name}` as provenance. No file resolution needed.
+> **Framework-injected steps**: The last two steps of every process are framework-injected: **Continuous Improvement** and **End Process Validation**. Their full definitions are embedded in `process.json` as `stepDefinition` (same as template steps). The `stepRef` field contains the framework step's UUID as provenance. Framework steps are identified by `"type": "framework-step"` in their definition. No file resolution needed.
 
 ### Sub-Process Step Handling
 
@@ -101,9 +101,8 @@ When a step has `subProcessTrigger` in `process.json` and an empty `stepDefiniti
 
 #### A. Resolve Template and Parameters
 
-1. Read `subProcessTrigger.template` (e.g., `"sdlc/plan-work-item"`)
-2. Resolve template path: `~/.claude/agentic-processes/templates/processes/{template}/{basename}.json`
-   - Example: `sdlc/plan-work-item` → `~/.claude/agentic-processes/templates/processes/sdlc/plan-work-item/plan-work-item.json`
+1. Read `subProcessTrigger.template` (a UUID matching a template's `id` field). The `templateName` companion field (e.g., `"sdlc/plan-work-item"`) provides human-readable context.
+2. Resolve template path: scan `~/.claude/agentic-processes/templates/processes/` subdirectories for a template JSON file whose `id` field matches the UUID
 3. Resolve parameters: For each value in `subProcessTrigger.parameters`, replace `{{paramName}}` placeholders with actual values from the parent's `process.parameters`
    - Example: `"{{workItemId}}"` with parent param `workItemId: "1274362"` → `"1274362"`
 

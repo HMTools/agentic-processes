@@ -178,9 +178,33 @@ export interface ProcessStep {
   /** Current status of this step */
   status: StepStatus;
   
-  /** Reference to the step definition */
+  /** Reference to the step definition UUID (provenance — stepDefinition is already embedded) */
   stepRef: StepRef;
-  
+
+  /** Human-readable companion name for stepRef (display-only, never used for resolution) */
+  stepRefName?: string;
+
+  /** Sub-process triggering configuration */
+  subProcessTrigger?: {
+    condition?: string;
+    /** Template UUID — primary cross-reference */
+    template: string;
+    /** Human-readable companion name for template (display-only) */
+    templateName?: string;
+    parameters?: Record<string, string>;
+    forEach?: string;
+    syncPoint: string;
+  };
+
+  /** Step name to loop back to when loopCondition is met */
+  loopBackTo?: string;
+
+  /** Condition expression for looping back */
+  loopCondition?: string;
+
+  /** Maximum number of loop iterations */
+  maxIterations?: number;
+
   /** ISO 8601 timestamp when the step was started */
   startedAt?: ISOTimestamp;
   

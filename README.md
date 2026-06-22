@@ -149,7 +149,7 @@ Processes are stored in `~/.claude/agentic-processes/`:
 
 **Templates** define reusable workflows with:
 - Parameter placeholders (`{{paramName}}`)
-- Step references (`@step:category/step-name`)
+- Step references via UUID (`stepRef`) with human-readable companion (`stepRefName`)
 - Process flow diagrams (mermaid)
 - Sequential step definitions
 
@@ -164,16 +164,16 @@ Templates are installed to `~/.claude/agentic-processes/templates/processes/{cat
 - Substeps breakdown
 - Examples and common pitfalls
 
-Steps are defined at `{template-dir}/{stepRef}/{stepRef}.json` within each process template.
+Steps are defined in subdirectories of each process template. Each step definition JSON file has a unique `id` field (UUID v4), and templates reference steps via this UUID in the `stepRef` field, with a `stepRefName` companion for human readability.
 
 ### Framework Steps
 
 **Framework steps** are cross-cutting workflow steps that are automatically injected into every process by `process_manager.py` at creation time. Template authors do not need to include them. Currently, two framework steps are auto-appended as the final steps of every process:
 
-- **Continuous Improvement** (`@framework-step:continuous-improvement`) — Captures learnings, improvements, and patterns discovered during process execution.
-- **End Process Validation** (`@framework-step:end-process-validation`) — Validates that all process deliverables are complete and correct before closing.
+- **Continuous Improvement** — Captures learnings, improvements, and patterns discovered during process execution.
+- **End Process Validation** — Validates that all process deliverables are complete and correct before closing.
 
-Framework step definitions live in `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`.
+Framework steps are identified by `"type": "framework-step"` in their JSON definition and use plain UUID `stepRef` values (no prefix). Their definitions live in `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`.
 
 ## Template Marketplaces
 

@@ -165,7 +165,8 @@ You want to create a template for a specific workflow your team uses frequently.
    ```
 
 3. **Reference Steps**:
-   - Use a simple step name (e.g., `"understand-context"`) as the `stepRef` -- it references a subfolder of the process template directory
+   - Use the step definition's UUID as the `stepRef` value, with `stepRefName` as a human-readable companion (e.g., `"understand-context"`)
+   - Each step definition JSON file must have a unique `id` field (UUID v4)
    - Create new steps as subfolders if needed
 
 4. **Test Template**:
@@ -234,7 +235,7 @@ You need a step that doesn't exist in the steps library.
    ```
 
 4. **Reference in Template**:
-   - Use `@step:{category}/step-name` to reference the step
+   - Use the step's UUID `id` field as the `stepRef` in the template, with `stepRefName` as human-readable companion
 
 ## Example 5: Resuming an Interrupted Process
 

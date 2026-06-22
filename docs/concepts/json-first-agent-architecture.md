@@ -185,7 +185,8 @@ When to use this step:
     {
       "number": 1,
       "name": "Step name",
-      "stepRef": "step-name",
+      "stepRef": "28047be4-e7c5-4152-8329-2929982ad042",
+      "stepRefName": "step-name",
       "description": "Full description of what this step does in the context of this template",
       "context": {
         "param1": "{{param1}}",
@@ -205,7 +206,7 @@ When to use this step:
     "keyFields": ["Approved plan", "Decisions made"]
   },
   "references": {
-    "steps": ["@step:category/step1"],
+    "steps": ["28047be4-e7c5-4152-8329-2929982ad042"],
     "relatedTemplates": [],
     "dependencies": []
   }

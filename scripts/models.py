@@ -180,13 +180,14 @@ class ProcessStep:
     name: str
     status: StepStatus
     stepRef: str
+    stepRefName: Optional[str] = None
     startedAt: Optional[str] = None
     completedAt: Optional[str] = None
     approvalRequired: Optional[bool] = None
     approved: Optional[bool] = None
     stepDefinition: dict[str, Any] = field(default_factory=dict)
     subProcessTrigger: Optional[dict[str, Any]] = None
-    loopBackTo: Optional[int] = None
+    loopBackTo: Optional[str] = None
     loopCondition: Optional[str] = None
     maxIterations: Optional[int] = None
 
@@ -198,6 +199,8 @@ class ProcessStep:
             "status": self.status.value,
             "stepRef": self.stepRef,
         }
+        if self.stepRefName is not None:
+            d["stepRefName"] = self.stepRefName
         if self.startedAt is not None:
             d["startedAt"] = self.startedAt
         if self.completedAt is not None:
@@ -225,6 +228,7 @@ class ProcessStep:
             name=data["name"],
             status=StepStatus(data["status"]),
             stepRef=data["stepRef"],
+            stepRefName=data.get("stepRefName"),
             startedAt=data.get("startedAt"),
             completedAt=data.get("completedAt"),
             approvalRequired=data.get("approvalRequired"),

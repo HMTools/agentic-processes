@@ -9,11 +9,14 @@
  * of a step within a running process instance.
  */
 
-import { StepRef } from "./shared-types";
+import { StepRef, StepDefinitionId } from "./shared-types";
 
 export interface StepDefinition {
   /** Discriminator field - always "step" */
   type: 'step';
+
+  /** Unique identifier (UUID v4) — stable across renames and reorganizations */
+  id: StepDefinitionId;
 
   /** Step identifier (e.g., "understand-context", "apply-changes") */
   name: string;

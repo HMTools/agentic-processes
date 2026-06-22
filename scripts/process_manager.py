@@ -283,25 +283,39 @@ def cmd_create_process(args: argparse.Namespace) -> None:
                           "successCriteria", "complianceChecklist", "searchModes",
                           "changeProposalFormat", "captureTypes"]
 
-    # --- Resolve template steps from subfolders ---
+    # --- Build UUID-to-path registry for step definitions ---
     template_dir = template_path.parent
+    step_id_registry: dict[str, Path] = {}  # {uuid: path_to_json}
+    for subfolder in template_dir.iterdir():
+        if not subfolder.is_dir():
+            continue
+        step_json = subfolder / f"{subfolder.name}.json"
+        if step_json.exists():
+            try:
+                sd = read_json(step_json)
+                if sd.get("type") == "step" and "id" in sd:
+                    step_id_registry[sd["id"]] = step_json
+            except (json.JSONDecodeError, KeyError):
+                pass
+
+    # --- Resolve template steps by UUID ---
     steps_data = template_data.get("steps", [])
     steps = []
     for i, step_def in enumerate(steps_data):
         step_ref = step_def.get("stepRef")
         step_definition = {}
 
-        if step_ref:  # Non-null, non-empty stepRef
-            # Resolve step file from template directory subfolder
-            step_json_path = template_dir / step_ref / f"{step_ref}.json"
-            if step_json_path.exists():
-                step_data = read_json(step_json_path)
+        if step_ref:  # Non-null, non-empty stepRef (UUID)
+            if step_ref in step_id_registry:
+                step_data = read_json(step_id_registry[step_ref])
                 for f in EMBED_FIELDS + EXTRA_EMBED_FIELDS:
                     if f in step_data:
                         step_definition[f] = step_data[f]
             else:
-                # Fallback: use inline stepDefinition if step file not found
+                # No fallback -- UUID must resolve or error
                 step_definition = step_def.get("stepDefinition", {})
+                if not step_definition:
+                    _error(f"Step definition UUID not found in template directory: {step_ref}")
         else:
             # Null/empty stepRef: orchestrator step, keep empty definition
             step_definition = step_def.get("stepDefinition", {})
@@ -312,6 +326,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             name=step_def.get("name", f"Step {i}"),
             status=StepStatus.PENDING,
             stepRef=step_ref or "",
+            stepRefName=step_def.get("stepRefName"),
             approvalRequired=step_def.get("approvalRequired"),
             stepDefinition=step_definition,
             subProcessTrigger=step_def.get("subProcessTrigger"),
@@ -322,13 +337,16 @@ def cmd_create_process(args: argparse.Namespace) -> None:
 
     # --- Auto-inject framework steps ---
     framework_steps_dir = Path(__file__).parent.parent / "framework-steps"
-    FRAMEWORK_STEPS = ["continuous-improvement", "end-process-validation"]
-
-    for fs_name in FRAMEWORK_STEPS:
-        step_json_path = framework_steps_dir / fs_name / f"{fs_name}.json"
+    for fs_dir in sorted(framework_steps_dir.iterdir()):
+        if not fs_dir.is_dir():
+            continue
+        step_json_path = fs_dir / f"{fs_dir.name}.json"
         if not step_json_path.exists():
             continue
         step_data = read_json(step_json_path)
+        if step_data.get("type") != "framework-step":
+            continue
+        fw_step_id = step_data.get("id", "")
         step_definition = {}
         for f in EMBED_FIELDS + EXTRA_EMBED_FIELDS:
             if f in step_data:
@@ -336,9 +354,10 @@ def cmd_create_process(args: argparse.Namespace) -> None:
         steps.append(ProcessStep(
             id=_new_uuid(),
             number=len(steps),
-            name=step_data.get("metadata", {}).get("title", fs_name),
+            name=step_data.get("metadata", {}).get("title", fs_dir.name),
             status=StepStatus.PENDING,
-            stepRef=f"@framework-step:{fs_name}",
+            stepRef=fw_step_id,
+            stepRefName=fs_dir.name,
             approvalRequired=step_data.get("approvalRequired"),
             stepDefinition=step_definition,
         ))

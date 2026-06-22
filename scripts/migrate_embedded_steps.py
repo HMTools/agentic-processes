@@ -19,14 +19,48 @@ EXTRA_EMBED_FIELDS = [
     "changeProposalFormat", "captureTypes",
 ]
 
-STEP_SEARCH_PATHS = [
-    Path.home() / ".claude" / "agentic-processes" / "steps",
-    Path.home() / ".claude" / "agentic-processes" / "templates" / "steps",
-    Path(r"C:\Projects\HM\agentic-process-templates\templates\steps"),
-    Path(r"C:\Projects\HM\sdlc-process-templates\templates\steps"),
+STEP_SEARCH_DIRS = [
+    Path.home() / ".claude" / "agentic-processes" / "templates" / "processes",
+    Path(r"C:\Projects\HM\agentic-process-templates\templates\processes"),
+    Path(r"C:\Projects\HM\sdlc-process-templates\templates\processes"),
 ]
 
 FRAMEWORK_STEPS_DIR = Path(__file__).parent.parent / "framework-steps"
+
+
+def _build_uuid_registry() -> dict[str, Path]:
+    """Scan all step definition directories and build a UUID-to-path registry."""
+    registry: dict[str, Path] = {}
+
+    # Scan template process directories for step definition subfolders
+    for base in STEP_SEARCH_DIRS:
+        if not base.exists():
+            continue
+        for step_json in base.rglob("*.json"):
+            try:
+                with open(step_json, encoding="utf-8") as f:
+                    data = json.load(f)
+                if data.get("type") in ("step", "framework-step") and "id" in data:
+                    registry[data["id"]] = step_json
+            except (json.JSONDecodeError, KeyError, OSError):
+                pass
+
+    # Scan framework steps directory
+    if FRAMEWORK_STEPS_DIR.exists():
+        for fs_dir in FRAMEWORK_STEPS_DIR.iterdir():
+            if not fs_dir.is_dir():
+                continue
+            step_json = fs_dir / f"{fs_dir.name}.json"
+            if step_json.exists():
+                try:
+                    with open(step_json, encoding="utf-8") as f:
+                        data = json.load(f)
+                    if "id" in data:
+                        registry[data["id"]] = step_json
+                except (json.JSONDecodeError, KeyError, OSError):
+                    pass
+
+    return registry
 
 
 def extract_step_definition(step_data: dict) -> dict:
@@ -37,32 +71,20 @@ def extract_step_definition(step_data: dict) -> dict:
     return definition
 
 
-def resolve_step_ref(step_ref: str) -> dict | None:
+def resolve_step_ref(step_ref: str, registry: dict[str, Path]) -> dict | None:
+    """Resolve a stepRef UUID to a step definition. UUID-only lookup, no fallback."""
     if not step_ref:
         return None
 
-    if step_ref.startswith("@framework-step:"):
-        name = step_ref.split(":", 1)[1]
-        path = FRAMEWORK_STEPS_DIR / name / f"{name}.json"
-        if path.exists():
-            with open(path, encoding="utf-8") as f:
-                return json.load(f)
-        return None
+    # UUID-based lookup
+    if step_ref in registry:
+        with open(registry[step_ref], encoding="utf-8") as f:
+            return json.load(f)
 
-    if step_ref.startswith("@step:"):
-        ref_path = step_ref.split(":", 1)[1]
-        parts = ref_path.split("/")
-        if len(parts) == 2:
-            category, name = parts
-            for base in STEP_SEARCH_PATHS:
-                path = base / category / name / f"{name}.json"
-                if path.exists():
-                    with open(path, encoding="utf-8") as f:
-                        return json.load(f)
     return None
 
 
-def migrate_process(process_dir: Path) -> dict:
+def migrate_process(process_dir: Path, registry: dict[str, Path]) -> dict:
     process_path = process_dir / "process.json"
     if not process_path.exists():
         return {"status": "skipped", "reason": "no process.json"}
@@ -88,7 +110,7 @@ def migrate_process(process_dir: Path) -> dict:
             modified += 1
             continue
 
-        step_template = resolve_step_ref(step_ref)
+        step_template = resolve_step_ref(step_ref, registry)
         if step_template is None:
             unresolved.append(step_ref)
             step["stepDefinition"] = {}
@@ -120,11 +142,14 @@ def main():
         print(f"Active directory not found: {active_dir}")
         sys.exit(1)
 
+    registry = _build_uuid_registry()
+    print(f"Built UUID registry: {len(registry)} step definitions found.")
+
     results = {}
     for process_dir in sorted(active_dir.iterdir()):
         if not process_dir.is_dir():
             continue
-        result = migrate_process(process_dir)
+        result = migrate_process(process_dir, registry)
         results[process_dir.name] = result
         print(f"  {process_dir.name}: {result['status']}"
               f" (modified={result.get('modified', 0)}"

@@ -9,12 +9,15 @@
  * of a running process created from a template.
  */
 
-import { StepRef } from "./shared-types";
+import { StepRef, TemplateId, StepDefinitionId } from "./shared-types";
 import { EmbeddedStepDefinition } from "./step-definition";
 
 export interface TemplateDefinition {
   /** Discriminator field - always "template" */
   type: 'template';
+
+  /** Unique identifier (UUID v4) — stable across renames and reorganizations */
+  id: TemplateId;
 
   /** Template identifier (e.g., "develop-user-story", "set-concept") */
   name: string;
@@ -59,8 +62,10 @@ export interface TemplateDefinition {
     number: number;
     /** Step name */
     name: string;
-    /** Reference to step definition - required */
+    /** Reference to step definition UUID — primary cross-reference, used for resolution */
     stepRef: StepRef;
+    /** Human-readable companion name for stepRef (display-only, never used for resolution) */
+    stepRefName?: string;
     /** Full description of what this step does in this template's context */
     description?: string;
     /** Context variables passed to the step */
@@ -77,10 +82,19 @@ export interface TemplateDefinition {
     notes?: string;
     /** Conditional execution description */
     conditional?: string;
+    /** Step name to loop back to when loopCondition is met */
+    loopBackTo?: string;
+    /** Condition expression for looping back */
+    loopCondition?: string;
+    /** Maximum number of loop iterations */
+    maxIterations?: number;
     /** Sub-process triggering configuration */
     subProcessTrigger?: {
       condition?: string;
+      /** Template UUID — primary cross-reference, used for resolution */
       template: string;
+      /** Human-readable companion name for template (display-only, never used for resolution) */
+      templateName?: string;
       parameters?: Record<string, string>;
       forEach?: string;
       syncPoint: string;
@@ -118,10 +132,10 @@ export interface TemplateDefinition {
 
   /** References to related resources */
   references: {
-    /** Step references used by this template */
-    steps: StepRef[];
-    /** Related template names */
-    relatedTemplates: string[];
+    /** Step definition UUIDs used by this template */
+    steps: StepDefinitionId[];
+    /** Related template UUIDs */
+    relatedTemplates: TemplateId[];
     /** Dependencies */
     dependencies: string[];
   };

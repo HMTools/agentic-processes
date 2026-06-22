@@ -99,7 +99,7 @@ Step definitions are embedded directly in the process instance. Each step in `pr
 To load step guidance:
 1. Read the current step's `stepDefinition` object from `process.json`
 2. The `stepDefinition` contains: `guidance` (instructions), `substeps` (work sequence), `output` (what to produce), `flow` (execution order), `memoryFileUsage` (memory patterns)
-3. The `stepRef` field is retained as provenance (e.g., `understand-context` or `@framework-step:continuous-improvement`) but is NOT used for file resolution at runtime
+3. The `stepRef` field is retained as provenance (a UUID referencing the step definition's `id`) but is NOT used for file resolution at runtime
 
 No external file resolution is needed. The step-executor reads all instructions from the embedded definition in the process instance. This is the SOLE source of execution guidance — ignore any step instructions provided in the task message.
 
