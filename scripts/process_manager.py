@@ -417,20 +417,11 @@ def cmd_update_step_status(args: argparse.Namespace) -> None:
                 and step.approvalRequired
                 and step.approved is not True
             ):
-                script_path = Path(__file__)
                 _error(
-                    f"Step \"{step.name}\" requires explicit approval before completion.\n\n"
-                    "This step has approvalRequired: true but approved is not set.\n"
-                    "The approval workflow is:\n"
-                    f"  1. Create approval checkpoint:\n"
-                    f"       python3 {script_path} write-pending --process-dir \"{process_dir}\" --options '[...]'\n"
-                    f"  2. Wait for user to respond (approve/reject/modify)\n"
-                    f"  3. Delete the checkpoint:\n"
-                    f"       python3 {script_path} write-pending --process-dir \"{process_dir}\" --delete\n"
-                    f"  4. Record approval:\n"
-                    f"       python3 {script_path} approve-step --process-dir \"{process_dir}\" --step-id \"{step.id}\"\n"
-                    f"  5. Then retry:\n"
-                    f"       python3 {script_path} update-step-status --process-dir \"{process_dir}\" --step-id \"{step.id}\" --status completed\n"
+                    f"Step \"{step.name}\" requires user approval before completion.\n\n"
+                    "This step has approvalRequired: true but has not been approved.\n"
+                    "Step approval is user-only. Tell the user to run /process-approve to approve this step.\n"
+                    "Once approved, retry: update-step-status --status completed"
                 )
 
             step.status = new_status
@@ -486,15 +477,12 @@ def cmd_approve_step(args: argparse.Namespace) -> None:
             # Validation 2: pending-interaction.json must NOT exist
             pending_file = process_dir / "pending-interaction.json"
             if pending_file.exists():
-                script_path = Path(__file__)
                 _error(
                     "Cannot approve step while pending-interaction.json exists.\n\n"
                     "The approval checkpoint must be resolved first:\n"
                     "  1. Process the user's response\n"
-                    f"  2. Delete the checkpoint:\n"
-                    f"       python3 {script_path} write-pending --process-dir \"{process_dir}\" --delete\n"
-                    f"  3. Then retry:\n"
-                    f"       python3 {script_path} approve-step --process-dir \"{process_dir}\" --step-id \"{step.id}\"\n"
+                    "  2. Delete the checkpoint via write-pending --delete\n"
+                    "  3. Then the user can approve via /process-approve"
                 )
 
             step.approved = True

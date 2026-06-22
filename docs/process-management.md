@@ -101,13 +101,27 @@ The `log.json` file must be updated:
 
 ## Approval Checkpoints
 
-### Script-Enforced Approval Gates
+### User-Only Approval Architecture
 
-Approval checkpoints are **enforced by `process_manager.py`**, not just by agent self-discipline. When a step has `approvalRequired: true`, calling `update-step-status --status completed` will **fail with an error** unless the step has `approved: true` set via the `approve-step` command.
+Step approval is **user-only**. No agent or automated process can approve steps. Approval is enforced through three layers:
 
-### Required Approval Workflow
+1. **Skill Invocation Control**: The `process-approve` skill has `disable-model-invocation: true`, making it invisible to agents. Only users can invoke it via `/process-approve`.
+2. **Instruction Removal**: Agent-visible documentation contains no instructions for calling `approve-step`. Agents are told to inform the user to run `/process-approve` when approval is needed.
+3. **Hook Enforcement**: A PreToolUse hook (`block-approve-step.sh`) blocks any Bash command containing `approve-step` unless a `.approve-token` file exists (created only by the user-only skill).
 
-Before completing ANY step with `approvalRequired: true`, follow this mandatory sequence:
+### How Approval Works
+
+**CLI channel** (Claude Code):
+- The user runs `/process-approve` which creates a `.approve-token`, calls `approve-step`, and sets `approved: true`
+- The hook consumes the token, allowing the command to execute
+
+**UI channel**:
+- The UI app calls `approve-step` directly via the command line (hooks do not apply outside Claude Code sessions)
+- No token is needed for UI-initiated approvals
+
+### Agent Role at Approval Checkpoints
+
+When a step has `approvalRequired: true`, the agent's role is:
 
 1. **Check process.json** - Look for `"approvalRequired": true` on the current step
 2. **Present deliverables** to the user
@@ -115,20 +129,18 @@ Before completing ANY step with `approvalRequired: true`, follow this mandatory 
 4. **WAIT** - Do NOT proceed until user responds
 5. **Log user response** in log.json via `log-interaction`
 6. **Delete the checkpoint** via `write-pending --delete`
-7. **Record approval** via `approve-step --step-id "..."` (sets `approved = true`)
-8. **Complete the step** via `update-step-status --status completed` (succeeds because `approved = true`)
+7. **Complete the step** via `update-step-status --status completed` (succeeds only if the user has approved)
 
-**Note**: Step 8 will be rejected by the script if step 7 was not called. This makes it structurally impossible to skip approval checkpoints.
+If step 7 fails because the step is not yet approved, inform the user they need to run `/process-approve` first.
 
 ### Workflow Checklist (Before Completing Step)
 
 - [ ] Check if step has `approvalRequired: true`
 - [ ] If yes: Present deliverables and create pending checkpoint
-- [ ] Wait for explicit user approval
+- [ ] Wait for user response
 - [ ] Log the user's response via `log-interaction`
 - [ ] Delete the pending checkpoint via `write-pending --delete`
-- [ ] Call `approve-step` to record approval
-- [ ] Then call `update-step-status --status completed`
+- [ ] Call `update-step-status --status completed` (user must have approved first)
 
 ---
 

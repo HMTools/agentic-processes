@@ -79,17 +79,15 @@ For each step, determine its type and execute accordingly:
 - Follow the **Sub-Process Step Handling** protocol below
 - Do NOT call `step-executor-delegation` for these steps — the step-executor cannot handle them
 
-**Handle approval checkpoints** (applies to both regular and child steps): If step has `approvalRequired: true`, the following sequence is mandatory and enforced by the script:
+**Handle approval checkpoints** (applies to both regular and child steps): If step has `approvalRequired: true`, the following sequence is mandatory:
   1. Present deliverables to user
   2. Create pending checkpoint via `write-pending`
   3. Wait for user response (approve/reject/modify)
   4. Log the user's response via `log-interaction`
   5. Delete the pending checkpoint via `write-pending --delete`
-  6. Call `approve-step` via the `process-state-update` skill to record approval (sets `approved=true`)
-  7. Then call `update-step-status --status completed` (will succeed because `approved=true`)
-  - **Note**: Step 7 will fail with an error if step 6 was not called -- this is enforced by `process_manager.py`
+  6. Call `update-step-status --status completed` (will succeed only if user has approved via `/process-approve` or UI)
 
-**Never call `approve-step` based on a conversational response.** A user saying "yes" to a mid-step question (assumption validation, clarification, follow-up) is NOT approval of the step's deliverable. Only call `approve-step` after: (1) the deliverable file is fully created/updated, (2) you presented it with explicit approval options via `write-pending`, and (3) the user's response directly addresses the deliverable approval.
+Step approval is user-only. The agent does not approve steps -- the user approves via `/process-approve` (CLI) or the UI app. If `update-step-status --status completed` fails because the step is not yet approved, inform the user they need to run `/process-approve` first.
 
 **Handle user corrections**: Log interaction via `process-state-update` skill, then re-invoke the `step-executor-delegation` skill with the corrections as the third argument: `step-executor-delegation "<process-dir>" "<step-id>" "<user corrections>"`. Re-present updated deliverables.
 

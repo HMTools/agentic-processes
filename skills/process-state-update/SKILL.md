@@ -58,43 +58,7 @@ python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" update-step
 
 Valid statuses: `pending`, `in_progress`, `completed`, `skipped`, `awaiting_approval`
 
-**Note**: When completing a step with `approvalRequired: true`, the step must have `approved: true` set via `approve-step` first. Otherwise, `update-step-status --status completed` will fail with an error describing the required approval workflow.
-
----
-
-### approve-step
-
-Record explicit approval for a step with `approvalRequired: true`. This is the **only** way to set `approved = true` on a step, and it is **required** before `update-step-status --status completed` will succeed on approval-required steps.
-
-**When to use**: After the user has approved at an approval checkpoint and the pending interaction has been resolved (deleted).
-
-**Bash**:
-```bash
-python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py approve-step \
-  --process-dir "/c/Users/username/.claude/agentic-processes/active/process-name" \
-  --step-id "abc-123-uuid"
-```
-
-**PowerShell**:
-```powershell
-python "C:/Projects/HM/agentic-processes/scripts/process_manager.py" approve-step --process-dir "C:/Users/username/.claude/agentic-processes/active/process-name" --step-id "abc-123-uuid"
-```
-
-**Error conditions**:
-- Step does not have `approvalRequired: true` -- cannot approve a non-approval step
-- `pending-interaction.json` still exists -- the approval checkpoint must be resolved first (user must respond, then call `write-pending --delete`)
-
-**Full Approval Workflow** (mandatory sequence for approval-required steps):
-```
-1. write-pending --options '[...]'          # Create approval checkpoint
-2. (wait for user response)                  # User approves/rejects/modifies
-3. log-interaction --request "..." ...       # Log the user's response
-4. write-pending --delete                    # Delete the checkpoint
-5. approve-step --step-id "..."              # Record approval (sets approved=true)
-6. update-step-status --status completed     # Complete the step (succeeds because approved=true)
-```
-
-This workflow is **enforced by the script** -- step 6 will fail if step 5 was not called.
+**Note**: When completing a step with `approvalRequired: true`, the step must have `approved: true` (set by the user via `/process-approve` or the UI). If not yet approved, this command will fail with a message directing the user to approve first.
 
 ---
 

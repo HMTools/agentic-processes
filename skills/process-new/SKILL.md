@@ -189,12 +189,17 @@ Read the child's `process.json`. For each child step in order:
 
 ### Distinguishing mid-step answers from deliverable approval
 
-**Never call `approve-step` based on a conversational response.** A user saying "yes" to a mid-step question (assumption validation, clarification, follow-up) is NOT approval of the step's deliverable.
+A user saying "yes" to a mid-step question (assumption validation, clarification, follow-up) is NOT approval of the step's deliverable.
 
-Only call `approve-step` after ALL of these conditions are met:
+Step approval is user-only. The agent does not approve steps -- the user approves via `/process-approve` (CLI) or the UI app. The agent's role at approval checkpoints is:
 1. The step's deliverable file has been fully created/updated (e.g., `step0-context.md`, `implementation-plan.md`)
-2. You presented the deliverable to the user with explicit approval options (approve/reject/modify) via `write-pending`
-3. The user's response directly addresses the deliverable approval — not a follow-up question, assumption confirmation, or clarification
+2. Present the deliverable to the user with explicit approval options (approve/reject/modify) via `write-pending`
+3. Wait for the user's response
+4. Log the user's response via `log-interaction`
+5. Delete the pending checkpoint via `write-pending --delete`
+6. Call `update-step-status --status completed` (will succeed only if the user has approved via `/process-approve` or the UI)
+
+If `update-step-status --status completed` fails because the step is not yet approved, inform the user they need to run `/process-approve` first.
 
 **Examples of what is NOT approval:**
 - User confirms an assumption → mid-step answer, continue the step
