@@ -1,0 +1,24 @@
+{
+  "id": "RM-040",
+  "title": "Adapt continuous improvement for non-owner template users",
+  "description": "The current continuous improvement mechanism suggests edits to process templates directly. However, users can run templates they don't own, meaning they lack write access to apply those improvements. This item is about rethinking how continuous improvement works in a multi-user/marketplace context — e.g., forking suggestions, submitting improvement proposals to template owners, or maintaining user-local overlays on top of shared templates.",
+  "type": "improvement",
+  "status": "proposed",
+  "priority": "medium",
+  "category": "framework",
+  "milestone": "backlog",
+  "effort": "",
+  "tags": [
+    "continuous-improvement",
+    "templates",
+    "marketplace",
+    "permissions"
+  ],
+  "dependencies": [],
+  "created": "2026-06-14",
+  "updated": "2026-06-14",
+  "author": "matanha@payoneer.com",
+  "notes": "",
+  "acceptance_criteria": [],
+  "illustration": "brain-learning"
+}

@@ -16,7 +16,6 @@
   "references": {
     "relatedDocs": ["getting-started", "process-management", "examples"],
     "templatesLocation": "~/.claude/agentic-processes/templates/processes/",
-    "stepsLocation": "~/.claude/agentic-processes/templates/steps/",
     "commandsLocation": "commands/",
     "typesLocation": "types/",
     "configLocation": "~/.claude/agentic-processes/config/",

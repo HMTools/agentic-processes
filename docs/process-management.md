@@ -219,7 +219,7 @@ Sub-processes allow a parent process to spawn child processes for delegation or 
 
 | Scenario | Example |
 |----------|---------|
-| **Delegation** | Missing template steps → spawn `create-process-step-template` for each |
+| **Delegation** | Missing dependencies → spawn sub-process to create each |
 | **Parallel work** | After LLD → spawn test plan and code dev processes |
 
 ### Sync Point Placement
@@ -282,7 +282,7 @@ The `--summary` argument is **required** for sub-processes. If omitted, the scri
 ```markdown
 - [ ] Step 3: Validate process-steps exist
   - **Sub-Process Trigger**: If missing steps found
-    - For each missing step, spawn `create-process-step-template`
+    - For each missing dependency, spawn the appropriate sub-process
     - **Sync Point**: Immediate (wait for all to complete)
     - Continue with newly created steps
 ```
@@ -300,7 +300,7 @@ Parent memory includes Sub-Process State section:
 ### Child Sub-Processes
 | Name | Template | Status | Spawned At | Sync Point |
 |------|----------|--------|------------|------------|
-| process-create-step-xyz-20260120 | create-process-step-template | completed | Step 3 | immediate |
+| process-create-template-xyz-20260120 | create-process-template | completed | Step 3 | immediate |
 
 ### Sync Points
 - **Next Sync Point**: None

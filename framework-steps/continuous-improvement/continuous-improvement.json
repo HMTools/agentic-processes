@@ -1,5 +1,6 @@
 {
   "type": "framework-step",
+  "id": "aba25021-e2a0-4b50-853e-aa84ddd4efcd",
   "name": "continuous-improvement",
   "category": "learning",
   "approvalRequired": true,
@@ -41,8 +42,7 @@
       ],
       "create": [],
       "update": [
-        "Process templates in ~/.claude/agentic-processes/templates/processes/",
-        "Process steps in ~/.claude/agentic-processes/templates/steps/",
+        "Process templates in ~/.claude/agentic-processes/templates/processes/ (step definitions within each template)",
         "Documentation in docs/"
       ]
     },
@@ -179,7 +179,9 @@
   },
   "memoryFileUsage": {
     "readFrom": [],
-    "writeTo": ["improvements.json"],
+    "writeTo": [
+      "improvements.json"
+    ],
     "fields": [
       "Improvements Identified: List with descriptions",
       "Improvements Implemented: Each with Change, Files Modified, User Approval, Impact",

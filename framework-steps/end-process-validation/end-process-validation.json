@@ -1,5 +1,6 @@
 {
   "type": "framework-step",
+  "id": "4e34c0ec-4fd0-4ba1-bc9c-0d906d712b1b",
   "name": "end-process-validation",
   "category": "common",
   "metadata": {
@@ -153,7 +154,9 @@
   },
   "memoryFileUsage": {
     "readFrom": [],
-    "writeTo": ["compliance.json"],
+    "writeTo": [
+      "compliance.json"
+    ],
     "fields": [
       "complianceValidated: true/false",
       "violations: []",

@@ -83,7 +83,10 @@
       "Bash(git commit -m ' *)",
       "Bash(mkdir -p __TRACKED_VAR__/.claude/agentic-processes/completed)",
       "Bash(mv __TRACKED_VAR__/.claude/agentic-processes/active/json-qa-session-feature-20260512 __TRACKED_VAR__/.claude/agentic-processes/completed/)",
-      "Bash(powershell *)"
+      "Bash(powershell *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(git fetch *)"
     ],
     "additionalDirectories": [
       "C:\\Projects\\HM\\agentic-processes-ui",

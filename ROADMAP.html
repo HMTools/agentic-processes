@@ -742,7 +742,7 @@ body {
 <script>
 const ROADMAP = {
   "name": "Agentic Processes",
-  "generated": "2026-06-10T17:33:24.605550+00:00",
+  "generated": "2026-06-14T07:28:17.023682+00:00",
   "milestones": [
     {
       "name": "backlog",
@@ -1084,7 +1084,7 @@ const ROADMAP = {
       "title": "Replace template sources git with marketplace",
       "description": "Replace the git-based template sources with a marketplace system (strongly UI-driven) where users can see available templates, check for updates, and install specific templates.",
       "type": "feature",
-      "status": "proposed",
+      "status": "done",
       "priority": "medium",
       "category": "framework",
       "milestone": "backlog",
@@ -1092,7 +1092,7 @@ const ROADMAP = {
       "tags": [],
       "dependencies": [],
       "created": "2026-05-29",
-      "updated": "2026-05-29",
+      "updated": "2026-06-11",
       "author": "matanha@payoneer.com",
       "notes": "",
       "acceptance_criteria": [],
@@ -1348,7 +1348,7 @@ const ROADMAP = {
       "title": "Host roadmap HTML on GitHub Pages",
       "description": "Set up GitHub Pages hosting for ROADMAP.html so users can be directed to a live URL to view the full project roadmap, rather than needing local access to the repository.",
       "type": "feature",
-      "status": "completed",
+      "status": "proposed",
       "priority": "medium",
       "category": "infrastructure",
       "milestone": "backlog",
@@ -1359,11 +1359,83 @@ const ROADMAP = {
       ],
       "dependencies": [],
       "created": "2026-06-10",
-      "updated": "2026-06-11",
+      "updated": "2026-06-10",
       "author": "matanha@payoneer.com",
       "notes": "",
       "acceptance_criteria": [],
       "illustration": "deploy-rocket"
+    },
+    {
+      "id": "RM-038",
+      "title": "Multi-directory workspace support for UI-triggered processes",
+      "description": "When the UI app triggers a new process or runs process-continue, the spawned Claude Code session should support attaching multiple directories (workspaces) via --add-dir. This allows processes to operate across multiple codebases simultaneously - e.g., a process that needs access to both the main repo and a shared library. The UI should let users configure which directories to attach per process or template.",
+      "type": "feature",
+      "status": "proposed",
+      "priority": "medium",
+      "category": "ui",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [
+        "ui",
+        "workspaces",
+        "multi-directory",
+        "process-triggering",
+        "claude-code"
+      ],
+      "dependencies": [],
+      "created": "2026-06-11",
+      "updated": "2026-06-11",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "scope-layers"
+    },
+    {
+      "id": "RM-039",
+      "title": "Show full template details in marketplace on click",
+      "description": "When clicking a template in the marketplace, display the complete template details (all fields, parameters, steps, metadata) instead of the current simplified/summary view. Users need to see the full picture before deciding to use a template.",
+      "type": "feature",
+      "status": "proposed",
+      "priority": "medium",
+      "category": "ui",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [
+        "marketplace",
+        "templates",
+        "ux"
+      ],
+      "dependencies": [],
+      "created": "2026-06-14",
+      "updated": "2026-06-14",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "marketplace"
+    },
+    {
+      "id": "RM-040",
+      "title": "Adapt continuous improvement for non-owner template users",
+      "description": "The current continuous improvement mechanism suggests edits to process templates directly. However, users can run templates they don't own, meaning they lack write access to apply those improvements. This item is about rethinking how continuous improvement works in a multi-user/marketplace context — e.g., forking suggestions, submitting improvement proposals to template owners, or maintaining user-local overlays on top of shared templates.",
+      "type": "improvement",
+      "status": "proposed",
+      "priority": "medium",
+      "category": "framework",
+      "milestone": "backlog",
+      "effort": "",
+      "tags": [
+        "continuous-improvement",
+        "templates",
+        "marketplace",
+        "permissions"
+      ],
+      "dependencies": [],
+      "created": "2026-06-14",
+      "updated": "2026-06-14",
+      "author": "matanha@payoneer.com",
+      "notes": "",
+      "acceptance_criteria": [],
+      "illustration": "brain-learning"
     }
   ],
   "archived": [

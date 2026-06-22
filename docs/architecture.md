@@ -18,11 +18,11 @@ agentic-processes/                    # Plugin root
 ├── hooks/hooks.json                  # Hook configuration
 ├── scripts/                          # Hook and utility scripts
 │   ├── process_manager.py            # Process state management
-│   ├── template_manager.py           # Git-based template operations
+│   ├── template_manager.py           # Marketplace template operations
 │   └── ...hook scripts...
 ├── skills/                           # Skills for AI discoverability
 ├── config/                           # Default configuration files
-│   └── template-sources.default.json
+│   └── marketplaces.default.json
 ├── types/                            # TypeScript types + schema.json
 └── AGENTS.md                         # Agent discovery file
 ```
@@ -56,7 +56,7 @@ Templates define reusable workflows with:
 - Process flow diagrams
 - Sequential step definitions
 
-**Location**: `~/.claude/agentic-processes/templates/processes/{category}/` (synced from git sources)
+**Location**: `~/.claude/agentic-processes/templates/processes/{category}/` (installed from marketplaces)
 
 **Structure**:
 ```markdown
@@ -82,22 +82,7 @@ Steps are modular, self-contained definitions with:
 - Substeps
 - Examples
 
-**Location**: Steps are subfolders of their process template directory. The `templates/steps/` directory serves as a blueprint catalog for authoring reference only.
-
-**Categories**:
-- `api/` - API layer steps
-- `common/` - Common/shared steps
-- `data/` - Data layer steps
-- `service/` - Service layer steps
-- `testing/` - Testing steps
-- `planning/` - Planning steps
-- `documentation/` - Documentation steps
-- `external-services/` - External service steps
-- `guideline/` - Guideline steps
-- `investigation/` - Investigation steps
-- `learning/` - Learning/improvement steps
-- `multi-repo/` - Multi-repo steps
-- `template/` - Template authoring steps
+**Location**: Steps are subdirectories of their process template directory: `{template-dir}/{stepRef}/{stepRef}.json`
 
 ### 4. Process Instances
 
@@ -241,7 +226,7 @@ Each topic file follows this structure:
 - `process-new/SKILL.md` - Process creation
 - `process-continue/SKILL.md` - Process continuation
 - `process-state-update/SKILL.md` - State file updates
-- `process-template-sync/SKILL.md` - Template source management
+- Marketplace management via UI Settings
 
 **Agents**: Auto-discovered from `agents/` and `AGENTS.md`
 - `step-executor.md` - Step execution subagent
@@ -261,28 +246,27 @@ commands/                            # Commands
 hooks/hooks.json                     # Hook configuration
 scripts/                             # Hook and utility scripts
 ├── process_manager.py               # Process state management
-├── template_manager.py              # Git-based template operations
+├── template_manager.py              # Marketplace template operations
 ├── models.py                        # Shared data models
 └── ...hook scripts...
 skills/
 ├── process-new/SKILL.md             # Start new process
 ├── process-continue/SKILL.md        # Continue existing process
 ├── process-state-update/SKILL.md    # Update process state
-└── process-template-sync/SKILL.md   # Manage template sources
 config/
-└── template-sources.default.json    # Default template source config
+└── marketplaces.default.json        # Default marketplace config
 types/                               # TypeScript types + schema.json
 AGENTS.md                            # Agent discovery
 
 # Runtime Location (~/.claude/agentic-processes/)
 ~/.claude/agentic-processes/
 ├── config/
-│   └── template-sources.json        # User's template source config
+│   ├── marketplaces.json            # User's marketplace config
+│   └── installed-templates.json     # Installed templates manifest
 ├── cache/
-│   └── sources/{name}/              # Git clone cache per source
+│   └── sources/{name}/              # Git clone cache per marketplace
 ├── templates/
-│   ├── processes/{category}/        # Process templates (synced)
-│   └── steps/{category}/            # Step templates (synced)
+│   └── processes/{category}/        # Installed process templates (steps within each)
 ├── guidelines/                      # Project-specific guidelines
 ├── flags/                           # Runtime flag files
 ├── active/                          # Running processes
@@ -333,39 +317,46 @@ Steps are executed via the `step-executor-delegation` skill which forks into the
 - **Clear responsibility boundaries**: The skill defines WHAT the step-executor receives. The step-executor.md defines HOW it behaves. The orchestrator handles the workflow around execution.
 - **Consistent execution patterns**: All step execution goes through one skill, regardless of which orchestrator (process-continue or process-new) triggers it.
 
-## Git-Based Template Sources
+## Template Marketplace
 
-Templates are distributed via git repositories rather than bundled with the plugin. This architecture enables versioning, team sharing, and independent template updates.
+Templates are distributed via git-backed marketplaces rather than bundled with the plugin. This architecture enables versioning, team sharing, per-template installation, and update detection.
 
-### Template Sync Flow
+### Marketplace Refresh & Install Flow
 
 ```mermaid
 graph TD
-    A[User runs /process-template-sync] --> B[template_manager.py sync]
-    B --> C[Read config/template-sources.json]
-    C --> D{For each enabled source}
+    A[User opens Marketplace in UI] --> B[template_manager.py refresh]
+    B --> C[Read config/marketplaces.json]
+    C --> D{For each enabled marketplace}
     D --> E[Clone or pull git repo to cache/]
-    E --> F[Copy templates/processes/ to runtime]
-    E --> G[Copy templates/steps/ to runtime]
-    F --> H[Templates available for /process-new]
-    G --> H
+    E --> F[template_manager.py catalog]
+    F --> G[Browse available templates in UI]
+    G --> H{User selects Install}
+    H --> I[template_manager.py install]
+    I --> J[Copy template from cache to runtime]
+    I --> K[Update installed-templates.json manifest]
+    J --> L[Template available for /process-new]
 ```
 
-### Source Configuration
+### Marketplace Configuration
 
-Sources are configured in `~/.claude/agentic-processes/config/template-sources.json`. Each source specifies a git URL, branch, and priority. When multiple sources provide the same template, the higher-priority source wins.
+Marketplaces are configured in `~/.claude/agentic-processes/config/marketplaces.json`. Each marketplace specifies a git URL, branch, and priority.
 
 ### Cache Strategy
 
-Each source is shallow-cloned to `~/.claude/agentic-processes/cache/sources/{source-name}/`. The cache is separate from the installed templates, so a failed sync cannot corrupt the working set.
+Each marketplace is shallow-cloned to `~/.claude/agentic-processes/cache/sources/{marketplace-name}/`. The cache is separate from the installed templates, so a failed refresh cannot corrupt the working set.
+
+### Install Tracking
+
+Installed templates are tracked in `~/.claude/agentic-processes/config/installed-templates.json`. Each entry records the template name, category, type, source marketplace, installation timestamp, and git commit hash. Update detection compares the installed version hash against the current cache HEAD.
 
 ## Extension Points
 
-### Adding Custom Template Sources
+### Adding Custom Marketplaces
 
-1. Create a git repo with the standard structure: `templates/processes/` and `templates/steps/`
-2. Use `/process-template-sync` to add it as a source
-3. Sync to install the templates alongside official ones
+1. Create a git repo with the standard structure: `templates/processes/`
+2. Open the Marketplace in the UI Settings and add the repo as a marketplace
+3. Refresh and install the templates you need
 
 ### Contributing to Official Templates
 

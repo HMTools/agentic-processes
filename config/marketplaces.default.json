@@ -1,5 +1,5 @@
 {
-  "sources": [
+  "marketplaces": [
     {
       "name": "official",
       "url": "https://github.com/HMTools/agentic-process-templates.git",
@@ -9,7 +9,7 @@
     }
   ],
   "settings": {
-    "autoSyncOnStale": false,
+    "autoRefreshOnStale": false,
     "staleDurationMinutes": 1440
   }
 }

@@ -26,12 +26,7 @@ claude --plugin-dir /path/to/agentic-processes
 
 ### After Installation
 
-After installing the plugin, sync templates from configured git sources:
-```
-/process-template-sync
-```
-
-This fetches process and step templates to `~/.claude/agentic-processes/templates/` and creates all required runtime directories (`active/`, `completed/`, `failed/`, `flags/`, `guidelines/`, etc.).
+After installing the plugin, open the Marketplace in the UI to browse available templates and install the ones you need. This installs process templates to `~/.claude/agentic-processes/templates/processes/` and creates all required runtime directories (`active/`, `completed/`, `failed/`, `flags/`, `guidelines/`, etc.).
 
 ## Your First Process
 
@@ -137,15 +132,12 @@ Templates define reusable workflows:
 - Include flow diagrams
 - Define sequential steps
 
-Templates are synced to `~/.claude/agentic-processes/templates/processes/{category}/` from configured git sources.
+Templates are installed to `~/.claude/agentic-processes/templates/processes/{category}/` from configured marketplaces.
 
 ### Steps
 
-Steps are subfolders of their process template directory. Each step subfolder contains:
+Steps are subdirectories of their process template directory. Each step subdirectory contains:
 - `{step-name}.json` -- complete step definition with guidance, substeps, flow
-- `{step-name}.md` -- brief documentation
-
-The `templates/steps/` directory serves as a blueprint catalog for authoring reference only.
 
 ### Step References
 
@@ -189,31 +181,35 @@ Framework steps use the `@framework-step:name` prefix and resolve from the `fram
 4. **Check State**: Review current state section to understand progress
 5. **Follow Guidance**: Step guidance provides detailed instructions
 
-## Setting Up Template Sources
+## Setting Up Marketplaces
 
-Template sources are git repositories that provide process and step templates. The default configuration includes the official templates repo, but you can add custom sources.
+Marketplaces are git-backed repositories that provide process templates. The default configuration includes the official templates repo, but you can add custom marketplaces.
 
-### Viewing Configured Sources
+### Viewing Configured Marketplaces
 
-Use `/process-template-sync` and choose "list sources" to see all configured template sources.
+Open the Marketplace section in the UI Settings to see all configured marketplaces with their status, installed template counts, and available updates.
 
-### Adding a Custom Source
+### Adding a Custom Marketplace
 
-Use `/process-template-sync` and choose "add source" to register a new git repository as a template source. Provide:
-- **name**: A short identifier for the source
+In the Marketplace section of the UI Settings, click "Add Marketplace" and provide:
+- **name**: A short identifier for the marketplace
 - **url**: The git clone URL
 - **branch**: The branch to track (default: `main`)
-- **priority**: Lower number = higher priority when resolving conflicts
+- **priority**: Lower number = higher priority
 
-### Syncing Templates
+### Browsing and Installing Templates
 
-Run `/process-template-sync` periodically to fetch the latest templates from all enabled sources.
+Expand a marketplace row to see its template catalog. Each template shows its name, description, category, type (process/step), and install status. Click "Install" to install a template, or "Uninstall" to remove it. Templates with available updates show an "Update" button.
+
+### Refreshing Marketplaces
+
+Click "Refresh All" to fetch the latest template catalogs from all enabled marketplaces, or refresh individual marketplaces using the refresh button on each row.
 
 ## Next Steps
 
 - Read [Architecture Guide](architecture.md) for system details
 - Check [Examples](examples.md) for more use cases
-- Explore templates by running `/process-template-sync` then browsing `~/.claude/agentic-processes/templates/`
+- Explore templates by opening the Marketplace in the UI Settings to browse available templates
 
 ## Getting Help
 

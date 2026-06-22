@@ -38,18 +38,9 @@ if [ -f "$PENDING_FILE" ]; then
   exit 0
 fi
 
-# Check if any step has status 'in_progress' and approvalRequired: true
-HAS_APPROVAL_STEP=false
-
-if grep -qE '"status"[[:space:]]*:[[:space:]]*"in[_-]progress"' "$PROCESS_JSON_FILE"; then
-  if grep -qE '"approvalRequired"[[:space:]]*:[[:space:]]*true' "$PROCESS_JSON_FILE"; then
-    HAS_APPROVAL_STEP=true
-  fi
-fi
-
-if [ "$HAS_APPROVAL_STEP" = true ]; then
-    # Extract step info for actionable error
-    STEP_INFO=$(python3 -c "
+# Check if any SINGLE step has BOTH status 'in_progress' AND approvalRequired: true
+# Uses Python to check both conditions on the same step object (not file-wide grep)
+STEP_INFO=$(python3 -c "
 import json
 data = json.load(open('$PROCESS_JSON_FILE'))
 for s in data.get('steps', []):
@@ -57,6 +48,8 @@ for s in data.get('steps', []):
         print(s.get('id','') + '|' + s.get('name',''))
         break
 " 2>/dev/null)
+
+if [ -n "$STEP_INFO" ]; then
     APPROVAL_STEP_ID=$(echo "$STEP_INFO" | cut -d'|' -f1)
     APPROVAL_STEP_NAME=$(echo "$STEP_INFO" | cut -d'|' -f2)
 

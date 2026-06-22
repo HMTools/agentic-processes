@@ -14,23 +14,18 @@ Or use a local plugin directory:
 claude --plugin-dir /path/to/agentic-processes
 ```
 
-After installation, sync templates from configured git sources:
-```
-/process-template-sync
-```
-
-This fetches process and step templates to `~/.claude/agentic-processes/templates/` and creates all required runtime directories.
+After installation, open the Marketplace in the UI to browse and install templates from configured marketplaces. This installs process templates to `~/.claude/agentic-processes/templates/processes/` and creates all required runtime directories.
 
 ## Overview
 
 The Agentic Process System enables structured, repeatable workflows for complex development tasks. It provides:
 
 - **Process Templates**: Reusable workflow definitions with parameter substitution
-- **Modular Steps**: Self-contained, reusable step definitions that can be composed into processes
+- **Modular Steps**: Self-contained step definitions within each process template
 - **State Management**: Persistent process state with checkboxes, timestamps, and audit logs
 - **AI Integration**: Seamless integration with Claude Code
 - **Process Tracking**: Resume interrupted processes, track progress, and maintain context across sessions
-- **Git-Based Template Sources**: Templates fetched from configurable git repositories, enabling team sharing and versioning
+- **Template Marketplaces**: Templates installed from configurable git-backed marketplaces, enabling team sharing and versioning
 
 ## Key Features
 
@@ -43,10 +38,9 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 
 ### Modular Architecture
 - **Templates**: Define reusable workflows with placeholders
-- **Steps**: Self-contained step definitions with rich guidance
-- **Step References**: Compose processes using `@step:category/step-name` syntax
+- **Steps**: Self-contained step definitions within each template directory
 - **Pluggable Resources**: Add your own templates, steps, components, and guidelines
-- **Git-Based Sources**: Configure multiple git repositories as template sources
+- **Marketplaces**: Configure multiple git repositories as template marketplaces
 
 ### State Persistence
 - Process state stored in JSON files
@@ -55,21 +49,16 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 - No data loss between sessions
 
 ### AI Integration
-- Commands: `/process-new`, `/process-continue`, `/process-template-sync`
+- Commands: `/process-new`, `/process-continue`
 - Strict process adherence to prevent deviation
 - Proactive guidance for next steps
 - Subagent delegation for context isolation
 
 ## Quick Start
 
-### 1. Sync Templates
+### 1. Install Templates from Marketplaces
 
-After installing the plugin, fetch templates from git sources:
-```
-/process-template-sync
-```
-
-This clones configured template repositories and populates `~/.claude/agentic-processes/templates/` with process and step templates.
+After installing the plugin, open the Marketplace in the UI to browse available templates and install the ones you need. The marketplace refreshes git-backed template repositories and lets you install individual templates to `~/.claude/agentic-processes/templates/`.
 
 ### 2. Create a New Process
 
@@ -82,7 +71,7 @@ The system will:
 1. Check for existing similar processes
 2. List available templates from `~/.claude/agentic-processes/templates/processes/`
 3. Collect required parameters
-4. Resolve step references from `~/.claude/agentic-processes/templates/steps/`
+4. Resolve step definitions from subdirectories within the selected template
 5. Create process instance with expanded steps
 
 ### 3. Continue an Existing Process
@@ -122,7 +111,7 @@ agentic-processes/                    # Plugin root
 │   └── hooks.json                    # Unified hook configuration
 ├── scripts/                          # Hook and utility scripts
 │   ├── process_manager.py            # Process state management
-│   ├── template_manager.py           # Git-based template operations
+│   ├── template_manager.py           # Marketplace template operations
 │   ├── models.py                     # Shared data models
 │   └── ...hook scripts...
 ├── skills/
@@ -132,10 +121,8 @@ agentic-processes/                    # Plugin root
 │   │   └── SKILL.md                  # Continue an existing process
 │   ├── process-state-update/
 │   │   └── SKILL.md                  # Update process state files
-│   └── process-template-sync/
-│       └── SKILL.md                  # Manage template sources and sync
 ├── config/
-│   └── template-sources.default.json # Default template source configuration
+│   └── marketplaces.default.json     # Default marketplace configuration
 ├── types/                            # TypeScript types + schema.json
 ├── assets/
 │   └── logo.svg                      # Plugin branding
@@ -166,19 +153,18 @@ Processes are stored in `~/.claude/agentic-processes/`:
 - Process flow diagrams (mermaid)
 - Sequential step definitions
 
-Templates are synced to `~/.claude/agentic-processes/templates/processes/{category}/` from configured git sources.
+Templates are installed to `~/.claude/agentic-processes/templates/processes/{category}/` from configured marketplaces.
 
 ### Steps
 
-**Steps** are modular, self-contained definitions that include:
+**Steps** are modular, self-contained definitions that live as subdirectories within each process template directory. Each step includes:
 - Description and objectives
 - Expected outputs
 - Detailed guidance
-- Flow diagrams (mermaid)
 - Substeps breakdown
 - Examples and common pitfalls
 
-Steps are synced to `~/.claude/agentic-processes/templates/steps/{category}/` from configured git sources.
+Steps are defined at `{template-dir}/{stepRef}/{stepRef}.json` within each process template.
 
 ### Framework Steps
 
@@ -189,37 +175,27 @@ Steps are synced to `~/.claude/agentic-processes/templates/steps/{category}/` fr
 
 Framework step definitions live in `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`.
 
-### Step References
+## Template Marketplaces
 
-Templates reference steps using unified syntax:
-
-```markdown
-- [ ] Step 1: Implement feature
-  - **Step**: `@step:api/implement-controller-layer`
-
-- [ ] Step 2: Apply project conventions
-  - **Step**: `@step:my-category/my-custom-step`
-```
-
-## Template Sources
-
-Templates are distributed via git repositories, not bundled with the plugin. This enables:
+Templates are distributed via git-backed marketplaces, not bundled with the plugin. This enables:
 
 - **Versioned templates**: Pin to a branch or tag for stability
 - **Team sharing**: Host custom templates in private repos
-- **Multiple sources**: Combine official and custom template repos
+- **Multiple marketplaces**: Combine official and custom template repos
+- **Per-template install**: Browse catalogs and install only the templates you need
+- **Update detection**: See which installed templates have updates available
 - **Independent updates**: Update templates without updating the plugin
 
 ### Configuration
 
-Template sources are configured in `~/.claude/agentic-processes/config/template-sources.json`:
+Marketplaces are configured in `~/.claude/agentic-processes/config/marketplaces.json`:
 
 ```json
 {
-  "sources": [
+  "marketplaces": [
     {
       "name": "official",
-      "url": "https://github.com/HM/agentic-process-templates.git",
+      "url": "https://github.com/HMTools/agentic-process-templates.git",
       "branch": "main",
       "enabled": true,
       "priority": 100
@@ -228,27 +204,28 @@ Template sources are configured in `~/.claude/agentic-processes/config/template-
 }
 ```
 
-### Managing Sources
+### Managing Marketplaces
 
-Use `/process-template-sync` to:
-- **Sync**: Fetch latest templates from all configured sources
-- **Add source**: Register a new git repository as a template source
-- **Remove source**: Unregister a template source
-- **List sources**: View configured sources and their status
-- **Status**: Check sync state and installed template counts
+Use the Marketplace section in the UI Settings to:
+- **Add marketplace**: Register a new git repository as a marketplace
+- **Remove marketplace**: Unregister a marketplace
+- **Refresh**: Fetch latest template catalogs from all configured marketplaces
+- **Browse catalog**: Expand a marketplace to see all available templates
+- **Install/Uninstall**: Install specific templates from a marketplace
+- **Update**: Update installed templates when new versions are available
 
 ### Runtime Layout
 
-After syncing, templates are available at:
+After installing templates from marketplaces:
 ```
 ~/.claude/agentic-processes/
 ├── config/
-│   └── template-sources.json          # Source configuration
+│   ├── marketplaces.json              # Marketplace configuration
+│   └── installed-templates.json       # Installed templates manifest
 ├── cache/
-│   └── sources/{name}/                # Git clone cache per source
+│   └── sources/{name}/                # Git clone cache per marketplace
 ├── templates/
-│   ├── processes/{category}/          # Process templates
-│   └── steps/{category}/             # Step templates
+│   └── processes/{category}/          # Installed process templates (steps within each)
 ├── active/                            # Running processes
 ├── completed/                         # Finished processes
 ├── failed/                            # Failed processes
@@ -310,21 +287,20 @@ View the full interactive roadmap: [https://hmtools.github.io/agentic-processes/
 Official templates live in the [agentic-process-templates](https://github.com/HM/agentic-process-templates) repository. To contribute:
 
 1. Fork the templates repository
-2. Create or modify templates under `templates/processes/{category}/`
-3. Create or modify steps under `templates/steps/{category}/`
-4. Submit a pull request
+2. Create or modify templates under `templates/processes/{category}/` (step definitions live as subdirectories within each template)
+3. Submit a pull request
 
 ### Adding Custom Templates Locally
 
-For local/team-specific templates, add a custom git source:
+For local/team-specific templates, add a custom marketplace:
 
-1. Create a git repo with the standard template structure (`templates/processes/`, `templates/steps/`)
-2. Use `/process-template-sync` to add the repo as a source
-3. Sync to install the templates
+1. Create a git repo with the standard template structure (`templates/processes/`)
+2. Open the Marketplace in the UI Settings and add the repo as a marketplace
+3. Refresh and install the templates you need
 
 ### Template Authoring
 
-Process templates use parameter placeholders (`{{paramName}}`) and reference steps using `@step:category/step-name` syntax. Step templates include description, output, guidance, flow diagrams, substeps, examples, and common pitfalls.
+Process templates use parameter placeholders (`{{paramName}}`) and define steps as subdirectories within the template directory. Each step definition includes description, output, guidance, substeps, examples, and common pitfalls.
 
 ## License
 

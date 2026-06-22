@@ -732,10 +732,10 @@ class LogFile:
         )
 
 
-# --- Template Source types ---
+# --- Marketplace types ---
 
 @dataclass
-class TemplateSource:
+class Marketplace:
     name: str
     url: str
     branch: str = "main"
@@ -756,7 +756,7 @@ class TemplateSource:
         return d
 
     @classmethod
-    def from_dict(cls, data: dict) -> TemplateSource:
+    def from_dict(cls, data: dict) -> Marketplace:
         return cls(
             name=data["name"],
             url=data["url"],
@@ -774,7 +774,7 @@ class TemplateSource:
         branch: str = "main",
         enabled: bool = True,
         priority: int = 100,
-    ) -> TemplateSource:
+    ) -> Marketplace:
         return cls(
             name=name,
             url=url,
@@ -785,22 +785,97 @@ class TemplateSource:
 
 
 @dataclass
-class TemplateSourcesConfig:
-    sources: list[TemplateSource]
+class InstalledTemplate:
+    name: str
+    category: str
+    type: str  # 'process' | 'step'
+    marketplace: str
+    installedAt: str
+    version: str  # git commit hash at install time
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "category": self.category,
+            "type": self.type,
+            "marketplace": self.marketplace,
+            "installedAt": self.installedAt,
+            "version": self.version,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> InstalledTemplate:
+        return cls(
+            name=data["name"],
+            category=data["category"],
+            type=data["type"],
+            marketplace=data["marketplace"],
+            installedAt=data["installedAt"],
+            version=data["version"],
+        )
+
+    @classmethod
+    def create(
+        cls,
+        name: str,
+        category: str,
+        type: str,
+        marketplace: str,
+        version: str,
+    ) -> InstalledTemplate:
+        return cls(
+            name=name,
+            category=category,
+            type=type,
+            marketplace=marketplace,
+            installedAt=_now_iso(),
+            version=version,
+        )
+
+
+@dataclass
+class InstalledTemplatesManifest:
+    templates: list[InstalledTemplate]
+    lastUpdated: str
+
+    def to_dict(self) -> dict:
+        return {
+            "templates": [t.to_dict() for t in self.templates],
+            "lastUpdated": self.lastUpdated,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> InstalledTemplatesManifest:
+        return cls(
+            templates=[InstalledTemplate.from_dict(t) for t in data.get("templates", [])],
+            lastUpdated=data.get("lastUpdated", ""),
+        )
+
+    @classmethod
+    def create(cls) -> InstalledTemplatesManifest:
+        return cls(
+            templates=[],
+            lastUpdated=_now_iso(),
+        )
+
+
+@dataclass
+class MarketplaceConfig:
+    marketplaces: list[Marketplace]
     settings: dict[str, Any]
 
     def to_dict(self) -> dict:
         return {
-            "sources": [s.to_dict() for s in self.sources],
+            "marketplaces": [m.to_dict() for m in self.marketplaces],
             "settings": self.settings,
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> TemplateSourcesConfig:
+    def from_dict(cls, data: dict) -> MarketplaceConfig:
         return cls(
-            sources=[TemplateSource.from_dict(s) for s in data.get("sources", [])],
+            marketplaces=[Marketplace.from_dict(m) for m in data.get("marketplaces", [])],
             settings=data.get("settings", {
-                "autoSyncOnStale": False,
+                "autoRefreshOnStale": False,
                 "staleDurationMinutes": 1440,
             }),
         )
@@ -808,13 +883,13 @@ class TemplateSourcesConfig:
     @classmethod
     def create(
         cls,
-        sources: Optional[list[TemplateSource]] = None,
+        marketplaces: Optional[list[Marketplace]] = None,
         settings: Optional[dict[str, Any]] = None,
-    ) -> TemplateSourcesConfig:
+    ) -> MarketplaceConfig:
         return cls(
-            sources=sources or [],
+            marketplaces=marketplaces or [],
             settings=settings or {
-                "autoSyncOnStale": False,
+                "autoRefreshOnStale": False,
                 "staleDurationMinutes": 1440,
             },
         )

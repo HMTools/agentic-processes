@@ -32,14 +32,13 @@ Create a new process from a template with parameter substitution and step resolu
 - Always use a template from `~/.claude/agentic-processes/templates/processes/`
 - Never create files directly without a template
 - If no template exists: inform the user, list what templates exist, stop and wait
-- If no templates found at all, suggest running `/process-template-sync` to fetch templates from configured git sources.
+- If no templates found at all, suggest opening the Marketplace in the UI to browse and install templates from configured marketplaces.
 
 ### Unified Architecture
 
 | Location | Contains |
 |----------|----------|
-| `~/.claude/agentic-processes/templates/processes/` | All process templates |
-| `~/.claude/agentic-processes/templates/steps/` | All step definitions |
+| `~/.claude/agentic-processes/templates/processes/` | All process templates (steps within each) |
 | `~/.claude/agentic-processes/active/` | Running process instances |
 
 All process-related files live under `~/.claude/agentic-processes/`.
