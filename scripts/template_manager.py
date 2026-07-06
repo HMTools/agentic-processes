@@ -181,9 +181,31 @@ def _migrate_legacy_config() -> bool:
     return True
 
 
+def _ensure_default_config() -> None:
+    """Seed marketplaces.json from the bundled default config if it doesn't exist yet."""
+    if MARKETPLACE_CONFIG_FILE.exists():
+        return
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    if DEFAULT_CONFIG_FILE.exists():
+        shutil.copy2(DEFAULT_CONFIG_FILE, MARKETPLACE_CONFIG_FILE)
+    else:
+        default_config = MarketplaceConfig.create(
+            marketplaces=[
+                Marketplace.create(
+                    name="official",
+                    url="https://github.com/HMTools/agentic-processes-templates.git",
+                    branch="main",
+                    priority=100,
+                )
+            ]
+        )
+        _save_config(default_config)
+
+
 def _load_config() -> MarketplaceConfig:
-    """Load marketplace config, auto-migrating from legacy format if needed."""
+    """Load marketplace config, auto-migrating from legacy format and seeding defaults if needed."""
     _migrate_legacy_config()
+    _ensure_default_config()
     if MARKETPLACE_CONFIG_FILE.exists():
         data = read_json(MARKETPLACE_CONFIG_FILE)
         return MarketplaceConfig.from_dict(data)
@@ -287,25 +309,8 @@ def cmd_init(args: argparse.Namespace) -> None:
     # Auto-migrate legacy config
     migrated = _migrate_legacy_config()
 
-    config_created = False
-    if not MARKETPLACE_CONFIG_FILE.exists():
-        if DEFAULT_CONFIG_FILE.exists():
-            shutil.copy2(DEFAULT_CONFIG_FILE, MARKETPLACE_CONFIG_FILE)
-            config_created = True
-        else:
-            # Write a minimal default config
-            default_config = MarketplaceConfig.create(
-                marketplaces=[
-                    Marketplace.create(
-                        name="official",
-                        url="https://github.com/HMTools/agentic-process-templates.git",
-                        branch="main",
-                        priority=100,
-                    )
-                ]
-            )
-            _save_config(default_config)
-            config_created = True
+    config_created = not MARKETPLACE_CONFIG_FILE.exists()
+    _ensure_default_config()
 
     _ok({
         "dirsCreated": created_dirs,
@@ -458,19 +463,7 @@ def cmd_refresh(args: argparse.Namespace) -> None:
     # Auto-init first
     for d in RUNTIME_DIRS:
         d.mkdir(parents=True, exist_ok=True)
-    if not MARKETPLACE_CONFIG_FILE.exists():
-        if DEFAULT_CONFIG_FILE.exists():
-            shutil.copy2(DEFAULT_CONFIG_FILE, MARKETPLACE_CONFIG_FILE)
-        else:
-            default_config = MarketplaceConfig.create(
-                marketplaces=[
-                    Marketplace.create(
-                        name="official",
-                        url="https://github.com/HMTools/agentic-process-templates.git",
-                    )
-                ]
-            )
-            _save_config(default_config)
+    _ensure_default_config()
 
     if not _git_available():
         _error("git is not available on this system. Install git and try again.")

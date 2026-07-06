@@ -361,7 +361,7 @@ Installed templates are tracked in `~/.claude/agentic-processes/config/installed
 
 ### Contributing to Official Templates
 
-Official templates are maintained in the [agentic-process-templates](https://github.com/HM/agentic-process-templates) repository. Fork, modify, and submit pull requests.
+Official templates are maintained in the [agentic-processes-templates](https://github.com/HMTools/agentic-processes-templates) repository. Fork, modify, and submit pull requests.
 
 ### Custom Hooks
 

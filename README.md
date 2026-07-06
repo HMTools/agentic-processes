@@ -196,7 +196,7 @@ Marketplaces are configured in `~/.claude/agentic-processes/config/marketplaces.
   "marketplaces": [
     {
       "name": "official",
-      "url": "https://github.com/HMTools/agentic-process-templates.git",
+      "url": "https://github.com/HMTools/agentic-processes-templates.git",
       "branch": "main",
       "enabled": true,
       "priority": 100
@@ -285,7 +285,7 @@ View the full interactive roadmap: [https://hmtools.github.io/agentic-processes/
 
 ### Contributing to Official Templates
 
-Official templates live in the [agentic-process-templates](https://github.com/HM/agentic-process-templates) repository. To contribute:
+Official templates live in the [agentic-processes-templates](https://github.com/HMTools/agentic-processes-templates) repository. To contribute:
 
 1. Fork the templates repository
 2. Create or modify templates under `templates/processes/{category}/` (step definitions live as subdirectories within each template)
