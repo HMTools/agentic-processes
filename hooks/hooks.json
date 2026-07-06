@@ -5,15 +5,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-approval-stop.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/check-approval-stop.sh"]
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/enforce-log-on-stop.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/enforce-log-on-stop.sh"]
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/block-stop-pending-steps.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/block-stop-pending-steps.sh"]
           }
         ]
       }
@@ -23,7 +26,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/block-tools-on-pending.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/block-tools-on-pending.sh"]
           }
         ]
       },
@@ -32,7 +36,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/block-todo-tools.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/block-todo-tools.sh"]
           }
         ]
       },
@@ -41,7 +46,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/enforce-log-first.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/enforce-log-first.sh"]
           }
         ]
       },
@@ -50,7 +56,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/block-approve-step.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/block-approve-step.sh"]
           }
         ]
       }
@@ -61,11 +68,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/bind-session-to-process.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/bind-session-to-process.sh"]
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/track-file-change.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/track-file-change.sh"]
           }
         ]
       }
@@ -75,7 +84,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-approval-stop.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/check-approval-stop.sh"]
           }
         ]
       }
@@ -85,11 +95,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/create-log-flag.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/create-log-flag.sh"]
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-qa-session.sh"
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/check-qa-session.sh"]
           }
         ]
       }
