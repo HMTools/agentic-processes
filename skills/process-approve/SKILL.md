@@ -24,13 +24,13 @@ If no arguments provided, auto-detect the active process from `~/.claude/agentic
 4. **Create approve token**: Write an empty file `.approve-token` in the process directory
 5. **Call approve-step**: Run the command:
    ```bash
-   python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py approve-step \
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py approve-step \
      --process-dir "<process-dir>" \
      --step-id "<step-id>"
    ```
 6. **Delete pending interaction** (if exists):
    ```bash
-   python3 /c/Projects/HM/agentic-processes/scripts/process_manager.py write-pending \
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py write-pending \
      --process-dir "<process-dir>" \
      --delete
    ```

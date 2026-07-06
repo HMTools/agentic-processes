@@ -19,10 +19,11 @@ EXTRA_EMBED_FIELDS = [
     "changeProposalFormat", "captureTypes",
 ]
 
+CACHE_SOURCES_DIR = Path.home() / ".claude" / "agentic-processes" / "cache" / "sources"
+
 STEP_SEARCH_DIRS = [
     Path.home() / ".claude" / "agentic-processes" / "templates" / "processes",
-    Path(r"C:\Projects\HM\agentic-process-templates\templates\processes"),
-    Path(r"C:\Projects\HM\sdlc-process-templates\templates\processes"),
+    *sorted(CACHE_SOURCES_DIR.glob("*/templates/processes")),
 ]
 
 FRAMEWORK_STEPS_DIR = Path(__file__).parent.parent / "framework-steps"
