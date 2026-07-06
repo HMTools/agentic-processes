@@ -4,12 +4,13 @@ A powerful plugin for managing long-running, multi-step workflows with AI agents
 
 ## Installation
 
-Install from the marketplace:
+Add the marketplace (one-time), then install the plugin:
 ```bash
-claude plugin install agentic-processes
+/plugin marketplace add HMTools/agentic-processes
+claude plugin install agentic-processes@agentic-processes
 ```
 
-Or use a local plugin directory:
+Or use a local plugin directory (no marketplace needed):
 ```bash
 claude --plugin-dir /path/to/agentic-processes
 ```
