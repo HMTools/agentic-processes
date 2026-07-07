@@ -13,21 +13,17 @@ tool_input = data.get('tool_input', {})
 print(tool_input.get('command', ''))
 " 2>/dev/null)
 
-# Only check commands that contain 'approve-step'
-if echo "$COMMAND" | grep -q 'approve-step'; then
-    # Find the process directory from the command arguments
-    PROCESS_DIR=$(echo "$COMMAND" | python3 -c "
-import sys, re
-cmd = sys.stdin.read()
-match = re.search(r'--process-dir\s+[\"'\''](.*?)[\"'\'']', cmd)
-if match:
-    print(match.group(1))
-else:
-    # Try unquoted
-    match = re.search(r'--process-dir\s+(\S+)', cmd)
-    if match:
-        print(match.group(1))
-" 2>/dev/null)
+# Only check commands that actually invoke process_manager.py's approve-step subcommand
+# (a bare substring match on 'approve-step' also fires on unrelated commands, e.g. ones
+# that merely mention this hook's own filename)
+if echo "$COMMAND" | grep -qE 'process_manager\.py.*\bapprove-step\b'; then
+    # Find the process directory from the command arguments. This is delegated to a
+    # standalone .py file rather than embedded inline: embedding a Python one-liner with
+    # internal quotes inside a bash double-quoted `-c "..."` string is fragile (a previous
+    # version of this script had a `\'` escape here that bash does not interpret as intended
+    # inside double quotes, producing a Python SyntaxError on every invocation).
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROCESS_DIR=$(echo "$COMMAND" | python3 "$SCRIPT_DIR/hook_extract_process_dir.py" 2>/dev/null)
 
     if [ -z "$PROCESS_DIR" ]; then
         # Cannot determine process dir -- block for safety
