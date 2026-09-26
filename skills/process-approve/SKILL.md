@@ -16,6 +16,8 @@ Approve a step that has `approvalRequired: true` in its process definition.
 
 If no arguments provided, auto-detect the active process from `~/.claude/agentic-processes/active/` by finding the process directory with a `.session` file matching the current session.
 
+**Prefer explicit arguments.** A bare `/process-approve` with no arguments has been observed to fail silently -- the forked subagent gets no task and does nothing (0 tool calls). Whenever anything (a hook error, another skill, the UI) tells the user to run this command, it should give the real `<process-dir> <step-id>` values, not just the bare command name.
+
 ## Workflow
 
 1. **Read process state**: Read `process.json` from the process directory

@@ -88,7 +88,7 @@ For each step, determine its type and execute accordingly:
   5. Delete the pending checkpoint via `write-pending --delete`
   6. Call `update-step-status --status completed` (will succeed only if user has approved via `/process-approve` or UI)
 
-Step approval is user-only. The agent does not approve steps -- the user approves via `/process-approve` (CLI) or the UI app. If `update-step-status --status completed` fails because the step is not yet approved, inform the user they need to run `/process-approve` first.
+Step approval is user-only. The agent does not approve steps -- the user approves via `/process-approve` (CLI) or the UI app. If `update-step-status --status completed` fails because the step is not yet approved, tell the user the exact command to run, with the real process directory and step ID filled in -- e.g. `/agentic-processes:process-approve <process-dir> <step-id>` -- not just the bare skill name. Bare `/process-approve` with no arguments relies on auto-detection that can fail to hand the forked skill any task at all; always give explicit arguments.
 
 **Handle user corrections**: Log interaction via `process-state-update` skill, then re-invoke the `step-executor-delegation` skill with the corrections as the third argument: `step-executor-delegation "<process-dir>" "<step-id>" "<user corrections>"`. Re-present updated deliverables.
 

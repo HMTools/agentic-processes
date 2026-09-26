@@ -200,7 +200,7 @@ Step approval is user-only. The agent does not approve steps -- the user approve
 5. Delete the pending checkpoint via `write-pending --delete`
 6. Call `update-step-status --status completed` (will succeed only if the user has approved via `/process-approve` or the UI)
 
-If `update-step-status --status completed` fails because the step is not yet approved, inform the user they need to run `/process-approve` first.
+If `update-step-status --status completed` fails because the step is not yet approved, tell the user the exact command to run, with the real process directory and step ID filled in -- e.g. `/agentic-processes:process-approve <process-dir> <step-id>` -- not just the bare skill name. Bare `/process-approve` with no arguments relies on auto-detection that can fail to hand the forked skill any task at all; always give explicit arguments.
 
 **Examples of what is NOT approval:**
 - User confirms an assumption → mid-step answer, continue the step

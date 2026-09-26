@@ -42,8 +42,14 @@ if echo "$COMMAND" | grep -qE 'process_manager\.py.*\bapprove-step\b'; then
         echo '{}'
         exit 0
     else
-        # No token -- block the command
-        echo '{"decision": "block", "reason": "Step approval is user-only. Tell the user to run /process-approve to approve this step."}' >&2
+        # No token -- block the command. Include the ready-to-run command with the
+        # actual process-dir/step-id filled in: /process-approve invoked bare (no
+        # arguments) can fail to auto-detect the target when forked, so always hand
+        # the user the explicit command instead of just the skill name.
+        STEP_ID=$(python3 -c "import json; print(json.load(open('$PROCESS_DIR/process.json')).get('currentState',{}).get('activeStep',{}).get('id',''))" 2>/dev/null)
+        cat >&2 << EOF
+{"decision": "block", "reason": "Step approval is user-only. Tell the user to run this exact command:\n\n  /agentic-processes:process-approve $PROCESS_DIR $STEP_ID"}
+EOF
         exit 2
     fi
 fi
