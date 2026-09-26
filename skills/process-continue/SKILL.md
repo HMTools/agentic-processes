@@ -71,6 +71,7 @@ Update process state to reflect resumption using the `process-state-update` skil
 For each step, determine its type and execute accordingly:
 
 **Regular step** (has non-empty `stepDefinition`):
+- **Mark the step in progress first**: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-step-status --process-dir "<process-dir>" --step-id "<step-id>" --status in_progress`. Do this BEFORE invoking delegation — it's what tells the Stop hook a subagent is already working the step, instead of it re-blocking every turn.
 - **Invoke the `step-executor-delegation` skill** with the process directory and step ID to execute the step. The skill handles all delegation — do NOT construct the step-executor prompt directly.
 - Wait for skill/subagent completion
 - Verify step completed successfully

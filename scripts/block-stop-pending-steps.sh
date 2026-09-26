@@ -63,4 +63,37 @@ EOF
     exit 0
 fi
 
+# No pending step left. Check for an orphaned in_progress step: its
+# step-executor subagent may have crashed without writing "completed".
+# Only re-block once real time has passed (startedAt older than 10 min),
+# so a live subagent's normal runtime never triggers a false block.
+STALE_STEP_INFO=$(python3 -c "
+import json, datetime
+data = json.load(open('$PROCESS_JSON_FILE'))
+now = datetime.datetime.now(datetime.timezone.utc)
+for s in data.get('steps', []):
+    if s.get('status') == 'in_progress' and s.get('startedAt'):
+        try:
+            started = datetime.datetime.fromisoformat(s['startedAt'].replace('Z', '+00:00'))
+        except ValueError:
+            continue
+        if (now - started).total_seconds() > 600:
+            print(str(s.get('number','')) + '|' + s.get('id','') + '|' + s.get('name',''))
+            break
+" 2>/dev/null)
+
+if [ -n "$STALE_STEP_INFO" ]; then
+    STALE_NUMBER=$(echo "$STALE_STEP_INFO" | cut -d'|' -f1)
+    STALE_ID=$(echo "$STALE_STEP_INFO" | cut -d'|' -f2)
+    STALE_NAME=$(echo "$STALE_STEP_INFO" | cut -d'|' -f3)
+
+    cat << EOF
+{
+  "decision": "block",
+  "reason": "Step $STALE_NUMBER — \"$STALE_NAME\" (ID: $STALE_ID) has been in_progress for over 10 minutes with no completion — its step-executor subagent likely crashed or was lost.\nProcess dir: $PROCESS_DIR\n\nInvestigate, then either re-delegate the step via step-executor-delegation or mark it failed."
+}
+EOF
+    exit 0
+fi
+
 exit 0

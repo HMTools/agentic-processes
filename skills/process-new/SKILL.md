@@ -107,6 +107,7 @@ The script writes `process.json`, `memory/_cross-references.json`, and `log.json
 For each step in the process, determine its type and execute accordingly:
 
 **Regular step** (has non-empty `stepDefinition`):
+- Mark the step in progress first: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-step-status --process-dir "<process-dir>" --step-id "<step-id>" --status in_progress`. Do this BEFORE invoking delegation — it's what tells the Stop hook a subagent is already working the step, instead of it re-blocking every turn.
 - Invoke the `step-executor-delegation` skill with the process directory and step ID
 - Handle `approvalRequired` checkpoints (see Handling User Corrections below)
 - After completion, advance to the next step
@@ -168,7 +169,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py register-child-process 
 Read the child's `process.json`. For each child step in order:
 
 1. Check if the child step itself is a sub-process orchestrator step (recursive) or a regular step
-2. **Regular child step**: Call `step-executor-delegation "<child-process-dir>" "<child-step-id>"`
+2. **Regular child step**: Mark the step in progress first (`update-step-status --process-dir "<child-process-dir>" --step-id "<child-step-id>" --status in_progress`), then call `step-executor-delegation "<child-process-dir>" "<child-step-id>"`
 3. Handle `approvalRequired` on child steps the same way as parent steps (present deliverables, wait for approval, handle corrections)
 4. After each child step completes, advance to the next child step
 
