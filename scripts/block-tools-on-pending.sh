@@ -38,7 +38,7 @@ esac
 # Allow writes to process files
 if [ "$TOOL_NAME" = "Write" ] || [ "$TOOL_NAME" = "StrReplace" ] || [ "$TOOL_NAME" = "Edit" ]; then
   case "$FILE_PATH" in
-    *process.json|*log.json|*memory.json|*/memory/*.json|*pending-interaction.json)
+    *process.json|*log.json|*memory.json|*/memory/*.json|*pending-interaction.json|*.approve-token)
       exit 0
       ;;
   esac
