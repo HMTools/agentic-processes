@@ -2,7 +2,6 @@
 name: process-approve
 description: Approve a process step's deliverables
 disable-model-invocation: true
-context: fork
 allowed-tools: Bash(python3 *process_manager.py*) Write Read Glob
 ---
 
@@ -46,8 +45,7 @@ When no arguments are provided:
 
 ## Notes
 
-- This skill uses `context: fork` -- it runs in an isolated subagent so the main conversation agent never sees the token mechanism or approve-step command
-- This skill is invisible to the agent (`disable-model-invocation: true`) -- description not loaded into context
+- `disable-model-invocation: true` is the entire security boundary here: it makes this skill unreachable by the agent's own initiative under any circumstances (Claude: ✗ to invoke, per Claude Code's skill invocation rules) — only a human literally typing `/process-approve` can trigger it. This skill intentionally does NOT use `context: fork` split into a second skill, because a second `context: fork` skill invoked by this one would need `user-invocable: false` (Claude: ✓) to be callable at all, which would let the agent invoke the token-writing step on its own initiative and self-approve. Keeping the whole read+write flow in this single `disable-model-invocation: true` skill is what keeps approval human-only.
 - The `.approve-token` file is consumed by the `block-approve-step.sh` hook
 - For UI channel: the UI app calls `approve-step` directly (not through Claude Code), so hooks don't apply and no token is needed
 - The user's invocation of `/process-approve` IS the confirmation -- no additional confirmation needed within the skill
