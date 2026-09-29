@@ -6,6 +6,7 @@ Provides serialization (to_dict/from_dict) and factory methods for all process f
 from __future__ import annotations
 
 import json
+import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -46,6 +47,7 @@ class ProcessMetadata:
     template: str
     created: str
     lastUpdated: str
+    templateId: Optional[str] = None
     templateCategory: Optional[str] = None
     projectPaths: Optional[list[str]] = None
     processPath: Optional[str] = None
@@ -56,6 +58,8 @@ class ProcessMetadata:
             "created": self.created,
             "lastUpdated": self.lastUpdated,
         }
+        if self.templateId is not None:
+            d["templateId"] = self.templateId
         if self.templateCategory is not None:
             d["templateCategory"] = self.templateCategory
         if self.projectPaths is not None:
@@ -76,6 +80,7 @@ class ProcessMetadata:
             template=data["template"],
             created=data["created"],
             lastUpdated=data["lastUpdated"],
+            templateId=data.get("templateId"),
             templateCategory=data.get("templateCategory"),
             projectPaths=project_paths,
             processPath=data.get("processPath"),
@@ -378,6 +383,7 @@ class ProcessInstance:
         project_paths: list[str],
         process_path: str,
         template_category: Optional[str] = None,
+        template_id: Optional[str] = None,
         parent_process: Optional[ParentProcessRef] = None,
     ) -> ProcessInstance:
         now = _now_iso()
@@ -391,6 +397,7 @@ class ProcessInstance:
             name=name,
             metadata=ProcessMetadata(
                 template=template,
+                templateId=template_id,
                 templateCategory=template_category,
                 created=now,
                 lastUpdated=now,
@@ -580,6 +587,68 @@ class MemoryCrossReferences:
             filesModified=[],
             filesCreated=[],
             custom={},
+        )
+
+
+# --- Improvement Findings types (global, cross-process store) ---
+
+FINDINGS_DIR = Path.home() / ".claude" / "agentic-processes" / "improvement-findings"
+
+
+@dataclass
+class ImprovementFinding:
+    """A single improvement finding gathered (but not implemented) by the
+    continuous-improvement step. Stored under FINDINGS_DIR/<templateId>/<processId>.json
+    and later reviewed/implemented by the apply-improvements skill."""
+    id: str
+    processId: str
+    processName: str
+    template: str  # the template's readable name, for display only -- never the grouping key
+    createdAt: str
+    category: str
+    title: str
+    what: str
+    why: str
+    impact: str
+    scope: list[str] = field(default_factory=list)
+    status: str = "open"  # open | applied | rejected | deferred
+    resolution: Optional[dict[str, Any]] = None
+
+    def to_dict(self) -> dict:
+        d: dict[str, Any] = {
+            "id": self.id,
+            "processId": self.processId,
+            "processName": self.processName,
+            "template": self.template,
+            "createdAt": self.createdAt,
+            "category": self.category,
+            "title": self.title,
+            "what": self.what,
+            "why": self.why,
+            "impact": self.impact,
+            "scope": self.scope,
+            "status": self.status,
+        }
+        if self.resolution is not None:
+            d["resolution"] = self.resolution
+        return d
+
+    @classmethod
+    def from_dict(cls, data: dict) -> ImprovementFinding:
+        return cls(
+            id=data["id"],
+            processId=data["processId"],
+            processName=data["processName"],
+            template=data.get("template", ""),
+            createdAt=data["createdAt"],
+            category=data["category"],
+            title=data["title"],
+            what=data["what"],
+            why=data["why"],
+            impact=data["impact"],
+            scope=data.get("scope", []),
+            status=data.get("status", "open"),
+            resolution=data.get("resolution"),
         )
 
 
@@ -916,6 +985,8 @@ def read_json(path: Path) -> dict:
 
 def write_json(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
+    tmp_path = path.with_name(path.name + ".tmp")
+    with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
         f.write("\n")
+    os.replace(tmp_path, path)

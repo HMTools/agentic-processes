@@ -188,7 +188,63 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py add-log-entry \
 | `--decisions` | JSON array of decisions made during the step |
 | `--performance-notes` | JSON array of performance observations |
 
-**Important**: Use `--problems` to log any issues, errors, workarounds, or unexpected situations encountered during step execution. The `continuous-improvement` step reads `problemsEncountered` from the log to identify systemic issues and propose fixes.
+**Important**: Use `--problems` to log any issues, errors, workarounds, or unexpected situations encountered during step execution. The `continuous-improvement` step reads `problemsEncountered` from the log to identify systemic issues and save them as findings (see `write-finding` below).
+
+---
+
+### write-finding
+
+Save one improvement finding to the global findings store (`~/.claude/agentic-processes/improvement-findings/<templateId>/<processId>.json`, grouped by the process's own template UUID). Called only by the `continuous-improvement` step — never during a normal work step.
+
+**Example**:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py write-finding \
+  --process-dir ~/.claude/agentic-processes/active/process-name \
+  --category "Documentation Enhancement" \
+  --title "Step X guidance doesn't mention Y" \
+  --what "..." --why "..." --impact "..." \
+  --scope '["docs/foo.md"]'
+```
+
+**Args**:
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--process-dir` | Yes | Process directory path |
+| `--category` | Yes | One of the step's `improvementCategories` names |
+| `--title` | Yes | Short description of the finding |
+| `--what` | Yes | What the improvement would do |
+| `--why` | Yes | Why it's worth doing |
+| `--impact` | Yes | Expected impact |
+| `--scope` | No | JSON array of target file paths |
+
+---
+
+### list-findings
+
+Scan every process's finding file under the global findings store and return the matching records. Add `--template-id` to scope the scan to one template's subfolder. Used by the `apply-improvements` skill, never by a running process's own step.
+
+**Example**:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py list-findings --status open
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py list-findings --template-id 2932a013-81b1-487b-8f0c-991549eedeef
+```
+
+**Note**: `--template-id` is the template's own UUID (its `<name>.json`'s `"id"` field, or any of its processes' `process.json` → `metadata.templateId`) — not the template's readable name. Each returned finding's own `template` field carries the readable name for display.
+
+---
+
+### update-finding-status
+
+Record the outcome of a finding (`applied` / `rejected` / `deferred`) back into its process's finding file. Used only by the `apply-improvements` skill.
+
+**Example**:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-finding-status \
+  --process-id "<process-uuid>" --finding-id "<finding-uuid>" \
+  --status applied --notes "..." --files-modified '["docs/foo.md"]'
+```
+
+**Note**: `--process-id` alone is enough to locate the file — no `--template-id` needed, since process ids are globally unique.
 
 ---
 

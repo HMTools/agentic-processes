@@ -3,23 +3,20 @@
   "id": "aba25021-e2a0-4b50-853e-aa84ddd4efcd",
   "name": "continuous-improvement",
   "category": "learning",
-  "approvalRequired": true,
+  "approvalRequired": false,
   "metadata": {
     "title": "Continuous Improvement & Learning",
-    "purposeAndUsage": "Analyze process execution log and implement improvements for future iterations. Auto-injected by the framework at process creation time — template authors do not include this step.",
-    "lastUpdated": "2026-05-27"
+    "purposeAndUsage": "Analyze process execution log and SAVE improvement findings for later, async review. Does not propose, implement, or block on user approval — see the apply-improvements skill for that. Auto-injected by the framework at process creation time — template authors do not include this step.",
+    "lastUpdated": "2026-09-28"
   },
   "output": {
-    "description": "Analysis report and implemented improvements",
+    "description": "Improvement findings saved to the global findings store",
     "artifacts": [
-      "updated templates",
-      "updated steps",
-      "updated documentation"
+      "improvement-findings/<templateId>/<processId>.json entries"
     ],
     "memoryUpdates": [
       "improvementsIdentified",
-      "improvementsImplemented",
-      "improvementsDeferred",
+      "improvementsSaved",
       "summary"
     ]
   },
@@ -31,37 +28,27 @@
       "Read Process Log: Load log.json; parse all user interactions and change requests; identify patterns and recurring issues; note high iteration counts",
       "Analyze for Improvements: Group similar user corrections; identify corrections that could be automated; find missing validations; detect documentation gaps",
       "Prioritize Improvements: Rank by frequency, impact, and ease; focus on high frequency + high impact + easy to implement; limit to top 3-5",
-      "For Each Improvement: Propose to user (What, Why, Impact, Scope); investigate solution; IMPLEMENT ACTUAL CHANGES to files; request approval; document improvement",
-      "CRITICAL: Improvements must be IMPLEMENTED, not just documented. This means actually modifying template files, step files, or guidance documents to prevent recurrence.",
-      "MANDATORY: Propose ALL improvements before completing; user must approve/reject each",
-      "Summarize All Improvements: List improvements made (with file paths modified) and skipped; provide recommendations"
+      "For Each Finding: Call write-finding with category, title, what/why/impact, and scope (target files) — do NOT propose in chat and do NOT modify any file in this step",
+      "Summarize: List findings written to the global store; this step never blocks and never needs approval"
     ],
     "files": {
       "read": [
         "~/.claude/agentic-processes/active/{process-name}/log.json"
       ],
       "create": [],
-      "update": [
-        "Process templates in ~/.claude/agentic-processes/templates/processes/ (step definitions within each template)",
-        "Documentation in docs/"
-      ]
+      "update": []
     },
     "tools": [
-      "read_file - Read log.json and target files",
-      "write - Create or update files",
-      "search_replace - Make targeted updates"
+      "read_file - Read log.json",
+      "process-state-update skill (write-finding) - Save findings to the global store"
     ],
     "bestPractices": [
-      "Propose all improvements: Before completing, ensure ALL identified improvements have been proposed",
-      "One at a time: Only implement one improvement at a time",
-      "Always get approval: User must approve before proceeding",
-      "Atomic changes: Keep each improvement focused and self-contained",
-      "No traceback: Don't reference the previous state in the improved version",
-      "Clean implementation: Make it look like it was always there",
-      "IMPLEMENT, don't just document: Every approved improvement must result in actual file modifications (templates, steps, docs) - documentation alone is NOT an improvement",
-      "Show the diff: After implementing, show what files were modified and what changed",
-      "DEEP DIVE REQUIRED: Never propose a shallow fix - always trace actual execution and identify ALL affected files across the framework",
-      "VERIFY BEFORE PROPOSING: Confirm the target files were actually used in this process before proposing changes to them"
+      "Save, don't implement: this step's only output is finding records — implementation happens later, in the apply-improvements skill",
+      "One finding per write-finding call: keep records atomic and independently actionable",
+      "Still do the deep dive: findings should name real files and real evidence, even though nothing gets changed here",
+      "DEEP DIVE REQUIRED: Never save a shallow finding - always trace actual execution and identify ALL affected files across the framework",
+      "VERIFY BEFORE PROPOSING: Confirm the target files were actually used in this process before naming them in a finding's scope",
+      "Zero findings is a valid outcome — do not force artificial findings to fill a quota"
     ]
   },
   "substeps": [
@@ -92,7 +79,7 @@
     {
       "number": 2,
       "name": "Analyze for Improvements (with Deep Dive)",
-      "description": "Identify improvement opportunities from the log with thorough root cause analysis - do NOT propose shallow fixes",
+      "description": "Identify improvement opportunities from the log with thorough root cause analysis - do NOT save a shallow finding",
       "actions": [
         "ANALYZE FLAGGED ITEMS FIRST: Start with entries from priority list (forImprovementStep: true and potentialImprovement values)",
         "SECTION-SPECIFIC ANALYSIS:",
@@ -108,11 +95,11 @@
         "Find documentation gaps",
         "Detect repeated manual interventions",
         "TRACE ACTUAL EXECUTION: Review log.json to identify exactly which files were used during this process (which prompts, which steps, which templates)",
-        "IDENTIFY ALL AFFECTED FILES: For each improvement, find ALL files in the framework that could be affected - not just one obvious file",
+        "IDENTIFY ALL AFFECTED FILES: For each finding, find ALL files in the framework that could be affected - not just one obvious file",
         "CHECK FRAMEWORK-WIDE IMPACT: Consider if the issue exists in multiple places (e.g., both process-new.md AND process-continue.md)",
-        "VERIFY FILE USAGE: Before proposing a fix to any file, confirm that file was actually relevant to this process execution",
+        "VERIFY FILE USAGE: Before naming any file in a finding's scope, confirm that file was actually relevant to this process execution",
         "ROOT CAUSE ANALYSIS: Ask 'why did this happen?' at least 3 times to find the true root cause, not just the symptom",
-        "DOCUMENT REASONING: For each improvement, document: (1) What files were actually used, (2) What files need changes, (3) Why each file needs changes"
+        "DOCUMENT REASONING: For each finding, capture: (1) What files were actually used, (2) What files would need to change, (3) Why each file would need to change"
       ]
     },
     {
@@ -127,43 +114,26 @@
     },
     {
       "number": 4,
-      "name": "Implement Each Improvement (Iteratively)",
-      "description": "For each prioritized improvement, propose, implement ACTUAL FILE CHANGES, and get approval",
+      "name": "Save Each Finding",
+      "description": "For each prioritized improvement, save it as a finding in the global store — no proposal, no implementation, no approval",
       "actions": [
-        "a. Propose Improvement: Present What, Why, Impact, Scope, Target Files to modify",
-        "b. Get User Approval: Wait for user to approve/reject the proposed improvement",
-        "c. Investigate Solution: Research approach, identify exact files and sections to modify",
-        "d. Implement Change: ACTUALLY MODIFY the target files (templates, steps, docs) using write/search_replace tools",
-        "e. Show Changes: Present what files were modified and the specific changes made",
-        "f. Document Improvement: Update memory with file paths modified and change summary",
-        "CRITICAL: Step (d) must result in actual file modifications - documenting the problem without changing files is NOT implementing an improvement"
+        "For each prioritized finding, call write-finding via the process-state-update skill with --category, --title, --what, --why, --impact, and --scope (JSON array of target file paths)",
+        "Do not propose the finding in chat. Do not wait for a response. Do not modify any file.",
+        "Findings are automatically grouped by this process's template (via templateId) — no extra step needed"
       ]
     },
     {
       "number": 5,
-      "name": "Mandatory: Propose ALL Improvements",
-      "description": "Ensure all identified improvements are proposed to user",
+      "name": "Summarize Findings Saved",
+      "description": "Create a final summary of all findings written this run",
       "actions": [
-        "Checklist:",
-        "- Have all identified improvements been proposed?",
-        "- Has the user approved/rejected each?",
-        "- Have all approved improvements been implemented?",
-        "- Have all rejected improvements been documented with reasons?"
+        "List every finding written this run, with its category and target files",
+        "Note that zero findings is a valid, non-error outcome",
+        "Record processWideObservations.recommendationsForFuture with all recommendations from this analysis"
       ]
     },
     {
       "number": 6,
-      "name": "Summarize All Improvements",
-      "description": "Create final summary of all improvements",
-      "actions": [
-        "List all improvements made",
-        "List improvements skipped and why",
-        "Provide recommendations for future work",
-        "Record processWideObservations.recommendationsForFuture with all recommendations from this analysis (both implemented and deferred improvements)"
-      ]
-    },
-    {
-      "number": 7,
       "name": "End-Step: Compliance Check",
       "description": "Verify principles were followed in this step",
       "actions": [
@@ -175,7 +145,7 @@
     }
   ],
   "flow": {
-    "description": "Read log → Analyze for improvements (with deep dive: trace execution, find ALL affected files) → Prioritize → For each: propose → implement → approve → Next → Summarize all"
+    "description": "Read log → Analyze for improvements (with deep dive: trace execution, find ALL affected files) → Prioritize → Save each as a finding (write-finding, no proposal/implementation) → Summarize → step completes immediately, no approval needed"
   },
   "memoryFileUsage": {
     "readFrom": [],
@@ -184,9 +154,8 @@
     ],
     "fields": [
       "Improvements Identified: List with descriptions",
-      "Improvements Implemented: Each with Change, Files Modified, User Approval, Impact",
-      "Improvements Deferred: Each with Reason",
-      "Summary: Total identified, implemented, deferred"
+      "Improvements Saved: Each with category, target files, and the global finding id it was written as",
+      "Summary: Total identified, total saved"
     ]
   },
   "improvementCategories": [
@@ -226,29 +195,24 @@
   },
   "workflow": {
     "steps": [
-      "propose",
-      "investigate",
-      "implement",
-      "approve",
-      "document"
+      "gather",
+      "prioritize",
+      "save"
     ],
-    "approvalRequired": true
+    "approvalRequired": false
   },
   "successCriteria": [
     "Process log has been fully analyzed",
-    "All identified improvements have been either implemented or deferred",
-    "User has approved all implemented changes",
-    "Memory file documents all improvements and outcomes",
-    "No more high-priority improvements remain"
+    "All identified improvements have been saved as findings via write-finding (or zero findings, if none were found)",
+    "Memory file documents all findings saved",
+    "Step completes without proposing anything in chat or waiting on the user"
   ],
   "dependencies": {
     "requiredFiles": [
       "log.json"
     ],
     "requiredTools": [
-      "read_file",
-      "write",
-      "search_replace"
+      "read_file"
     ]
   },
   "references": {
