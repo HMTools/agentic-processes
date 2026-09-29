@@ -190,6 +190,7 @@ class ProcessStep:
     loopBackTo: Optional[str] = None
     loopCondition: Optional[str] = None
     maxIterations: Optional[int] = None
+    view: Optional[dict] = None  # resolved from views/ via viewRef at process-creation time
 
     def to_dict(self) -> dict:
         d: dict[str, Any] = {
@@ -218,6 +219,8 @@ class ProcessStep:
             d["loopCondition"] = self.loopCondition
         if self.maxIterations is not None:
             d["maxIterations"] = self.maxIterations
+        if self.view is not None:
+            d["view"] = self.view
         return d
 
     @classmethod
@@ -238,6 +241,7 @@ class ProcessStep:
             loopBackTo=data.get("loopBackTo"),
             loopCondition=data.get("loopCondition"),
             maxIterations=data.get("maxIterations"),
+            view=data.get("view"),
         )
 
 
@@ -417,6 +421,7 @@ class InteractionOption:
     label: str
     description: Optional[str] = None
     isDefault: Optional[bool] = None
+    data: Optional[dict] = None  # present only when the step's view declares this option's id
 
     def to_dict(self) -> dict:
         d: dict[str, Any] = {"id": self.id, "label": self.label}
@@ -424,6 +429,8 @@ class InteractionOption:
             d["description"] = self.description
         if self.isDefault is not None:
             d["isDefault"] = self.isDefault
+        if self.data is not None:
+            d["data"] = self.data
         return d
 
     @classmethod
@@ -433,6 +440,7 @@ class InteractionOption:
             label=data["label"],
             description=data.get("description"),
             isDefault=data.get("isDefault"),
+            data=data.get("data"),
         )
 
 

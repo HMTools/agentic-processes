@@ -298,6 +298,22 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             except (json.JSONDecodeError, KeyError):
                 pass
 
+    # --- Build UUID-to-path registry for views (mirrors the step registry above) ---
+    views_dir = template_dir / "views"
+    view_id_registry: dict[str, Path] = {}  # {uuid: path_to_json}
+    if views_dir.is_dir():
+        for subfolder in views_dir.iterdir():
+            if not subfolder.is_dir():
+                continue
+            view_json = subfolder / f"{subfolder.name}.json"
+            if view_json.exists():
+                try:
+                    vd = read_json(view_json)
+                    if vd.get("type") == "view" and "id" in vd:
+                        view_id_registry[vd["id"]] = view_json
+                except (json.JSONDecodeError, KeyError):
+                    pass
+
     # --- Resolve template steps by UUID ---
     steps_data = template_data.get("steps", [])
     steps = []
@@ -320,6 +336,20 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             # Null/empty stepRef: orchestrator step, keep empty definition
             step_definition = step_def.get("stepDefinition", {})
 
+        view_ref = step_def.get("viewRef")
+        view = None
+        if view_ref:
+            if view_ref not in view_id_registry:
+                # No fallback -- UUID must resolve or error, same rule as stepRef above
+                _error(f"View UUID not found in template's views/ folder: {view_ref}")
+            view_json_path = view_id_registry[view_ref]
+            view_data = read_json(view_json_path)
+            view = {k: view_data[k] for k in ("id", "name", "htmlFile", "operationIds", "mockData") if k in view_data}
+            html_file = view_json_path.parent / view_data["htmlFile"]
+            if not html_file.exists():
+                _error(f"View \"{view_data.get('name')}\" declares htmlFile \"{view_data['htmlFile']}\" but it does not exist: {html_file}")
+            view["html"] = html_file.read_text()
+
         steps.append(ProcessStep(
             id=_new_uuid(),
             number=i,
@@ -333,6 +363,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
             loopBackTo=step_def.get("loopBackTo"),
             loopCondition=step_def.get("loopCondition"),
             maxIterations=step_def.get("maxIterations"),
+            view=view,
         ))
 
     # --- Auto-inject framework steps ---
@@ -1111,11 +1142,13 @@ def cmd_write_pending(args: argparse.Namespace) -> None:
 
     # Guard: only allow pending-interaction on steps with approvalRequired
     process_path = process_dir / "process.json"
+    active_step = None
     if process_path.exists():
         pdata = read_json(process_path)
         active_step_id = pdata.get("currentState", {}).get("activeStep", {}).get("id", "")
         for step in pdata.get("steps", []):
             if step["id"] == active_step_id:
+                active_step = step
                 if not step.get("approvalRequired"):
                     _error(
                         f"Cannot create pending-interaction: step \"{step.get('name', '')}\" "
@@ -1128,6 +1161,21 @@ def cmd_write_pending(args: argparse.Namespace) -> None:
 
     options_data = json.loads(args.options)
     options = [InteractionOption.from_dict(o) for o in options_data]
+
+    view = active_step.get("view") if active_step else None  # resolved by cmd_create_process
+    if view:
+        by_id = {o.id: o for o in options}
+        missing = [
+            oid for oid in view.get("operationIds", [])
+            if oid not in by_id or not by_id[oid].data
+        ]
+        if missing:
+            _error(
+                f"Step \"{active_step.get('name', '')}\" resolves to view \"{view.get('name')}\" "
+                f"requiring bound data on option ids {view.get('operationIds')}, but these are "
+                f"missing or have empty data: {missing}. Pass --options with a `data` object for each."
+            )
+
     pending = PendingInteractionFile.create(options)
 
     write_json(pending_path, pending.to_dict())
