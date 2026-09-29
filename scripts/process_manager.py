@@ -15,6 +15,9 @@ Subcommands:
   register-child-process   Register a child subprocess in parent's process.json
   update-child-status      Update a child's status in parent's process.json
   update-log-observations  Update processWideObservations in log.json
+  write-finding            Save one improvement finding to the global findings store
+  list-findings            Scan the global findings store across processes
+  update-finding-status    Record the outcome (applied/rejected/deferred) of a finding
   write-pending            Create or delete pending-interaction.json
   create-qa-session        Create Q&A session with questions
   update-qa-answer         Add or update answer for a question
@@ -39,6 +42,8 @@ from models import (
     ActiveStepSubstep,
     ChildProcessRef,
     FileChange,
+    FINDINGS_DIR,
+    ImprovementFinding,
     LogFile,
     LogStepEntry,
     MemoryCrossReferences,
@@ -276,6 +281,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
     template_data = read_json(template_path)
     template_name = template_data.get("name", template_path.stem)
     template_category = template_data.get("category", None)
+    template_id = template_data.get("id", None)
 
     # --- Constants for step definition fields to embed ---
     EMBED_FIELDS = ["output", "guidance", "substeps", "flow", "memoryFileUsage", "parameters"]
@@ -390,6 +396,7 @@ def cmd_create_process(args: argparse.Namespace) -> None:
         project_paths=[args.project_path or str(Path.cwd())],
         process_path=str(process_dir),
         template_category=template_category,
+        template_id=template_id,
         parent_process=parent_process,
     )
 
@@ -1080,6 +1087,78 @@ def cmd_update_log_observations(args: argparse.Namespace) -> None:
     _ok("log.json")
 
 
+def cmd_write_finding(args: argparse.Namespace) -> None:
+    process_dir = Path(args.process_dir)
+    process = ProcessInstance.from_dict(read_json(process_dir / "process.json"))
+
+    # Fallback covers a template installed before templateId existed; grouping still
+    # works, just under the readable name instead of the UUID for that one template.
+    template_key = process.metadata.templateId or process.metadata.template
+    findings_path = FINDINGS_DIR / template_key / f"{process.id}.json"
+
+    data = read_json(findings_path) if findings_path.exists() else {
+        "type": "improvement-findings-file",
+        "templateId": template_key,
+        "template": process.metadata.template,
+        "processId": process.id,
+        "processName": process.name,
+        "findings": [],
+    }
+
+    finding = ImprovementFinding(
+        id=_new_uuid(),
+        processId=process.id,
+        processName=process.name,
+        template=process.metadata.template,
+        createdAt=_now_iso(),
+        category=args.category,
+        title=args.title,
+        what=args.what,
+        why=args.why,
+        impact=args.impact,
+        scope=json.loads(args.scope) if args.scope else [],
+    )
+    data["findings"].append(finding.to_dict())
+    write_json(findings_path, data)
+    _ok(str(findings_path))
+
+
+def cmd_list_findings(args: argparse.Namespace) -> None:
+    results = []
+    pattern = f"{args.template_id}/*.json" if args.template_id else "*/*.json"
+    if FINDINGS_DIR.exists():
+        for f in sorted(FINDINGS_DIR.glob(pattern)):
+            data = read_json(f)
+            for finding in data.get("findings", []):
+                if args.status and finding.get("status") != args.status:
+                    continue
+                results.append(finding)
+    print(json.dumps({"status": "ok", "findings": results}, indent=2))
+
+
+def cmd_update_finding_status(args: argparse.Namespace) -> None:
+    # process-id is globally unique, so the template subfolder doesn't need to be
+    # passed in separately -- find whichever template folder holds this process's file.
+    matches = list(FINDINGS_DIR.glob(f"*/{args.process_id}.json")) if FINDINGS_DIR.exists() else []
+    if not matches:
+        _error(f"No findings file for process {args.process_id}")
+    findings_path = matches[0]
+
+    data = read_json(findings_path)
+    for finding in data.get("findings", []):
+        if finding["id"] == args.finding_id:
+            finding["status"] = args.status
+            finding["resolution"] = {
+                "resolvedAt": _now_iso(),
+                "notes": args.notes,
+                "filesModified": json.loads(args.files_modified) if args.files_modified else [],
+            }
+            write_json(findings_path, data)
+            _ok(str(findings_path))
+            return
+    _error(f"Finding {args.finding_id} not found in {findings_path}")
+
+
 def cmd_write_pending(args: argparse.Namespace) -> None:
     process_dir = Path(args.process_dir)
     pending_path = process_dir / "pending-interaction.json"
@@ -1537,6 +1616,32 @@ def main() -> None:
     p_obs.add_argument("--metrics", help="JSON object of efficiency metrics")
     p_obs.add_argument("--recommendations", help="JSON array of recommendations for future")
     p_obs.set_defaults(func=cmd_update_log_observations)
+
+    # write-finding
+    p_write_finding = subparsers.add_parser("write-finding", help="Save one improvement finding to the global store")
+    p_write_finding.add_argument("--process-dir", required=True)
+    p_write_finding.add_argument("--category", required=True)
+    p_write_finding.add_argument("--title", required=True)
+    p_write_finding.add_argument("--what", required=True)
+    p_write_finding.add_argument("--why", required=True)
+    p_write_finding.add_argument("--impact", required=True)
+    p_write_finding.add_argument("--scope", help="JSON array of target file paths")
+    p_write_finding.set_defaults(func=cmd_write_finding)
+
+    # list-findings
+    p_list_findings = subparsers.add_parser("list-findings", help="Scan the global findings store across processes")
+    p_list_findings.add_argument("--status", choices=["open", "applied", "rejected", "deferred"])
+    p_list_findings.add_argument("--template-id", help="Scope the scan to one template's subfolder")
+    p_list_findings.set_defaults(func=cmd_list_findings)
+
+    # update-finding-status
+    p_update_finding = subparsers.add_parser("update-finding-status", help="Record the outcome of a finding")
+    p_update_finding.add_argument("--process-id", required=True)
+    p_update_finding.add_argument("--finding-id", required=True)
+    p_update_finding.add_argument("--status", required=True, choices=["applied", "rejected", "deferred"])
+    p_update_finding.add_argument("--notes")
+    p_update_finding.add_argument("--files-modified", help="JSON array of file paths modified")
+    p_update_finding.set_defaults(func=cmd_update_finding_status)
 
     # write-pending
     p_pending = subparsers.add_parser("write-pending", help="Create/delete pending interaction")
