@@ -59,6 +59,6 @@ came from and the files touched.
   `update-finding-status`. That directory is process state, same rule as `process.json`,
   `log.json`, and `memory/*.json`.
 - If a target file belongs to a template the user doesn't own (a marketplace template),
-  say so and stop — do not attempt the edit. This is a pre-existing gap tracked as
-  `roadmap/items/RM-040.json`, not something this skill solves.
+  say so and stop — do not attempt the edit. This is a pre-existing gap this skill
+  doesn't solve.
 - Zero open findings is a normal outcome — report that and stop, don't invent work.
