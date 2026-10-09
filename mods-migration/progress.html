@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mods Migration Progress</title>
+<style>
+:root{--bg:#faf8f3;--fg:#1c1b19;--mut:#6f6a5d;--card:#fff;--line:#ddd8cc;--ok:#1f7a52;--warn:#946410;--bad:#b3261e;--acc:#2b5fd9;--chip:#f1ede2}
+@media (prefers-color-scheme:dark){:root{--bg:#151412;--fg:#ece8dd;--mut:#9d978a;--card:#1e1d1a;--line:#34312b;--ok:#4cc38a;--warn:#e0b04c;--bad:#f0746b;--acc:#7aa2ff;--chip:#2a2824}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 64px}h1{margin:0 0 4px;font-size:24px}.sub{color:var(--mut);margin:0 0 20px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}.tile b{display:block;font-size:24px}.tile span{color:var(--mut);font-size:12px}
+.bar{height:8px;background:var(--chip);border-radius:6px;overflow:hidden;margin-bottom:18px}.bar i{display:block;height:100%;background:var(--ok)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.filters button{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:16px;padding:4px 12px;cursor:pointer;font:inherit;font-size:13px}.filters button[aria-pressed=true]{background:var(--fg);color:var(--bg)}
+.row{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.row summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:52px 1fr auto auto;gap:10px;align-items:center;padding:10px 14px}
+.row summary::-webkit-details-marker{display:none}.id{font:600 13px ui-monospace,Menlo,monospace}
+.chip{font-size:12px;padding:2px 9px;border-radius:12px;background:var(--chip);white-space:nowrap}
+.st-todo{color:var(--mut)}.st-researching{color:var(--warn)}.st-done{color:var(--ok)}.st-blocked{color:var(--bad)}
+.body{padding:2px 14px 14px 76px;font-size:14px}.body dt{font-weight:600;margin-top:8px;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em}.body dd{margin:2px 0}
+code{font:12.5px ui-monospace,Menlo,monospace;background:var(--chip);padding:0 4px;border-radius:4px}
+a{color:var(--acc)}.how{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin:0 0 18px;font-size:14px}
+@media (max-width:600px){.row summary{grid-template-columns:44px 1fr}.row summary .chip{grid-column:2}.body{padding-left:14px}}
+</style>
+</head>
+<body>
+<main>
+<h1>Mods Migration Progress</h1>
+<p class="sub">Research only. One row for each file in <code>items/</code>. Open a row for details. Edit the data in the <code>ITEMS</code> block at the bottom of this file.</p>
+<details class="how"><summary><b>How to update this page</b></summary>
+<ol>
+<li>Finish the research in <code>items/&lt;ID&gt;-*.md</code> (section 7, Research result).</li>
+<li>In this file find the object with the same <code>id</code> between <code>/* ITEMS:START */</code> and <code>/* ITEMS:END */</code>.</li>
+<li>Set <code>status</code> to <code>"researching"</code>, <code>"done"</code> or <code>"blocked"</code>; <code>verdict</code> to <code>replace</code>, <code>improve</code>, <code>keep</code> or <code>later</code>; <code>summary</code> to 1–3 sentences; <code>open</code> to a list of open questions; <code>updated</code> to <code>YYYY-MM-DD</code>.</li>
+<li>Do not edit <code>firstGuess</code>, <code>file</code> or other entries. Reload the page and check your row.</li>
+</ol></details>
+<div class="tiles" id="tiles"></div>
+<div class="bar"><i id="barfill"></i></div>
+<div class="filters" id="filters"></div>
+<div id="list"></div>
+</main>
+<script>
+const ITEMS = /* ITEMS:START */ [
+  {
+    "id": "H01",
+    "group": "H",
+    "title": "block-stop-pending-steps (auto-advance)",
+    "file": "items/H01-block-stop-pending-steps.md",
+    "firstGuess": "replace",
+    "source": "scripts/block-stop-pending-steps.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H02",
+    "group": "H",
+    "title": "check-approval-stop",
+    "file": "items/H02-check-approval-stop.md",
+    "firstGuess": "replace",
+    "source": "scripts/check-approval-stop.sh, scripts/build_approval_block_message.py",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H03",
+    "group": "H",
+    "title": "enforce-log-on-stop",
+    "file": "items/H03-enforce-log-on-stop.md",
+    "firstGuess": "replace",
+    "source": "scripts/enforce-log-on-stop.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H04",
+    "group": "H",
+    "title": "block-tools-on-pending",
+    "file": "items/H04-block-tools-on-pending.md",
+    "firstGuess": "replace",
+    "source": "scripts/block-tools-on-pending.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H05",
+    "group": "H",
+    "title": "block-todo-tools",
+    "file": "items/H05-block-todo-tools.md",
+    "firstGuess": "replace",
+    "source": "scripts/block-todo-tools.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H06",
+    "group": "H",
+    "title": "enforce-log-first",
+    "file": "items/H06-enforce-log-first.md",
+    "firstGuess": "replace",
+    "source": "scripts/enforce-log-first.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H07",
+    "group": "H",
+    "title": "block-approve-step",
+    "file": "items/H07-block-approve-step.md",
+    "firstGuess": "replace",
+    "source": "scripts/block-approve-step.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H08",
+    "group": "H",
+    "title": "bind-session-to-process",
+    "file": "items/H08-bind-session-to-process.md",
+    "firstGuess": "replace",
+    "source": "scripts/bind-session-to-process.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H09",
+    "group": "H",
+    "title": "track-file-change",
+    "file": "items/H09-track-file-change.md",
+    "firstGuess": "replace",
+    "source": "scripts/track-file-change.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H10",
+    "group": "H",
+    "title": "create-log-flag",
+    "file": "items/H10-create-log-flag.md",
+    "firstGuess": "replace",
+    "source": "scripts/create-log-flag.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "H11",
+    "group": "H",
+    "title": "check-qa-session",
+    "file": "items/H11-check-qa-session.md",
+    "firstGuess": "replace",
+    "source": "scripts/check-qa-session.sh",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "C01",
+    "group": "C",
+    "title": "Shared hook plumbing and session lookup",
+    "file": "items/C01-shared-hook-plumbing.md",
+    "firstGuess": "replace",
+    "source": "scripts/parse_hook_input.py, scripts/hook_extract_process_dir.py",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P01",
+    "group": "P",
+    "title": "Python CLI process_manager.py",
+    "file": "items/P01-python-cli-process-manager.md",
+    "firstGuess": "improve",
+    "source": "scripts/process_manager.py",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P02",
+    "group": "P",
+    "title": "Approval wait file (pending-interaction.json)",
+    "file": "items/P02-approval-wait-file.md",
+    "firstGuess": "improve",
+    "source": "scripts/process_manager.py (write-pending)",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P03",
+    "group": "P",
+    "title": "process-approve skill",
+    "file": "items/P03-process-approve-skill.md",
+    "firstGuess": "replace",
+    "source": "skills/process-approve/SKILL.md",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P04",
+    "group": "P",
+    "title": "process-new and process-continue skills",
+    "file": "items/P04-process-new-and-continue-skills.md",
+    "firstGuess": "improve",
+    "source": "skills/process-new, skills/process-continue",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P05",
+    "group": "P",
+    "title": "Q&A session skill",
+    "file": "items/P05-qna-session-skill.md",
+    "firstGuess": "improve",
+    "source": "skills/process-QnA-session/SKILL.md",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P06",
+    "group": "P",
+    "title": "Step executor agent and delegation",
+    "file": "items/P06-step-executor-agent.md",
+    "firstGuess": "keep",
+    "source": "agents/step-executor.md, agents/process-spawner.md, skills/step-executor-delegation",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P07",
+    "group": "P",
+    "title": "Memory, log and findings files",
+    "file": "items/P07-memory-log-findings-files.md",
+    "firstGuess": "keep",
+    "source": "scripts/process_manager.py, scripts/models.py",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P08",
+    "group": "P",
+    "title": "Continuous improvement and apply-improvements",
+    "file": "items/P08-continuous-improvement.md",
+    "firstGuess": "keep",
+    "source": "framework-steps/, skills/apply-improvements",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P09",
+    "group": "P",
+    "title": "Template marketplaces",
+    "file": "items/P09-template-marketplaces.md",
+    "firstGuess": "keep",
+    "source": "scripts/template_manager.py",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P10",
+    "group": "P",
+    "title": "Settings hooks in hooks.json (transition)",
+    "file": "items/P10-settings-hooks-transition.md",
+    "firstGuess": "keep, then remove",
+    "source": "hooks/hooks.json",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P11",
+    "group": "P",
+    "title": "Step status shown in the session",
+    "file": "items/P11-step-status-in-session.md",
+    "firstGuess": "improve",
+    "source": "(new)",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "P12",
+    "group": "P",
+    "title": "View widgets and the UI app",
+    "file": "items/P12-views-and-ui-app.md",
+    "firstGuess": "later",
+    "source": "../agentic-processes-templates (views), ../agentic-processes-ui",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "S01",
+    "group": "S",
+    "title": "Spike: tool guard as a mod",
+    "file": "items/S01-spike-guard.md",
+    "firstGuess": "spike",
+    "source": "(throwaway mod outside the repo)",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "S02",
+    "group": "S",
+    "title": "Spike: session to process link",
+    "file": "items/S02-spike-session-link.md",
+    "firstGuess": "spike",
+    "source": "(throwaway mod outside the repo)",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "S03",
+    "group": "S",
+    "title": "Spike: block a stop",
+    "file": "items/S03-spike-stop-block.md",
+    "firstGuess": "spike",
+    "source": "(throwaway mod outside the repo)",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "X01",
+    "group": "X",
+    "title": "Admin policy and fallback",
+    "file": "items/X01-admin-policy-and-fallback.md",
+    "firstGuess": "risk",
+    "source": "docs: mods/admin; hooks/hooks.json",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  }
+] /* ITEMS:END */;
+const GROUPS={H:"Hook scripts",C:"Shared plumbing",P:"Other plugin parts",S:"Spikes",X:"Cross-cutting"};
+let fg="all",fs="all";
+const $=s=>document.querySelector(s),esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function tiles(){const n=ITEMS.length,c=s=>ITEMS.filter(i=>i.status===s).length;
+ $("#tiles").innerHTML=[["Items",n],["Todo",c("todo")],["Researching",c("researching")],["Done",c("done")],["Blocked",c("blocked")],["Open questions",ITEMS.reduce((a,i)=>a+(i.open||[]).length,0)]].map(([l,v])=>`<div class="tile"><b>${v}</b><span>${l}</span></div>`).join("");
+ $("#barfill").style.width=(100*c("done")/n)+"%";}
+function filters(){const g=["all",...Object.keys(GROUPS)],s=["all","todo","researching","done","blocked"];
+ $("#filters").innerHTML=g.map(x=>`<button data-g="${x}" aria-pressed="${fg===x}">${x==="all"?"All groups":GROUPS[x]}</button>`).join("")+s.map(x=>`<button data-s="${x}" aria-pressed="${fs===x}">${x==="all"?"Any status":x}</button>`).join("");
+ document.querySelectorAll("#filters button").forEach(b=>b.onclick=()=>{if(b.dataset.g)fg=b.dataset.g;else fs=b.dataset.s;render()});}
+function list(){$("#list").innerHTML=ITEMS.filter(i=>(fg==="all"||i.group===fg)&&(fs==="all"||i.status===fs)).map(i=>`
+<details class="row"><summary><span class="id">${esc(i.id)}</span><span>${esc(i.title)}</span><span class="chip">first guess: ${esc(i.firstGuess)}</span><span class="chip st-${esc(i.status)}">${esc(i.status)}${i.verdict?" · "+esc(i.verdict):""}</span></summary>
+<dl class="body"><dt>Task file</dt><dd><a href="${esc(i.file)}">${esc(i.file)}</a></dd>
+<dt>Source in the repo</dt><dd><code>${esc(i.source)}</code></dd>
+<dt>Summary</dt><dd>${esc(i.summary)||"<i>not researched yet</i>"}</dd>
+<dt>Open questions</dt><dd>${(i.open||[]).length?"<ul>"+i.open.map(q=>`<li>${esc(q)}</li>`).join("")+"</ul>":"none recorded"}</dd>
+<dt>Updated</dt><dd>${esc(i.updated)||"—"}</dd></dl></details>`).join("");}
+function render(){tiles();filters();list();}
+render();
+</script>
+</body>
+</html>
