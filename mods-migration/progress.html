@@ -49,11 +49,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H01-block-stop-pending-steps.md",
     "firstGuess": "replace",
     "source": "scripts/block-stop-pending-steps.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "improve",
+    "summary": "A mod can replace the script: classic.Stop returns { block: reason }, is main-agent only, and $.agent.list() can replace the 10 minute timer. Owner choices: no shell fallback, no loop guard. Several behaviours are from docs and types only and need spike S03.",
+    "open": ["Does classic.Stop never fire for subagents? (S03)","How are several Stop blocks merged, and is there an engine re-block cap? (S03)","Does agent.list() still show a crashed step-executor at Stop time? (S03)","Block or allow when a background step-executor is still running?"],
+    "updated": "2026-10-09"
   },
   {
     "id": "H02",
@@ -62,11 +62,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H02-check-approval-stop.md",
     "firstGuess": "replace",
     "source": "scripts/check-approval-stop.sh, scripts/build_approval_block_message.py",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "improve / partial replace",
+    "summary": "Moved into hooks/on-agent-stopping/on-agent-stopping.ts as a turn.complete re-prompt (classic.Stop is skipped for user mods, see H01). Both scripts and both hook entries (Stop, SubagentStop) removed; no subagent guard; capped by the H01 3-turn limit.",
+    "open": ["Is dropping the SubagentStop guard right? (step-executor returns to parent, parent writes the checkpoint)", "Org-tier mod: switch to classic.Stop block (H01 TODO)"],
+    "updated": "2026-10-09"
   },
   {
     "id": "H03",

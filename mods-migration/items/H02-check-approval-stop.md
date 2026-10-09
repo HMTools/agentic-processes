@@ -60,7 +60,7 @@ _(output of `claude --version`)_
 _(one answer per question in section 4, each with evidence: doc page + section, type-file name, or repo file:line)_
 
 ### Final verdict
-_(replace | improve | keep | later)_
+**improve / partial replace.** Implemented 2026-10-09 on `feat/h01-stop-guard-mod`: the rule is one more branch in `hooks/on-agent-stopping/on-agent-stopping.ts` (`approvalPrompt`, placed before the pending-step rule; a live step-executor gets the wait text). Owner answers: rule stays in `auto-advance.ts`; text points to the `process-state-update` skill instead of printing the script path; the `SubagentStop` guard is dropped (the parent writes the checkpoint); an open Q&A session gets no extra text, only a TODO for a configurable retry count once the mod has a settings UI. Scripts `check-approval-stop.sh`, `build_approval_block_message.py` and both hook entries deleted. 16 tests pass. Same limits as H01: re-prompt, not a stop veto; no guard when mods are off.
 
 ### Evidence
 ### Open questions
