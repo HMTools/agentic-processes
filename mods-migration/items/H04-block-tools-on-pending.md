@@ -55,21 +55,54 @@
 No implementation. No plugin edits. No building a mod. (Only items S01–S03 may build a throwaway mod outside this repo.) Do not run or change the plugin's scripts.
 
 ## 7. Research result
-_(empty until the research is done; fill each heading below.)_
+
+Planned and built 2026-10-09 (plan page: https://claude.ai/artifact/XQrZnqF8njUdfvg6PP5tM9). Not committed.
 
 ### Claude Code version
-_(output of `claude --version`)_
+`2.1.295 (Claude Code)`. Type file from the `plugin-authoring` skill for this build.
 
 ### Answers per question
-_(one answer per question in section 4, each with evidence: doc page + section, type-file name, or repo file:line)_
+1. Pre-tool event: `tool.call`, result `{ deny: text }` or `next(e)`. Used instead of `classic.PreToolUse`, as in H06.
+2. Tool names are the real ones (`Bash`, `Read`, `Write`, ...); MCP tools are `mcp__server__tool` (type file, tool list docs). The old script's Cursor-era names are gone.
+3. `tool.call` carries `agentId` for a subagent. Owner choice: the guard ignores it, so a subagent waits too (as the old script did; unlike H06).
+4. The `deny` text arrives as the tool error (H06 live test). Multi-line works.
+5. A handler that throws is skipped (fail open), as the shell hook did. No time problem seen.
+6. Order with settings hooks: not tested. The todo-tool and approve-step hooks keep their own matchers.
+7. Cost: read-only tools pass before any file access. Other tools do one folder scan plus one `exists` per call, as the script did. No cache, no watcher.
+8. Bash: the raw command is checked with the H06 `runsProcessManager` regex (shared, now exported). `echo process_manager.py; rm -rf x` and `ls # process_manager.py` are refused. A chain that also holds a real run (`rm x; python3 process_manager.py ...`) still passes (known ceiling).
 
 ### Final verdict
-_(replace | improve | keep | later)_
+**replace**
+
+### Implemented
+- `hooks/on-pending-checkpoint/on-pending-checkpoint.ts`: one `tool.call` handler with no tool filter.
+- `hooks/infra/pending-checkpoint/pending-checkpoint.ts`: `findPendingBlock` (rules) and the refusal text (names the skill, not the script path).
+- `hooks/infra/log-owed/log-owed.ts`: `runsProcessManager` exported. `hooks/register.ts`: new handler registered before the log-first one.
+- Removed `scripts/block-tools-on-pending.sh` and its first `PreToolUse` group in `hooks/hooks.json`.
+- Owner choices: pass `Read`, `Glob`, `Grep`, `LS`, `WebFetch`, `WebSearch`; refuse all else incl. MCP, `Agent`, `Task`, `TodoWrite`; **no Write/Edit of process files** (use `process_manager.py` only); subagents wait.
+- One exception kept: `Write`/`Edit` of exactly `<bound process dir>/.approve-token`, because `skills/process-approve/SKILL.md:26` writes it with the Write tool while the checkpoint still exists. Without it `/process-approve` would break.
+- Tests: `hooks/on-pending-checkpoint/on-pending-checkpoint.test.ts`. Full suite 84 pass (`claude plugin test .`).
+- Not live-tested: a real checkpoint in a real session; a call from a subagent; `tool.call` with no filter seeing MCP tools (the test host does not prove it).
 
 ### Evidence
+- Type file `claude-code.d.ts`: `tool.call` input `agentId`, tool names (`mcp__x__y`), `deny` result.
+- Repo: removed script (git history), `scripts/process_manager.py` `cmd_write_pending` (`:1155`), `skills/process-approve/SKILL.md:26`, `agents/step-executor.md:115`.
+- Precedent: H06 hook `hooks/on-agent-editing/on-agent-editing.ts`.
+
 ### Open questions
+- Does a `tool.call` handler with no filter see every tool, MCP included? (Needs a live run.)
+- Order against the shell hooks `block-todo-tools.sh` and `block-approve-step.sh`.
+- Close the chain gap (`x; process_manager.py ...`) with a whole-command check? Not chosen.
+- Any other skill that writes a state file by hand while a checkpoint waits? Only the `.approve-token` case was found.
+
 ### Risks
+- With mods off (`--safe-mode`, organization policy, crashed worker) no guard runs: the script is gone (same as H01, H06). X01 decides on a fallback.
+- A bug in the handler that throws lets calls pass; a bug that wrongly refuses blocks the agent until the pending file is deleted by hand.
+- The first prompt in a new session is not covered until `.session` is bound (H08).
+
 ### What a later plan must decide
+- Settings-hook fallback for mods-off machines (X01).
+- Whether `WebFetch`/`WebSearch` should pass (decided yes now; revisit if the agent starts research during approvals).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "H04"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

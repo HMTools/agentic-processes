@@ -3,15 +3,6 @@
   "hooks": {
     "PreToolUse": [
       {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/block-tools-on-pending.sh"]
-          }
-        ]
-      },
-      {
         "matcher": "Task|TaskCreate|TaskUpdate",
         "hooks": [
           {

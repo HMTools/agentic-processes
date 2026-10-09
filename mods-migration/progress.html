@@ -88,11 +88,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H04-block-tools-on-pending.md",
     "firstGuess": "replace",
     "source": "scripts/block-tools-on-pending.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Replaced by a tool.call mod handler. Only read and web tools plus exact process_manager.py runs pass while an approval waits; subagents wait too; no direct Write/Edit of process files (except the approve token).",
+    "open": ["Does a no-filter tool.call see MCP tools in a live run?", "Order against block-todo-tools.sh and block-approve-step.sh", "Chain gap: x; process_manager.py ... still passes"],
+    "updated": "2026-10-09"
   },
   {
     "id": "H05",

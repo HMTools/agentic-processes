@@ -18,7 +18,7 @@ export async function raiseLogOwed(files: FileSystem, sessionId: string): Promis
 // ── What a Bash command does to the log ────────────────────────────────────
 
 // A command of its own or one step of a chain; `echo process_manager.py log-interaction` does not count.
-const runsProcessManager = (subcommand: string) => new RegExp(`(?:^|&&|;|\\|\\|)\\s*(?:python3?\\s+)?\\S*process_manager\\.py\\s+${subcommand}\\b`)
+export const runsProcessManager = (subcommand: string) => new RegExp(`(?:^|&&|;|\\|\\|)\\s*(?:python3?\\s+)?\\S*process_manager\\.py\\s+${subcommand}\\b`)
 export const isLogInteractionCommand = (command: string) => runsProcessManager('log-interaction').test(command)
 
 // The commands that change the process. They wait for the log, as the Python check did before.
