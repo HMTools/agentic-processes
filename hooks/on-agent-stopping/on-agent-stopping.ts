@@ -2,8 +2,9 @@ import type { Register } from 'claude-code'
 import type { Step, StepView } from '../infra/agentic-process-types/agentic-process-types'
 import { findAgenticProcessDir, readAgenticProcess, hasApprovalCheckpoint, hasAgenticProcessInstance, isProcessRunning } from '../infra/agentic-process-repository/agentic-process-repository'
 import { isStepExecutorRunning } from '../infra/step-executors/step-executors'
+import { findLogOwed } from '../infra/log-first/log-first'
 import { createRepromptLimiter } from '../infra/reprompt-limiter/reprompt-limiter'
-import { isMainAgentAnswer, isPromptFromPlugin } from '../infra/mod-events/mod-events'
+import { isMainAgentAnswer } from '../infra/mod-events/mod-events'
 import type { FileSystem, ListAgents } from '../infra/ports/ports'
 
 // When the main agent ends a turn while its process still has work, send it a prompt that starts a new turn.
@@ -35,6 +36,9 @@ const agentsOf = ($: any): ListAgents => () => $.agent.list()
 // Not awaited: the new turn only starts once the current one has ended.
 const startNewTurn = ($: any, text: string) => { void $.prompt.submit({ text }) }
 
+// The user's own prompt starts the count again (called by the prompt hook in ../on-user-prompt).
+export const startCountingAgain = () => repromptLimiter.reset()
+
 // ── Entry point ─────────────────────────────────────────────────────────────
 
 export const register: Register = on => {
@@ -48,12 +52,6 @@ export const register: Register = on => {
     if (timesInARow <= MAX_REPROMPTS) startNewTurn($, prompt.text)
     return result
   })
-
-  // The user's own prompt starts the count again. Our re-prompts pass through here too.
-  on('prompt.submit', ($, e, next) => {
-    if (!isPromptFromPlugin(e)) repromptLimiter.reset()
-    return next(e)
-  })
 }
 
 // ── The rules ───────────────────────────────────────────────────────────────
@@ -61,6 +59,11 @@ export const register: Register = on => {
 // What the agent must do next, or undefined when it may stop.
 async function promptToContinue($: any, sessionId: string): Promise<Prompt | undefined> {
   const files = filesOf($)
+
+  // The user's last prompt has no log entry yet. Even at an approval checkpoint the agent must log it first.
+  const logOwed = await findLogOwed(files, sessionId)
+  if (logOwed) return logOwed
+
   const agenticProcessDir = await findAgenticProcessDir(files, sessionId)
   if (!hasAgenticProcessInstance(agenticProcessDir)) return
   if (await hasApprovalCheckpoint(files, agenticProcessDir)) return

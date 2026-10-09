@@ -10,7 +10,7 @@ Subcommands:
   add-memory-entry         Add or update a step entry in memory/<topic>.json
   read-memory-topic        Read a memory topic file with access validation
   add-log-entry            Append actions to a step entry in log.json
-  log-interaction          Log a user interaction in log.json (+ clear pending-log flag)
+  log-interaction          Log a user interaction in log.json
   update-process-status    Change process status (running/completed/failed/paused)
   register-child-process   Register a child subprocess in parent's process.json
   update-child-status      Update a child's status in parent's process.json
@@ -214,36 +214,6 @@ def _error(msg: str) -> None:
     json.dump({"status": "error", "message": msg}, sys.stdout)
     print()
     sys.exit(1)
-
-
-def _check_pending_log(process_dir: Path) -> None:
-    """Block state-mutating commands while a user interaction is unlogged."""
-    session_file = process_dir / ".session"
-    if not session_file.exists():
-        return
-    session_id = session_file.read_text(encoding="utf-8").strip()
-    if not session_id:
-        return
-    flag_file = Path.home() / ".claude" / "agentic-processes" / "flags" / f"pending-log-{session_id}"
-    if flag_file.exists():
-        step_id = "<active-step-id>"
-        try:
-            pdata = json.loads((process_dir / "process.json").read_text(encoding="utf-8"))
-            step_id = pdata.get("currentState", {}).get("activeStep", {}).get("id", step_id)
-        except Exception:
-            pass
-        script_path = Path(__file__)
-        _error(
-            "User interaction not yet logged — call log-interaction before modifying process state.\n\n"
-            "Command:\n"
-            f"  python3 {script_path} log-interaction \\\n"
-            f"    --process-dir \"{process_dir}\" \\\n"
-            f"    --step-id \"{step_id}\" \\\n"
-            "    --request \"User requested: [describe what user asked]\" \\\n"
-            "    --reason \"User feedback on [topic]\" \\\n"
-            "    --response \"Action taken: [what you're doing]\"\n\n"
-            "After logging, the flag is cleared and you can proceed."
-        )
 
 
 def _check_pending_approval(process_dir: Path) -> None:
@@ -891,14 +861,6 @@ def cmd_log_interaction(args: argparse.Namespace) -> None:
 
     write_json(log_path, log.to_dict())
 
-    # Clear the pending-log flag (enforce-log-first integration)
-    session_file = process_dir / ".session"
-    if session_file.exists():
-        session_id = session_file.read_text(encoding="utf-8").strip()
-        if session_id:
-            flag_file = Path.home() / ".claude" / "agentic-processes" / "flags" / f"pending-log-{session_id}"
-            if flag_file.exists():
-                flag_file.unlink()
 
     _ok("log.json")
 
@@ -1729,16 +1691,6 @@ def main() -> None:
     p_qa_get.add_argument("--process-dir", required=True)
     p_qa_get.set_defaults(func=cmd_get_qa_session)
 
-    _LOG_GATED_COMMANDS = {
-        "update-step-status",
-        "approve-step",
-        "update-current-state",
-        "update-active-substep",
-        "add-memory-entry",
-        "update-process-status",
-        "write-pending",
-    }
-
     _APPROVAL_GATED_COMMANDS = {
         "update-step-status",
         "update-current-state",
@@ -1747,9 +1699,6 @@ def main() -> None:
     }
 
     parsed = parser.parse_args()
-    if parsed.command in _LOG_GATED_COMMANDS:
-        if not (parsed.command == "write-pending" and getattr(parsed, "delete", False)):
-            _check_pending_log(Path(parsed.process_dir))
     if parsed.command in _APPROVAL_GATED_COMMANDS:
         _check_pending_approval(Path(parsed.process_dir))
     try:

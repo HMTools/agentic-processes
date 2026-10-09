@@ -75,11 +75,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H03-enforce-log-on-stop.md",
     "firstGuess": "replace",
     "source": "scripts/enforce-log-on-stop.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "improve",
+    "summary": "A mod replaces the script: the turn-end hook (native `turn.complete`, as H01) re-prompts the agent to log when the flag exists and a process belongs to the session; log first, at most 3 in a row. The bit is in memory (no file); the log command clears it. The classic.Stop route is skipped by the built-in guard (see H01).",
+    "open": ["Does the turn-end log prompt work in a live run? (unit tests only)", "Skip slash commands and trivial prompts?"],
+    "updated": "2026-10-09"
   },
   {
     "id": "H04",
@@ -114,11 +114,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H06-enforce-log-first.md",
     "firstGuess": "replace",
     "source": "scripts/enforce-log-first.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "A mod replaces the script: `tool.call` on Write, Edit, MultiEdit, NotebookEdit, Agent and Task returns `{ deny: text }` while the log is owed (in-memory bit) and a process belongs to the session; it also gates the Bash process commands the Python check gated. Live test: the refusal reaches the agent as the tool error, and after `log-interaction` the edit works. A subagent's calls pass.",
+    "open": ["A subagent's edits pass while a log is owed (owner choice): keep?", "With mods off no log rule runs (see X01)"],
+    "updated": "2026-10-09"
   },
   {
     "id": "H07",
@@ -166,11 +166,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H10-create-log-flag.md",
     "firstGuess": "replace",
     "source": "scripts/create-log-flag.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "A mod replaces the script: the one `prompt.submit` hook marks the log as owed in an in-memory bit for each session, so a prompt the plugin sends owes no log. Live test confirmed it on a `claude -p` prompt. The first prompt of a session is still not covered (H08).",
+    "open": ["First prompt of a session has no flag until .session is bound (H08)", "Skip slash commands and trivial prompts?"],
+    "updated": "2026-10-09"
   },
   {
     "id": "H11",

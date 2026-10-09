@@ -250,7 +250,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-finding-status \
 
 ### log-interaction
 
-Log a user interaction in `log.json`. Also clears the `pending-log` flag (integrates with `enforce-log-first` hook).
+Log a user interaction in `log.json`. The plugin's mod sees this command succeed and stops asking for a log.
 
 **Example**:
 ```bash

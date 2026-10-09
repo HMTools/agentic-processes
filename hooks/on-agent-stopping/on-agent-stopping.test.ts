@@ -18,7 +18,7 @@ function world(on: On, files: Record<string, string>, agents: { type: string; st
   on('fs.exists', async ($, e) => ({ value: e.path in all }))
   on('fs.read', async ($, e) => { if (!(e.path in all)) throw new Error('missing'); return { value: all[e.path] } })
   on('agent.list', async () => ({ value: agents as never }))
-  on('prompt.submit', async (_$, e) => { submitted.push(e.text); return { drop: 'test' } })
+  on('prompt.submit', async (_$, e) => { if (e.origin?.kind === 'plugin') submitted.push(e.text); return { drop: 'test' } })
   on('turn.complete', async () => ({ text: '' }))
   return submitted
 }
@@ -82,7 +82,7 @@ test('a prompt from the user starts the count again', async ($, on) => {
   for (let i = 0; i < 4; i++) await end($)
   await $.prompt.submit({ text: 'continue' })
   await end($)
-  expect(sent.filter(t => t.startsWith('Process has')).length).toBe(4)
+  expect(sent.length).toBe(4) // the 4th is the log prompt: the user's prompt owes a log
 })
 
 // approval checkpoint rule
@@ -107,6 +107,57 @@ test('approval step, step-executor alive: wait text', async ($, on) => {
 })
 test('approval step with a checkpoint file: no re-prompt', async ($, on) => {
   const sent = world(on, { [json]: proc('running', [approvalStep()]), [`${DIR}/pending-interaction.json`]: '{}' })
+  await end($)
+  expect(sent).toEqual([])
+})
+
+// log rule: the user's prompt has no log entry yet
+// the log is owed: the user sent a prompt and the agent has not logged it
+// the prompt hook raises it; our own re-prompts do not
+const owe = ($: any) => $.prompt.submit({ text: 'please change the plan' })
+const procWithActiveStep = (steps: unknown[]) => JSON.stringify({ status: 'running', steps, currentState: { activeStep: { id: 's7' } } })
+test('owed, and a process: re-prompt asks to log, names the folder and step', async ($, on) => {
+  const sent = world(on, { [json]: procWithActiveStep([step(1, 'completed')]) })
+  await owe($)
+  await end($)
+  expect(sent.length).toBe(1)
+  expect(sent[0]).toContain('User interaction not yet logged')
+  expect(sent[0]).toContain(`Process dir: ${DIR}`)
+  expect(sent[0]).toContain('Step ID: s7')
+  expect(sent[0]).toContain('log-interaction')
+})
+test('owed, but no process for the session: no re-prompt', async ($, on) => {
+  const sent = world(on, { [json]: proc('running', [step(1, 'completed')]), [`${DIR}/.session`]: 'other' })
+  await owe($)
+  await end($)
+  expect(sent).toEqual([])
+})
+test('owed, pending step and approval checkpoint: the log comes first', async ($, on) => {
+  const sent = world(on, { [json]: proc('running', [step(1, 'pending')]), [`${DIR}/pending-interaction.json`]: '{}' })
+  await owe($)
+  await end($)
+  expect(sent.length).toBe(1)
+  expect(sent[0]).toContain('User interaction not yet logged')
+})
+test('owed, process has no active step: the text still names the folder', async ($, on) => {
+  const sent = world(on, { [json]: proc('paused', []) })
+  await owe($)
+  await end($)
+  expect(sent[0]).toContain('Step ID: <active step id>')
+})
+test('owed, on a subagent turn: no re-prompt', async ($, on) => {
+  const sent = world(on, { [json]: proc('running', []) })
+  await end($, { agentId: 'a1' })
+  expect(sent).toEqual([])
+})
+test('log prompt at most 3 times in a row', async ($, on) => {
+  const sent = world(on, { [json]: proc('running', []) })
+  await owe($)
+  for (let i = 0; i < 5; i++) await end($)
+  expect(sent.length).toBe(3)
+})
+test('nothing owed: no log prompt', async ($, on) => {
+  const sent = world(on, { [json]: procWithActiveStep([step(1, 'completed')]) })
   await end($)
   expect(sent).toEqual([])
 })

@@ -53,21 +53,59 @@
 No implementation. No plugin edits. No building a mod. (Only items S01–S03 may build a throwaway mod outside this repo.) Do not run or change the plugin's scripts.
 
 ## 7. Research result
-_(empty until the research is done; fill each heading below.)_
+
+Result of the combined plan H03 + H10 + H06 (2026-10-09). The implementation sits in one PR.
 
 ### Claude Code version
-_(output of `claude --version`)_
+`2.1.295 (Claude Code)`. Type file from the `plugin-authoring` skill for this build.
 
 ### Answers per question
-_(one answer per question in section 4, each with evidence: doc page + section, type-file name, or repo file:line)_
+1. Prompt text and session id: `prompt.submit` gives `e.text` and `e.origin`; `$.session.id()` gives the id. Origin kinds `composer | bridge | sdk` are what a person typed (type file `PromptOrigin`). Slash commands and UI resumes were not tested.
+2. Where the bit lives: **one in-memory bit for each session** (owner choice, a module variable). Lost on reload, `/clear`, `/resume` and restart.
+3. Seeing the log run: yes. The `tool.call` hook sees a Bash `process_manager.py log-interaction` and clears the bit when `next(e)` returns no error and no deny.
+4. `stop_hook_active`: not used. `classic.Stop` is skipped for a user-tier mod where `sec-default` loads (H01 live test). The hook uses `turn.complete` and a re-prompt count (3 in a row, reset by a user prompt).
+5. The re-prompt is a new user-role prompt the model reads, built by a template (no heredoc, no JSON by hand).
+6. Skipping trivial prompts: possible with `e.text`, but a product decision. Not done.
+7. Failure mode: a hook that throws is skipped (fail open).
+8. CLI contract: none. The CLI check and the flag file are removed.
 
 ### Final verdict
-_(replace | improve | keep | later)_
+**improve**
+
+### Implemented (2026-10-09, branch `feat/h01-stop-guard-mod`, one PR for H03, H10 and H06, not committed)
+Plan page: the `visual-plan` artifact "Log-First Rule as a Mod, in One PR" (it still shows the first design with a flag file; the owner then chose an in-memory bit, described here). Owner choices: **"log owed" is one in-memory bit for each session, no file** (`hooks/infra/log-owed/log-owed.ts`); log first when a step rule and the log rule both apply; at most 3 log prompts in a row (shared with the step rule); a subagent's own tool calls pass; the edit block covers Write, Edit, MultiEdit, NotebookEdit, Agent, Task.
+- `hooks/on-user-prompt/on-user-prompt.ts`: the one `prompt.submit` hook (a plugin cannot have two without a matcher). A prompt that is not from the plugin restarts the re-prompt count (as before) and, in a session with a process, marks the log as owed (**H10**). A prompt the plugin sends owes nothing.
+- `hooks/on-agent-stopping/on-agent-stopping.ts`: the log rule runs first in `promptToContinue` (**H03**; native `turn.complete` re-prompt, as H01).
+- `hooks/on-agent-editing/on-agent-editing.ts`: `tool.call` returns `{ deny: text }` while the log is owed for Write, Edit, MultiEdit, NotebookEdit, Agent, Task, and for a Bash `process_manager.py` command that changes the process (**H06**, and the Python check it replaces). A Bash `process_manager.py log-interaction` that succeeds clears the bit; a failed one, or a command that only mentions it, does not.
+- `scripts/process_manager.py`: `_check_pending_log`, its gated-command set and the flag deletion in `log-interaction` are removed. No flag file exists any more.
+- Removed: `scripts/enforce-log-on-stop.sh`, `scripts/create-log-flag.sh`, `scripts/enforce-log-first.sh` and their `hooks.json` entries.
+- Tests: 62 pass (`claude plugin test .`). A test cannot send a prompt as the user or share state with the test file, so the bit is driven through the prompt hook.
+- Live test (`claude -p --plugin-dir`, fake process bound to the session id): `Write` was refused with the log text, the agent ran `log-interaction`, the bit cleared, and the second `Write` worked. No flag file was written.
+- Not live-tested: the turn-end log prompt; a subagent's calls passing; the `Agent`/`Task` refusal; a plugin prompt owing nothing; the first prompt of a session before `.session` is bound (H08).
 
 ### Evidence
-### Open questions
+- Type file `claude-code.d.ts`: `PromptSubmitInput`, `PromptOrigin`, `ToolCallResult` (`deny`), `ToolCallInput` (`agentId`), `$.fs.write` ("creating it and its directories"), `$.prompt.submit`.
+- Repo: the removed scripts (see git history), the removed `_check_pending_log` in `scripts/process_manager.py`, `hooks/hooks.json`.
+- Plan page: https://claude.ai/artifact/5VCyr6pqKKDNSB7cCNbybw
+
 ### Risks
+- With mods off (`--safe-mode`, an organization policy, a crashed hooks worker) no log rule runs: no reminder, no edit block, no gate on the process commands. Same choice as H01.
+- A subagent's edits pass while a log is owed, so a step can run before the log entry exists (owner choice). The old script refused them.
+- The log is still owed after every user prompt, also on "thanks" and slash commands. Skipping those is a later product decision.
+- The log text names the skill, not the script path, because a mod does not know the path.
+- `tool.call` tool names (`Agent`, `Task`) are not in the type file; the names are taken from the old script and Claude Code's current tool.
+- The first prompt in a new session is not covered, because `.session` is bound only after it (H08).
+
+### Open questions
+- The bit is lost on a mod reload, `/clear`, `/resume` or restart: the agent then owes nothing until the next prompt. Acceptable?
+- Plain-terminal use of `process_manager.py` no longer has a log gate.
+- Does the turn-end log prompt work in a live run, and do two prompts at once (log rule plus step rule) ever occur? (The code sends one.)
+- Should the flag skip slash commands and trivial prompts?
+- Should a later change move the flag into the mod and drop the Python check? (Needs a plain-terminal story.)
+
 ### What a later plan must decide
+- The first-prompt gap (H08 and C01).
+- Whether to ship a settings-hook fallback for mods-off machines (X01).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "H03"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:
