@@ -1,5 +1,5 @@
 import type { Register } from 'claude-code'
-import { findAgenticProcessDir, hasAgenticProcessInstance } from '../infra/agentic-process-repository/agentic-process-repository'
+import { findAgenticProcessDir, hasAgenticProcessInstance, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 import { PROCESS_TOOLS, TOOL_PREFIX, ensureProcessTools, runTool } from '../infra/process-manager/tools'
 import { bindSession } from '../infra/process-manager/bind-session'
 import { moveCommands, slash } from '../infra/process-manager/move'
@@ -33,13 +33,20 @@ const portsOf = ($: any): ManagerPorts => ({
   pluginRoot: slash($.plugin.root),
   cwd: () => $.session.cwd(),
   sessionId: () => $.session.id(),
+  links: {
+    get: async sessionId => ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? [],
+    add: async (sessionId, dir) => {
+      const dirs = ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? []
+      await $.store.set(sessionKey(sessionId), [...dirs.filter(d => d !== dir), dir]) // the newest goes last, and answers first
+    },
+  },
 })
 const registerOf = ($: any) => (spec: Parameters<typeof $.tool.register>[0]) => $.tool.register(spec)
 
 export const register: Register = on => {
   // A session that already has a process lists the tools at once.
   on('session.start', async ($, e, next) => {
-    if (hasAgenticProcessInstance(await findAgenticProcessDir(filesOf($), await $.session.id()))) {
+    if (hasAgenticProcessInstance(await findAgenticProcessDir(filesOf($), portsOf($).links, await $.session.id()))) {
       await ensureProcessTools(registerOf($), await $.session.id())
     }
     return next(e)

@@ -99,10 +99,9 @@ export interface ProcessMetadata {
   processPath?: ProcessPath;
 
   /**
-   * @deprecated Session binding moved to .session file in process directory.
-   * The tools `create_process` and `bind_process` write the session ID to a dedicated
-   * .session file (plain text) alongside process.json. Consumer hooks read
-   * that file instead of grepping process.json. This field is no longer used.
+   * @deprecated Session binding moved to the mod store, key `session:<id>`: the folders the session bound,
+   * oldest first. The tools `create_process` and `bind_process` write it, and the hooks read it
+   * instead of grepping process.json. This field is no longer used.
    */
   sessionId?: string;
 }

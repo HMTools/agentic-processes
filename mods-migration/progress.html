@@ -142,8 +142,8 @@ const ITEMS = /* ITEMS:START */ [
     "source": "scripts/bind-session-to-process.sh",
     "status": "done",
     "verdict": "replace",
-    "summary": "Replaced by a mod tool: bind_process writes the session id (also over an old one) and create_process uses the same function. The shell script and its hooks.json entry are deleted; the .session file stays as the link.",
-    "open": ["Live run not done: skill calls bind_process on a real resume (S01/S02)", "Is $.session.id() the same as the hook session_id, and does it change on /clear, /resume?", "No unbind when a session ends or a process leaves active/ (C01)", "First prompt after /process-continue runs before the link (H10)"],
+    "summary": "Replaced by a mod tool: bind_process writes the session id (also over an old one) and create_process uses the same function. The shell script and its hooks.json entry are deleted. The link later moved from the .session file to the mod store (C01).",
+    "open": ["Live run not done: skill calls bind_process on a real resume (S01/S02)", "Is $.session.id() the same as the hook session_id, and does it change on /clear, /resume?", "No unbind when a session ends; a stale session:<id> store entry stays (C01)", "First prompt after /process-continue runs before the link (H10)"],
     "updated": "2026-10-10"
   },
   {
@@ -166,11 +166,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/C01-shared-hook-plumbing.md",
     "firstGuess": "replace",
     "source": "scripts/parse_hook_input.py, scripts/hook_extract_process_dir.py",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Replaced: the session-to-process link now lives in the mod store (key session:<id>), one function reads it, and a child process answers before its parent. The .session file and parse_hook_input.py are gone.",
+    "open": ["Is $.session.id() the same as the hook session_id; does it change on /clear, /resume? (S02)", "Store list over a real restart not run", "A process running during the upgrade is unlinked until bind_process runs", "Old session:<id> keys are never removed"],
+    "updated": "2026-10-10"
   },
   {
     "id": "P01",

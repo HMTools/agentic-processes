@@ -1,7 +1,8 @@
 import type { Register } from 'claude-code'
+import { sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 import { findLogOwed } from '../infra/log-first/log-first'
 import { LOG_GATED_TOOLS, LOG_TOOL, clearLogOwed } from '../infra/log-owed/log-owed'
-import type { FileSystem } from '../infra/ports/ports'
+import type { FileSystem, SessionLinks } from '../infra/ports/ports'
 
 // While the agent owes a log entry, it cannot edit files, start a subagent or change the process.
 // The tool `log_interaction` still works: when it succeeds, the log is no longer owed.
@@ -15,6 +16,9 @@ const filesOf = ($: any): FileSystem => ({
   exists: path => $.fs.exists(path),
   read: path => $.fs.read(path),
 })
+const linksOf = ($: any): SessionLinks => ({
+  get: async sessionId => ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? [],
+})
 
 export const register: Register = on => {
   on('tool.call', { tool: [...EDIT_TOOLS, LOG_TOOL, ...LOG_GATED_TOOLS] }, async ($, e, next) => {
@@ -25,7 +29,7 @@ export const register: Register = on => {
       return result
     }
     if (e.agentId) return next(e)
-    const logOwed = await findLogOwed(filesOf($), sessionId)
+    const logOwed = await findLogOwed(filesOf($), linksOf($), sessionId)
     return logOwed ? { deny: logOwed.text } : next(e)
   })
 }

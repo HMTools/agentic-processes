@@ -10,10 +10,10 @@ const processJson = (steps: unknown[] = [step]) => JSON.stringify({ status: 'run
 // fake disk: one process folder bound to session S1; writes land in `written`
 // The answer to the dialog is not tested here: a test has no screen, so $.ui.ask is dismissed. askGate's own test covers every answer.
 function world(on: On, { steps = [step] as unknown[], bound = 'S1' } = {}) {
-  const all: Record<string, string> = { [`${DIR}/.session`]: bound, [`${DIR}/process.json`]: processJson(steps) }
+  const all: Record<string, string> = { [`${DIR}/process.json`]: processJson(steps) }
   const written: Record<string, string> = {}
   mock.env(on, { HOME: '/h' })
-  mock.store(on)
+  mock.store(on, { [`session:${bound}`]: [DIR] })
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async (_$, e) => ({ value: e.path in all }))

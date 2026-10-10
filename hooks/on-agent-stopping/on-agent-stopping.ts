@@ -1,12 +1,12 @@
 import type { Register } from 'claude-code'
 import type { Step } from '../infra/agentic-process-types/agentic-process-types'
-import { findAgenticProcessDir, readAgenticProcess, hasAgenticProcessInstance, isProcessRunning } from '../infra/agentic-process-repository/agentic-process-repository'
+import { findAgenticProcessDir, readAgenticProcess, hasAgenticProcessInstance, isProcessRunning, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 import { isStepExecutorRunning } from '../infra/step-executors/step-executors'
 import { findLogOwed } from '../infra/log-first/log-first'
 import { createRepromptLimiter } from '../infra/reprompt-limiter/reprompt-limiter'
 import { isMainAgentAnswer } from '../infra/mod-events/mod-events'
 import { hasOpenGate } from '../infra/approval-gate/approval-gate'
-import type { FileSystem, Gate, GateStore, ListAgents } from '../infra/ports/ports'
+import type { FileSystem, Gate, GateStore, ListAgents, SessionLinks } from '../infra/ports/ports'
 
 // When the main agent ends a turn while its process still has work, send it a prompt that starts a new turn.
 // Read top to bottom: the mods API, the entry point, the rules, the texts. Shared code is in ../infra.
@@ -30,6 +30,9 @@ const filesOf = ($: any): FileSystem => ({
   list: path => $.fs.list(path),
   exists: path => $.fs.exists(path),
   read: path => $.fs.read(path),
+})
+const linksOf = ($: any): SessionLinks => ({
+  get: async sessionId => ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? [],
 })
 const agentsOf = ($: any): ListAgents => () => $.agent.list()
 const gatesOf = ($: any): GateStore => ({
@@ -66,10 +69,10 @@ async function promptToContinue($: any, sessionId: string): Promise<Prompt | und
   const files = filesOf($)
 
   // The user's last prompt has no log entry yet. Even at an approval checkpoint the agent must log it first.
-  const logOwed = await findLogOwed(files, sessionId)
+  const logOwed = await findLogOwed(files, linksOf($), sessionId)
   if (logOwed) return logOwed
 
-  const agenticProcessDir = await findAgenticProcessDir(files, sessionId)
+  const agenticProcessDir = await findAgenticProcessDir(files, linksOf($), sessionId)
   if (!hasAgenticProcessInstance(agenticProcessDir)) return
   if (await hasOpenGate(gatesOf($), sessionId)) return
 

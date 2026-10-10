@@ -60,21 +60,21 @@ Built instead of only researched, at the owner's request (plan page "Session Bin
 ### Answers per question (1-8, each with evidence)
 1. **Not verified live.** The mod uses `$.session.id()` for every check; tests fake it. Same string as the hook `session_id` and `${CLAUDE_SESSION_ID}` is assumed, not run (S02). A resumed session has a new id (item section 2), so the binding must be redone on resume.
 2. **Done: a tool the skill calls.** `bind_process` (`hooks/infra/process-manager/bind-session.ts`) is the first action of `skills/process-continue/SKILL.md` step 2. `create_process` binds through the same function (`hooks/on-process-tools/on-process-tools.ts`). A command-run guess was rejected: the process is chosen inside the skill, after the command starts.
-3. **Kept the file.** `.session` stays the link: `findAgenticProcessDir` (`hooks/infra/agentic-process-repository/agentic-process-repository.ts:8`) is the one reader and survives a restart. The UI app is obsolete, so no file is kept for it. A `$.store` map is left to C01.
-4. **No double write.** The settings hook is deleted, so only the mod writes. The tool writes only when the id differs.
+3. **Kept the file at first, then moved to the store (C01).** H08 first kept `.session` as the link. C01 then moved the link to `$.store`, key `session:<id>`. `bindSession` no longer writes the file, and `findAgenticProcessDir` reads the store. The UI app is obsolete, so no file is kept for it.
+4. **No double write.** The settings hook is deleted, so only the mod binds. Binding the same folder again moves it last on the list (C01).
 5. **Not verified.** Subagent calls carry `agentId` (README finding). `bind_process` is called by the main agent. Not run in a subagent.
-6. **Not done.** Nothing unbinds on `session.end` or when a process leaves `active/`. A stale id stays until the next resume. Left to C01.
+6. **Not done.** Nothing unbinds on `session.end`. A process that leaves `active/` drops out by itself, because the lookup checks `process.json` (C01). A stale `session:<id>` entry stays.
 7. **Decided: no fallback.** Every process tool is a mod tool, so with mods off the plugin cannot change a process. A binding fallback has no job. The script is deleted.
-8. **Replace, with the file as source.** `bind_process` replaces an old id. Two live sessions that bind the same folder: the last write wins, as today. `$.fs.write` is not atomic; the file holds one short id.
+8. **Replace, with the store as source (C01).** A resumed session has a new id, so it starts a new list. Two live sessions that bind the same folder both answer for it. The store write is not atomic.
 
 ### Final verdict
-**replace.** The tool `bind_process` and `create_process` write `.session`. The shell script and its `hooks.json` entry are deleted. The `.session` file stays.
+**replace.** The tool `bind_process` and `create_process` link the session through `bindSession`. The shell script and its `hooks.json` entry are deleted. The `.session` file is gone too (C01).
 
 ### Evidence (doc page + section, type-file names, repo file:line)
 - Added: `hooks/infra/process-manager/bind-session.ts`, tool in `hooks/infra/process-manager/tools.ts`, `sessionId()` in `hooks/infra/ports/ports.ts`.
 - Changed: `hooks/on-process-tools/on-process-tools.ts`, `skills/process-continue/SKILL.md`, `hooks/hooks.json`, `types/process-instance.ts`.
 - Deleted: `scripts/bind-session-to-process.sh`.
-- Tests: `bind-session.test.ts`, `on-process-tools.test.ts`; `claude plugin test .` gave 206 pass, 0 fail.
+- Tests: `bind-session.test.ts`, `on-process-tools.test.ts`; `claude plugin test .` gave 206 pass, 0 fail at the time. After C01: 205 pass, 0 fail.
 
 ### Open questions
 - Does `$.session.id()` equal the hook `session_id` and `${CLAUDE_SESSION_ID}`? (S02)
@@ -85,10 +85,10 @@ Built instead of only researched, at the owner's request (plan page "Session Bin
 ### Risks
 - The first prompt after `/process-continue` runs before the link (H10).
 - A resumed session is unlinked until the agent calls the tool. If the agent skips it, the rules stay off.
-- No unbind: a stale id of a dead session stays.
+- No unbind on session end: a stale `session:<id>` entry stays, but a gone folder never answers.
 
 ### What a later plan must decide
-- Move the session-to-process lookup into `$.store` or `$.state` (C01).
+- Remove old `session:<id>` keys (C01 did the move to `$.store`).
 - Unbind on process completion or `session.end`.
 - Link at `/process-continue` start if a process name can be known there.
 

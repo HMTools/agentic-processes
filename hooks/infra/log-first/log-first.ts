@@ -1,6 +1,6 @@
 import { findAgenticProcessDir, readAgenticProcess, hasAgenticProcessInstance } from '../agentic-process-repository/agentic-process-repository'
 import { isLogOwed } from '../log-owed/log-owed'
-import type { FileSystem } from '../ports/ports'
+import type { FileSystem, SessionLinks } from '../ports/ports'
 
 // The log-first rule: the agent must log the user's request (the tool `log_interaction`) before it
 // stops or edits. `isLogOwed` says the log is owed. Used by the turn-end hook and the edit hook.
@@ -8,9 +8,9 @@ import type { FileSystem } from '../ports/ports'
 export type LogPrompt = { key: string; text: string } // key = step id + :log; the re-prompt limit counts per key
 
 // What the agent must do, or undefined when no log is owed. Only a session with a process owes one: a bit left by a finished process is ignored.
-export async function findLogOwed(files: FileSystem, sessionId: string): Promise<LogPrompt | undefined> {
+export async function findLogOwed(files: FileSystem, links: SessionLinks, sessionId: string): Promise<LogPrompt | undefined> {
   if (!isLogOwed(sessionId)) return
-  const agenticProcessDir = await findAgenticProcessDir(files, sessionId)
+  const agenticProcessDir = await findAgenticProcessDir(files, links, sessionId)
   if (!hasAgenticProcessInstance(agenticProcessDir)) return
   const stepId = (await readAgenticProcess(files, agenticProcessDir))?.currentState?.activeStep?.id
   return logInteractionPrompt(agenticProcessDir, stepId)

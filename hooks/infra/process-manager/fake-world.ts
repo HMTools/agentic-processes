@@ -9,6 +9,7 @@ export function world(initial: Record<string, unknown> = {}, { failMove = false 
   const disk: Record<string, string> = {}
   for (const [path, value] of Object.entries(initial)) disk[path] = typeof value === 'string' ? value : JSON.stringify(value)
   const moved: string[][] = []
+  const links: Record<string, string[]> = {} // session id → the folders it bound
   let counter = 0
   const under = (folder: string) => Object.keys(disk).filter(p => p.startsWith(`${folder}/`))
   const ports: ManagerPorts = {
@@ -33,9 +34,10 @@ export function world(initial: Record<string, unknown> = {}, { failMove = false 
     pluginRoot: '/plugin',
     cwd: async () => '/work',
     sessionId: async () => 'S1',
+    links: { get: async id => links[id] ?? [], add: async (id, dir) => { links[id] = [...(links[id] ?? []).filter(d => d !== dir), dir] } },
   }
   const json = (path: string) => JSON.parse(disk[path])
-  return { ports, disk, moved, json }
+  return { ports, disk, moved, links, json }
 }
 
 export const step = (extra: Record<string, unknown> = {}) => ({ id: 's1', number: 0, name: 'Design', status: 'pending', stepRef: 'r1', stepDefinition: {}, ...extra })

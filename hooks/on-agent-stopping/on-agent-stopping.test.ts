@@ -9,11 +9,11 @@ const step = (number: number, status: string) => ({ number, id: `s${number}`, na
 const json = `${DIR}/process.json`
 
 // fake ~/.claude/agentic-processes: one process folder bound to session S1; returns the prompts submitted
-function world(on: On, files: Record<string, string>, agents: { type: string; status: string }[] = [], gate = false) {
+function world(on: On, files: Record<string, string>, agents: { type: string; status: string }[] = [], gate = false, bound = 'S1') {
   const submitted: string[] = []
   mock.env(on, { HOME: '/h' })
-  mock.store(on, gate ? { 'gate:S1': { dir: DIR, stepId: 's1' } } : {})
-  const all = { [`${DIR}/.session`]: 'S1', ...files }
+  mock.store(on, { [`session:${bound}`]: [DIR], ...(gate ? { 'gate:S1': { dir: DIR, stepId: 's1' } } : {}) })
+  const all = files
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async ($, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async ($, e) => ({ value: e.path in all }))
@@ -27,7 +27,7 @@ const end = ($: any, extra = {}) =>
   $.turn.complete({ answer: 'ok', durationMs: 1, isAborted: false, turnId: 't1', reason: 'answer', ...extra })
 
 test('no process for this session: no re-prompt', async ($, on) => {
-  const sent = world(on, { [json]: proc('running', [step(1, 'pending')]), [`${DIR}/.session`]: 'other' })
+  const sent = world(on, { [json]: proc('running', [step(1, 'pending')])}, [], false, 'other')
   await end($)
   expect(sent).toEqual([])
 })
@@ -127,7 +127,7 @@ test('owed, and a process: re-prompt asks to log, names the folder and step', as
   expect(sent[0]).toContain('log_interaction')
 })
 test('owed, but no process for the session: no re-prompt', async ($, on) => {
-  const sent = world(on, { [json]: proc('running', [step(1, 'completed')]), [`${DIR}/.session`]: 'other' })
+  const sent = world(on, { [json]: proc('running', [step(1, 'completed')])}, [], false, 'other')
   await owe($)
   await end($)
   expect(sent).toEqual([])

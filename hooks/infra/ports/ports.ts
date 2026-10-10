@@ -20,6 +20,9 @@ export type GateStore = {
   clear(sessionId: string): Promise<void>
 }
 
+// The folders a session bound, oldest first: a parent process, then its child. The mod keeps them in its store.
+export type SessionLinks = { get(sessionId: string): Promise<string[]> }
+
 export type Ask = (question: string, options: readonly string[]) => Promise<string>
 
 
@@ -33,4 +36,5 @@ export type ManagerPorts = {
   pluginRoot: string
   cwd(): Promise<string>
   sessionId(): Promise<string>
+  links: SessionLinks & { add(sessionId: string, dir: string): Promise<void> }
 }

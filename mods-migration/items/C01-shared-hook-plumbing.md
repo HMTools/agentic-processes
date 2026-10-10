@@ -51,21 +51,44 @@ Two helper scripts plus a pattern copied into many hook scripts.
 No implementation. No plugin edits. No building a mod. (Only items S01–S03 may build a throwaway mod outside this repo.) Do not run or change the plugin's scripts.
 
 ## 7. Research result
-_(empty until the research is done; fill each heading below.)_
+
+Built as well as researched, at the owner's request (plan page "Session Lookup in the Store", 2 decisions kept, 1 changed: the link lives in the mod store).
 
 ### Claude Code version
-_(output of `claude --version`)_
+2.1.296 (Claude Code)
 
 ### Answers per question
-_(one answer per question in section 4, each with evidence: doc page + section, type-file name, or repo file:line)_
+1. **Yes for the fields the mod uses.** The hooks read `e.tool`, `e.command`, `e.file_path`, `e.agentId` and `$.session.id()`. Typed input replaced `parse_hook_input.py`; its callers are gone and the file is deleted. `stop_hook_active` not checked (H01).
+2. **Not verified live.** Same id as the hook `session_id` and `${CLAUDE_SESSION_ID}` is assumed (S02). A resumed session has a new id, so `bind_process` links it again.
+3. **Yes, `$.store`.** Key `session:<id>` holds the folders the session bound, oldest first (`hooks/infra/agentic-process-repository/agentic-process-repository.ts`). The store survives a restart. The `.session` file is no longer written or read. The UI app is obsolete (owner, 2026-10-10), so no file stays for it.
+4. **Yes.** `bindSession` (`hooks/infra/process-manager/bind-session.ts`), called by `bind_process` and `create_process`, adds the folder. Nothing in the plugin needs the file.
+5. **Done differently.** `hook_extract_process_dir.py` went with H07 (approval is a mod dialog, no command to guard).
+6. **Cheap.** A lookup is one store read plus one `process.json` exists-check for each folder on the list, newest first. No folder scan.
+7. **No fallback.** Every process tool is a mod tool, so with mods off the plugin cannot change a process (X01).
+
+New behaviour: a child process is bound after its parent, so it answers first. When the child leaves `active/`, the parent answers again. Before, the first folder listed won.
 
 ### Final verdict
-_(replace | improve | keep | later)_
+**replace.** The shell helpers are gone. The lookup is one function over the mod store.
 
 ### Evidence
+- Changed: `hooks/infra/agentic-process-repository/agentic-process-repository.ts`, `hooks/infra/ports/ports.ts` (`SessionLinks`), `hooks/infra/process-manager/bind-session.ts`, `hooks/on-process-tools/on-process-tools.ts`, and a `linksOf($)` in 6 hook files; `types/process-instance.ts` comment.
+- Deleted: `scripts/parse_hook_input.py`.
+- Tests: `claude plugin test .` gave 205 pass, 0 fail. New cases: child before parent, folder gone, rebind order.
+
 ### Open questions
+- Does `$.session.id()` equal the hook `session_id`, and does it change on `/clear`, `/resume`? (S02)
+- Does `$.store` keep the list over a real restart? (not run)
+- A process that runs during the upgrade is unlinked until the agent calls `bind_process`.
+
 ### Risks
+- Entries in `session:<id>` are never removed. Each is small and a gone folder never answers.
+- `$.store` is shared across sessions on the machine; two sessions that bind the same folder both answer for it (as before).
+- Read and write of the list is not atomic. Two binds at the same moment in one session could lose one.
+
 ### What a later plan must decide
+- Remove old `session:<id>` keys (on `session.end` or by age).
+- Whether the six `linksOf($)` copies can go once a mod can share `$` across files.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "C01"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

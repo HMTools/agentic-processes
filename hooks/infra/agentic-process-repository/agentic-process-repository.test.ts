@@ -18,23 +18,27 @@ function disk(files: Record<string, string>): FileSystem {
   }
 }
 
-test('finds the process folder bound to the session', async () => {
-  const files = disk({ [`${ACTIVE}/a/.session`]: 'S0', [`${ACTIVE}/b/.session`]: 'S1' })
-  expect(await findAgenticProcessDir(files, 'S1')).toBe(`${ACTIVE}/b`)
+const links = (byId: Record<string, string[]>) => ({ get: async (id: string) => byId[id] ?? [] })
+const A = `${ACTIVE}/a`
+const B = `${ACTIVE}/b`
+
+test('finds the process folder the session bound', async () => {
+  const files = disk({ [`${A}/process.json`]: '{}' })
+  expect(await findAgenticProcessDir(files, links({ S1: [A] }), 'S1')).toBe(A)
 })
-test('no folder is bound to the session: nothing', async () => {
-  expect(await findAgenticProcessDir(disk({ [`${ACTIVE}/a/.session`]: 'S0' }), 'S1')).toBeUndefined()
+test('the session bound nothing: nothing', async () => {
+  expect(await findAgenticProcessDir(disk({ [`${A}/process.json`]: '{}' }), links({ S0: [A] }), 'S1')).toBeUndefined()
 })
-test('a folder with no .session file is skipped', async () => {
-  expect(await findAgenticProcessDir(disk({ [`${ACTIVE}/a/process.json`]: '{}' }), 'S1')).toBeUndefined()
+test('a child, bound after its parent, answers first', async () => {
+  const files = disk({ [`${A}/process.json`]: '{}', [`${B}/process.json`]: '{}' })
+  expect(await findAgenticProcessDir(files, links({ S1: [A, B] }), 'S1')).toBe(B)
 })
-test('a home with backslashes, as on Windows, still finds the folder', async () => {
-  const files = { ...disk({ [`${ACTIVE}/a/.session`]: 'S1' }), home: async () => 'C:\\Users\\me' }
-  const found = disk({ 'C:/Users/me/.claude/agentic-processes/active/a/.session': 'S1' })
-  expect(await findAgenticProcessDir({ ...found, home: files.home }, 'S1')).toBe('C:/Users/me/.claude/agentic-processes/active/a')
+test('a folder that left active/ is skipped, so the parent answers again', async () => {
+  const files = disk({ [`${A}/process.json`]: '{}' })
+  expect(await findAgenticProcessDir(files, links({ S1: [A, B] }), 'S1')).toBe(A)
 })
-test('no active folder at all: nothing', async () => {
-  expect(await findAgenticProcessDir(disk({}), 'S1')).toBeUndefined()
+test('every folder of the list is gone: nothing', async () => {
+  expect(await findAgenticProcessDir(disk({}), links({ S1: [A] }), 'S1')).toBeUndefined()
 })
 test('reads process.json', async () => {
   const files = disk({ '/p/process.json': '{"status":"running","steps":[]}' })

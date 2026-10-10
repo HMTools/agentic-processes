@@ -7,11 +7,10 @@ const DIR = `${ACTIVE}/p1`
 // fake disk: one process folder bound to `bound`, with the given process status
 function world(on: On, { status = 'running', bound = 'S1', pending = false } = {}) {
   const all: Record<string, string> = {
-    [`${DIR}/.session`]: bound,
     [`${DIR}/process.json`]: JSON.stringify({ status, steps: [{ id: 's1', status: 'running' }] }),
   }
   mock.env(on, { HOME: '/h' })
-  mock.store(on, pending ? { 'gate:S1': { dir: DIR, stepId: 's1' } } : {})
+  mock.store(on, { [`session:${bound}`]: [DIR], ...(pending ? { 'gate:S1': { dir: DIR, stepId: 's1' } } : {}) })
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async (_$, e) => ({ value: e.path in all }))

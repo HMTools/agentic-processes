@@ -1,11 +1,11 @@
 import type { Register } from 'claude-code'
 import { raiseLogOwed } from '../infra/log-owed/log-owed'
 import { isPromptFromPlugin } from '../infra/mod-events/mod-events'
-import type { FileSystem, Gate, GateStore } from '../infra/ports/ports'
+import type { FileSystem, Gate, GateStore, SessionLinks } from '../infra/ports/ports'
 import { startCountingAgain } from '../on-agent-stopping/on-agent-stopping'
 import { reopenPanel } from '../infra/approval-gate/approval-gate'
 import { ensureProcessTools } from '../infra/process-manager/tools'
-import { findAgenticProcessDir, hasAgenticProcessInstance } from '../infra/agentic-process-repository/agentic-process-repository'
+import { findAgenticProcessDir, hasAgenticProcessInstance, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 
 // The one hook on prompts (a plugin cannot have two without a matcher). A prompt that the plugin sends
 // itself, as a re-prompt, changes nothing. A prompt from anywhere else:
@@ -20,6 +20,9 @@ const filesOf = ($: any): FileSystem => ({
   exists: path => $.fs.exists(path),
   read: path => $.fs.read(path),
 })
+const linksOf = ($: any): SessionLinks => ({
+  get: async sessionId => ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? [],
+})
 
 const gatesOf = ($: any): GateStore => ({
   get: async sessionId => ((await $.store.get(`gate:${sessionId}`)) as Gate | undefined) ?? undefined,
@@ -32,8 +35,8 @@ export const register: Register = on => {
     if (!isPromptFromPlugin(e)) {
       startCountingAgain()
       const sessionId = await $.session.id()
-      await raiseLogOwed(filesOf($), sessionId)
-      if (hasAgenticProcessInstance(await findAgenticProcessDir(filesOf($), sessionId))) await ensureProcessTools(spec => $.tool.register(spec), sessionId).catch(() => {})
+      await raiseLogOwed(filesOf($), linksOf($), sessionId)
+      if (hasAgenticProcessInstance(await findAgenticProcessDir(filesOf($), linksOf($), sessionId))) await ensureProcessTools(spec => $.tool.register(spec), sessionId).catch(() => {})
       await reopenPanel(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), (q, options) => $.ui.ask(q, options), text => $.prompt.submit({ text }), sessionId)
     }
     return next(e)

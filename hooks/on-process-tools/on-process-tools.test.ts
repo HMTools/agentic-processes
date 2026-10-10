@@ -10,12 +10,15 @@ const processFile = JSON.stringify({ status: 'running', metadata: { lastUpdated:
 // fake disk: one process folder bound to session S1, and a template to create another from; writes land on the disk
 function world(on: On, { bound = 'S1', env = { HOME: '/h' } as Record<string, string> } = {}) {
   const all: Record<string, string> = {
-    [`${DIR}/.session`]: bound, [`${DIR}/process.json`]: processFile,
+    [`${DIR}/process.json`]: processFile,
     '/t/tpl.json': JSON.stringify({ name: 'T', steps: [{ name: 'Only', stepRef: '' }] }),
   }
   const registered: string[] = []
   mock.env(on, env)
-  mock.store(on)
+  const store: Record<string, unknown> = { [`session:${bound}`]: [DIR] }
+  on('store.get', async (_$, e: any) => ({ value: store[e.key] as never }))
+  on('store.set', async (_$, e: any) => { store[e.key] = e.value; return { value: undefined } as never })
+  on('store.delete', async (_$, e: any) => { delete store[e.key]; return { value: undefined } as never })
   on('session.id', async () => ({ value: 'S1' }))
   on('session.cwd', async () => ({ value: '/work' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
@@ -25,7 +28,7 @@ function world(on: On, { bound = 'S1', env = { HOME: '/h' } as Record<string, st
   on('tool.register', async (_$, e: any) => { registered.push(e.name); return { value: { tool: `mcp__agentic-processes__${e.name}` } } as never })
   on('prompt.submit', async () => ({ drop: 'test' }))
   on('tool.call', async () => ({ result: 'done', text: 'done' }) as never)
-  return { all, registered }
+  return { all, registered, store }
 }
 const answer = (r: any) => JSON.parse(r.result.content[0].text)
 
@@ -41,17 +44,17 @@ test('a failing rule is an error result, and the model can read the message', as
   expect(r.result.isError).toBe(true)
   expect(answer(r)).toEqual({ status: 'error', message: 'Step zzz not found' })
 })
-test('create_process binds the new process to the session, as the old shell hook did after a write', async ($, on) => {
+test('create_process binds the new process to the session', async ($, on) => {
   const w = world(on)
   const r = await $.tool.call({ tool: TOOL('create_process'), processDir: NEW, templatePath: '/t/tpl.json' })
   expect(answer(r).status).toBe('ok')
-  expect(w.all[`${NEW}/.session`]).toBe('S1')
+  expect(w.store['session:S1']).toEqual([DIR, NEW]) // the newest goes last, and answers first
 })
-test('bind_process replaces the old id of a resumed process', async ($, on) => {
+test('bind_process links a resumed process to the new session', async ($, on) => {
   const w = world(on, { bound: 'old' })
   const r = await $.tool.call({ tool: TOOL('bind_process'), processDir: DIR })
   expect(answer(r).status).toBe('ok')
-  expect(w.all[`${DIR}/.session`]).toBe('S1')
+  expect(w.store['session:S1']).toEqual([DIR])
 })
 test('bind_process on a wrong folder is an error result', async ($, on) => {
   world(on)
@@ -61,7 +64,7 @@ test('bind_process on a wrong folder is an error result', async ($, on) => {
 test('create_process that fails binds nothing', async ($, on) => {
   const w = world(on)
   await $.tool.call({ tool: TOOL('create_process'), processDir: NEW, templatePath: '/nope.json' })
-  expect(w.all[`${NEW}/.session`]).toBeUndefined()
+  expect(w.store['session:S1']).toEqual([DIR])
 })
 test('a prompt in a session with a process lists the tools, once', async ($, on) => {
   const w = world(on)

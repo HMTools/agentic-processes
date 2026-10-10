@@ -7,9 +7,9 @@ const process = JSON.stringify({ status: 'running', steps: [], currentState: { a
 
 // fake disk: one process folder bound to `bound`; the gate is open or not
 function world(on: On, { gate = true, bound = 'S1' } = {}) {
-  const all: Record<string, string> = { [`${DIR}/.session`]: bound, [`${DIR}/process.json`]: process }
+  const all: Record<string, string> = { [`${DIR}/process.json`]: process }
   mock.env(on, { HOME: '/h' })
-  mock.store(on, gate ? { 'gate:S1': { dir: DIR, stepId: 's7' } } : {})
+  mock.store(on, { [`session:${bound}`]: [DIR], ...(gate ? { 'gate:S1': { dir: DIR, stepId: 's7' } } : {}) })
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async (_$, e) => ({ value: e.path in all }))

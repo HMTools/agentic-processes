@@ -1,6 +1,6 @@
 import { findAgenticProcessDir, hasAgenticProcessInstance } from '../agentic-process-repository/agentic-process-repository'
 import { TOOL_PREFIX } from '../mod-events/mod-events'
-import type { FileSystem } from '../ports/ports'
+import type { FileSystem, SessionLinks } from '../ports/ports'
 
 // "The agent owes a log entry for the user's last prompt": one bit for each session, held in memory.
 // It is lost when the mods reload or the session is resumed. The hooks that use it share this module.
@@ -12,8 +12,8 @@ export const clearLogOwed = (sessionId: string) => { owed.delete(sessionId) }
 export const isLogOwed = (sessionId: string) => owed.has(sessionId)
 
 // A prompt arrived in a session that has a process.
-export async function raiseLogOwed(files: FileSystem, sessionId: string): Promise<void> {
-  if (hasAgenticProcessInstance(await findAgenticProcessDir(files, sessionId))) markLogOwed(sessionId)
+export async function raiseLogOwed(files: FileSystem, links: SessionLinks, sessionId: string): Promise<void> {
+  if (hasAgenticProcessInstance(await findAgenticProcessDir(files, links, sessionId))) markLogOwed(sessionId)
 }
 
 // ── What a tool does to the log ───────────────────────────────────────────

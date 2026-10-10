@@ -1,7 +1,7 @@
 import type { Register } from 'claude-code'
-import { findAgenticProcessDir, readAgenticProcess } from '../infra/agentic-process-repository/agentic-process-repository'
+import { findAgenticProcessDir, readAgenticProcess, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 import { askGate, findApprovalStep, isHandEdit, HAND_EDIT_TEXT, REQUEST_APPROVAL_TOOL } from '../infra/approval-gate/approval-gate'
-import type { Ask, FileSystem, FileWriter, Gate, GateStore } from '../infra/ports/ports'
+import type { Ask, FileSystem, FileWriter, Gate, GateStore, SessionLinks } from '../infra/ports/ports'
 
 // The user approves a step with a click. The agent asks with the tool `request_approval` (listed by on-process-tools); the call waits for the answer.
 // Only this mod writes `approved` in process.json. The agent cannot edit that file by hand.
@@ -14,6 +14,9 @@ const filesOf = ($: any): FileSystem => ({
   list: path => $.fs.list(path),
   exists: path => $.fs.exists(path),
   read: path => $.fs.read(path),
+})
+const linksOf = ($: any): SessionLinks => ({
+  get: async sessionId => ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? [],
 })
 const writerOf = ($: any): FileWriter => (path, text) => $.fs.write(path, text)
 const askOf = ($: any): Ask => (question, options) => $.ui.ask(question, options)
@@ -29,7 +32,7 @@ export const register: Register = on => {
   on('tool.call', { tool: FULL_TOOL }, async ($, e) => {
     const sessionId = await $.session.id()
     const files = filesOf($)
-    const dir = await findAgenticProcessDir(files, sessionId)
+    const dir = await findAgenticProcessDir(files, linksOf($), sessionId)
     if (!dir) return reply('No process is bound to this session.')
     const step = findApprovalStep(await readAgenticProcess(files, dir))
     if (!step?.id) return reply('No step is waiting for approval.')
