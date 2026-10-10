@@ -208,6 +208,43 @@ test('the timer redraws the list only when it changed, so a redraw cannot swallo
   await ui.unmount()
 })
 
+test('a bound process redraws only when what it reads changed', async ($, on) => {
+  let redraws = 0
+  on('ui.invalidate', async () => { redraws++; return { value: undefined } })
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'in_progress' }] } })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await w.clock.advance(5000) // the first look
+  const seen = redraws
+  await w.clock.advance(5000)
+  await w.clock.advance(5000)
+  expect(redraws).toBe(seen) // nothing changed: no redraw, so no click meets a redraw
+  w.files[`${dir}/process.json`] = JSON.stringify({ ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed' }] })
+  await w.clock.advance(5000)
+  expect(redraws).toBeGreaterThan(seen) // a step changed: it redraws
+  await ui.unmount()
+})
+
+test('/process debug toasts each press with the button key, and /process debug again turns it off', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'pending' }] } })
+  w.store['session:S1'] = [dir]
+  const answer = await $.command.run({ command: 'process', args: 'debug' }) as any
+  expect(JSON.stringify(answer)).toContain('Click debug on')
+  expect(w.store.debugClicks).toBe(true)
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'sec-memory' })
+  expect(w.toasts.some(t => t.startsWith('press sec-memory'))).toBe(true)
+  await $.command.run({ command: 'process', args: 'debug' })
+  expect(w.store.debugClicks).toBe(false)
+  const count = w.toasts.length
+  await ui.press({ key: 'sec-logs' })
+  expect(w.toasts.length).toBe(count) // off: no toast
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

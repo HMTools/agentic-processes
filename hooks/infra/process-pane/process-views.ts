@@ -115,3 +115,18 @@ export async function filesView(files: FileSystem, dir: string): Promise<FileRow
   for (const [full, step] of touched) if (!rows.has(full)) rows.set(full, { path: full, name: full.startsWith(`${dir}/`) ? full.slice(dir.length + 1) : full, output: true, step, openable: await files.exists(full) })
   return [...rows.values()].sort((a, b) => Number(b.output) - Number(a.output) || a.name.localeCompare(b.name))
 }
+
+// The numbers on the Memory and Files tabs, from folder listings only: no file is read. The Files number is approximate: it counts the files in the
+// process folder (framework files apart) and leaves out the files that only the log or memory name.
+export async function tabCounts(files: FileSystem, dir: string): Promise<{ topics: number; files: number }> {
+  const topics = (await list(files, `${dir}/memory`)).filter(f => f.name.endsWith('.json') && !f.name.startsWith('_')).length
+  let found = 0
+  const walk = async (path: string, depth: number) => {
+    for (const e of await list(files, path)) {
+      const rel = `${path}/${e.name}`.slice(dir.length + 1)
+      if (e.kind === 'dir') { if (depth < 3 && rel !== 'memory') await walk(`${path}/${e.name}`, depth + 1) } else if (!FRAMEWORK.has(rel)) found++
+    }
+  }
+  await walk(dir, 0)
+  return { topics, files: found }
+}

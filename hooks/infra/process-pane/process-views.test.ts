@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 import { ACTIVE, processFile, step, world } from '../process-manager/fake-world'
-import { filesView, logView, memoryView, timesOf } from './process-views'
+import { filesView, logView, memoryView, tabCounts, timesOf } from './process-views'
 
 const D = `${ACTIVE}/p1`
 const steps = [
@@ -51,4 +51,13 @@ test('files: output first, framework files apart, a touched file knows its step'
   const out = rows.filter(r => r.output).map(r => [r.name, r.step, r.openable])
   expect(out).toEqual([['/repo/src/x.ts', '2', false], ['notes/approval.md', '2', true], ['other.txt', undefined, true], ['report.md', '1', true]])
   expect(rows.filter(r => !r.output).map(r => r.name).sort()).toEqual(['log.json', 'memory/invoice.json', 'process.json'])
+})
+
+test('the tab counts come from folder listings: topics without the cross-references file, and files without the framework files', async () => {
+  const w = world({
+    [`${D}/process.json`]: processFile({}, steps), [`${D}/log.json`]: {},
+    [`${D}/memory/invoice.json`]: {}, [`${D}/memory/approvals.json`]: {}, [`${D}/memory/_cross-references.json`]: {},
+    [`${D}/notes/a.md`]: 'x', [`${D}/b.md`]: 'y',
+  })
+  expect(await tabCounts(w.ports.files, D)).toEqual({ topics: 2, files: 2 })
 })

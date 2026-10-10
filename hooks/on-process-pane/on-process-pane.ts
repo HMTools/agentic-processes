@@ -10,7 +10,7 @@ import { ensureProcessTools } from '../infra/process-manager/tools'
 import { FAVORITES, matches, mergeTemplates, templateDetail } from '../infra/process-pane/template-views'
 import type { TemplateRow } from '../infra/process-pane/template-views'
 import { flowGrid, nodeSegment, progressBar, ring } from '../infra/process-pane/rich'
-import { filesView, logView, memoryView } from '../infra/process-pane/process-views'
+import { filesView, logView, memoryView, tabCounts } from '../infra/process-pane/process-views'
 import { stepLine } from '../infra/process-pane/step-line'
 import { addMarketplace, catalog, installTemplate, listMarketplaces, refreshMarketplaces, removeMarketplace, removeTemplate, toggleMarketplace, updateMarketplace } from '../infra/templates/templates'
 import type { CatalogEntry, MarketplaceFields, MarketplaceInfo, TemplatePorts } from '../infra/templates/templates'
@@ -54,6 +54,9 @@ let timer: { cancel(): void } | undefined
 let seen = new Set<string>() // the processes that needed the user at the last look: a new one raises a toast
 let primed = false
 let lastPrint: string | undefined // the fingerprint of the process list at the last redraw
+let lastViewPrint = '' // the same for what the open bound view reads
+let debugClicks = false // /process debug: a toast for each press and focus move
+let lastDraw = Date.now()
 let entries: CatalogEntry[] = []
 let markets: MarketplaceInfo[] = []
 let form: { original?: string; values: MarketplaceFields } | undefined // the Add or Edit form of a marketplace
@@ -135,20 +138,40 @@ async function handOff($: any, started: Started): Promise<void> {
 }
 
 // Read every process again, and say so with a toast when one starts to need the user. The first look raises none.
-// The pane redraws only when the list changed, so a redraw cannot swallow a click. A bound process reads its files on each draw, so it redraws each time.
+// The pane redraws only when the list, or what the open bound view reads, changed. A redraw cannot then swallow a click.
 async function refresh($: any): Promise<void> {
   let changed = true
   try {
     processes = await listProcesses(filesOf($))
     const print = fingerprint(processes)
-    changed = print !== lastPrint
+    const viewPrint = await viewFingerprint($)
+    changed = print !== lastPrint || viewPrint !== lastViewPrint
     lastPrint = print
+    lastViewPrint = viewPrint
     const needing = processes.filter(p => needsUser(p.kind))
     if (primed) for (const p of needing) if (!seen.has(p.dir)) await $.ui.toast(`${p.name} ${LOOK[p.kind].word}`)
     seen = new Set(needing.map(p => p.dir))
     primed = true
   } catch { /* keep the last list */ }
-  if (changed || view === 'process') $.ui.invalidate('ui.render')
+  if (changed) $.ui.invalidate('ui.render')
+}
+
+// What the open tab of a bound process reads: only that tab (the counts of the other two come from folder listings).
+async function readViews(files: FileSystem, dir: string) {
+  const [mem, logs, rows, counts] = await Promise.all([
+    section === 'memory' ? memoryView(files, dir) : Promise.resolve({ topics: [], history: [], diffs: [] } as Awaited<ReturnType<typeof memoryView>>),
+    section === 'logs' ? logView(files, dir) : Promise.resolve([] as Awaited<ReturnType<typeof logView>>),
+    section === 'files' ? filesView(files, dir) : Promise.resolve([] as Awaited<ReturnType<typeof filesView>>),
+    tabCounts(files, dir),
+  ])
+  return { mem, logs, rows, counts }
+}
+// A text that changes when what the pane would draw for the bound process changes.
+async function viewFingerprint($: any): Promise<string> {
+  if (view !== 'process' || !shown) return ''
+  const files = filesOf($)
+  const detail = openStep ? await stepDetail(files, shown, openStep) : undefined
+  return JSON.stringify([await boundView(files, shown), detail, detail ? undefined : await readViews(files, shown)])
 }
 
 // The saved folder switch, and the timer that keeps the count and the badge current. A mod has no file watcher.
@@ -157,6 +180,7 @@ async function ensureLoaded($: any): Promise<void> {
     loaded = true
     allFolders = (await $.store.get('allFolders')) === true
     favorites = new Set(((await $.store.get('favorites')) as string[] | undefined) ?? [])
+    debugClicks = (await $.store.get('debugClicks')) === true
   }
   if (!timer) {
     try { timer = $.clock.every(REFRESH_MS, () => refresh($)) } catch { /* no timer: the pane refreshes when it opens */ }
@@ -207,9 +231,25 @@ export const register: Register = on => {
   on('command.run', { command: COMMANDS }, async ($, e) => {
     const text = String(e.args ?? '').trim()
     const [word = '', ...others] = text.split(/\s+/)
+    if (word.toLowerCase() === 'debug') { // /process debug: show a toast for each press and focus move, to find a lost click
+      await ensureLoaded($)
+      debugClicks = !debugClicks
+      await $.store.set('debugClicks', debugClicks)
+      return { text: `Click debug ${debugClicks ? 'on: each press and focus move shows a toast' : 'off'}` } as never
+    }
     const named = TABS.find(t => t === word.toLowerCase())
     await openPane($, named, named ? others.join(' ') : text)
     return {}
+  })
+
+  // The debug switch: say what reached the mod, and how long after the last draw.
+  on('ui.press', async ($, e, next) => {
+    if (debugClicks && e.requestId === PANE) await $.ui.toast(`press ${e.element}  +${((Date.now() - lastDraw) / 1000).toFixed(1)} s since the last draw`)
+    return next(e)
+  })
+  on('ui.focus', async ($, e, next) => {
+    if (debugClicks && e.requestId === PANE) await $.ui.toast(`focus ${e.element ?? '(engine)'}  +${((Date.now() - lastDraw) / 1000).toFixed(1)} s since the last draw`)
+    return next(e)
   })
 
   // After /clear, /resume and /branch the saved folder switch is read again.
@@ -258,8 +298,9 @@ export const register: Register = on => {
     const need = waitingCount(processes)
     const bound = view === 'process' && shown ? await boundView(filesOf($), shown) : undefined
     const detail = bound && openStep ? await stepDetail(filesOf($), bound.dir, openStep) : undefined
-    // The Memory, Logs and Files tabs read their files on each draw (the 5 second timer redraws). The tab counts need all three.
-    const views = bound && !detail ? { mem: await memoryView(filesOf($), bound.dir), logs: await logView(filesOf($), bound.dir), rows: await filesView(filesOf($), bound.dir) } : undefined
+    // A draw reads only the open tab. The two tab counts come from folder listings (tabCounts), not from the views.
+    lastDraw = Date.now()
+    const views = bound && !detail ? await readViews(filesOf($), bound.dir) : undefined
 
     // The two tabs: buttons in a row, and on Desktop a rail with an icon for each.
     const badge = need ? ` ${symbolOf('waiting', false)}${need}` : ''
@@ -520,12 +561,14 @@ export const register: Register = on => {
       // The four tabs of a bound process. A count on a tab says how much is inside.
       const v = views!
       const outputs = v.rows.filter(r => r.output)
+      const topicCount = section === 'memory' ? v.mem.topics.length : v.counts.topics
+      const fileCount = section === 'files' ? outputs.length : v.counts.files
       const sec = (name: typeof section, label: string, short: string, count = 0) => Button({
         key: `sec-${name}`, label: `${narrow ? short : label}${count && !narrow ? ` ·${count}` : ''}`, plain: true, dimColor: section !== name,
         onPress: () => { section = name; message = ''; redraw() },
       })
       const sectionTabs = Box({ flexDirection: 'row', columnGap: narrow ? 1 : 3, children: [
-        sec('steps', 'Steps', 'Steps'), sec('memory', 'Memory', 'Mem', v.mem.topics.length), sec('logs', 'Logs', 'Logs'), sec('files', 'Files', 'Files', outputs.length),
+        sec('steps', 'Steps', 'Steps'), sec('memory', 'Memory', 'Mem', topicCount), sec('logs', 'Logs', 'Logs'), sec('files', 'Files', 'Files', fileCount),
       ] })
       const none = (text: string) => line(text, { dimColor: true })
       const sub = (name: typeof memTab, label: string) => Button({ key: `mem-${name}`, label, plain: true, dimColor: memTab !== name, onPress: () => { memTab = name; redraw() } })

@@ -67,7 +67,7 @@ export const register: Register = on => {
     }
     await nudgeFindings($)
     // The command that opens the process pane (see ../on-process-pane). A name that is taken throws, so it must not stop the session.
-    await $.command.register({ name: 'process', description: 'Start a new process or resume one', argumentHint: '[new | continue | templates | first field]' }).catch(() => {})
+    await $.command.register({ name: 'process', description: 'Start a new process or resume one', argumentHint: '[new | continue | templates | debug | first field]' }).catch(() => {})
     return next(e)
   })
 
