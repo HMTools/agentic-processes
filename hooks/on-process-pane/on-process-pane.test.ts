@@ -245,6 +245,50 @@ test('/process debug toasts each press with the button key, and /process debug a
   expect(w.toasts.length).toBe(count) // off: no toast
 })
 
+test('Desktop draws cards, pills and chips: every screen mounts, and each control keeps its key', async ($, on) => {
+  const dir = `${HOME}/active/p1`, child = `${HOME}/active/kid`
+  const w = world(on, {
+    [`${T}/bug.json`]: { ...template, metadata: { title: 'Bug', purposeAndUsage: 'Fix a bug.' } },
+    [`${T}/design/design.json`]: { type: 'step', id: 'r1' },
+    [`${dir}/process.json`]: { ...process, subProcessState: { parentProcess: null, childProcesses: [{ id: 'k', name: 'Lookup', status: 'running', spawnedAtStep: 'a', syncPoint: 's', processPath: child }] },
+      steps: [{ id: 'a', number: 1, name: 'Design', status: 'in_progress', stepDefinition: { substeps: [{ number: 1, name: 'Draft' }, { number: 2, name: 'Review' }] } }, { id: 'b', number: 2, name: 'Build', status: 'awaiting_approval' }] },
+    [`${dir}/log.json`]: { steps: { a: { actionsTaken: ['drew it'], problemsEncountered: ['slow'] } } },
+    [`${dir}/memory/plan.json`]: { entries: { a: { informationProduced: { goal: 'ship' } } } },
+    [`${dir}/notes.md`]: 'x',
+  })
+  const desk = { ...PANE, surface: 'desktop' } as const
+  // New and Continue lists
+  await $.command.run({ command: 'process', args: 'new' })
+  let ui = await $.ui.mount(desk)
+  expect(await ui.find({ type: 'Button', key: 'tab-new', variant: 'primary' })).toBeDefined() // the open tab is the primary button
+  expect(await ui.find({ type: 'Button', key: 'tab-continue', variant: 'secondary' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'template-dev/bug', label: 'Details' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'start-dev/bug' })).toBeDefined()
+  await ui.press({ key: 'template-dev/bug' })
+  await ui.press({ key: 'td-steps' })
+  await ui.press({ key: 'td-back' })
+  await ui.press({ key: 'tab-continue' })
+  expect(await ui.find({ type: 'Button', key: 'process-0', label: 'Resume' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'del-0', label: 'Delete' })).toBeDefined()
+  await ui.unmount()
+  // A bound process: step cards, a sub-process card, and every tab
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  ui = await $.ui.mount(desk)
+  expect(await ui.find({ type: 'Box', key: 'scard-a' })).toBeDefined()
+  expect(await ui.find({ type: 'Box', key: 'ccard-a-0' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'sec-steps', variant: 'primary' })).toBeDefined()
+  for (const key of ['sec-memory', 'mem-topics', 'topic-plan', 'mem-history', 'mem-diffs', 'sec-logs', 'sec-files']) await ui.press({ key })
+  await ui.press({ key: 'sec-logs' })
+  expect(await ui.find({ type: 'Box', key: 'logcard-a' })).toBeDefined()
+  await ui.press({ key: 'log-a' }) // the step detail
+  expect(await ui.find({ type: 'Button', key: 'back-steps', label: 'Back to logs' })).toBeDefined()
+  await ui.press({ key: 'back-steps' })
+  await ui.press({ key: 'sec-steps' })
+  await ui.press({ key: 'back-list' })
+  expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

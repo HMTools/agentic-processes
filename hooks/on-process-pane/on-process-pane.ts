@@ -10,6 +10,7 @@ import { ensureProcessTools } from '../infra/process-manager/tools'
 import { FAVORITES, matches, mergeTemplates, templateDetail } from '../infra/process-pane/template-views'
 import type { TemplateRow } from '../infra/process-pane/template-views'
 import { flowGrid, nodeSegment, progressBar, ring } from '../infra/process-pane/rich'
+import { richKit } from './rich-ui'
 import { filesView, logView, memoryView, tabCounts } from '../infra/process-pane/process-views'
 import { stepLine } from '../infra/process-pane/step-line'
 import { addMarketplace, catalog, installTemplate, listMarketplaces, refreshMarketplaces, removeMarketplace, removeTemplate, toggleMarketplace, updateMarketplace } from '../infra/templates/templates'
@@ -25,10 +26,6 @@ const PANE = 'process-pane'
 const COMMANDS = ['process', 'agentic-processes:process']
 const TABS = ['new', 'continue', 'templates'] as const
 const REFRESH_MS = 5000
-const ICONS = {
-  new: '<path d="M8 2v12M2 8h12"/>',
-  continue: '<path d="M4 2l9 6-9 6z"/>',
-}
 
 // The pane keeps what it shows in module variables: a reload of the mod starts it again from the command.
 let tab: (typeof TABS)[number] = 'new'
@@ -222,9 +219,6 @@ async function openInViewer($: any, path: string, surface: string): Promise<stri
   return `Could not open the file with ${tries.map(t => t[0]).join(' or ')}. The file is ${path}`
 }
 
-const iconSvg = (path: string, color: string, dot: boolean) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><g transform="translate(2 2)" fill="none" stroke="${color}" stroke-width="2">${path}</g>${dot ? '<circle cx="16" cy="4" r="3.5" fill="#e3a63b"/>' : ''}</svg>`
-
 export const register: Register = on => {
   // The command is registered in on-process-tools: a plugin can have only one session.start hook without a matcher.
   // A first word that is a tab name opens that tab. Any other text goes to the first field, as before.
@@ -294,6 +288,13 @@ export const register: Register = on => {
     const narrow = ((e.props as any).bodyColumns ?? 60) < 52 // short labels, no bar
     const rich = !!Svg && e.surface === 'desktop' // Desktop draws small SVG pictures (see infra/process-pane/rich): status nodes, bars, a ring. The terminal never does.
     const picture = (source: string, alt: string, width: number, height: number) => Svg({ source, alt, width, height, isInteractive: true })
+    const k = rich ? richKit({ Box, Text, Button }) : undefined // the Desktop look: cards, pills, chips (see rich-ui)
+    // A tab-like button: the open one is the primary button on Desktop, and the other dim text elsewhere.
+    const toggle = (key: string, label: string, active: boolean, onPress: () => void) => (k ? k.tab(key, label, active, onPress) : Button({ key, label, plain: true, dimColor: !active, onPress }))
+    // A row of tabs: one segmented control on Desktop.
+    const tabRow = (buttons: unknown[]) => (k ? k.segmented(buttons) : Box({ flexDirection: 'row', columnGap: narrow ? 1 : 3, children: buttons }))
+    // A navigation button: a real secondary button on Desktop, plain text elsewhere.
+    const nav = (key: string, label: string, onPress: () => void) => Button({ key, label, ...(k ? { variant: 'secondary' } : { plain: true }), onPress })
     const cwd: string = await $.session.cwd()
     const need = waitingCount(processes)
     const bound = view === 'process' && shown ? await boundView(filesOf($), shown) : undefined
@@ -308,15 +309,7 @@ export const register: Register = on => {
       { name: 'new', key: 'tab-new', label: 'New', short: 'New', go: show('new') },
       { name: 'continue', key: 'tab-continue', label: `Continue${badge}`, short: `Cont${badge}`, go: show('continue') },
     ] as const
-    const tabButton = (t: (typeof tabDefs)[number]) => Button({ key: t.key, label: narrow ? t.short : t.label, plain: true, dimColor: tab !== t.name, onPress: t.go })
-    const tabs = Box({ flexDirection: 'row', columnGap: narrow ? 1 : 3, children: tabDefs.map(tabButton) })
-    const rail = Svg && Box({
-      flexDirection: 'column',
-      children: tabDefs.map(t => Box({
-        key: `rail-${t.name}`, flexDirection: 'row', columnGap: 1,
-        children: [Svg({ source: iconSvg(ICONS[t.name], tab === t.name ? '#8fa8ff' : '#8a90a0', t.name === 'continue' && need > 0), alt: `${t.label} icon`, width: 20, height: 20 }), tabButton(t)],
-      })),
-    })
+    const tabs = tabRow(tabDefs.map(t => toggle(t.key, narrow ? t.short : t.label, tab === t.name, t.go)))
 
     // A card: a round border, the status symbol and word, the step, and a bar. A process that needs the user has a yellow border.
     const card = (cardKey: string, children: unknown[], hot = false) => Box({
@@ -326,21 +319,34 @@ export const register: Register = on => {
     const processCard = (p: ProcessInfo, i: number) => {
       const look = LOOK[p.kind]
       const filled = p.kind === 'done' ? 20 : Math.round(((p.step - 1) / Math.max(1, p.total)) * 20)
+      const resume = async () => handOff($, await resumeProcess(portsOf($), p.dir))
+      // Delete moves the folder to deleted/ and asks twice. The process this session works on stays.
+      const deletePress = async () => {
+        if (p.dir === boundDir) { message = 'This session works on that process. Close it first.'; redraw(); return }
+        if (sure !== p.dir) { sure = p.dir; message = ''; redraw(); return }
+        sure = undefined
+        try { message = `Moved to ${await deleteProcess(portsOf($), p.dir)}` } catch (error) { message = error instanceof Error ? error.message : String(error) }
+        await refresh($)
+      }
+      if (k) {
+        return k.card(`card-${i}`, [
+          Box({ flexDirection: 'row', columnGap: 1, children: [line(p.name, { bold: true }), k.kindPill(p.kind)] }),
+          line(`step ${p.step} of ${p.total}  ·  ${p.updated}`, { dimColor: true }),
+          ...(narrow ? [] : [picture(progressBar(p.kind === 'done' ? p.total : p.step - 1, p.total, p.kind, 240), `step ${p.step} of ${p.total}`, 240, 8)]),
+          Box({ flexDirection: 'row', columnGap: 1, children: [
+            Button({ key: `process-${i}`, label: 'Resume', variant: 'primary', onPress: resume }),
+            Button({ key: `del-${i}`, label: sure === p.dir ? 'Sure?' : 'Delete', variant: 'secondary', onPress: deletePress }),
+          ] }),
+        ], { hot: needsUser(p.kind) })
+      }
       return card(`card-${i}`, [
         Box({
           flexDirection: 'row', columnGap: 1,
           children: [
             line(symbolOf(p.kind, false), { color: look.color, bold: true }),
-            Button({ key: `process-${i}`, plain: true, label: p.name, onPress: async () => handOff($, await resumeProcess(portsOf($), p.dir)) }),
+            Button({ key: `process-${i}`, plain: true, label: p.name, onPress: resume }),
             line(look.word, { color: look.color }),
-            // Delete moves the folder to deleted/ and asks twice. The process this session works on stays.
-            Button({ key: `del-${i}`, label: sure === p.dir ? 'Sure?' : 'Delete', plain: true, dimColor: sure !== p.dir, onPress: async () => {
-              if (p.dir === boundDir) { message = 'This session works on that process. Close it first.'; redraw(); return }
-              if (sure !== p.dir) { sure = p.dir; message = ''; redraw(); return }
-              sure = undefined
-              try { message = `Moved to ${await deleteProcess(portsOf($), p.dir)}` } catch (error) { message = error instanceof Error ? error.message : String(error) }
-              await refresh($)
-            } }),
+            Button({ key: `del-${i}`, label: sure === p.dir ? 'Sure?' : 'Delete', plain: true, dimColor: sure !== p.dir, onPress: deletePress }),
           ],
         }),
         line(narrow ? `step ${p.step}/${p.total}` : `step ${p.step} of ${p.total}  ·  ${p.updated}`, { dimColor: true }),
@@ -384,7 +390,7 @@ export const register: Register = on => {
         line(' '),
         Box({ flexDirection: 'row', columnGap: 3, children: [
           Button({ key: 'tpl-refresh', label: 'Refresh', onPress: () => templateJob($, async ports => (await refreshMarketplaces(ports)).join('\n')) }),
-          Button({ key: 'mk-back', label: 'Back to templates', plain: true, onPress: () => { tab = 'new'; message = ''; redraw() } }),
+          nav('mk-back', 'Back to templates', () => { tab = 'new'; message = ''; redraw() }),
         ] }),
       ]
     } else if (tab === 'continue') {
@@ -393,14 +399,14 @@ export const register: Register = on => {
       const folderSwitch = Box({
         flexDirection: 'row', columnGap: 2,
         children: [
-          Button({ key: 'folder-here', label: 'This folder', plain: true, dimColor: allFolders, onPress: setFolders(false) }),
-          Button({ key: 'folder-all', label: 'All folders', plain: true, dimColor: !allFolders, onPress: setFolders(true) }),
+          toggle('folder-here', 'This folder', !allFolders, setFolders(false)),
+          toggle('folder-all', 'All folders', allFolders, setFolders(true)),
         ],
       })
       body = [
         folderSwitch,
         ...(visible.length
-          ? visible.map(processCard)
+          ? (k ? [k.stack(visible.map(processCard))] : visible.map(processCard))
           : [line(allFolders || !processes.length ? 'No process is running. Start one on the New tab.' : 'No process in this folder. Press All folders to see every process.', { dimColor: true })]),
       ]
     } else if (!chosen) {
@@ -418,7 +424,7 @@ export const register: Register = on => {
       if (row) {
         // The detail of one template: purpose and parameters, the steps, the memory flow, and the file.
         const d = row.template ? await templateDetail(filesOf($), row.template.path) : undefined
-        const tdTabButton = (name: typeof tdTab, label: string) => Button({ key: `td-${name}`, label, plain: true, dimColor: tdTab !== name, onPress: () => { tdTab = name; redraw() } })
+        const tdTabButton = (name: typeof tdTab, label: string) => toggle(`td-${name}`, label, tdTab === name, () => { tdTab = name; redraw() })
         const param = (p: { name: string; required: boolean; description: string; example: string }) => line(`  ${p.name}${p.required ? ' *' : ''}   ${p.description}${p.example ? `   e.g. ${p.example}` : ''}`)
         const overview = !d ? [line(row.purpose || 'No description.'), line(' '), line('Install this template to see its steps.', { dimColor: true })] : [
           line('Purpose', { bold: true }), line(`  ${d.purpose || row.purpose || '-'}`),
@@ -446,26 +452,36 @@ export const register: Register = on => {
           : [line('Install this template to open its file.', { dimColor: true })]
         body = [card('tdetail', [
           Box({ flexDirection: 'row', columnGap: 3, children: [
-            Button({ key: 'td-back', label: 'Back', plain: true, onPress: () => { detailKey = undefined; tdStep = undefined; message = ''; redraw() } }),
+            nav('td-back', 'Back', () => { detailKey = undefined; tdStep = undefined; message = ''; redraw() }),
             ...(row.template ? [start(row)] : []), ...(row.entry && row.state !== 'installed' ? [install(row)] : []),
             ...(row.state !== 'available' ? [Button({ key: `tpl-remove-${row.key}`, label: 'Remove', plain: true, onPress: () => templateJob($, ports => removeTemplate(ports, row)) })] : []),
           ] }),
           Box({ flexDirection: 'row', columnGap: 1, children: [star(row.key, 'td-fav'), line(`${row.category} / ${row.title}`, { bold: true }), line(wordOf[row.state], { dimColor: true })] }),
-          Box({ flexDirection: 'row', columnGap: narrow ? 1 : 3, children: [tdTabButton('overview', 'Overview'), tdTabButton('steps', narrow ? 'Steps' : `Steps${d ? ` ·${d.steps.length}` : ''}`), tdTabButton('flow', narrow ? 'Flow' : 'Memory flow'), tdTabButton('raw', 'Raw')] }),
+          tabRow([tdTabButton('overview', 'Overview'), tdTabButton('steps', narrow ? 'Steps' : `Steps${d ? ` ·${d.steps.length}` : ''}`), tdTabButton('flow', narrow ? 'Flow' : 'Memory flow'), tdTabButton('raw', 'Raw')]),
           line(' '),
           ...(tdTab === 'overview' ? overview : tdTab === 'steps' ? stepsBody : tdTab === 'flow' ? flowBody : rawBody),
         ])]
       } else {
         const cats = [...new Set(allRows.map(r => r.category))].sort()
-        const chip = (id: string, label: string, value: string | undefined) => Button({ key: id, label, plain: true, dimColor: category !== value, onPress: () => { category = value; redraw() } })
+        const chip = (id: string, label: string, value: string | undefined) => toggle(id, label, category === value, () => { category = value; redraw() })
         const shownRows = matches(allRows, query, category, favorites)
+        const stateColor = { installed: 'success', update: 'warning', available: 'inactive' } as const
+        const richTemplate = (r: TemplateRow) => k!.card(`tcard-${r.key}`, [
+          Box({ flexDirection: 'row', columnGap: 1, children: [star(r.key, `fav-${r.key}`), line(`${r.category} / ${r.title}`, { bold: true }), k!.pill(wordOf[r.state], stateColor[r.state])] }),
+          ...(r.steps != null ? [line(`${r.steps} steps`, { dimColor: true })] : []),
+          ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 90 ? `${r.purpose.slice(0, 89)}…` : r.purpose, { dimColor: true })]),
+          Box({ flexDirection: 'row', columnGap: 1, children: [
+            ...(r.template ? [start(r)] : []), ...(r.entry && r.state !== 'installed' ? [install(r)] : []),
+            Button({ key: `template-${r.key}`, label: 'Details', variant: 'secondary', onPress: () => { detailKey = r.key; tdTab = 'overview'; tdStep = undefined; message = ''; redraw() } }),
+          ] }),
+        ])
         body = [
           Input({ key: 'search', label: 'Search', placeholder: 'name, category or purpose', value: query, onInput: (text: string) => { query = text; redraw() }, onSubmit: (text: string) => { query = text; redraw() } }),
           Box({ flexDirection: 'row', columnGap: narrow ? 1 : 2, flexWrap: 'wrap', children: [
             chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${favorites.size ? ` ·${favorites.size}` : ''}`, FAVORITES), ...cats.map(c => chip(`cat-${c}`, c, c)),
           ] }),
           line(' '),
-          ...(shownRows.length ? shownRows.map(r => card(`tcard-${r.key}`, [
+          ...(shownRows.length ? (k ? [k.stack(shownRows.map(richTemplate))] : shownRows.map(r => card(`tcard-${r.key}`, [
             Box({ flexDirection: 'row', columnGap: 1, children: [
               star(r.key, `fav-${r.key}`),
               Button({ key: `template-${r.key}`, plain: true, label: `${r.category} / ${r.title}`, onPress: () => { detailKey = r.key; tdTab = 'overview'; tdStep = undefined; message = ''; redraw() } }),
@@ -473,7 +489,7 @@ export const register: Register = on => {
             ] }),
             ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 90 ? `${r.purpose.slice(0, 89)}…` : r.purpose, { dimColor: true })]),
             Box({ flexDirection: 'row', columnGap: 2, children: [...(r.template ? [start(r)] : []), ...(r.entry && r.state !== 'installed' ? [install(r)] : [])] }),
-          ])) : [line(allRows.length ? 'No template matches. Clear the search or press All.' : 'No template yet. Press Refresh to read the marketplaces.', { dimColor: true })]),
+          ]))) : [line(allRows.length ? 'No template matches. Clear the search or press All.' : 'No template yet. Press Refresh to read the marketplaces.', { dimColor: true })]),
           line(' '),
           Box({ flexDirection: 'row', columnGap: 3, children: [
             Button({ key: 'tpl-refresh', label: 'Refresh', plain: true, onPress: () => templateJob($, async ports => (await refreshMarketplaces(ports)).join('\n')) }),
@@ -510,21 +526,21 @@ export const register: Register = on => {
         const at = bound.steps.findIndex(s => s.id === detail.id)
         const move = (by: number) => () => { openStep = bound.steps[at + by]?.id; redraw() }
         const section = (title: string, items: string[]) => items.length ? [line(title, { bold: true }), ...items.map(item => line(`  ${item}`))] : []
-        const tabButton = (name: typeof detailTab, label: string) => Button({ key: `dtab-${name}`, label, plain: true, dimColor: detailTab !== name, onPress: () => { detailTab = name; redraw() } })
+        const tabButton = (name: typeof detailTab, label: string) => toggle(`dtab-${name}`, label, detailTab === name, () => { detailTab = name; redraw() })
         const parts = detailTab === 'definition'
           ? [...section('Produces', detail.produces), ...section('Substeps', detail.substeps), ...section('Reads memory', detail.reads), ...section('Writes memory', detail.writes)]
           : [...section('Actions', detail.actions), ...section('Reasoning', detail.reasoning), ...section('Decisions', detail.decisions), ...section('Files', detail.files),
              ...section('Produced', detail.produced.map(([k, v]) => `${k}: ${v}`)), ...section('Notes', detail.notes), ...section('Problems', detail.problems)]
         return card('step-detail', [
-          Box({ flexDirection: 'row', columnGap: 1, children: [line(symbolOf(detail.kind, false), { color: LOOK[detail.kind].color, bold: true }), line(`${detail.number}. ${detail.name}`, { bold: true }), kindWord(detail.kind)] }),
-          Box({ flexDirection: 'row', columnGap: 3, children: [tabButton('definition', 'Definition'), tabButton('execution', 'Execution')] }),
+          Box({ flexDirection: 'row', columnGap: 1, children: k ? [line(`${detail.number}. ${detail.name}`, { bold: true }), k.kindPill(detail.kind)] : [line(symbolOf(detail.kind, false), { color: LOOK[detail.kind].color, bold: true }), line(`${detail.number}. ${detail.name}`, { bold: true }), kindWord(detail.kind)] }),
+          tabRow([tabButton('definition', 'Definition'), tabButton('execution', 'Execution')]),
           line(' '),
           ...(parts.length ? parts : [line(detailTab === 'definition' ? 'This step has no definition.' : 'Nothing recorded yet.', { dimColor: true })]),
           line(' '),
           Box({ flexDirection: 'row', columnGap: 3, children: [
-            Button({ key: 'back-steps', label: section === 'logs' ? 'Back to logs' : 'Back to steps', plain: true, onPress: () => { openStep = undefined; redraw() } }),
-            ...(at > 0 ? [Button({ key: 'step-prev', label: `‹ ${bound.steps[at - 1].number}`, plain: true, onPress: move(-1) })] : []),
-            ...(at >= 0 && at < bound.steps.length - 1 ? [Button({ key: 'step-next', label: `${bound.steps[at + 1].number} ›`, plain: true, onPress: move(1) })] : []),
+            nav('back-steps', section === 'logs' ? 'Back to logs' : 'Back to steps', () => { openStep = undefined; redraw() }),
+            ...(at > 0 ? [nav('step-prev', `‹ ${bound.steps[at - 1].number}`, move(-1))] : []),
+            ...(at >= 0 && at < bound.steps.length - 1 ? [nav('step-next', `${bound.steps[at + 1].number} ›`, move(1))] : []),
           ] }),
         ], needsUser(detail.kind))
       }
@@ -540,13 +556,30 @@ export const register: Register = on => {
           Button({ key: `sub-${s.id}-${n}`, label: c.name, plain: true, onPress: goTo(c.dir) }), kindWord(c.kind),
         ] }))),
       ]
+      // Desktop: a card for each step, with its substeps as chips and a sub-process under it in a dashed card.
+      const stepCards = (s: StepRow, i: number) => {
+        const activeSub = s.substeps.find(x => x.active)?.number ?? 0
+        return [
+          k!.card(`scard-${s.id}`, [
+            Box({ flexDirection: 'row', columnGap: 1, children: [
+              picture(nodeSegment(s.kind, { first: true, last: true, height: 22 }), LOOK[s.kind].word, 24, 22),
+              Button({ key: `step-${s.id}`, label: `${s.number}. ${s.name}`, plain: true, dimColor: s.kind === 'done' || s.kind === 'pending', onPress: () => { openStep = s.id; redraw() } }),
+              s.kind === 'pending' || s.kind === 'done' ? line(LOOK[s.kind].word, { dimColor: true }) : k!.kindPill(s.kind),
+            ] }),
+            ...(narrow || !s.substeps.length ? [] : [k!.wrap(s.substeps.map(sub => k!.chip(`${sub.number} ${sub.name}`, sub.active ? 'active' : sub.number < activeSub ? 'done' : 'idle')))]),
+          ], { hot: needsUser(s.kind), active: s.active }),
+          ...(narrow ? [] : s.children.map((c, n) => Box({ key: `child-${s.id}-${n}`, marginLeft: 3, flexDirection: 'column', children: [
+            k!.card(`ccard-${s.id}-${n}`, [Box({ flexDirection: 'row', columnGap: 1, children: [line('↳', { dimColor: true }), Button({ key: `sub-${s.id}-${n}`, label: c.name, plain: true, onPress: goTo(c.dir) }), k!.kindPill(c.kind)] })], { dashed: true }),
+          ] }))),
+        ]
+      }
       // Desktop: the steps as a graph the user can move. The terminal and the toggle's other side keep the timeline.
       const node = (id: string, label: string, kind: keyof typeof LOOK, sub: string, go: 'step' | 'open', target: string) =>
         ({ id, label, sub, symbol: symbolOf(kind, false), color: LOOK[kind].color, hot: needsUser(kind), go, target })
-      const graphToggle = Box({ flexDirection: 'row', columnGap: 3, children: [
-        Button({ key: 'mode-graph', label: 'Graph', plain: true, dimColor: !graphOn, onPress: () => { graphOn = true; redraw() } }),
-        Button({ key: 'mode-list', label: 'Timeline', plain: true, dimColor: graphOn, onPress: () => { graphOn = false; redraw() } }),
-      ] })
+      const graphToggle = tabRow([
+        toggle('mode-graph', 'Graph', graphOn, () => { graphOn = true; redraw() }),
+        toggle('mode-list', 'Timeline', !graphOn, () => { graphOn = false; redraw() }),
+      ])
       const graph = Client && e.surface === 'desktop' && graphOn ? Client({
         key: 'graph', module: './graph-view.ts', width: '100%', height: 22,
         props: {
@@ -563,47 +596,47 @@ export const register: Register = on => {
       const outputs = v.rows.filter(r => r.output)
       const topicCount = section === 'memory' ? v.mem.topics.length : v.counts.topics
       const fileCount = section === 'files' ? outputs.length : v.counts.files
-      const sec = (name: typeof section, label: string, short: string, count = 0) => Button({
-        key: `sec-${name}`, label: `${narrow ? short : label}${count && !narrow ? ` ·${count}` : ''}`, plain: true, dimColor: section !== name,
-        onPress: () => { section = name; message = ''; redraw() },
-      })
-      const sectionTabs = Box({ flexDirection: 'row', columnGap: narrow ? 1 : 3, children: [
+      const sec = (name: typeof section, label: string, short: string, count = 0) =>
+        toggle(`sec-${name}`, `${narrow ? short : label}${count && !narrow ? ` ·${count}` : ''}`, section === name, () => { section = name; message = ''; redraw() })
+      const sectionTabs = tabRow([
         sec('steps', 'Steps', 'Steps'), sec('memory', 'Memory', 'Mem', topicCount), sec('logs', 'Logs', 'Logs'), sec('files', 'Files', 'Files', fileCount),
-      ] })
+      ])
       const none = (text: string) => line(text, { dimColor: true })
-      const sub = (name: typeof memTab, label: string) => Button({ key: `mem-${name}`, label, plain: true, dimColor: memTab !== name, onPress: () => { memTab = name; redraw() } })
+      const sub = (name: typeof memTab, label: string) => toggle(`mem-${name}`, label, memTab === name, () => { memTab = name; redraw() })
       const toLine = (items: string[]) => items.join(', ') || '-'
+      const topicRows = (t: (typeof v.mem.topics)[number]) => [
+        Button({ key: `topic-${t.topic}`, label: `${openTopic === t.topic ? '▾' : '▸'} ${t.topic}`, plain: true, onPress: () => { openTopic = openTopic === t.topic ? undefined : t.topic; redraw() } }),
+        ...(openTopic === t.topic ? t.entries.flatMap(en => [
+          line(`  step ${en.step} ${en.stepName}`, { bold: true }),
+          ...en.values.map(([key, val]) => line(`    ${key}: ${val}`)),
+          ...en.decisions.map(d => line(`    decision: ${d}`)), ...en.files.map(f => line(`    file: ${f}`)), ...en.notes.map(n => line(`    note: ${n}`)),
+        ]) : []),
+      ]
       const diffColor = (l: string) => (l[0] === '+' ? 'success' : l[0] === '-' ? 'error' : 'warning')
       const memoryBody = [
-        Box({ flexDirection: 'row', columnGap: 3, children: [sub('flow', 'Flow'), sub('topics', 'Topics'), sub('history', 'History'), sub('diffs', 'Diffs')] }),
+        tabRow([sub('flow', 'Flow'), sub('topics', 'Topics'), sub('history', 'History'), sub('diffs', 'Diffs')]),
         line(' '),
         ...(!v.mem.topics.length ? [none('No memory yet. A step writes memory when it runs.')]
           : memTab === 'flow' ? v.mem.topics.map(t => line(`${t.topic}  ·  written by ${toLine(t.writtenBy)}  ·  read by ${toLine(t.readBy)}`))
-          : memTab === 'topics' ? v.mem.topics.flatMap(t => [
-            Button({ key: `topic-${t.topic}`, label: `${openTopic === t.topic ? '▾' : '▸'} ${t.topic}`, plain: true, onPress: () => { openTopic = openTopic === t.topic ? undefined : t.topic; redraw() } }),
-            ...(openTopic === t.topic ? t.entries.flatMap(en => [
-              line(`  step ${en.step} ${en.stepName}`, { bold: true }),
-              ...en.values.map(([k, val]) => line(`    ${k}: ${val}`)),
-              ...en.decisions.map(d => line(`    decision: ${d}`)), ...en.files.map(f => line(`    file: ${f}`)), ...en.notes.map(n => line(`    note: ${n}`)),
-            ]) : []),
-          ])
+          : memTab === 'topics' ? (k ? [k.stack(v.mem.topics.map(t => k.card(`tcard-${t.topic}`, topicRows(t))))] : v.mem.topics.flatMap(topicRows))
           : memTab === 'history' ? (v.mem.history.length ? v.mem.history.map(en => line(`${en.updated.slice(0, 16).replace('T', ' ')}  ${en.topic}  step ${en.step}  ·  ${en.values.length} values`)) : [none('No entries yet.')])
           : (v.mem.diffs.length ? v.mem.diffs.flatMap(d => [line(`${d.topic}: step ${d.from} → step ${d.to}`, { bold: true }), ...d.lines.map(l => line(`  ${l}`, { color: diffColor(l) }))]) : [none('No topic has two entries that differ.')])),
       ]
       const clock = (t?: string) => (t ? t.slice(11, 16) || t.slice(0, 16) : '')
-      const logsBody = v.logs.length ? v.logs.flatMap(r => [
+      const logRows = (r: (typeof v.logs)[number]) => [
         Box({ key: `logrow-${r.id}`, flexDirection: 'row', columnGap: 1, children: [
-          line(symbolOf(r.kind, false), { color: LOOK[r.kind].color }),
+          ...(k ? [k.kindPill(r.kind)] : [line(symbolOf(r.kind, false), { color: LOOK[r.kind].color })]),
           Button({ key: `log-${r.id}`, label: `${r.number}. ${r.name}`, plain: true, onPress: () => { openStep = r.id; detailTab = 'execution'; redraw() } }),
           ...(clock(r.started) ? [line(`${clock(r.started)}${r.completed ? ` – ${clock(r.completed)}` : ''}`, { dimColor: true })] : []),
         ] }),
         ...(narrow ? [] : r.actions.slice(0, 2).map(a => line(`    ${a}`, { dimColor: true }))),
         ...(narrow ? [] : r.problems.slice(0, 2).map(p => line(`    problem: ${p}`, { color: 'error' }))),
-      ]) : [none('No log yet.')]
-      const fileRow = (r: (typeof v.rows)[number], i: number) => Box({ key: `filerow-${i}`, flexDirection: 'row', columnGap: 2, children: [
+      ]
+      const logsBody = v.logs.length ? (k ? [k.stack(v.logs.map(r => k.card(`logcard-${r.id}`, logRows(r))))] : v.logs.flatMap(logRows)) : [none('No log yet.')]
+      const fileRow = (r: (typeof v.rows)[number], i: number) => (k ? (x: unknown) => k.card(`filecard-${i}`, [x]) : (x: unknown) => x)(Box({ key: `filerow-${i}`, flexDirection: 'row', columnGap: 2, children: [
         r.openable ? Button({ key: `file-${r.path}`, label: r.name, plain: true, onPress: async () => { message = await openInViewer($, r.path, e.surface); redraw() } }) : line(r.name, { dimColor: true }),
         ...(r.step ? [line(`step ${r.step}`, { dimColor: true })] : []),
-      ] })
+      ] }))
       const framework = v.rows.filter(r => !r.output)
       // A file never opens inside the pane: a press hands it to the viewer (see openInViewer).
       const filesBody = [
@@ -612,15 +645,15 @@ export const register: Register = on => {
         ...(showFramework ? framework.map(fileRow) : []),
         ...(message ? [line(message, { color: 'error' })] : []),
       ]
-      const stepsBody = graph ? [graphToggle, graph] : [...(Client && e.surface === 'desktop' ? [graphToggle] : []), ...bound.steps.flatMap(stepRows)]
+      const stepsBody = graph ? [graphToggle, graph] : [...(Client && e.surface === 'desktop' ? [graphToggle] : []), ...(k ? [k.stack(bound.steps.flatMap(stepCards))] : bound.steps.flatMap(stepRows))]
       return card('bound', [
-        ...(bound.parent ? [Button({ key: 'parent', label: `↑ ${bound.parent.name}`, plain: true, onPress: goTo(bound.parent.dir) })] : []),
+        ...(bound.parent ? [nav('parent', `↑ ${bound.parent.name}`, goTo(bound.parent.dir))] : []),
         ...(rich
           ? [Box({ flexDirection: 'row', columnGap: 2, children: [
             picture(ring(bound.step, bound.total, bound.kind), `Step ${bound.step} of ${bound.total}`, 44, 44),
             Box({ flexDirection: 'column', children: [
-              Box({ flexDirection: 'row', columnGap: 1, children: [line(bound.name, { bold: true }), line(look.word, { color: look.color })] }),
-              line(`Step ${bound.step} of ${bound.total}`, { dimColor: true }),
+              Box({ flexDirection: 'row', columnGap: 1, children: [line(bound.name, { bold: true }), k!.kindPill(bound.kind)] }),
+              line(`Step ${bound.step} of ${bound.total}${bound.steps[bound.step - 1] ? `  ·  ${bound.steps[bound.step - 1].name}` : ''}`, { dimColor: true }),
               picture(progressBar(bound.kind === 'done' ? bound.total : bound.step - 1, bound.total, bound.kind, 240), 'Progress of the process', 240, 8),
             ] }),
           ] })]
@@ -630,10 +663,10 @@ export const register: Register = on => {
         line(' '),
         ...(section === 'memory' ? memoryBody : section === 'logs' ? logsBody : section === 'files' ? filesBody : stepsBody),
         line(' '),
-        Button({ key: 'back-list', label: 'Back to list', plain: true, onPress: () => { view = 'list'; tab = 'continue'; shown = boundDir; redraw() } }),
+        nav('back-list', k ? '← Back to list' : 'Back to list', () => { view = 'list'; tab = 'continue'; shown = boundDir; redraw() }),
       ], needsUser(bound.kind))
     }
-    const main = Box({ flexDirection: 'column', children: [...(rail ? [] : [tabs, line(' ')]), ...body, ...(message ? [line(message, { color: tab === 'templates' || (tab === 'new' && !chosen) || message.startsWith('Moved to') ? undefined : 'red' })] : [])] })
-    return rail ? Box({ flexDirection: 'row', columnGap: 2, children: [rail, main] }) : main
+    const main = Box({ flexDirection: 'column', children: [tabs, line(' '), ...body, ...(message ? [line(message, { color: tab === 'templates' || (tab === 'new' && !chosen) || message.startsWith('Moved to') ? undefined : 'red' })] : [])] })
+    return main
   })
 }

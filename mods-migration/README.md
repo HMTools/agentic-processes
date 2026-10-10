@@ -1,6 +1,6 @@
 # Mods migration: research pack
 
-Goal: find out which parts of the `agentic-processes` plugin can be replaced or improved by a **Claude Code mod**, so that a later plan can migrate the plugin system. This folder started as **research tasks only**. All items are now `done` and the plugin is migrated (v3.3.4): the section "Research result" (7) of each item is the record. The `U` items (UI) were planned with a visual plan page and then built in the mod, so the "No implementation" line in the section "Out of scope" (6) of those items is history.
+Goal: find out which parts of the `agentic-processes` plugin can be replaced or improved by a **Claude Code mod**, so that a later plan can migrate the plugin system. This folder started as **research tasks only**. All items are now `done` and the plugin is migrated (v3.4.0): the section "Research result" (7) of each item is the record. The `U` items (UI) were planned with a visual plan page and then built in the mod, so the "No implementation" line in the section "Out of scope" (6) of those items is history.
 
 Each task is one file in `items/`. Each file is written so that a person (or a Claude session) with **no earlier context** can pick it up, research it, and record the result. Progress is tracked in `progress.html`.
 
@@ -15,7 +15,7 @@ Each task is one file in `items/`. Each file is written so that a person (or a C
 A Claude Code plugin whose JS/TS code runs **inside** Claude Code and handles events (a tool call, a submitted prompt, a stop, a session start). It can observe, rewrite or answer the event, add slash commands and tools, keep state, call a model, run processes, and draw panes. Docs: https://code.claude.com/docs/en/plugins/mods/overview. Settings hooks (shell commands in `hooks/hooks.json`) are a different thing: they run outside Claude Code.
 
 ## What is this plugin
-`agentic-processes` (v3.3.4, `.claude-plugin/plugin.json`) runs structured, resumable workflows ("processes") created from templates, with steps, approval gates. Questions use the built-in dialog (P05). It is a Claude Code plugin made of:
+`agentic-processes` (v3.4.0, `.claude-plugin/plugin.json`) runs structured, resumable workflows ("processes") created from templates, with steps, approval gates. Questions use the built-in dialog (P05). It is a Claude Code plugin made of:
 
 | Piece | Where | Role |
 |---|---|---|
