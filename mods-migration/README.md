@@ -47,11 +47,12 @@ Every enforcement hook finds "its" process the same way: loop over `active/*/.se
 - `replace`: a mod does the job instead.
 - `improve`: the part stays; a mod adds to it.
 - `keep`: no mod change.
-- `later`: needs the UI round (a later project: put the UI inside the Claude Code session).
+- `later`: not now. Used for a screen that a later round may build (in the UI phase `U`, for example the processes overview).
 
 ## Decisions already made by the owner
-- Scope now: the **plugin system** only. The UI move is later.
-- The UI app keeps reading the **same JSON files**; they stay the contract.
+- Phase 1 (done): the **plugin system** (groups H, C, P, S, X).
+- Phase 2 (now, group `U`): the **UI app moves into the mod**, and the mod UI gets a more GUI-like look. Start with `U01`.
+- The UI app is obsolete (decision of 2026-10-10): the JSON files are no longer a contract for it, and a later plan may change them.
 - The research report lives as a page (these files + `progress.html`), not in the repo `docs/`.
 - Up to three throwaway spikes (`S1`–`S3`) test what reading cannot settle. Spikes live outside this repo and are deleted after the report.
 
@@ -71,6 +72,7 @@ Every enforcement hook finds "its" process the same way: loop over `active/*/.se
 | `P` | P01–P12 | Other plugin parts (CLI, skills, agents, files, UI) |
 | `S` | S01–S03 | Spikes: small throwaway mods that test open questions |
 | `X` | X01 | Cross-cutting: admin policy and fallback |
+| `U` | U01–U11 | The UI app moves into the mod: `U01` look and feel first, then one item for each app screen (shell, dashboard, diagram, memory/logs/files, overview, templates, agent sessions, lazy prompts, settings, small parts) |
 
 The full list with titles, files and first guesses is in `progress.html`.
 

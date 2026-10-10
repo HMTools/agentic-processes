@@ -379,9 +379,152 @@ const ITEMS = /* ITEMS:START */ [
     "summary": "When mods are off, the process skill finds no process tool, tells the user and stops. The policy table comes from the admin and troubleshoot docs. Organization facts stay open.",
     "open": ["Which managed settings are deployed at the organization, and how is the plugin installed? A copy from a git marketplace counts as a user mod.", "Is the baseline Claude Code version 2.1.287 or later?", "Does --safe-mode load plugin skills? The troubleshoot page says no installed plugin loads at all.", "--bare and trust: do skills load? Unproven."],
     "updated": "2026-10-10"
+  },
+  {
+    "id": "U01",
+    "group": "U",
+    "title": "Look and feel of the mod UI",
+    "file": "items/U01-look-and-feel.md",
+    "firstGuess": "improve",
+    "source": "hooks/on-process-pane (the current pane)",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "U02",
+    "group": "U",
+    "title": "Shell: navigation, panes, project folders",
+    "file": "items/U02-shell-and-navigation.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/Layout/Sidebar.tsx, ../agentic-processes-ui/src/App.tsx",
+    "status": "done",
+    "verdict": "replace",
+    "summary": "One /process pane: New, Continue, Templates before a process is bound, that one process after. Dashboard and overview not migrated. Waiting badge on Continue, step line, toast, and an always-on band button. Folder list becomes the session folder with an All folders switch. Desktop gets an Svg sidebar rail.",
+    "open": ["Does /clear keep the session id? (spike S02)", "What can Client draw on Desktop?", "Always-on band button costs one row in every session", "U06 can close as not needed"],
+    "updated": "2026-10-10"
+  },
+  {
+    "id": "U03",
+    "group": "U",
+    "title": "Dashboard: process list, filters, cards",
+    "file": "items/U03-dashboard.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/Dashboard",
+    "status": "done",
+    "verdict": "remove",
+    "summary": "Dashboard not migrated: the mod scopes to one process. The list and badge are in U02.",
+    "open": [],
+    "updated": "2026-10-10"
+  },
+  {
+    "id": "U04",
+    "group": "U",
+    "title": "Process diagram and step details",
+    "file": "items/U04-process-diagram.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/DiagramView",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "U05",
+    "group": "U",
+    "title": "Memory, logs and files views",
+    "file": "items/U05-memory-logs-files.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/DiagramView (RightPanel, MemoryView, MemoryExplorerModal, LogsView, FilesView), ../agentic-processes-ui/src/components/FileContentModal",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "U06",
+    "group": "U",
+    "title": "Processes overview: tiles, tree, condensed diagrams",
+    "file": "items/U06-processes-overview.md",
+    "firstGuess": "later",
+    "source": "../agentic-processes-ui/src/components/ProcessesOverview, ../agentic-processes-ui/overview-window.html",
+    "status": "done",
+    "verdict": "remove",
+    "summary": "Overview not migrated: out of scope with the dashboard.",
+    "open": [],
+    "updated": "2026-10-10"
+  },
+  {
+    "id": "U07",
+    "group": "U",
+    "title": "Templates browser and details",
+    "file": "items/U07-templates-browser.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/Templates",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "U08",
+    "group": "U",
+    "title": "Agent sessions and terminal",
+    "file": "items/U08-agent-sessions.md",
+    "firstGuess": "keep",
+    "source": "../agentic-processes-ui/electron/agentSessionManager.ts, ../agentic-processes-ui/electron/herdrClient.ts, ../agentic-processes-ui/src/components/AgentSessionPanel, AgentSessions, TerminalWindow",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "U09",
+    "group": "U",
+    "title": "Lazy prompts and gate shortcuts",
+    "file": "items/U09-lazy-prompts.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/LazyPromptModal, ../agentic-processes-ui/src/components/LazyPromptButton, ../agentic-processes-ui/src/services/lazyPromptsService.ts",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "U10",
+    "group": "U",
+    "title": "Settings and operating principles",
+    "file": "items/U10-settings-and-principles.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/Settings, ../agentic-processes-ui/src/components/PrinciplesConfig",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
+  },
+  {
+    "id": "U11",
+    "group": "U",
+    "title": "Toasts, errors, confirmations and update banner",
+    "file": "items/U11-small-parts.md",
+    "firstGuess": "replace",
+    "source": "../agentic-processes-ui/src/components/Toast, ErrorDisplay, ErrorBoundary, ConfirmationModal, Alert, UpdateBanner, ../agentic-processes-ui/src/hooks/useAutoUpdate.ts",
+    "status": "todo",
+    "verdict": "",
+    "summary": "",
+    "open": [],
+    "updated": ""
   }
 ] /* ITEMS:END */;
-const GROUPS={H:"Hook scripts",C:"Shared plumbing",P:"Other plugin parts",S:"Spikes",X:"Cross-cutting"};
+const GROUPS={H:"Hook scripts",C:"Shared plumbing",P:"Other plugin parts",S:"Spikes",X:"Cross-cutting",U:"UI app move"};
 let fg="all",fs="all";
 const $=s=>document.querySelector(s),esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function tiles(){const n=ITEMS.length,c=s=>ITEMS.filter(i=>i.status===s).length;

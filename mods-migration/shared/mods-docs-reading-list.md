@@ -11,7 +11,7 @@ Every item in `../items/` tells you to "re-read the mods docs". This file says *
 | React to events | `.../mods/events` | `on(event, matcher, ($, e, next) => ...)`; observe / rewrite / answer; `tool.call`, `tool.check`, `prompt.submit`, `turn.*`, `classic.<Event>` (e.g. `classic.Stop`); `.catch` fail-closed guards; order of mods and settings hooks |
 | Use the mods API | `.../mods/api` | `$.command`, `$.tool`, `$.model`, `$.clock`, `$.session.send`, `$.fs`, `$.process.run`, `$.http`, `$.store`, `$.env`; hook time limits |
 | Draw in the interface | `.../mods/interface` | Panes, band, `$.ui.*`, `$.state` vs `$.store` vs module variables; state after `/clear` and `/resume` |
-| Interface gallery | `.../mods/gallery` | Element samples (only for UI items) |
+| Interface gallery | `.../mods/gallery` | Element samples (only for UI items; all `U` items read it with `interface` and `reference#elements`) |
 | Test a mod | `.../mods/test` | `claude plugin test`, stubs, mock clock/store |
 | Troubleshoot | `.../mods/troubleshoot` | Why a mod does nothing; refusal messages; debug log |
 | Admin | `.../mods/admin` | `allowManagedModsOnly`, `allowManagedHooksOnly`, `disableAllHooks`, `--safe-mode`; policy mods |

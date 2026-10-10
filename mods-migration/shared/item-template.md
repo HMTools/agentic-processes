@@ -19,6 +19,9 @@ Five lines: what the `agentic-processes` plugin is, where this part sits, who ca
 ## 4. Research questions
 Numbered. Each can be answered yes/no or with a short fact.
 
+## 4b. Shared questions (UI phase, group `U` only)
+S1 What does the app screen do today? S2 What draws it in the mod, for the terminal and for the Desktop app? S3 How does it learn of a change (no file watcher)? S4 What stays outside the mod, or is dropped? S5 Verdict and what a later plan must decide. Apply the result of `U01` (look and feel).
+
 ## 5. How to research
 1. Re-read these mods docs pages (see `../shared/mods-docs-reading-list.md`): …
 2. Search the type file for: …
