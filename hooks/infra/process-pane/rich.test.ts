@@ -1,5 +1,5 @@
 import { test, expect } from 'claude-code/testing'
-import { esc, flowGrid, HEX, nodeSegment, progressBar, ring } from './rich'
+import { esc, flowGrid, HEX, nodeSegment, progressBar, ring, softPill, titleText } from './rich'
 import type { Kind } from './status-look'
 
 const KINDS: Kind[] = ['waiting', 'running', 'done', 'failed', 'paused', 'pending']
@@ -39,4 +39,12 @@ test('flow grid: a badge where a step reads or writes, and a topic name cannot b
   expect(g).not.toContain('<b>')
   expect(g).toContain('R/W')
   expect(esc(`a'b`)).toBe('a&apos;b')
+})
+
+test('softPill and titleText: sized to the text, and escape it', () => {
+  const p = softPill('waits for you', '#f2b13d')
+  expect(p.source.includes('waits for you')).toBe(true)
+  expect(p.width > softPill('done', '#f2b13d').width).toBe(true)
+  const t = titleText('A <b> & C')
+  expect(t.source.includes('A &lt;b&gt; &amp; C')).toBe(true)
 })

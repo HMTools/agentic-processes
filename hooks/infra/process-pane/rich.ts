@@ -59,3 +59,22 @@ export function flowGrid(topics: string[], cells: Record<string, ('R' | 'W' | 'R
   }).join('')
   return svg(width, height, head + body)
 }
+
+// A status word as a soft pill: a tinted fill, a thin border, a dot and the word. Mid-tone colors read in both themes.
+export function softPill(word: string, hex: string): { source: string; width: number; height: number } {
+  const w = Math.round(word.length * 6.6 + 30), h = 20
+  return {
+    width: w, height: h,
+    source: svg(w, h, `<rect x="0.5" y="0.5" width="${w - 1}" height="${h - 1}" rx="10" fill="${hex}" fill-opacity="0.16" stroke="${hex}" stroke-opacity="0.5"/>`
+      + `<circle cx="11" cy="10" r="3" fill="${hex}"/><text x="19" y="14" font-size="11" font-weight="700" fill="${hex}">${esc(word)}</text>`),
+  }
+}
+
+// The process name in the header: larger and bolder than the app font allows. Its color follows the system scheme.
+export function titleText(name: string): { source: string; width: number; height: number } {
+  const w = Math.round(name.length * 9.6 + 6), h = 26
+  return {
+    width: w, height: h,
+    source: svg(w, h, `<style>text{fill:#2a2f3a}@media (prefers-color-scheme:dark){text{fill:#e6e9f0}}</style><text x="2" y="19" font-size="18" font-weight="700">${esc(name)}</text>`),
+  }
+}

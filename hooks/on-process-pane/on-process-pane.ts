@@ -9,7 +9,7 @@ import { moveCommands, slash } from '../infra/process-manager/move'
 import { ensureProcessTools } from '../infra/process-manager/tools'
 import { FAVORITES, matches, mergeTemplates, templateDetail } from '../infra/process-pane/template-views'
 import type { TemplateRow } from '../infra/process-pane/template-views'
-import { flowGrid, nodeSegment, progressBar, ring } from '../infra/process-pane/rich'
+import { HEX, flowGrid, nodeSegment, progressBar, ring, titleText } from '../infra/process-pane/rich'
 import { richKit } from './rich-ui'
 import { filesView, logView, memoryView, tabCounts } from '../infra/process-pane/process-views'
 import { stepLine } from '../infra/process-pane/step-line'
@@ -288,11 +288,11 @@ export const register: Register = on => {
     const narrow = ((e.props as any).bodyColumns ?? 60) < 52 // short labels, no bar
     const rich = !!Svg && e.surface === 'desktop' // Desktop draws small SVG pictures (see infra/process-pane/rich): status nodes, bars, a ring. The terminal never does.
     const picture = (source: string, alt: string, width: number, height: number) => Svg({ source, alt, width, height, isInteractive: true })
-    const k = rich ? richKit({ Box, Text, Button }) : undefined // the Desktop look: cards, pills, chips (see rich-ui)
+    const k = rich ? richKit({ Box, Text, Button, Svg }) : undefined // the Desktop look: cards, pills, chips (see rich-ui)
     // A tab-like button: the open one is the primary button on Desktop, and the other dim text elsewhere.
     const toggle = (key: string, label: string, active: boolean, onPress: () => void) => (k ? k.tab(key, label, active, onPress) : Button({ key, label, plain: true, dimColor: !active, onPress }))
     // A row of tabs: one segmented control on Desktop.
-    const tabRow = (buttons: unknown[]) => (k ? k.segmented(buttons) : Box({ flexDirection: 'row', columnGap: narrow ? 1 : 3, children: buttons }))
+    const tabRow = (buttons: unknown[], right: unknown[] = []) => (k ? k.segmented(buttons, right) : Box({ flexDirection: 'row', columnGap: narrow ? 1 : 3, children: buttons }))
     // A navigation button: a real secondary button on Desktop, plain text elsewhere.
     const nav = (key: string, label: string, onPress: () => void) => Button({ key, label, ...(k ? { variant: 'secondary' } : { plain: true }), onPress })
     const cwd: string = await $.session.cwd()
@@ -465,9 +465,9 @@ export const register: Register = on => {
         const cats = [...new Set(allRows.map(r => r.category))].sort()
         const chip = (id: string, label: string, value: string | undefined) => toggle(id, label, category === value, () => { category = value; redraw() })
         const shownRows = matches(allRows, query, category, favorites)
-        const stateColor = { installed: 'success', update: 'warning', available: 'inactive' } as const
+        const stateHex = { installed: HEX.running, update: HEX.waiting, available: HEX.pending } as const
         const richTemplate = (r: TemplateRow) => k!.card(`tcard-${r.key}`, [
-          Box({ flexDirection: 'row', columnGap: 1, children: [star(r.key, `fav-${r.key}`), line(`${r.category} / ${r.title}`, { bold: true }), k!.pill(wordOf[r.state], stateColor[r.state])] }),
+          Box({ flexDirection: 'row', columnGap: 1, children: [star(r.key, `fav-${r.key}`), line(`${r.category} / ${r.title}`, { bold: true }), k!.pill(wordOf[r.state], stateHex[r.state])] }),
           ...(r.steps != null ? [line(`${r.steps} steps`, { dimColor: true })] : []),
           ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 90 ? `${r.purpose.slice(0, 89)}…` : r.purpose, { dimColor: true })]),
           Box({ flexDirection: 'row', columnGap: 1, children: [
@@ -576,10 +576,10 @@ export const register: Register = on => {
       // Desktop: the steps as a graph the user can move. The terminal and the toggle's other side keep the timeline.
       const node = (id: string, label: string, kind: keyof typeof LOOK, sub: string, go: 'step' | 'open', target: string) =>
         ({ id, label, sub, symbol: symbolOf(kind, false), color: LOOK[kind].color, hot: needsUser(kind), go, target })
-      const graphToggle = tabRow([
+      const graphButtons = [
         toggle('mode-graph', 'Graph', graphOn, () => { graphOn = true; redraw() }),
         toggle('mode-list', 'Timeline', !graphOn, () => { graphOn = false; redraw() }),
-      ])
+      ]
       const graph = Client && e.surface === 'desktop' && graphOn ? Client({
         key: 'graph', module: './graph-view.ts', width: '100%', height: 22,
         props: {
@@ -600,7 +600,7 @@ export const register: Register = on => {
         toggle(`sec-${name}`, `${narrow ? short : label}${count && !narrow ? ` ·${count}` : ''}`, section === name, () => { section = name; message = ''; redraw() })
       const sectionTabs = tabRow([
         sec('steps', 'Steps', 'Steps'), sec('memory', 'Memory', 'Mem', topicCount), sec('logs', 'Logs', 'Logs'), sec('files', 'Files', 'Files', fileCount),
-      ])
+      ], Client && e.surface === 'desktop' && section === 'steps' ? graphButtons : []) // Graph and Timeline sit at the right of the same row
       const none = (text: string) => line(text, { dimColor: true })
       const sub = (name: typeof memTab, label: string) => toggle(`mem-${name}`, label, memTab === name, () => { memTab = name; redraw() })
       const toLine = (items: string[]) => items.join(', ') || '-'
@@ -645,16 +645,16 @@ export const register: Register = on => {
         ...(showFramework ? framework.map(fileRow) : []),
         ...(message ? [line(message, { color: 'error' })] : []),
       ]
-      const stepsBody = graph ? [graphToggle, graph] : [...(Client && e.surface === 'desktop' ? [graphToggle] : []), ...(k ? [k.stack(bound.steps.flatMap(stepCards))] : bound.steps.flatMap(stepRows))]
+      const stepsBody = graph ? [graph] : [...(k ? [k.stack(bound.steps.flatMap(stepCards))] : bound.steps.flatMap(stepRows))]
+      const title = titleText(bound.name)
       return card('bound', [
         ...(bound.parent ? [nav('parent', `↑ ${bound.parent.name}`, goTo(bound.parent.dir))] : []),
         ...(rich
           ? [Box({ flexDirection: 'row', columnGap: 2, children: [
             picture(ring(bound.step, bound.total, bound.kind), `Step ${bound.step} of ${bound.total}`, 44, 44),
             Box({ flexDirection: 'column', children: [
-              Box({ flexDirection: 'row', columnGap: 1, children: [line(bound.name, { bold: true }), k!.kindPill(bound.kind)] }),
+              Box({ flexDirection: 'row', columnGap: 1, children: [picture(title.source, bound.name, title.width, title.height), k!.kindPill(bound.kind)] }),
               line(`Step ${bound.step} of ${bound.total}${bound.steps[bound.step - 1] ? `  ·  ${bound.steps[bound.step - 1].name}` : ''}`, { dimColor: true }),
-              picture(progressBar(bound.kind === 'done' ? bound.total : bound.step - 1, bound.total, bound.kind, 240), 'Progress of the process', 240, 8),
             ] }),
           ] })]
           : [Box({ flexDirection: 'row', columnGap: 1, children: [line(symbolOf(bound.kind, false), { color: look.color, bold: true }), line(bound.name, { bold: true }), line(look.word, { color: look.color })] }),
