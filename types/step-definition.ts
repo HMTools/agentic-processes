@@ -117,21 +117,6 @@ export interface StepDefinition {
   // Optional step-specific fields
   // ============================================
 
-  /** Operating principles (for init-process-principles step) */
-  principles?: Array<{
-    number: number;
-    name: string;
-    rule: string;
-    verification: string | null;
-  }>;
-
-  /** Compliance checklist (for end-process-validation step) */
-  complianceChecklist?: Array<{
-    principle: number;
-    name: string;
-    check: string;
-  }>;
-
   /** Step-specific parameters (for configurable steps like identify-files, review-verify-document) */
   parameters?: {
     required?: string[];

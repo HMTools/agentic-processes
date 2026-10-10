@@ -41,7 +41,18 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Verdict **remove** (owner, 2026-10-10: "remove the principles feature from the framework"). A plan page for a principles editor was published first; the owner then found that no principles exist on the machine (the config file was never created, the app's editor never loaded it) and removed the feature.
+
+Done in the framework repo (265 tests pass, `claude plugin validate .` passes):
+- `agents/step-executor.md`: the "Load Operating Principles" step, the config file line, the principles check in the end-step verification and the closing "Operating Principles" section are gone. The substep count report and a short end-step check (decisions and files recorded) stay.
+- `types/step-definition.ts`: the `principles` field is gone. `types/template-definition.ts`: a comment fixed.
+- `framework-steps/continuous-improvement`: the last substep is now "End-Step: Log Problems" (it keeps the problem logging).
+- Other settings: lazy prompts (U09), agent sessions and the terminal (U08) are removed. No `userConfig` is needed.
+
+Open:
+- Templates repo (done after the owner asked): 17 step files had the end-step substep "Compliance Check" ("Verify principles were followed in this step"). It is now "End-Step: Log Problems" with only the problem-logging action; the two Verify lines and the "compliance with operating principles" output line are gone. A "(LOG FIRST principle)" remark in one step is trimmed. No file mentions principles any more.
+- `framework-steps/end-process-validation` (decided with a plan page, 2026-10-10): the compliance checks are removed, the step is renamed `framework-steps/complete-process` and keeps two substeps: delete the artifact files (the owner chose to keep this, as before), then call `update_process_status` with `completed`. The status tool now writes `metadata.completed` itself (test added). The `complianceChecklist` field is gone from the types and from `create-process`. README, the process-run skill and the templates repo (README, one orchestrator note) use the new name. A process that started before this keeps its old copy of the step.
+- The app's principles editor is in the obsolete UI app and was not touched.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U10"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.

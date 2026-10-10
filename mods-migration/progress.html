@@ -247,7 +247,7 @@ const ITEMS = /* ITEMS:START */ [
     "status": "done",
     "verdict": "keep",
     "summary": "The step agent and its fork skill stay. A dead agent is found from the agent list, not a timer (already built). The unused process-spawner agent is deleted.",
-    "open": ["Does the step agent still print the operating principles each step (token cost)? Not changed here.", "Do hooks in a subagent see the parent's session id? The mod uses agentId, so it does not depend on it."],
+    "open": ["Do hooks in a subagent see the parent's session id? The mod uses agentId, so it does not depend on it."],
     "updated": "2026-10-10"
   },
   {
@@ -325,7 +325,7 @@ const ITEMS = /* ITEMS:START */ [
     "status": "done",
     "verdict": "later",
     "summary": "The UI app is not built for here. Its screens map to the mod as listed; HTML view widgets are dropped from the plugin because no gate uses them.",
-    "open": ["A Steps tab (step list, log, memory) is the main missing screen.", "The answer-question call in the app (main.ts:524-530) looks outdated; the app is obsolete, so it is only recorded."],
+    "open": ["The answer-question call in the app (main.ts:524-530) looks outdated; the app is obsolete, so it is only recorded."],
     "updated": "2026-10-10"
   },
   {
@@ -390,7 +390,7 @@ const ITEMS = /* ITEMS:START */ [
     "status": "done",
     "verdict": "improve",
     "summary": "Spike ui-look-spike run by the owner: works, looks good. Card = round Box, theme-key border color, hover, status symbol + word; Desktop gets an Svg icon rail; narrow mode below ~52 columns. A tree with a refused prop (key on Text) draws blank.",
-    "open": ["Can Client draw a graph (U04)?", "Light theme and per-prop terminal vs Desktop not checked", "60/100/144 column behaviour not tested", "Spike mod still on disk, delete when done"],
+    "open": ["Light theme and per-prop terminal vs Desktop not checked", "60/100/144 column behaviour not tested"],
     "updated": "2026-10-10"
   },
   {
@@ -403,7 +403,7 @@ const ITEMS = /* ITEMS:START */ [
     "status": "done",
     "verdict": "replace",
     "summary": "One /process pane: New, Continue, Templates before a process is bound, that one process after. Dashboard and overview not migrated. Waiting badge on Continue, step line, toast, and an always-on band button. Folder list becomes the session folder with an All folders switch. Desktop gets an Svg sidebar rail.",
-    "open": ["Does /clear keep the session id? (spike S02)", "What can Client draw on Desktop?", "Always-on band button costs one row in every session", "U06 can close as not needed"],
+    "open": ["Does /clear keep the session id? (spike S02)", "Always-on band button costs one row in every session"],
     "updated": "2026-10-10"
   },
   {
@@ -426,11 +426,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/U04-process-diagram.md",
     "firstGuess": "replace",
     "source": "../agentic-processes-ui/src/components/DiagramView",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Bound process = a step timeline with substeps of the active step and sub-processes under their step (press to open, parent row to go back). A press on a step opens a detail with Definition and Execution tabs. Desktop adds a graph in a Client (drag, + and - size, press a node), with a Timeline toggle. Built and tested.",
+    "open": ["The Client graph is not seen on a real Desktop yet (drawing of absolute boxes, drag, clipping)", "Zoom is two sizes, no minimap"],
+    "updated": "2026-10-10"
   },
   {
     "id": "U05",
@@ -439,11 +439,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/U05-memory-logs-files.md",
     "firstGuess": "replace",
     "source": "../agentic-processes-ui/src/components/DiagramView (RightPanel, MemoryView, MemoryExplorerModal, LogsView, FilesView), ../agentic-processes-ui/src/components/FileContentModal",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "A bound process has four tabs: Steps, Memory (Flow, Topics, History, Diffs), Logs (a row opens the step detail) and Files (output and framework files, a press hands the file to the editor (terminal) or the system opener (Desktop)). Built and tested.",
+    "open": ["Not seen in a real session yet", "The terminal needs the code command on the PATH", "Desktop uses the system opener: the mods API has no built-in file viewer call"],
+    "updated": "2026-10-10"
   },
   {
     "id": "U06",
@@ -465,11 +465,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/U07-templates-browser.md",
     "firstGuess": "replace",
     "source": "../agentic-processes-ui/src/components/Templates",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "One New list: every marketplace and installed template with a state (installed, update, not installed), search, a category chip row, favorites in the store that sort first. A template opens with Overview, Steps (a step expands), Memory flow and Raw (opens the file in the viewer). Install, Update, Remove and Start are on the list or the detail. The Templates tab is now a Marketplaces view behind a button. Built and tested.",
+    "open": ["Not seen in a real session yet", "A template step file is found by its id inside the template folder only", "Marketplaces view keeps the P09 form"],
+    "updated": "2026-10-10"
   },
   {
     "id": "U08",
@@ -478,11 +478,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/U08-agent-sessions.md",
     "firstGuess": "keep",
     "source": "../agentic-processes-ui/electron/agentSessionManager.ts, ../agentic-processes-ui/electron/herdrClient.ts, ../agentic-processes-ui/src/components/AgentSessionPanel, AgentSessions, TerminalWindow",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
+    "status": "done",
+    "verdict": "remove",
+    "summary": "Not migrated: the UI is the Claude mod, so it always runs inside a session with its agents. Starting sessions, the embedded terminal and session discovery have no job. The planned agent-status mark was dropped.",
     "open": [],
-    "updated": ""
+    "updated": "2026-10-10"
   },
   {
     "id": "U09",
@@ -491,11 +491,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/U09-lazy-prompts.md",
     "firstGuess": "replace",
     "source": "../agentic-processes-ui/src/components/LazyPromptModal, ../agentic-processes-ui/src/components/LazyPromptButton, ../agentic-processes-ui/src/services/lazyPromptsService.ts",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
+    "status": "done",
+    "verdict": "remove",
+    "summary": "Not migrated: every lazy prompt already has a screen. Continue is a Resume button (U02), New is the Start button (U07), Select option is the approval dialog (P02). The UI is the session, so a copy-or-send step has no job. Closed without a plan page.",
     "open": [],
-    "updated": ""
+    "updated": "2026-10-10"
   },
   {
     "id": "U10",
@@ -504,11 +504,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/U10-settings-and-principles.md",
     "firstGuess": "replace",
     "source": "../agentic-processes-ui/src/components/Settings, ../agentic-processes-ui/src/components/PrinciplesConfig",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "remove",
+    "summary": "Settings and principles removed. The other settings went with U08 and U09. The owner removed the operating principles feature from the framework: no editor, no config file, no load step in the step-executor, no principles field in the types.",
+    "open": ["The last framework step is now complete-process: it deletes the artifact files (so the Files tab of a completed process is empty), then marks the process completed", "Running processes keep their old copy of the step"],
+    "updated": "2026-10-10"
   },
   {
     "id": "U11",
@@ -517,11 +517,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/U11-small-parts.md",
     "firstGuess": "replace",
     "source": "../agentic-processes-ui/src/components/Toast, ErrorDisplay, ErrorBoundary, ConfirmationModal, Alert, UpdateBanner, ../agentic-processes-ui/src/hooks/useAutoUpdate.ts",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Every small part already has a mod equivalent, so nothing new was built. Toasts: $.ui.toast (waiting process, findings). Errors: a red line in the pane. Confirmations: a two-press button and the approval dialog ($.ui.ask). The update banner is dropped: Claude Code updates plugins itself (no version line in the pane: /plugin shows it). One gap was built after the owner asked: a two-press Delete on a Continue card that moves the folder to deleted/.",
     "open": [],
-    "updated": ""
+    "updated": "2026-10-10"
   }
 ] /* ITEMS:END */;
 const GROUPS={H:"Hook scripts",C:"Shared plumbing",P:"Other plugin parts",S:"Spikes",X:"Cross-cutting",U:"UI app move"};

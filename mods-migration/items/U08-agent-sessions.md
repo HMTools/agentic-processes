@@ -42,7 +42,7 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Not migrated (owner, 2026-10-10): "it is obsolete, from now on the UI is the Claude mod, so it always runs with agents". Verdict **remove**. The app started Claude in terminal panes and showed the terminal; the mod already is a session, so starting sessions, the embedded terminal, session discovery by `.session` files and the herdr link have no job. A plan page proposed a small agent-status mark on the step row; the owner closed the item instead, so nothing was built. Settings (permission mode, auto-attach) go to U10.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U08"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.

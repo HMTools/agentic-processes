@@ -32,7 +32,7 @@ For each step in order, check its type:
 
 `approvalRequired: true` means approval of the deliverables AFTER the step ran. Never ask permission before a step runs.
 
-The last two steps of every process are framework steps (Continuous Improvement and End Process Validation). Their definitions sit in `process.json` like any other step.
+The last two steps of every process are framework steps (Continuous Improvement and Complete Process). Their definitions sit in `process.json` like any other step.
 
 ## Approval Checkpoints
 

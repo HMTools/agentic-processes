@@ -99,8 +99,8 @@ agentic-processes/                    # Plugin root
 ├── framework-steps/                  # Auto-injected framework-level steps
 │   ├── continuous-improvement/
 │   │   └── continuous-improvement.json
-│   └── end-process-validation/
-│       └── end-process-validation.json
+│   └── complete-process/
+│       └── complete-process.json
 ├── hooks/
 │   ├── hooks.json                    # Loads the mod (register.ts)
 │   └── ...                           # The mod: one folder for each rule, infra/ for the code they share
@@ -159,7 +159,7 @@ Steps are defined in subdirectories of each process template. Each step definiti
 **Framework steps** are cross-cutting workflow steps that are automatically injected into every process by the tool `create_process` at creation time. Template authors do not need to include them. Currently, two framework steps are auto-appended as the final steps of every process:
 
 - **Continuous Improvement** — Captures learnings, improvements, and patterns discovered during process execution.
-- **End Process Validation** — Validates that all process deliverables are complete and correct before closing.
+- **Complete Process** — Deletes the artifact files the steps made, then marks the process completed. The status tool records the time and moves the folder.
 
 Framework steps are identified by `"type": "framework-step"` in their JSON definition and use plain UUID `stepRef` values (no prefix). Their definitions live in `{PLUGIN_ROOT}/framework-steps/{name}/{name}.json`.
 

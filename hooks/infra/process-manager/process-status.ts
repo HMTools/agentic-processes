@@ -29,6 +29,7 @@ export const updateProcessStatus = (ports: ManagerPorts, a: ProcessStatusArgs): 
 
   process.status = a.status
   process.metadata.lastUpdated = ports.now()
+  if (a.status === 'completed') process.metadata.completed = process.metadata.lastUpdated // the completion time: no step has to record it
   await writeJson(ports, `${a.processDir}/process.json`, process)
 
   const target = STATUS_FOLDER[a.status]

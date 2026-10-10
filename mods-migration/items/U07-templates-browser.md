@@ -42,7 +42,15 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Verdict: **replace**. Plan page answered 2026-10-10: one list with a state (not two lists); favorites sort first and have a chip; Raw is a button that opens the template file in the viewer.
+
+Built (261 tests pass, `claude plugin validate .` passes):
+- `hooks/infra/process-pane/template-views.ts` (new): `mergeTemplates` (catalog entries with state plus installed templates), `matches` (every search word must appear; category or Favorites chip; favorites first), `templateDetail` (purpose, parameters, steps read from their step files by id, memory flow as a topic-by-step table of R, W, R/W).
+- `listTemplates` also returns title, purpose and step count.
+- `hooks/on-process-pane/on-process-pane.ts`: the New tab is the merged list: a search `Input`, chips (All, Favorites, categories), a card for each template with a star, state, Start (installed or update) and Install or Update. A press on the name opens the detail with tabs Overview, Steps, Memory flow and Raw, plus Back, Start, Remove and a star. Favorites live in the store (key `favorites`) and are read again after /clear. The Templates tab is gone: `/process templates` and the Marketplaces button open the marketplace form (P09), with Back to templates.
+- Cost: search and sort run on the list in memory on each key.
+- Gotcha found by the tests: an `Input` with no `onSubmit` blanks the whole pane.
+- Open: not seen in a real session; a step file outside the template folder is not found (the step then shows only its name); Desktop uses the same cards and hover, not the richer mock.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U07"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.

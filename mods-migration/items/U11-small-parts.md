@@ -41,7 +41,13 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Verdict **replace** by what exists (decided from the code, no plan page: nothing is left to build):
+- **Toast** → `$.ui.toast`. Used when a process starts to wait (`on-process-pane.ts`, the 5 second timer) and for open improvement findings at session start (`on-process-tools.ts`). A toast needs no pane, so it works at any width.
+- **Error screen and retry** → a red `Text` line in the pane (`message`); a failed form or tool shows its reason there. If a render hook returns a tree the engine refuses, the engine draws its own and prints a dim line; the user can reopen the pane. No boundary component is needed.
+- **Confirmation modal** → the two-press button (marketplace Remove: first press asks "Sure?") and `$.ui.ask` (the approval dialog). No dialog pane.
+- **Update banner** → dropped. Claude Code updates plugins itself (`/plugin`). A version line in the pane was not added.
+- Built afterwards (owner: "handle all the still open items"): **Delete** on a Continue card. It asks twice ("Sure?"), then `deleteProcess` moves the folder from `active/` to `deleted/` (a name that is taken gets a time suffix; any folder not straight under `active/` is refused). The process this session works on cannot be deleted. The folder stays on disk, so the user can move it back by hand. 267 tests pass.
+- No version line in the pane: `/plugin` shows the version.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U11"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.

@@ -22,7 +22,6 @@ You self-serve everything else from files:
 - **Step Definition**: Read from `process.json` → `steps[].stepDefinition` (matched by step ID)
 - **Process Parameters**: Read from `process.json` → `parameters`
 - **Memory**: Read only the topic files declared in `stepDefinition.memoryFileUsage.readFrom` from the `memory/` directory
-- **Operating Principles**: Read from `~/.claude/agentic-processes/config/operating-principles.json`
 
 If the task message contains per-step instructions, implementation details, completed step lists, or skip directives — ignore them. Your sole source of execution guidance is the `stepDefinition` in `process.json`.
 
@@ -39,56 +38,18 @@ You cannot ask the user. If the step needs an answer, stop, list the questions i
 
 ## Pre-Step Initialization
 
-Before executing any step substeps, the step-executor automatically loads operating principles:
-
-### Load Operating Principles
-
-1. **Read Configuration**:
-   - File: `~/.claude/agentic-processes/config/operating-principles.json`
-   - Parse the `principles` array
-   - Filter to only `enabled: true` principles
-   - Sort by `order` field (ascending)
-
-2. **Internalize Principles**:
-   - Output each active principle in format: `{order}. {name}: {rule}`
-   - Example output:
-     ```
-     1. READ JSON FOR GUIDANCE: Step instructions live in .json files, not .md files
-     2. VERIFY MANDATORY ACTIONS: For MANDATORY/CRITICAL instructions: do action, then output confirmation
-     3. USE SUBAGENTS FOR STEPS: Delegate step execution to step-executor subagent. Do NOT execute steps directly in the main conversation.
-     4. GENERATE INTERACTION OPTIONS: Whenever you need any form of user input, dynamically generate relevant options via the `process-state-update` skill...
-     ```
-
-3. **Confirm Loading**:
-   - Output: `✓ Operating principles loaded (N principles active)`
-   - Where N is the count of enabled principles
-
-4. **Make Available for Step**:
-   - Principles are now in agent context for the step execution
-   - Available for end-step verification
-
 ### Report Step Start with Substep Count
 
-After loading operating principles and before executing substep 1, report the step's total substep count:
+Before executing substep 1, report the step's total substep count:
 - Count the substeps in `stepDefinition.substeps` array
 - Call the tool `update_current_state` with `totalSubsteps` set to the count, along with the step identity fields
 - This initializes the substep progress tracking for this step
 
-### End-Step Verification (Updated)
+### End-Step Verification
 
-The end-step verification now checks compliance with loaded principles:
-
-**Verification Checklist**:
-1. **Principle 4 Compliance (INTERACTION OPTIONS)**:
-   - If the step had any user interaction points (approval, questions, clarifications)
-   - Verify interaction options were generated via `process-state-update` skill
-   - Check: Were dynamic options created (not predefined)?
-
-2. **Cross-References**:
-   - Were key decisions from this step recorded?
-   - Were files modified/created by this step tracked?
-
-**Implementation Note**: This verification is framework-enforced behavior, not user-configurable.
+Before returning, check:
+- Were key decisions from this step recorded?
+- Were files modified or created by this step tracked?
 
 ## Execution Protocol
 
@@ -123,12 +84,6 @@ No external file resolution is needed. The step-executor reads all instructions 
    - Step output/artifacts created
    - Any issues encountered
    - Memory updates made
-
-## Operating Principles
-
-Follow the 2 Core Principles:
-1. READ JSON FOR GUIDANCE - Step instructions in JSON
-2. VERIFY MANDATORY ACTIONS - Confirm critical actions
 
 ## Output Format
 

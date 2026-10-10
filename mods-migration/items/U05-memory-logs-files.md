@@ -43,7 +43,17 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Verdict: **replace**. Plan page answered 2026-10-10: Steps, Memory, Logs and Files are tabs inside the bound process; Memory gets all four app sub-tabs (Flow, Topics, History, Diffs); a file with a Mermaid diagram is not drawn: the viewer has an **Open in editor** button (the owner's idea: "navigate to the file in the IDE").
+
+Built (258 tests pass, `claude plugin validate .` passes):
+- `hooks/infra/process-pane/process-views.ts` (new): `memoryView` (topics with writtenBy and readBy, history newest first, diffs between the entries of a topic), `logView` (one row for each step; `timesOf` reads the three time formats), `filesView` (output files, framework files, the step that touched each; the list comes from the folder plus `filesModified` in the log and `filesModifiedCreated` in memory), `readText` (cut at 60,000 characters).
+- `hooks/on-process-pane/on-process-pane.ts`: the tab row with counts (short names below 52 columns); Memory sub-tabs; a Logs row opens the step detail on its Execution tab (button reads Back to logs); a file opens as `Markdown` or `Code` with Back to files and Open in editor.
+- Open in editor runs `code --goto <path>`. If `code` is missing the pane shows the path. The IDE-specific route (the VS Code surface) was not tried.
+- The tabs read their files on each draw, so the 5 second timer is the live refresh. Differences from the plan: the file limit is 60,000 characters (one drawing holds 100,000), not 1 MiB; Desktop uses the same elements as the terminal with cards and hover, not the richer mock.
+- Open: not seen on a real Desktop or terminal session; `code` may not be on the PATH; the Mermaid text shows as a code block inside Markdown.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U05"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.
+
+### Change after the build (owner: "never open directly the files, always via the file viewer")
+The pane no longer draws a file. A press on a file row calls `openInViewer`: in the terminal it runs `code --goto <path>`; on Desktop it runs the system opener (`open`, `xdg-open`, or `start`). The inline Markdown/Code viewer, Back to files, Open in editor and `readText` are removed. The mods API has no call for the Desktop app's own file viewer: the system opener is a stand-in, so ask the owner what "built-in capabilities" means. If nothing opens, the pane shows the path.

@@ -58,7 +58,7 @@ export interface TemplateDefinition {
 
   /** Complete step definitions with full agent guidance */
   steps: Array<{
-    /** Step number (0-based, where 0 is typically init-process-principles) */
+    /** Step number */
     number: number;
     /** Step name */
     name: string;

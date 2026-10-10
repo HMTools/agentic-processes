@@ -40,7 +40,12 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Verdict **remove** (decided from the code, no plan page: nothing is left to build). The three lazy prompts each have a screen in the mod:
+- Continue process: a Resume button on a Continue card (`process-N`, U02), which calls `resumeProcess` and submits the hand-off as the user's prompt with `$.prompt.submit({ text, asUser: true })`.
+- New process: the Start button on the New tab (U07).
+- Select option: the approval dialog (`$.ui.ask`, P02, `on-approval-gate`).
+
+The app's two actions (copy, send to an agent session) existed because the app was outside the session. The mod is the session, so `$.prompt.submit` is the one send path and there is no copy step. The pending-interaction file is gone (the gate is a store record). Open: the app never had a list of saved quick prompts, so none is built. If the owner wants one, it is a new item: a `$.store` list and a button row.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U09"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.

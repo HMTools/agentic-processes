@@ -54,7 +54,7 @@ test('Create refuses an empty required field, then starts the process and hands 
   const w = world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
   await $.command.run({ command: 'process', args: '' })
   const ui = await $.ui.mount(PANE)
-  await ui.press({ key: 'template-0' })
+  await ui.press({ key: 'start-dev/bug' })
   await ui.press({ key: 'create' })
   expect(await ui.find({ type: 'Text', text: 'Fill in: workItemId' })).toBeDefined()
   expect(w.sent).toEqual([])
@@ -76,12 +76,12 @@ test('Resume binds the process and hands it to the agent', async ($, on) => {
   expect(w.sent[0].text).toContain('I resumed the process "Old fix"')
 })
 
-test('the Templates tab lists the cache, installs a template and shows it on the New tab', async ($, on) => {
+test('the New list shows the marketplace templates with a state, and Install makes one startable', async ($, on) => {
   const CACHE = `${HOME}/cache/sources/official`
   const runs: string[][] = []
   const w = world(on, {
     [`${HOME}/config/marketplaces.json`]: { marketplaces: [{ name: 'official', url: 'u', branch: 'main', enabled: true, priority: 1 }] },
-    [`${CACHE}/templates/processes/dev/bug/bug.json`]: { metadata: { title: 'Bug' } },
+    [`${CACHE}/templates/processes/dev/bug/bug.json`]: { type: 'template', name: 'bug', metadata: { title: 'Bug' } },
   })
   on('process.run', async (_$, e: any) => {
     runs.push(e.argv)
@@ -90,11 +90,50 @@ test('the Templates tab lists the cache, installs a template and shows it on the
   })
   await $.command.run({ command: 'process', args: '' })
   const ui = await $.ui.mount(PANE)
-  await ui.press({ key: 'tab-templates' })
-  expect(await ui.find({ type: 'Text', text: 'dev / bug  ·  not installed' })).toBeDefined()
-  await ui.press({ key: 'tpl-install-0' })
+  expect(await ui.find({ type: 'Text', text: 'not installed' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'start-dev/bug' })).toBeUndefined() // only an installed template can start
+  await ui.press({ key: 'tpl-install-dev/bug' })
   expect(runs.map(r => r[0]).filter(c => c !== 'git')).toEqual(['rm', 'mkdir', 'cp'])
-  expect(await ui.find({ type: 'Text', text: 'dev / bug  ·  installed' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'start-dev/bug' })).toBeDefined()
+})
+
+test('search and favorites narrow the New list; a template opens with Overview, Steps, Memory flow and Raw', async ($, on) => {
+  const ran: string[][] = []
+  on('process.run', async (_$, e: any) => { ran.push(e.argv); return { value: { exitCode: 0, stdout: '', stderr: '' } } })
+  const other = `${HOME}/templates/processes/infra/set`
+  const w = world(on, {
+    [`${T}/bug.json`]: { ...template, metadata: { title: 'Bug', purposeAndUsage: 'Fix a bug.' }, steps: [{ number: 1, name: 'Design', stepRef: 'r1' }] },
+    [`${T}/design/design.json`]: { type: 'step', id: 'r1', output: { description: 'a design' }, guidance: { prerequisites: ['read the bug'] }, memoryFileUsage: { writeTo: ['bug.json'] } },
+    [`${other}/set.json`]: { type: 'template', name: 'set', metadata: { title: 'Set' }, parameters: {}, steps: [] },
+  })
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  const has = async (key: string) => (await ui.find({ type: 'Button', key })) !== undefined
+  expect(await has('start-dev/bug')).toBe(true)
+  expect(await has('start-infra/set')).toBe(true)
+  await ui.input({ key: 'search', text: 'fix', kind: 'change' })
+  expect(await has('start-dev/bug')).toBe(true)
+  expect(await has('start-infra/set')).toBe(false)
+  await ui.input({ key: 'search', text: '', kind: 'change' })
+  await ui.press({ key: 'fav-infra/set' })
+  expect(w.store.favorites).toEqual(['infra/set'])
+  await ui.press({ key: 'cat-fav' })
+  expect(await has('start-dev/bug')).toBe(false)
+  await ui.press({ key: 'cat-all' })
+
+  await ui.press({ key: 'template-dev/bug' })
+  expect(await ui.find({ type: 'Text', text: '  Fix a bug.' })).toBeDefined()
+  await ui.press({ key: 'td-steps' })
+  await ui.press({ key: 'tdstep-1' })
+  expect(await ui.find({ type: 'Text', text: '     guidance: read the bug' })).toBeDefined()
+  await ui.press({ key: 'td-flow' })
+  expect(await ui.find({ type: 'Text', text: 'W writes · R reads · R/W both' })).toBeDefined()
+  await ui.press({ key: 'td-raw' })
+  await ui.press({ key: 'raw-open' }) // the pane draws no JSON: the file goes to the editor
+  expect(ran).toEqual([['code', '--goto', `${T}/bug.json`]])
+  await ui.press({ key: 'td-back' })
+  expect(await has('search')).toBe(false) // an Input, not a Button
+  expect(await ui.find({ type: 'Input', key: 'search' })).toBeDefined()
 })
 
 test('marketplaces: Add saves a line, Off switches it, Remove needs two presses', async ($, on) => {
@@ -104,7 +143,7 @@ test('marketplaces: Add saves a line, Off switches it, Remove needs two presses'
   const saved = () => JSON.parse(w.files[`${HOME}/config/marketplaces.json`]).marketplaces
   await $.command.run({ command: 'process', args: '' })
   const ui = await $.ui.mount(PANE)
-  await ui.press({ key: 'tab-templates' })
+  await ui.press({ key: 'mk-open' })
   await ui.press({ key: 'mk-add' })
   await ui.press({ key: 'mk-save' })
   expect(await ui.find({ type: 'Text', text: 'Not a plain name: ' })).toBeDefined() // the form stays, with the reason
@@ -130,8 +169,26 @@ test('/process templates opens that tab, and another word still goes to the firs
   await ui.unmount()
   await $.command.run({ command: 'process', args: '99' })
   ui = await $.ui.mount(PANE)
-  await ui.press({ key: 'template-0' })
+  await ui.press({ key: 'start-dev/bug' })
   expect(await ui.find({ type: 'Input', key: 'field-workItemId', value: '99' })).toBeDefined()
+})
+
+test('Delete on a Continue card asks twice, then moves the folder; the process of this session stays', async ($, on) => {
+  const moves: string[][] = []
+  on('process.run', async (_$, e: any) => { moves.push(e.argv); return { value: { exitCode: 0, stdout: '', stderr: '' } } })
+  const mine = `${HOME}/active/mine`
+  const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${mine}/process.json`]: { ...process, name: 'Mine', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/work'] } } })
+  w.store['session:S1'] = [mine]
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'del-0' }) // the newest card is the bound process: it stays
+  expect(await ui.find({ type: 'Text', text: 'This session works on that process. Close it first.' })).toBeDefined()
+  expect(moves).toEqual([])
+  await ui.press({ key: 'del-1' })
+  expect(await ui.find({ type: 'Button', key: 'del-1', label: 'Sure?' })).toBeDefined()
+  expect(moves).toEqual([]) // the first press only asks
+  await ui.press({ key: 'del-1' })
+  expect(moves.flat().join(' ')).toContain(`${HOME}/deleted/p1`)
 })
 
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
@@ -187,9 +244,87 @@ test('with a process bound to the session the pane shows its steps, and Back goe
   w.store['session:S1'] = [dir]
   await $.command.run({ command: 'process', args: '' })
   const ui = await $.ui.mount(PANE)
-  expect(await ui.find({ type: 'Text', text: '✓ 1. Design' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '○ 2. Build' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'step-a', label: '1. Design' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'step-b', label: '2. Build' })).toBeDefined()
   expect(await ui.find({ type: 'Button', key: 'tab-new' })).toBeUndefined()
+  expect(await ui.find({ type: 'Svg' })).toBeUndefined() // the terminal draws no pictures
   await ui.press({ key: 'back-list' })
   expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
+})
+
+test('on Desktop a bound process draws a graph in a Client, and the toggle goes back to the timeline', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed' }, { id: 'b', number: 2, name: 'Build', status: 'pending' }] } })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Client', key: 'graph' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'step-a' })).toBeUndefined()
+  await ui.press({ key: 'mode-list' })
+  expect(await ui.find({ type: 'Button', key: 'step-a' })).toBeDefined()
+  expect(await ui.find({ type: 'Svg', alt: 'done' })).toBeDefined() // the rich look: a drawn node for each step, a ring and a bar in the header
+  expect(await ui.find({ type: 'Svg', alt: 'Progress of the process' })).toBeDefined()
+})
+
+test('a bound process has Memory, Logs and Files tabs; a log row opens the step; a file opens with a Back and an editor button', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const ran: string[][] = []
+  on('process.run', async (_$, e: any) => { ran.push(e.argv); return { value: { exitCode: 0, stdout: '', stderr: '' } } })
+  const w = world(on, {
+    [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed', stepDefinition: { memoryFileUsage: { writeTo: ['plan'] } } }, { id: 'b', number: 2, name: 'Build', status: 'pending', stepDefinition: { memoryFileUsage: { readFrom: ['plan'] } } }] },
+    [`${dir}/log.json`]: { steps: { a: { timestamp: { startedAt: '2026-01-01T10:02:00Z' }, actionsTaken: ['drew it'], problemsEncountered: ['slow'] } } },
+    [`${dir}/memory/plan.json`]: { entries: { a: { informationProduced: { goal: 'ship' }, updatedAt: '2026-01-01T10:03:00Z' } } },
+    [`${dir}/notes.md`]: '# Notes\nhello',
+  })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'sec-memory' })
+  expect(await ui.find({ type: 'Text', text: 'plan  ·  written by 1  ·  read by 2' })).toBeDefined()
+  await ui.press({ key: 'mem-topics' })
+  await ui.press({ key: 'topic-plan' })
+  expect(await ui.find({ type: 'Text', text: '    goal: ship' })).toBeDefined()
+  await ui.press({ key: 'mem-history' })
+  await ui.press({ key: 'mem-diffs' })
+  expect(await ui.find({ type: 'Text', text: 'No topic has two entries that differ.' })).toBeDefined()
+  await ui.press({ key: 'sec-logs' })
+  expect(await ui.find({ type: 'Text', text: '    problem: slow' })).toBeDefined()
+  await ui.press({ key: 'log-a' })
+  expect(await ui.find({ type: 'Text', text: '  drew it' })).toBeDefined() // the step detail, on its Execution tab
+  await ui.press({ key: 'back-steps' })
+  await ui.press({ key: 'sec-files' })
+  await ui.press({ key: `file-${dir}/notes.md` }) // the pane never shows the file: the terminal hands it to the editor
+  expect(ran).toEqual([['code', '--goto', `${dir}/notes.md`]])
+  expect(await ui.find({ type: 'Button', key: 'fw-toggle' })).toBeDefined() // still on the list
+  await ui.unmount()
+  const desk = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await desk.press({ key: 'sec-files' })
+  await desk.press({ key: `file-${dir}/notes.md` }) // Desktop hands it to the system opener
+  expect(ran[1]).toEqual(['open', `${dir}/notes.md`])
+})
+
+test('a step opens its detail with two tabs; Back and the arrows move around; a sub-process opens and the parent returns', async ($, on) => {
+  const dir = `${HOME}/active/p1`, child = `${HOME}/active/kid`
+  const w = world(on, {
+    [`${dir}/process.json`]: { ...process, subProcessState: { parentProcess: null, childProcesses: [{ id: 'k', name: 'Lookup', status: 'running', spawnedAtStep: 'a', syncPoint: 's', processPath: child }] },
+      steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed', stepDefinition: { output: { description: 'a design' } } }, { id: 'b', number: 2, name: 'Build', status: 'pending' }] },
+    [`${dir}/log.json`]: { steps: { a: { actionsTaken: ['drew it'] } } },
+    [`${child}/process.json`]: { name: 'Lookup', metadata: {}, parameters: {}, subProcessState: { parentProcess: { name: 'Old fix', processPath: dir }, childProcesses: [] }, steps: [{ id: 'x', number: 1, name: 'Find', status: 'pending' }] },
+  })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'step-a' })
+  expect(await ui.find({ type: 'Text', text: '  a design' })).toBeDefined()
+  await ui.press({ key: 'dtab-execution' })
+  expect(await ui.find({ type: 'Text', text: '  drew it' })).toBeDefined()
+  await ui.press({ key: 'step-next' })
+  await ui.press({ key: 'dtab-definition' })
+  expect(await ui.find({ type: 'Text', text: 'This step has no definition.' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'step-next' })).toBeUndefined() // the last step has no next
+  await ui.press({ key: 'back-steps' })
+  await ui.press({ key: 'sub-a-0' })
+  expect(await ui.find({ type: 'Button', key: 'step-x' })).toBeDefined()
+  await ui.press({ key: 'parent' })
+  expect(await ui.find({ type: 'Button', key: 'step-a' })).toBeDefined()
 })

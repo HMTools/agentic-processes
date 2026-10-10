@@ -4,7 +4,7 @@ import type { Doc, Result } from './process-files'
 
 // A step definition is copied into the process, so the process does not change when the template does.
 const EMBED_FIELDS = ['output', 'guidance', 'substeps', 'flow', 'memoryFileUsage', 'parameters']
-const EXTRA_EMBED_FIELDS = ['improvementCategories', 'prioritization', 'workflow', 'successCriteria', 'complianceChecklist', 'searchModes', 'changeProposalFormat', 'captureTypes']
+const EXTRA_EMBED_FIELDS = ['improvementCategories', 'prioritization', 'workflow', 'successCriteria','searchModes', 'changeProposalFormat', 'captureTypes']
 
 const dirOf = (path: string) => path.slice(0, path.lastIndexOf('/'))
 

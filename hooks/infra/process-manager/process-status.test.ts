@@ -15,6 +15,7 @@ test('completed: the folder moves to completed/ and processPath follows', async 
   expect(result.relocated_to).toBe(target)
   expect(w.moved).toEqual([[DIR, target]])
   expect(w.json(`${target}/process.json`).metadata.processPath).toBe(target)
+  expect(w.json(`${target}/process.json`).metadata.completed).toBe(w.json(`${target}/process.json`).metadata.lastUpdated) // the tool records the completion time
   expect(w.disk[`${target}/log.json`]).toBeDefined()
   expect(w.disk[`${DIR}/process.json`]).toBeUndefined()
 })

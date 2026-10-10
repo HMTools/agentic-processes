@@ -10,7 +10,7 @@ import type { Kind } from './status-look'
 // and the message that hands a bound process to the agent. The pane itself is in ../../on-process-pane.
 
 export type TemplateInfo = {
-  path: string; name: string; category: string
+  path: string; name: string; category: string; title: string; purpose: string; stepCount: number
   fields: { name: string; required: boolean; example: string; description: string }[]
 }
 export type ProcessInfo = { dir: string; name: string; step: number; total: number; updated: string; kind: Kind; folders: string[] }
@@ -36,7 +36,7 @@ export async function listTemplates(files: FileSystem): Promise<TemplateInfo[]> 
       if (data?.type !== 'template') continue
       const { required = [], optional = [], definitions = {} } = data.parameters ?? {}
       const field = (name: string, isRequired: boolean) => ({ name, required: isRequired, example: definitions[name]?.example ?? '', description: definitions[name]?.description ?? '' })
-      found.push({ path, name: data.name ?? entry.name, category: category.name, fields: [...required.map((n: string) => field(n, true)), ...optional.map((n: string) => field(n, false))] })
+      found.push({ path, name: data.name ?? entry.name, category: category.name, title: data.metadata?.title ?? data.name ?? entry.name, purpose: data.metadata?.purposeAndUsage ?? '', stepCount: (data.steps ?? []).length, fields: [...required.map((n: string) => field(n, true)), ...optional.map((n: string) => field(n, false))] })
     }
   }
   return found.sort((a, b) => `${a.category}/${a.name}`.localeCompare(`${b.category}/${b.name}`))
@@ -83,20 +83,84 @@ export const inFolder = (processes: ProcessInfo[], cwd: string, all: boolean) =>
 // The badge on the Continue tab: the processes that need the user.
 export const waitingCount = (processes: ProcessInfo[]) => processes.filter(p => needsUser(p.kind)).length
 
-export type BoundView = { name: string; step: number; total: number; kind: Kind; steps: { number: string; name: string; kind: Kind }[] }
+export type SubstepRow = { number: number; name: string; active: boolean }
+export type ChildRow = { name: string; kind: Kind; dir: string; returnsTo?: string }
+export type StepRow = { id: string; number: string; name: string; kind: Kind; active: boolean; substeps: SubstepRow[]; children: ChildRow[] }
+export type BoundView = { dir: string; name: string; step: number; total: number; kind: Kind; parent?: { name: string; dir: string }; steps: StepRow[] }
 
-// What the pane shows for the one process bound to the session.
+// A recorded sub-process status, as a symbol kind.
+const childKind = (status: string): Kind => (status === 'completed' ? 'done' : status === 'failed' ? 'failed' : status === 'paused' ? 'paused' : 'running')
+
+// What the pane shows for the one process bound to the session: its steps, the substeps of the active step, the sub-processes and the parent.
 export async function boundView(files: FileSystem, dir: string): Promise<BoundView | undefined> {
   const process = await readDoc(files, `${dir}/process.json`)
   if (!process) return
   const steps: Doc[] = process.steps ?? []
   const next = nextStep(process)
+  const active = process.currentState?.activeStep
+  const children: Doc[] = process.subProcessState?.childProcesses ?? []
+  const parent = process.subProcessState?.parentProcess
   return {
+    dir,
     name: process.name ?? dir.split('/').pop() ?? dir,
     step: next ? steps.indexOf(next) + 1 : steps.length,
     total: steps.length,
     kind: processKind(process),
-    steps: steps.map((s, i) => ({ number: String(s.number ?? i + 1), name: s.name ?? s.id ?? `Step ${i + 1}`, kind: stepKind(s.status) })),
+    ...(parent?.processPath ? { parent: { name: parent.name ?? parent.processPath, dir: parent.processPath } } : {}),
+    steps: steps.map((s, i) => {
+      const isActive = !!active && s.id === active.id && !isDone(s)
+      const defined: Doc[] = s.stepDefinition?.substeps ?? []
+      return {
+        id: s.id ?? String(i + 1),
+        number: String(s.number ?? i + 1),
+        name: s.name ?? s.id ?? `Step ${i + 1}`,
+        kind: stepKind(s.status),
+        active: isActive,
+        substeps: isActive ? defined.map((d, n) => ({ number: d.number ?? n + 1, name: d.name ?? `Substep ${n + 1}`, active: active.currentSubstep?.number === (d.number ?? n + 1) })) : [],
+        children: children
+          .filter(c => c.spawnedAtStep === s.id || c.spawnedAtStep === Number(s.number))
+          .map(c => ({ name: c.name ?? c.id, kind: childKind(c.status), dir: c.processPath, ...(c.syncPoint ? { returnsTo: String(c.syncPoint) } : {}) })),
+      }
+    }),
+  }
+}
+
+export type StepDetail = {
+  id: string; number: string; name: string; kind: Kind
+  produces: string[]; substeps: string[]; reads: string[]; writes: string[]
+  actions: string[]; reasoning: string[]; decisions: string[]; files: string[]; problems: string[]; notes: string[]
+  produced: [string, string][] // what the step put in memory
+}
+const strings = (v: unknown): string[] => (Array.isArray(v) ? v.map(x => (typeof x === 'string' ? x : JSON.stringify(x))) : typeof v === 'string' && v ? [v] : [])
+const topics = (v: unknown): string[] => strings(v).map(t => t.replace(/\.json$/, ''))
+
+// The detail of one step: its definition and what it did (memory topics and the log). Empty lists are not drawn.
+export async function stepDetail(files: FileSystem, dir: string, stepId: string): Promise<StepDetail | undefined> {
+  const process = await readDoc(files, `${dir}/process.json`)
+  const steps: Doc[] = process?.steps ?? []
+  const at = steps.findIndex(s => s.id === stepId)
+  if (at < 0) return
+  const step = steps[at], def: Doc = step.stepDefinition ?? {}
+  const log = (await readDoc(files, `${dir}/log.json`))?.steps?.[stepId] ?? {}
+  const decisions = new Set<string>(), changed = new Set<string>(), notes: string[] = [], produced: [string, string][] = []
+  for (const entry of await list(files, `${dir}/memory`)) {
+    if (!entry.name.endsWith('.json')) continue
+    const topic = (await readDoc(files, `${dir}/memory/${entry.name}`))?.entries?.[stepId]
+    if (!topic) continue
+    strings(topic.decisionsMade).forEach(d => decisions.add(d))
+    strings(topic.filesModifiedCreated).forEach(f => changed.add(f))
+    notes.push(...strings(topic.notes))
+    for (const [k, v] of Object.entries(topic.informationProduced ?? {})) produced.push([k, typeof v === 'string' ? v : JSON.stringify(v)])
+  }
+  strings(log.decisionsMade).forEach(d => decisions.add(d))
+  strings(log.filesModified).forEach(f => changed.add(f))
+  return {
+    id: stepId, number: String(step.number ?? at + 1), name: step.name ?? stepId, kind: stepKind(step.status),
+    produces: strings(def.output?.description ?? def.output?.create),
+    substeps: (def.substeps ?? []).map((d: Doc, n: number) => `${d.number ?? n + 1} ${d.name ?? ''}`.trim()),
+    reads: topics(def.memoryFileUsage?.readFrom), writes: topics(def.memoryFileUsage?.writeTo),
+    actions: strings(log.actionsTaken), reasoning: strings(log.agentReasoning), decisions: [...decisions], files: [...changed],
+    problems: strings(log.problemsEncountered), notes, produced,
   }
 }
 
@@ -147,4 +211,19 @@ export async function resumeProcess(ports: ManagerPorts, dir: string): Promise<S
     await bindSession(ports, dir)
     return { text: handoff('resume', dir, JSON.parse(await ports.files.read(`${dir}/process.json`))), dir }
   } catch (error) { return { error: error instanceof Error ? error.message : String(error) } }
+}
+
+// Take a running process off the Continue list: its folder moves to `deleted/`, so the user can still get it back by hand.
+// Only a folder straight under `active/` moves; the pane never removes files for good.
+export async function deleteProcess(ports: ManagerPorts, dir: string): Promise<string> {
+  const home = await ports.files.home()
+  if (!home) throw new Error('No home folder found')
+  const root = `${slash(home)}/.claude/agentic-processes`
+  const clean = slash(dir).replace(/\/+$/, '')
+  const name = clean.startsWith(`${root}/active/`) ? clean.slice(`${root}/active/`.length) : ''
+  if (!name || name.includes('/') || name === '..') throw new Error('That is not a running process folder')
+  let target = `${root}/deleted/${name}`
+  if (await ports.files.exists(target)) target = `${target}-${ports.now().replace(/[^0-9]/g, '')}` // a name taken before: keep both
+  await ports.move(clean, target)
+  return target
 }

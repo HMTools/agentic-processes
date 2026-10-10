@@ -43,7 +43,14 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Verdict: **replace**. Plan page answered 2026-10-10: a press on a sub-process opens it (parent row to go back); the step detail is a view with Back and prev/next; Desktop draws a graph with zoom and pan in a `Client`.
+
+Built (253 tests pass, `claude plugin validate .` passes):
+- `hooks/infra/process-pane/process-pane.ts`: `boundView` adds the active step's substeps, the sub-processes under their step and the parent; new `stepDetail` joins the step definition with `memory/*.json` and `log.json`.
+- `hooks/on-process-pane/on-process-pane.ts`: timeline rows are buttons; the detail view (tabs Definition and Execution, Back to steps, prev and next); sub-process and parent navigation; a `ui.message` hook for presses on graph nodes; on Desktop a Graph / Timeline toggle.
+- `hooks/on-process-pane/graph-view.ts` (new `Client` surface module): nodes are absolute `Box`es with borders and hover, connectors are text, drag moves the view, `+` and `-` switch two sizes, a press posts the step or the sub-process to open. `layout` and `hit` are pure and tested.
+
+Open: the graph has not been seen on a real Desktop (negative offsets of absolute boxes, drag capture). Zoom is two sizes, no minimap, no animated edges. Shift+P (lazy prompt) goes to U09, the agent panel to U08. The Memory, Logs and Files screens are U05.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U04"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.

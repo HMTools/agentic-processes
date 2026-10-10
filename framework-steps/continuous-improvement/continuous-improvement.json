@@ -134,13 +134,10 @@
     },
     {
       "number": 6,
-      "name": "End-Step: Compliance Check",
-      "description": "Verify principles were followed in this step",
+      "name": "End-Step: Log Problems",
+      "description": "Log what went wrong in this step",
       "actions": [
-        "Verify: Was log.json updated for any user interactions?",
-        "Verify: Were mandatory actions confirmed with output?",
-        "Log problems: If any problems, errors, workarounds, or unexpected situations were encountered during this step, log them with the tool add_log_entry, in its problems list. This feeds the continuous-improvement step's analysis.",
-        "Output: '✓ Step completed in compliance with operating principles'"
+        "Log problems: If any problems, errors, workarounds, or unexpected situations were encountered during this step, log them with the tool add_log_entry, in its problems list. This feeds the continuous-improvement step's analysis."
       ]
     }
   ],
