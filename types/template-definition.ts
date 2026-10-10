@@ -78,8 +78,6 @@ export interface TemplateDefinition {
     approvalRequired?: boolean;
     /** Actions to take after approval */
     postApprovalActions?: string[];
-    /** Q&A checkpoint details */
-    qnaCheckpoint?: string;
     /** Additional notes */
     notes?: string;
     /** Conditional execution description */

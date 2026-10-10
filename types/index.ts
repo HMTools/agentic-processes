@@ -25,16 +25,6 @@ export * from './process-instance';
 export * from './memory-file';
 export * from './log-file';
 
-// Q&A types
-export * from './qa-session';
-export type {
-  QASessionFile,
-  QASessionQuestion,
-  QuestionStatus,
-  SessionStatus,
-  AnswerIteration
-} from './qa-session';
-
 // Definition types (for templates and steps)
 export * from './step-definition';
 export * from './template-definition';

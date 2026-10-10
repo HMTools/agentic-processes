@@ -37,6 +37,6 @@ test('finds the commands that change the process', () => {
   expect(isLogGatedCommand('python3 /x/process_manager.py update-step-status --step-id s1')).toBe(true)
   expect(isLogGatedCommand('python3 /x/process_manager.py write-pending --process-dir /p')).toBe(true)
   expect(isLogGatedCommand('python3 /x/process_manager.py write-pending --process-dir /p --delete')).toBe(false)
-  expect(isLogGatedCommand('python3 /x/process_manager.py get-qa-session --process-dir /p')).toBe(false)
+  expect(isLogGatedCommand('python3 /x/process_manager.py list-findings --process-dir /p')).toBe(false)
   expect(isLogGatedCommand('ls -la')).toBe(false)
 })

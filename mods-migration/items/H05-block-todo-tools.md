@@ -56,15 +56,46 @@ Known weaknesses and open points:
 No implementation. No plugin edits. (Only items S01–S03 may build a throwaway mod outside this repo.)
 
 ## 7. Research result
-_(empty until the research is done)_
+
+Planned and built 2026-10-09 (plan page: https://claude.ai/artifact/1tKFCrVKyyGX12MtyjwwPF). Not committed.
 
 ### Claude Code version
+`2.1.295 (Claude Code)`. Type file from the `plugin-authoring` skill for this build.
+
 ### Answers per question (1-8, each with evidence)
+1. Todo tools in this build: `TaskCreate`, `TaskUpdate`, `TaskGet`, `TaskList`, `TodoWrite` (type file, built-in tool inputs). The subagent tool is `Agent`; `Task` is not a built-in name now. `TaskStop` stops a background job, it is not a todo tool. `TaskOutput` is not in the type file. So `Task`, `TaskStop`, `TaskOutput` are not in the guard.
+2. `{ deny: text }` arrives as the tool error (H06 live test). Same text as the script's `reason`.
+3. `tool.call` carries `agentId` in a subagent. Owner choice: the guard ignores subagent calls (the script refused them; same session id).
+4. Session id: `$.session.id()`, as in H04/H06. Not tested across `/clear`, `/resume`, compaction.
+5. Not tested. Moot: the shell hook is removed.
+6. A handler that throws is skipped (fail open), as the script did.
+7. Order against the remaining shell hooks: not tested. The approve-step hook has its own `Bash` matcher.
+8. Dead names dropped. `TodoWrite` added (the script never saw it).
+
 ### Final verdict
+**replace**
+
+### Implemented
+- `hooks/on-todo-tool/on-todo-tool.ts`: `tool.call` with `{ tool: [five names] }`. Refuses while the process `status` is `running` (parsed JSON, not a text grep). Reuses `findAgenticProcessDir`, `readAgenticProcess`, `isProcessRunning`. Registered in `hooks/register.ts`.
+- Removed `scripts/block-todo-tools.sh` and its `PreToolUse` group in `hooks/hooks.json`.
+- Tests: `hooks/on-todo-tool/on-todo-tool.test.ts`. Full suite 94 pass (`claude plugin test .`).
+- The reason for the rule: a todo list can make the agent skip an approval gate. A gate leaves the process `running`, so the rule covers it. `on-pending-checkpoint` (H04) also refuses every tool while a checkpoint waits.
+
 ### Evidence (doc page + section, type-file names, repo file:line)
+- Type file `claude-code.d.ts`: built-in tool inputs (`TaskCreate`, `TodoWrite`, `TaskStop`, `Agent`), `tool.call` `agentId`, `deny`.
+- Repo: removed script (git history), `types/process-status.ts:4`, `hooks/infra/agentic-process-repository/agentic-process-repository.ts:31`, `hooks/on-pending-checkpoint/`.
+
 ### Open questions
+- Does a live run refuse the five tools and show the text to the agent? (Test host only.)
+- Order against the shell hook `block-approve-step.sh`.
+- `paused` exists in the types but nothing sets it; the guard allows a paused process (as the script did).
+
 ### Risks
+- With mods off, no guard runs (script gone, as H01, H04, H06). X01 decides a fallback.
+- A subagent can use todo tools (owner choice).
+
 ### What a later plan must decide
+- Whether a subagent should be held to the rule.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "H05"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

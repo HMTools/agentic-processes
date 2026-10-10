@@ -99,31 +99,6 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-active-substep \
 
 ---
 
-### track-file-change
-
-Track a file operation in `currentState.activeStep.filesChanged`. Called automatically by the PostToolUse hook -- agents do not call this directly. Uses upsert-by-path: at most one entry per unique file path, latest operation always wins.
-
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py track-file-change \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --file-path "src/app.ts" \
-  --operation edited \
-  --tool Edit
-```
-
-**Args**:
-| Flag | Required | Description |
-|------|----------|-------------|
-| `--process-dir` | Yes | Process directory path |
-| `--file-path` | Yes | Absolute path of the changed file |
-| `--operation` | Yes | One of: `created`, `edited`, `deleted` |
-| `--tool` | Yes | Tool name that performed the operation (Write, Edit, etc.) |
-
-**Note**: This is called by the PostToolUse hook script (`track-file-change.sh`), not by agents directly. The hook fires on every Write, Edit, or StrReplace tool use and records the file change in the active step.
-
----
-
 ### add-memory-entry
 
 Add or update a step entry in a memory topic file (`memory/<topic>.json`). If the step already exists in that topic file, new info/decisions/files are appended. Also updates `memory/_cross-references.json` with any new decisions and files.
@@ -139,7 +114,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py add-memory-entry \
   --files '["api.py", "migration.sql"]'
 ```
 
-**Topic naming convention**: lowercase, hyphen-separated, describes the data content. Examples: `context`, `identified-files`, `implementation-decisions`, `findings`, `qa-sessions`.
+**Topic naming convention**: lowercase, hyphen-separated, describes the data content. Examples: `context`, `identified-files`, `implementation-decisions`, `findings`.
 
 **Note**: The `--topic` argument specifies which memory file to write to. The step name is auto-resolved from process.json. Escape inner quotes as needed for your shell, e.g. `'{"key": "value"}'`.
 

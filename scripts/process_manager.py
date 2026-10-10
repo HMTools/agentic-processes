@@ -6,7 +6,6 @@ Subcommands:
   update-step-status       Change a step's status in process.json
   approve-step             Record explicit approval for steps with approvalRequired: true
   update-current-state     Update the active step in process.json
-  track-file-change        Track a file change in activeStep.filesChanged
   add-memory-entry         Add or update a step entry in memory/<topic>.json
   read-memory-topic        Read a memory topic file with access validation
   add-log-entry            Append actions to a step entry in log.json
@@ -19,11 +18,6 @@ Subcommands:
   list-findings            Scan the global findings store across processes
   update-finding-status    Record the outcome (applied/rejected/deferred) of a finding
   write-pending            Create or delete pending-interaction.json
-  create-qa-session        Create Q&A session with questions
-  update-qa-answer         Add or update answer for a question
-  complete-qa-question     Mark question as completed
-  complete-qa-session      Archive session and delete file
-  get-qa-session           Read current Q&A session
 """
 
 from __future__ import annotations
@@ -41,7 +35,6 @@ from models import (
     ActiveStep,
     ActiveStepSubstep,
     ChildProcessRef,
-    FileChange,
     FINDINGS_DIR,
     ImprovementFinding,
     LogFile,
@@ -65,145 +58,6 @@ from models import (
     _now_iso,
     _new_uuid,
 )
-
-# Helper functions for Q&A session operations
-
-def derive_session_status(questions: list[dict]) -> str:
-    """
-    Derive session status from question statuses.
-    Returns 'pending' if any required question is 'unanswered'
-    Returns 'partial' if all required answered but not all 'completed'
-    Returns 'completed' if all required questions 'completed'
-    """
-    required_questions = [q for q in questions if q.get('priority') == 'required']
-
-    if not required_questions:
-        # No required questions, check all questions
-        all_completed = all(q.get('status') == 'completed' for q in questions)
-        return 'completed' if all_completed else 'partial'
-
-    # Check if any required question is unanswered
-    any_unanswered = any(q.get('status') == 'unanswered' for q in required_questions)
-    if any_unanswered:
-        return 'pending'
-
-    # All required questions have at least been answered
-    # Check if all required questions are completed
-    all_completed = all(q.get('status') == 'completed' for q in required_questions)
-    if all_completed:
-        return 'completed'
-
-    return 'partial'
-
-
-def validate_qa_session(data: dict) -> None:
-    """Validate QASessionFile structure against schema."""
-    required_fields = ['type', 'stepId', 'stepName', 'timestamp', 'questions', 'status']
-    for field in required_fields:
-        if field not in data:
-            raise ValueError(f"Missing required field: {field}")
-
-    if data['type'] != 'qa-session':
-        raise ValueError(f"Invalid type: expected 'qa-session', got '{data['type']}'")
-
-    if not isinstance(data['questions'], list):
-        raise ValueError("questions must be an array")
-
-    valid_statuses = ['pending', 'partial', 'completed']
-    if data['status'] not in valid_statuses:
-        raise ValueError(f"Invalid status: {data['status']}")
-
-    # Validate each question
-    for q in data['questions']:
-        q_required = ['id', 'topic', 'question', 'priority', 'status', 'answerHistory']
-        for field in q_required:
-            if field not in q:
-                raise ValueError(f"Question missing required field: {field}")
-
-        valid_q_statuses = ['unanswered', 'answered', 'refined', 'completed']
-        if q['status'] not in valid_q_statuses:
-            raise ValueError(f"Invalid question status: {q['status']}")
-
-        if not isinstance(q['answerHistory'], list):
-            raise ValueError("answerHistory must be an array")
-
-
-def map_to_qa_session_log(qa_session: dict) -> dict:
-    """Convert QASessionFile to QASessionLog format for log.json."""
-    questions_asked = []
-    answers_received = []
-    unanswered_questions = []
-
-    for q in qa_session['questions']:
-        # Add to questionsAsked (without status and answerHistory)
-        questions_asked.append({
-            'id': q['id'],
-            'topic': q['topic'],
-            'question': q['question'],
-            'priority': q['priority'],
-            'context': q.get('context'),
-            'options': q.get('options'),
-        })
-
-        # Process answers
-        if q['answerHistory']:
-            # Get the most recent answer
-            latest_answer = q['answerHistory'][-1]
-            answers_received.append({
-                'questionId': q['id'],
-                'answer': latest_answer['answer'],
-                'timestamp': latest_answer['timestamp'],
-            })
-        else:
-            unanswered_questions.append(q['id'])
-
-    # Determine outcome
-    if not unanswered_questions:
-        outcome = 'all_answered'
-    elif len(unanswered_questions) < len(qa_session['questions']):
-        outcome = 'partial'
-    else:
-        outcome = 'deferred'
-
-    return {
-        'timestamp': qa_session['timestamp'],
-        'questionsAsked': questions_asked,
-        'answersReceived': answers_received,
-        'unansweredQuestions': unanswered_questions,
-        'outcome': outcome,
-    }
-
-
-def create_qa_session_memory(qa_session: dict) -> dict:
-    """Generate QASessionMemory summary for memory.json."""
-    answered_count = sum(1 for q in qa_session['questions'] if q['answerHistory'])
-    total_count = len(qa_session['questions'])
-
-    # Create keyAnswers map from answered questions
-    key_answers = {}
-    assumptions = []
-
-    for q in qa_session['questions']:
-        if q['answerHistory']:
-            # Use most recent answer
-            latest_answer = q['answerHistory'][-1]['answer']
-            key_answers[q['topic']] = latest_answer
-        elif q['priority'] == 'required':
-            # Track required unanswered questions as assumptions
-            assumptions.append(f"No answer provided for: {q['question']}")
-
-    memory_entry = {
-        'conducted': True,
-        'questionsCount': total_count,
-        'answeredCount': answered_count,
-        'keyAnswers': key_answers,
-    }
-
-    if assumptions:
-        memory_entry['assumptions'] = assumptions
-
-    return memory_entry
-
 
 def _ok(*files: str) -> None:
     json.dump({"status": "ok", "files_written": list(files)}, sys.stdout)
@@ -541,9 +395,6 @@ def cmd_update_current_state(args: argparse.Namespace) -> None:
             name=args.substep_name,
         )
 
-    # Preserve filesChanged if same step
-    old_active = process.currentState.activeStep if process.currentState else None
-
     new_active_step = ActiveStep(
         id=args.step_id,
         name=args.step_name,
@@ -552,9 +403,6 @@ def cmd_update_current_state(args: argparse.Namespace) -> None:
         actionDetails=args.details,
         currentSubstep=current_substep,
     )
-
-    if old_active and old_active.id == args.step_id:
-        new_active_step.filesChanged = old_active.filesChanged
 
     process.currentState = ProcessCurrentState(activeStep=new_active_step)
     process.metadata.lastUpdated = _now_iso()
@@ -580,41 +428,6 @@ def cmd_update_active_substep(args: argparse.Namespace) -> None:
     if args.summary is not None:
         process.currentState.activeStep.actionSummary = args.summary
     process.metadata.lastUpdated = _now_iso()
-
-    write_json(process_path, process.to_dict())
-    _ok("process.json")
-
-
-def cmd_track_file_change(args: argparse.Namespace) -> None:
-    process_dir = Path(args.process_dir)
-    process_path = process_dir / "process.json"
-
-    if not process_path.exists():
-        _error(f"process.json not found in {process_dir}")
-
-    data = read_json(process_path)
-    process = ProcessInstance.from_dict(data)
-
-    file_change = FileChange(
-        path=args.file_path,
-        operation=args.operation,
-        tool=args.tool,
-        timestamp=_now_iso(),
-    )
-
-    if process.currentState.activeStep.filesChanged is None:
-        process.currentState.activeStep.filesChanged = []
-
-    # Upsert by path: if an entry with the same path exists, replace it
-    existing_idx = next(
-        (i for i, fc in enumerate(process.currentState.activeStep.filesChanged)
-         if fc.path == file_change.path),
-        None,
-    )
-    if existing_idx is not None:
-        process.currentState.activeStep.filesChanged[existing_idx] = file_change
-    else:
-        process.currentState.activeStep.filesChanged.append(file_change)
 
     write_json(process_path, process.to_dict())
     _ok("process.json")
@@ -1164,20 +977,6 @@ def cmd_write_pending(args: argparse.Namespace) -> None:
             _ok()
         return
 
-    # Check if Q&A session exists (Q&A blocks pending-interactions)
-    qa_session_path = process_dir / "qa-session.json"
-    if qa_session_path.exists():
-        script_path = Path(__file__)
-        _error(
-            "Cannot create pending-interaction while Q&A session is active.\n\n"
-            "Complete the Q&A session first:\n"
-            f"  1. Check session status: python3 {script_path} get-qa-session --process-dir \"{process_dir}\"\n"
-            f"  2. Answer remaining questions: python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" --question-id \"<id>\" --answer \"<text>\"\n"
-            f"  3. Complete each question: python3 {script_path} complete-qa-question --process-dir \"{process_dir}\" --question-id \"<id>\"\n"
-            f"  4. Archive the session: python3 {script_path} complete-qa-session --process-dir \"{process_dir}\"\n\n"
-            "After the session is archived, you can create the pending interaction."
-        )
-
     if not args.options:
         _error("--options is required when creating pending-interaction.json")
 
@@ -1221,264 +1020,6 @@ def cmd_write_pending(args: argparse.Namespace) -> None:
 
     write_json(pending_path, pending.to_dict())
     _ok("pending-interaction.json")
-
-
-def cmd_create_qa_session(args: argparse.Namespace) -> None:
-    """Create a new Q&A session with questions."""
-    process_dir = Path(args.process_dir)
-    qa_session_path = process_dir / "qa-session.json"
-
-    if qa_session_path.exists():
-        script_path = Path(__file__)
-        _error(
-            "Q&A session already exists. Complete current session before creating a new one.\n\n"
-            "To complete the existing session:\n"
-            f"  1. Review it: python3 {script_path} get-qa-session --process-dir \"{process_dir}\"\n"
-            f"  2. Answer remaining questions: python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" --question-id \"<id>\" --answer \"<text>\"\n"
-            f"  3. Complete each question: python3 {script_path} complete-qa-question --process-dir \"{process_dir}\" --question-id \"<id>\"\n"
-            f"  4. Archive: python3 {script_path} complete-qa-session --process-dir \"{process_dir}\""
-        )
-
-    questions_data = json.loads(args.questions)
-    if not isinstance(questions_data, list):
-        _error("questions must be a JSON array")
-
-    now = _now_iso()
-
-    # Initialize all questions with unanswered status and empty answerHistory
-    questions = []
-    for q in questions_data:
-        question = {
-            'id': q.get('id'),
-            'topic': q.get('topic'),
-            'question': q.get('question'),
-            'priority': q.get('priority', 'required'),
-            'status': 'unanswered',
-            'answerHistory': [],
-        }
-        if 'context' in q:
-            question['context'] = q['context']
-        if 'options' in q:
-            question['options'] = q['options']
-        questions.append(question)
-
-    # Derive session status
-    session_status = derive_session_status(questions)
-
-    qa_session = {
-        'type': 'qa-session',
-        'stepId': args.step_id,
-        'stepName': args.step_name,
-        'timestamp': now,
-        'questions': questions,
-        'status': session_status,
-    }
-
-    # Validate before write
-    validate_qa_session(qa_session)
-
-    # Atomic write
-    write_json(qa_session_path, qa_session)
-    _ok("qa-session.json")
-
-
-def cmd_update_qa_answer(args: argparse.Namespace) -> None:
-    """Add or update answer for a question."""
-    process_dir = Path(args.process_dir)
-    qa_session_path = process_dir / "qa-session.json"
-
-    if not qa_session_path.exists():
-        script_path = Path(__file__)
-        _error(
-            f"No active Q&A session found in {process_dir}.\n\n"
-            "Create one first with:\n"
-            f"  python3 {script_path} create-qa-session --process-dir \"{process_dir}\" "
-            "--step-id \"<step-id>\" --step-name \"<step-name>\" "
-            "--questions '[{\"id\": \"q1\", \"topic\": \"...\", \"question\": \"...\", \"priority\": \"required\"}]'"
-        )
-
-    qa_session = read_json(qa_session_path)
-    now = _now_iso()
-
-    # Find question by ID
-    question = None
-    for q in qa_session['questions']:
-        if q['id'] == args.question_id:
-            question = q
-            break
-
-    if not question:
-        _error(f"Question not found: {args.question_id}")
-
-    # Add new answer iteration
-    if not question['answerHistory']:
-        # First answer
-        iteration = 1
-        question['status'] = 'answered'
-    else:
-        # Refinement
-        iteration = max(a['iteration'] for a in question['answerHistory']) + 1
-        question['status'] = 'refined'
-
-    question['answerHistory'].append({
-        'answer': args.answer,
-        'timestamp': now,
-        'iteration': iteration,
-    })
-
-    # Re-derive session status
-    qa_session['status'] = derive_session_status(qa_session['questions'])
-
-    # Validate and write
-    validate_qa_session(qa_session)
-    write_json(qa_session_path, qa_session)
-    _ok("qa-session.json")
-
-
-def cmd_complete_qa_question(args: argparse.Namespace) -> None:
-    """Mark a question as completed."""
-    process_dir = Path(args.process_dir)
-    qa_session_path = process_dir / "qa-session.json"
-
-    if not qa_session_path.exists():
-        _error(f"No active Q&A session found in {process_dir}. Cannot complete question without an active session.")
-
-    qa_session = read_json(qa_session_path)
-
-    # Find question by ID
-    question = None
-    for q in qa_session['questions']:
-        if q['id'] == args.question_id:
-            question = q
-            break
-
-    if not question:
-        _error(f"Question not found: {args.question_id}")
-
-    # Verify answerHistory is not empty
-    if not question['answerHistory']:
-        script_path = Path(__file__)
-        _error(
-            f"Cannot complete unanswered question '{args.question_id}'. Provide at least one answer first.\n\n"
-            "Command to answer:\n"
-            f"  python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" "
-            f"--question-id \"{args.question_id}\" --answer \"<answer text>\"\n\n"
-            "After answering, retry the complete-qa-question command."
-        )
-
-    # Mark as completed
-    question['status'] = 'completed'
-
-    # Re-derive session status
-    qa_session['status'] = derive_session_status(qa_session['questions'])
-
-    # Validate and write
-    validate_qa_session(qa_session)
-    write_json(qa_session_path, qa_session)
-    _ok("qa-session.json")
-
-
-def cmd_complete_qa_session(args: argparse.Namespace) -> None:
-    """Archive completed session and delete file."""
-    process_dir = Path(args.process_dir)
-    qa_session_path = process_dir / "qa-session.json"
-
-    if not qa_session_path.exists():
-        _error(f"No active Q&A session found in {process_dir}. Cannot archive without an active session.")
-
-    qa_session = read_json(qa_session_path)
-
-    # Verify all required questions are completed
-    required_questions = [q for q in qa_session['questions'] if q['priority'] == 'required']
-    incomplete_required = [q for q in required_questions if q['status'] != 'completed']
-
-    if incomplete_required:
-        question_ids = [q['id'] for q in incomplete_required]
-        script_path = Path(__file__)
-        ids_str = ', '.join(question_ids)
-        _error(
-            f"Cannot complete session: required questions not completed: {ids_str}\n\n"
-            "For each incomplete question, answer it then mark it complete:\n"
-            f"  python3 {script_path} update-qa-answer --process-dir \"{process_dir}\" --question-id \"<id>\" --answer \"<text>\"\n"
-            f"  python3 {script_path} complete-qa-question --process-dir \"{process_dir}\" --question-id \"<id>\"\n\n"
-            "After all required questions are completed, retry complete-qa-session."
-        )
-
-    # Create log entry
-    log_path = process_dir / "log.json"
-    if log_path.exists():
-        log_data = read_json(log_path)
-        log = LogFile.from_dict(log_data)
-
-        step_id = qa_session['stepId']
-        qa_log_entry = map_to_qa_session_log(qa_session)
-
-        if step_id in log.steps:
-            entry = log.steps[step_id]
-            # Add qaSession field to log entry
-            if not hasattr(entry, 'qaSession'):
-                # Store as additional field in the step entry
-                pass
-            # We'll add it directly to the dict representation
-        else:
-            # Create new log entry with qa session
-            log.steps[step_id] = LogStepEntry(
-                timestamp=qa_session['timestamp'],
-            )
-
-        # Write log (we'll add qaSession directly to dict)
-        log_dict = log.to_dict()
-        if step_id not in log_dict['steps']:
-            log_dict['steps'][step_id] = {'timestamp': qa_session['timestamp']}
-        log_dict['steps'][step_id]['qaSession'] = qa_log_entry
-        write_json(log_path, log_dict)
-
-    # Create memory entry in memory/qa-sessions.json topic file
-    memory_dir = process_dir / "memory"
-    if memory_dir.exists():
-        step_id = qa_session['stepId']
-        qa_memory_entry = create_qa_session_memory(qa_session)
-
-        topic_path = memory_dir / "qa-sessions.json"
-        if topic_path.exists():
-            topic_data = read_json(topic_path)
-            topic_file = MemoryTopicFile.from_dict(topic_data)
-        else:
-            topic_file = MemoryTopicFile.create("qa-sessions")
-
-        now = _now_iso()
-        if step_id in topic_file.entries:
-            entry = topic_file.entries[step_id]
-            entry.informationProduced["qaSession"] = qa_memory_entry
-            entry.updatedAt = now
-        else:
-            topic_file.entries[step_id] = MemoryTopicEntry(
-                stepName=qa_session['stepName'],
-                informationProduced={"qaSession": qa_memory_entry},
-                updatedAt=now,
-            )
-
-        topic_file.lastUpdated = now
-        write_json(topic_path, topic_file.to_dict())
-
-    # Delete qa-session.json
-    qa_session_path.unlink()
-    _ok("qa-session.json (archived and deleted)")
-
-
-def cmd_get_qa_session(args: argparse.Namespace) -> None:
-    """Read current Q&A session."""
-    process_dir = Path(args.process_dir)
-    qa_session_path = process_dir / "qa-session.json"
-
-    if not qa_session_path.exists():
-        json.dump({"status": "ok", "session": None}, sys.stdout)
-        print()
-        return
-
-    qa_session = read_json(qa_session_path)
-    json.dump({"status": "ok", "session": qa_session}, sys.stdout)
-    print()
 
 
 # --- CLI setup ---
@@ -1536,14 +1077,6 @@ def main() -> None:
     p_substep.add_argument("--substep-name", required=True)
     p_substep.add_argument("--summary", default=None, help="Optionally update actionSummary")
     p_substep.set_defaults(func=cmd_update_active_substep)
-
-    # track-file-change
-    p_track = subparsers.add_parser("track-file-change", help="Track a file change in activeStep")
-    p_track.add_argument("--process-dir", required=True)
-    p_track.add_argument("--file-path", required=True)
-    p_track.add_argument("--operation", required=True, choices=["created", "edited", "deleted"])
-    p_track.add_argument("--tool", required=True)
-    p_track.set_defaults(func=cmd_track_file_change)
 
     # add-memory-entry
     p_mem = subparsers.add_parser("add-memory-entry", help="Add/update step in memory topic file")
@@ -1659,37 +1192,6 @@ def main() -> None:
     p_pending.add_argument("--options", help="JSON array of interaction options")
     p_pending.add_argument("--delete", action="store_true", help="Delete pending-interaction.json")
     p_pending.set_defaults(func=cmd_write_pending)
-
-    # create-qa-session
-    p_qa_create = subparsers.add_parser("create-qa-session", help="Create Q&A session with questions")
-    p_qa_create.add_argument("--process-dir", required=True)
-    p_qa_create.add_argument("--step-id", required=True, help="Step ID for this Q&A session")
-    p_qa_create.add_argument("--step-name", required=True, help="Step name for this Q&A session")
-    p_qa_create.add_argument("--questions", required=True, help="JSON array of questions")
-    p_qa_create.set_defaults(func=cmd_create_qa_session)
-
-    # update-qa-answer
-    p_qa_answer = subparsers.add_parser("update-qa-answer", help="Add or update answer for a question")
-    p_qa_answer.add_argument("--process-dir", required=True)
-    p_qa_answer.add_argument("--question-id", required=True, help="ID of question to answer")
-    p_qa_answer.add_argument("--answer", required=True, help="Answer text")
-    p_qa_answer.set_defaults(func=cmd_update_qa_answer)
-
-    # complete-qa-question
-    p_qa_complete = subparsers.add_parser("complete-qa-question", help="Mark question as completed")
-    p_qa_complete.add_argument("--process-dir", required=True)
-    p_qa_complete.add_argument("--question-id", required=True, help="ID of question to complete")
-    p_qa_complete.set_defaults(func=cmd_complete_qa_question)
-
-    # complete-qa-session
-    p_qa_session_complete = subparsers.add_parser("complete-qa-session", help="Archive session and delete file")
-    p_qa_session_complete.add_argument("--process-dir", required=True)
-    p_qa_session_complete.set_defaults(func=cmd_complete_qa_session)
-
-    # get-qa-session
-    p_qa_get = subparsers.add_parser("get-qa-session", help="Read current Q&A session")
-    p_qa_get.add_argument("--process-dir", required=True)
-    p_qa_get.set_defaults(func=cmd_get_qa_session)
 
     _APPROVAL_GATED_COMMANDS = {
         "update-step-status",

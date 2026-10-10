@@ -66,7 +66,7 @@ Every enforcement hook finds "its" process the same way: loop over `active/*/.se
 
 | Group | IDs | Meaning |
 |---|---|---|
-| `H` | H01–H11 | The 11 hook scripts, one each |
+| `H` | H01–H08, H10 | The 9 hook scripts left, one each (H09 and H11 were removed with their features) |
 | `C` | C01 | Shared hook plumbing (JSON parsing, session lookup) |
 | `P` | P01–P12 | Other plugin parts (CLI, skills, agents, files, UI) |
 | `S` | S01–S03 | Spikes: small throwaway mods that test open questions |
@@ -78,7 +78,6 @@ The full list with titles, files and first guesses is in `progress.html`.
 When all items are `done`, a final plan can order the migration. Not part of this folder.
 
 ## Facts found while writing the item files (read from code and docs, mostly not run)
-- `check-qa-session.sh` exits 1 on `UserPromptSubmit`. In settings hooks only exit 2 blocks, so it may be a no-op today (H11).
 - `block-stop-pending-steps.sh` and `check-approval-stop.sh` have no `stop_hook_active` guard; `check-approval-stop.sh` also runs on `SubagentStop` and ignores `agent_id` (H01, H02).
 - `block-tools-on-pending.sh` allows any Bash command that contains the text of the process manager script name, and allows writing `.approve-token`: the user-only approval can be forged (H04, H07). The same text match blocked a harmless command while this folder was written.
 - Some matchers or tool names may be stale: `StrReplace`, `Task` (now maybe `Agent`), dead Bash branches in `enforce-log-first.sh` (H05, H06).

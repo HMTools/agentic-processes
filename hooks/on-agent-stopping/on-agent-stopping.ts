@@ -17,7 +17,6 @@ import type { FileSystem, ListAgents } from '../infra/ports/ports'
 // (a real stop veto).
 
 // TODO: when the mod has a settings UI, make MAX_REPROMPTS configurable (or "retry until it succeeds").
-// That also covers an open Q&A session, which makes `write-pending` fail until it is archived.
 const MAX_REPROMPTS = 3
 const repromptLimiter = createRepromptLimiter() // this feature's own count
 

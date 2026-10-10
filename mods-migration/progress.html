@@ -101,11 +101,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H05-block-todo-tools.md",
     "firstGuess": "replace",
     "source": "scripts/block-todo-tools.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Replaced by a tool.call mod handler for TaskCreate, TaskUpdate, TaskGet, TaskList, TodoWrite. Refuses while the process status is running (parsed JSON); a subagent passes. Dead names dropped, TodoWrite added.",
+    "open": ["Live run not done", "Order against block-approve-step.sh"],
+    "updated": "2026-10-09"
   },
   {
     "id": "H06",
@@ -147,19 +147,6 @@ const ITEMS = /* ITEMS:START */ [
     "updated": ""
   },
   {
-    "id": "H09",
-    "group": "H",
-    "title": "track-file-change",
-    "file": "items/H09-track-file-change.md",
-    "firstGuess": "replace",
-    "source": "scripts/track-file-change.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
-  },
-  {
     "id": "H10",
     "group": "H",
     "title": "create-log-flag",
@@ -171,19 +158,6 @@ const ITEMS = /* ITEMS:START */ [
     "summary": "A mod replaces the script: the one `prompt.submit` hook marks the log as owed in an in-memory bit for each session, so a prompt the plugin sends owes no log. Live test confirmed it on a `claude -p` prompt. The first prompt of a session is still not covered (H08).",
     "open": ["First prompt of a session has no flag until .session is bound (H08)", "Skip slash commands and trivial prompts?"],
     "updated": "2026-10-09"
-  },
-  {
-    "id": "H11",
-    "group": "H",
-    "title": "check-qa-session",
-    "file": "items/H11-check-qa-session.md",
-    "firstGuess": "replace",
-    "source": "scripts/check-qa-session.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
   },
   {
     "id": "C01",

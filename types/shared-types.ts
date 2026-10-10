@@ -56,9 +56,3 @@ export type StepRef = string;
  * References a StepId - the parent will wait for the child after this step completes.
  */
 export type SyncPoint = StepId;
-
-/**
- * Unique identifier for a Q&A question.
- * Format: "Q1", "Q2", or any unique string within the session.
- */
-export type QuestionId = string;
