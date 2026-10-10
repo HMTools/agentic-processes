@@ -26,8 +26,7 @@ export interface ViewDefinition {
   html?: string;
 
   /**
-   * Operation ids the widget's elements can bind to — each must be a
-   * pending-interaction.json option id carrying non-empty `data` at gate time
+   * Operation ids the widget's elements can bind to
    */
   operationIds: string[];
 

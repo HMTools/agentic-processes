@@ -4,6 +4,8 @@ import { register as onUserPrompt } from './on-user-prompt/on-user-prompt'
 import { register as onPendingCheckpoint } from './on-pending-checkpoint/on-pending-checkpoint'
 import { register as onTodoTool } from './on-todo-tool/on-todo-tool'
 import { register as onAgentEditing } from './on-agent-editing/on-agent-editing'
+import { register as onApprovalGate } from './on-approval-gate/on-approval-gate'
+import { register as onProcessTools } from './on-process-tools/on-process-tools'
 
 export const register: Register = (on, options) => {
   onAgentStopping(on, options)
@@ -11,4 +13,6 @@ export const register: Register = (on, options) => {
   onPendingCheckpoint(on, options)
   onAgentEditing(on, options)
   onTodoTool(on, options)
+  onApprovalGate(on, options)
+  onProcessTools(on, options)
 }

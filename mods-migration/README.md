@@ -36,7 +36,7 @@ Sibling repos (read-only for this research; same parent folder `migrate-to-mod/`
 
 ## Runtime state (outside the repo)
 All under `~/.claude/agentic-processes/`:
-- `active/<process>/` (moves to a status folder when status changes, `process_manager.py` `STATUS_DIRS`) holding `process.json`, `log.json`, `memory/<topic>.json`, `pending-interaction.json`, `qa-session.json`, `.session` (session id), `.approve-token`.
+- `active/<process>/` (moves to a status folder when status changes, `process_manager.py` `STATUS_DIRS`) holding `process.json`, `log.json`, `memory/<topic>.json`, `qa-session.json`, `.session` (session id). The approval gate is a record in the mod's store (H07, P02, P03).
 - `flags/pending-log-<session>`: "a log entry is owed" flag.
 - `improvement-findings/<templateId>/<processId>.json`.
 - `templates/`, `config/`, `installed-templates.json`.

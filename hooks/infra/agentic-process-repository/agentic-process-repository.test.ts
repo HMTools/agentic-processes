@@ -1,5 +1,5 @@
 import { test, expect } from 'claude-code/testing'
-import { findAgenticProcessDir, readAgenticProcess, hasApprovalCheckpoint } from './agentic-process-repository'
+import { findAgenticProcessDir, readAgenticProcess } from './agentic-process-repository'
 import type { FileSystem } from '../ports/ports'
 
 const ACTIVE = '/h/.claude/agentic-processes/active'
@@ -28,6 +28,11 @@ test('no folder is bound to the session: nothing', async () => {
 test('a folder with no .session file is skipped', async () => {
   expect(await findAgenticProcessDir(disk({ [`${ACTIVE}/a/process.json`]: '{}' }), 'S1')).toBeUndefined()
 })
+test('a home with backslashes, as on Windows, still finds the folder', async () => {
+  const files = { ...disk({ [`${ACTIVE}/a/.session`]: 'S1' }), home: async () => 'C:\\Users\\me' }
+  const found = disk({ 'C:/Users/me/.claude/agentic-processes/active/a/.session': 'S1' })
+  expect(await findAgenticProcessDir({ ...found, home: files.home }, 'S1')).toBe('C:/Users/me/.claude/agentic-processes/active/a')
+})
 test('no active folder at all: nothing', async () => {
   expect(await findAgenticProcessDir(disk({}), 'S1')).toBeUndefined()
 })
@@ -37,9 +42,4 @@ test('reads process.json', async () => {
 })
 test('a process.json that is not valid JSON: nothing', async () => {
   expect(await readAgenticProcess(disk({ '/p/process.json': '{oops' }), '/p')).toBeUndefined()
-})
-test('the checkpoint exists only when pending-interaction.json exists', async () => {
-  const files = disk({ '/p/pending-interaction.json': '{}' })
-  expect(await hasApprovalCheckpoint(files, '/p')).toBe(true)
-  expect(await hasApprovalCheckpoint(files, '/q')).toBe(false)
 })

@@ -28,7 +28,7 @@
       "Read Process Log: Load log.json; parse all user interactions and change requests; identify patterns and recurring issues; note high iteration counts",
       "Analyze for Improvements: Group similar user corrections; identify corrections that could be automated; find missing validations; detect documentation gaps",
       "Prioritize Improvements: Rank by frequency, impact, and ease; focus on high frequency + high impact + easy to implement; limit to top 3-5",
-      "For Each Finding: Call write-finding with category, title, what/why/impact, and scope (target files) — do NOT propose in chat and do NOT modify any file in this step",
+      "For Each Finding: Call the tool write_finding with category, title, what/why/impact, and scope (target files) — do NOT propose in chat and do NOT modify any file in this step",
       "Summarize: List findings written to the global store; this step never blocks and never needs approval"
     ],
     "files": {
@@ -40,11 +40,11 @@
     },
     "tools": [
       "read_file - Read log.json",
-      "process-state-update skill (write-finding) - Save findings to the global store"
+      "process-state-update skill (the tool write_finding) - Save findings to the global store"
     ],
     "bestPractices": [
       "Save, don't implement: this step's only output is finding records — implementation happens later, in the apply-improvements skill",
-      "One finding per write-finding call: keep records atomic and independently actionable",
+      "One finding per write_finding call: keep records atomic and independently actionable",
       "Still do the deep dive: findings should name real files and real evidence, even though nothing gets changed here",
       "DEEP DIVE REQUIRED: Never save a shallow finding - always trace actual execution and identify ALL affected files across the framework",
       "VERIFY BEFORE PROPOSING: Confirm the target files were actually used in this process before naming them in a finding's scope",
@@ -117,7 +117,7 @@
       "name": "Save Each Finding",
       "description": "For each prioritized improvement, save it as a finding in the global store — no proposal, no implementation, no approval",
       "actions": [
-        "For each prioritized finding, call write-finding via the process-state-update skill with --category, --title, --what, --why, --impact, and --scope (JSON array of target file paths)",
+        "For each prioritized finding, call the tool write_finding (see the process-state-update skill) with category, title, what, why, impact, and scope (a list of target file paths)",
         "Do not propose the finding in chat. Do not wait for a response. Do not modify any file.",
         "Findings are automatically grouped by this process's template (via templateId) — no extra step needed"
       ]
@@ -139,13 +139,13 @@
       "actions": [
         "Verify: Was log.json updated for any user interactions?",
         "Verify: Were mandatory actions confirmed with output?",
-        "Log problems: If any problems, errors, workarounds, or unexpected situations were encountered during this step, log them via add-log-entry --problems '[\"description of problem 1\", ...]'. This feeds the continuous-improvement step's analysis.",
+        "Log problems: If any problems, errors, workarounds, or unexpected situations were encountered during this step, log them with the tool add_log_entry, in its problems list. This feeds the continuous-improvement step's analysis.",
         "Output: '✓ Step completed in compliance with operating principles'"
       ]
     }
   ],
   "flow": {
-    "description": "Read log → Analyze for improvements (with deep dive: trace execution, find ALL affected files) → Prioritize → Save each as a finding (write-finding, no proposal/implementation) → Summarize → step completes immediately, no approval needed"
+    "description": "Read log → Analyze for improvements (with deep dive: trace execution, find ALL affected files) → Prioritize → Save each as a finding (write_finding, no proposal/implementation) → Summarize → step completes immediately, no approval needed"
   },
   "memoryFileUsage": {
     "readFrom": [],
@@ -203,7 +203,7 @@
   },
   "successCriteria": [
     "Process log has been fully analyzed",
-    "All identified improvements have been saved as findings via write-finding (or zero findings, if none were found)",
+    "All identified improvements have been saved as findings via write_finding (or zero findings, if none were found)",
     "Memory file documents all findings saved",
     "Step completes without proposing anything in chat or waiting on the user"
   ],

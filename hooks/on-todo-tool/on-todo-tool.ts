@@ -9,7 +9,7 @@ const TODO_TOOLS = ['TaskCreate', 'TaskUpdate', 'TaskGet', 'TaskList', 'TodoWrit
 const TEXT = 'External todo tools are blocked during process execution — process steps are your task list'
 
 const filesOf = ($: any): FileSystem => ({
-  home: () => $.env.get('HOME'),
+  home: async () => (await $.env.get('HOME')) ?? (await $.env.get('USERPROFILE')), // Windows has no HOME in every shell
   list: path => $.fs.list(path),
   exists: path => $.fs.exists(path),
   read: path => $.fs.read(path),

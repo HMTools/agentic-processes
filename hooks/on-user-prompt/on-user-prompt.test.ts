@@ -9,6 +9,7 @@ const process = JSON.stringify({ status: 'running', steps: [], currentState: { a
 function world(on: On, boundTo: string) {
   const all: Record<string, string> = { [`${DIR}/.session`]: boundTo, [`${DIR}/process.json`]: process }
   mock.env(on, { HOME: '/h' })
+  mock.store(on)
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async (_$, e) => ({ value: e.path in all }))

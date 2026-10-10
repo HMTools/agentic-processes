@@ -129,17 +129,6 @@
       },
       "additionalProperties": false
     },
-    "InteractionOption": {
-      "type": "object",
-      "required": ["id", "label"],
-      "properties": {
-        "id": { "type": "string" },
-        "label": { "type": "string" },
-        "description": { "type": "string" },
-        "isDefault": { "type": "boolean" }
-      },
-      "additionalProperties": false
-    },
     "StepTimestamp": {
       "type": "object",
       "required": ["startedAt"],
@@ -364,24 +353,11 @@
         }
       },
       "additionalProperties": false
-    },
-    "PendingInteractionFile": {
-      "type": "object",
-      "required": ["type", "options"],
-      "properties": {
-        "type": { "const": "pending-interaction" },
-        "options": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/InteractionOption" }
-        }
-      },
-      "additionalProperties": false
     }
   },
   "oneOf": [
     { "$ref": "#/$defs/ProcessInstance" },
     { "$ref": "#/$defs/MemoryFile" },
-    { "$ref": "#/$defs/LogFile" },
-    { "$ref": "#/$defs/PendingInteractionFile" }
+    { "$ref": "#/$defs/LogFile" }
   ]
 }

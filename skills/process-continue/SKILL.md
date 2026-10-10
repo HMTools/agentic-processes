@@ -71,7 +71,7 @@ Update process state to reflect resumption using the `process-state-update` skil
 For each step, determine its type and execute accordingly:
 
 **Regular step** (has non-empty `stepDefinition`):
-- **Mark the step in progress first**: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-step-status --process-dir "<process-dir>" --step-id "<step-id>" --status in_progress`. Do this BEFORE invoking delegation — it's what tells the Stop hook a subagent is already working the step, instead of it re-blocking every turn.
+- **Mark the step in progress first**: call the tool `update_step_status` with `processDir`, `stepId` and `status: in_progress`. Do this BEFORE invoking delegation — it's what tells the Stop hook a subagent is already working the step, instead of it re-blocking every turn.
 - **Invoke the `step-executor-delegation` skill** with the process directory and step ID to execute the step. The skill handles all delegation — do NOT construct the step-executor prompt directly.
 - Wait for skill/subagent completion
 - Verify step completed successfully
@@ -82,13 +82,11 @@ For each step, determine its type and execute accordingly:
 
 **Handle approval checkpoints** (applies to both regular and child steps): If step has `approvalRequired: true`, the following sequence is mandatory:
   1. Present deliverables to user
-  2. Create pending checkpoint via `write-pending`
-  3. Wait for user response (approve/reject/modify)
-  4. Log the user's response via `log-interaction`
-  5. Delete the pending checkpoint via `write-pending --delete`
-  6. Call `update-step-status --status completed` (will succeed only if user has approved via `/process-approve` or UI)
+  2. Call the tool `request_approval`. It shows the user a dialog and waits for the click. The answer is the result.
+  3. Log the user's answer with the tool `log_interaction`
+  4. If the user approved, call the tool `update_step_status` with status completed. If the user asked for changes, change the step, present it again, and call `request_approval` again.
 
-Step approval is user-only. The agent does not approve steps -- the user approves via `/process-approve` (CLI) or the UI app. If `update-step-status --status completed` fails because the step is not yet approved, tell the user the exact command to run, with the real process directory and step ID filled in -- e.g. `/agentic-processes:process-approve <process-dir> <step-id>` -- not just the bare skill name. Bare `/process-approve` with no arguments relies on auto-detection that can fail to hand the forked skill any task at all; always give explicit arguments.
+Step approval is user-only. Only the user's click in the dialog sets `approved: true`. The agent does not approve in chat and does not edit `process.json`. While the dialog waits, the agent can only research (read, search, MCP tools, subagents). If the user closes the dialog, it opens again with their next prompt.
 
 **Handle user corrections**: Log interaction via `process-state-update` skill, then re-invoke the `step-executor-delegation` skill with the corrections as the third argument: `step-executor-delegation "<process-dir>" "<step-id>" "<user corrections>"`. Re-present updated deliverables.
 
@@ -112,37 +110,22 @@ When a step has `subProcessTrigger` in `process.json` and an empty `stepDefiniti
 1. Generate child directory: `~/.claude/agentic-processes/active/{child-name}-{YYYYMMDD}-{HHmmss}/`
 2. Read parent `process.json` to get parent ID and name
 3. Determine the `return-to-step`: the UUID of the **next** step after the current one in the parent process
-4. Create child process:
-   ```
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-process \
-     --template-path <resolved template path> \
-     --name "<step name>" \
-     --params '<resolved parameters JSON>' \
-     --process-dir <child directory> \
-     --project-path <same as parent> \
-     --parent-process-path <parent process directory> \
-     --parent-id <parent process ID> \
-     --parent-name <parent process name> \
-     --return-to-step <next parent step UUID>
-   ```
+4. Create the child process with the tool `create_process`: `templatePath` (the resolved template path), `name` (the step name), `params` (the resolved parameters), `processDir` (the child directory), `projectPath` (same as parent), `parentProcessPath`, `parentId`, `parentName`, and `returnToStep` (the next parent step UUID)
 
 #### C. Register Child in Parent
 
-```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py register-child-process \
-  --process-dir <parent process directory> \
-  --child-id <child process ID from child process.json> \
-  --child-name <child process name> \
-  --child-status running \
-  --spawned-at-step <parent step UUID that has subProcessTrigger> \
-  --sync-point <parent step UUID (same step for syncPoint: "immediate")> \
-  --child-process-path <child process directory>
-```
+Call the tool `register_child_process`:
+- `processDir`: the parent process directory
+- `childId`: the child process ID from the child's `process.json`
+- `childName`: the child process name
+- `childStatus`: `running`
+- `spawnedAtStep`: the parent step UUID that has `subProcessTrigger`
+- `syncPoint`: the parent step UUID (the same step for `syncPoint: "immediate"`)
+- `childProcessPath`: the child process directory
 
-#### D. Bind Session to Child
+#### D. Session of the Child
 
-1. Write an empty `.session` file in the child process directory
-2. Verify the hook fills it with the session ID
+`create_process` binds the child to this session as well. There is nothing to do.
 
 #### E. Drive Child Process Steps
 
@@ -155,14 +138,7 @@ Read the child's `process.json`. For each child step in order:
 
 #### F. Complete Child and Parent Step
 
-1. After all child steps are done, complete the child process:
-   ```
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-process-status \
-     --process-dir <child directory> \
-     --status completed \
-     --summary "<brief summary of what the child process accomplished>"
-   ```
-   This automatically updates the parent's `subProcessState.childProcesses` status.
+1. After all child steps are done, complete the child process with the tool `update_process_status`: `processDir` the child directory, `status: completed`, and `summary` a brief summary of what the child process accomplished. The child folder moves to `completed/`: use `relocated_to` from the answer. This also updates the parent's `subProcessState.childProcesses` status.
 2. Mark the parent orchestrator step as completed
 3. Continue to the next parent step
 

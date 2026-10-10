@@ -9,3 +9,27 @@ export type FileSystem = {
 }
 
 export type ListAgents = () => Promise<{ type: string; status: string }[]>
+
+export type FileWriter = (path: string, text: string) => Promise<void>
+
+// One open approval gate for each session. The mod keeps it in its store, so a restart does not lose it.
+export type Gate = { dir: string; stepId: string }
+export type GateStore = {
+  get(sessionId: string): Promise<Gate | undefined>
+  set(sessionId: string, gate: Gate): Promise<void>
+  clear(sessionId: string): Promise<void>
+}
+
+export type Ask = (question: string, options: readonly string[]) => Promise<string>
+
+
+// What the process tools need from the mods API. The mod builds it from `$`.
+export type ManagerPorts = {
+  files: FileSystem
+  write: FileWriter
+  move(from: string, to: string): Promise<void> // moves a folder; rejects with the reason when it fails
+  now(): string
+  uuid(): string
+  pluginRoot: string
+  cwd(): Promise<string>
+}

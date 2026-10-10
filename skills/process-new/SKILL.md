@@ -19,7 +19,7 @@ Create a new process from a template with parameter substitution and step resolu
 | Requirement | Description |
 |-------------|-------------|
 | Must use template | Never skip templates or work directly |
-| Must create instance | All file creation handled by `process_manager.py` |
+| Must create instance | All file creation handled by the tool `create_process` |
 
 ---
 
@@ -68,46 +68,38 @@ When `/process-new` is invoked:
 ### 4. Verify Step Definitions
 
 - Each step's `stepRef` is a UUID matching the `id` field of a step definition JSON file in a subdirectory of the template directory
-- At process creation time, `process_manager.py` resolves `stepRef` by scanning template subdirectories for step definition files with a matching `id` field and embedding the step definition into the process instance
+- At process creation time, the tool `create_process` resolves `stepRef` by scanning template subdirectories for step definition files with a matching `id` field and embedding the step definition into the process instance
 - The `stepRefName` companion field provides human-readable display text (e.g., `"understand-context"`) -- it is never used for resolution
 - Steps with `stepRef: null` (e.g., sub-process spawner steps) are orchestrator steps with empty stepDefinition
 - Templates do NOT embed `stepDefinition` inline -- step definitions live in dedicated step subfolders
 
-> **Framework steps**: Framework steps are auto-injected by `process_manager.py` at process creation time. They are identified by `"type": "framework-step"` in their JSON definition and use plain UUID `stepRef` values (no prefix). Their full definitions are embedded in `process.json` as `stepDefinition`. Template authors do not include these steps -- they are appended automatically.
+> **Framework steps**: Framework steps are auto-injected by `create_process` at process creation time. They are identified by `"type": "framework-step"` in their JSON definition and use plain UUID `stepRef` values (no prefix). Their full definitions are embedded in `process.json` as `stepDefinition`. Template authors do not include these steps -- they are appended automatically.
 
 ### 5. Create Process Instance (MANDATORY)
 
-**Session Binding**: Before creating process files, bind the session:
-1. Write an empty `.session` file in the process directory: `Write(.session, "")`
-2. The `bind-session-to-process` hook fills it with the session ID
-3. Verify `.session` contains a non-empty session ID
+**Create Process Files**: Call the tool `create_process` (find it by tool search):
+- `templatePath`: the template.json path
+- `name`: the process name
+- `params`: an object with the parameters
+- `processDir`: the process directory
+- `projectPath`: the absolute project path
 
-**Create Process Files**: Use the `process_manager.py` script:
-```
-Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-process \
-  --template-path <template.json path> \
-  --name "<process name>" \
-  --params '<JSON parameters>' \
-  --process-dir <process directory> \
-  --project-path <absolute project path>)
-```
+The tool writes `process.json`, `memory/_cross-references.json`, and `log.json`, and binds the process to this session. Read the answer for success or error.
 
-The script writes `process.json`, `memory/_cross-references.json`, and `log.json` directly. Check stdout for success/error.
-
-> **Auto-injected framework steps**: The script automatically appends **Continuous Improvement** and **End Process Validation** steps after the template's steps. These are defined in `framework-steps/` and use plain UUID `stepRef` values. Framework steps are distinguished by `"type": "framework-step"` in their definition. Template authors should not include them manually.
+> **Auto-injected framework steps**: The tool automatically appends **Continuous Improvement** and **End Process Validation** steps after the template's steps. These are defined in `framework-steps/` and use plain UUID `stepRef` values. Framework steps are distinguished by `"type": "framework-step"` in their definition. Template authors should not include them manually.
 
 ### 6. Start Process (Auto-Execute Step 0)
 
 - Display summary
 - For each step (starting from step 0), check if it is a **sub-process orchestrator step** (see section below) or a regular step, and handle accordingly
-- **CRITICAL**: `approvalRequired: true` means **post-execution approval of deliverables**. NEVER write `pending-interaction.json` or ask for user permission before a step runs.
+- **CRITICAL**: `approvalRequired: true` means **post-execution approval of deliverables**. NEVER call `request_approval` or ask for user permission before a step runs.
 
 ### 7. Step Execution Loop
 
 For each step in the process, determine its type and execute accordingly:
 
 **Regular step** (has non-empty `stepDefinition`):
-- Mark the step in progress first: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-step-status --process-dir "<process-dir>" --step-id "<step-id>" --status in_progress`. Do this BEFORE invoking delegation — it's what tells the Stop hook a subagent is already working the step, instead of it re-blocking every turn.
+- Mark the step in progress first: call the tool `update_step_status` with `processDir`, `stepId` and `status: in_progress`. Do this BEFORE invoking delegation — it's what tells the Stop hook a subagent is already working the step, instead of it re-blocking every turn.
 - Invoke the `step-executor-delegation` skill with the process directory and step ID
 - Handle `approvalRequired` checkpoints (see Handling User Corrections below)
 - After completion, advance to the next step
@@ -132,57 +124,35 @@ When a step has `subProcessTrigger` in `process.json` and an empty `stepDefiniti
 1. Generate child directory: `~/.claude/agentic-processes/active/{child-name}-{YYYYMMDD}-{HHmmss}/`
 2. Read parent `process.json` to get parent ID and name
 3. Determine the `return-to-step`: the UUID of the **next** step after the current one in the parent process
-4. Create child process:
-   ```
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py create-process \
-     --template-path <resolved template path> \
-     --name "<step name>" \
-     --params '<resolved parameters JSON>' \
-     --process-dir <child directory> \
-     --project-path <same as parent> \
-     --parent-process-path <parent process directory> \
-     --parent-id <parent process ID> \
-     --parent-name <parent process name> \
-     --return-to-step <next parent step UUID>
-   ```
+4. Create the child process with the tool `create_process`: `templatePath` (the resolved template path), `name` (the step name), `params` (the resolved parameters), `processDir` (the child directory), `projectPath` (same as parent), `parentProcessPath`, `parentId`, `parentName`, and `returnToStep` (the next parent step UUID)
 
 #### C. Register Child in Parent
 
-```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py register-child-process \
-  --process-dir <parent process directory> \
-  --child-id <child process ID from child process.json> \
-  --child-name <child process name> \
-  --child-status running \
-  --spawned-at-step <parent step UUID that has subProcessTrigger> \
-  --sync-point <parent step UUID (same step for syncPoint: "immediate")> \
-  --child-process-path <child process directory>
-```
+Call the tool `register_child_process`:
+- `processDir`: the parent process directory
+- `childId`: the child process ID from the child's `process.json`
+- `childName`: the child process name
+- `childStatus`: `running`
+- `spawnedAtStep`: the parent step UUID that has `subProcessTrigger`
+- `syncPoint`: the parent step UUID (the same step for `syncPoint: "immediate"`)
+- `childProcessPath`: the child process directory
 
-#### D. Bind Session to Child
+#### D. Session of the Child
 
-1. Write an empty `.session` file in the child process directory
-2. Verify the hook fills it with the session ID
+`create_process` binds the child to this session as well. There is nothing to do.
 
 #### E. Drive Child Process Steps
 
 Read the child's `process.json`. For each child step in order:
 
 1. Check if the child step itself is a sub-process orchestrator step (recursive) or a regular step
-2. **Regular child step**: Mark the step in progress first (`update-step-status --process-dir "<child-process-dir>" --step-id "<child-step-id>" --status in_progress`), then call `step-executor-delegation "<child-process-dir>" "<child-step-id>"`
+2. **Regular child step**: Mark the step in progress first (the tool `update_step_status` with `processDir` the child directory, `stepId` the child step, `status: in_progress`), then call `step-executor-delegation "<child-process-dir>" "<child-step-id>"`
 3. Handle `approvalRequired` on child steps the same way as parent steps (present deliverables, wait for approval, handle corrections)
 4. After each child step completes, advance to the next child step
 
 #### F. Complete Child and Parent Step
 
-1. After all child steps are done, complete the child process:
-   ```
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-process-status \
-     --process-dir <child directory> \
-     --status completed \
-     --summary "<brief summary of what the child process accomplished>"
-   ```
-   This automatically updates the parent's `subProcessState.childProcesses` status.
+1. After all child steps are done, complete the child process with the tool `update_process_status`: `processDir` the child directory, `status: completed`, and `summary` a brief summary of what the child process accomplished. The child folder moves to `completed/`: use `relocated_to` from the answer. This also updates the parent's `subProcessState.childProcesses` status.
 2. Mark the parent orchestrator step as completed
 3. Continue to the next parent step
 
@@ -192,24 +162,23 @@ Read the child's `process.json`. For each child step in order:
 
 A user saying "yes" to a mid-step question (assumption validation, clarification, follow-up) is NOT approval of the step's deliverable.
 
-Step approval is user-only. The agent does not approve steps -- the user approves via `/process-approve` (CLI) or the UI app. The agent's role at approval checkpoints is:
+The agent's role at approval checkpoints is:
 1. The step's deliverable file has been fully created/updated (e.g., `step0-context.md`, `implementation-plan.md`)
-2. Present the deliverable to the user with explicit approval options (approve/reject/modify) via `write-pending`
-3. Wait for the user's response
-4. Log the user's response via `log-interaction`
-5. Delete the pending checkpoint via `write-pending --delete`
-6. Call `update-step-status --status completed` (will succeed only if the user has approved via `/process-approve` or the UI)
+2. Present deliverables to user
+3. Call the tool `request_approval`. It shows the user a dialog and waits for the click. The answer is the result.
+4. Log the user's answer with the tool `log_interaction`
+5. If the user approved, call the tool `update_step_status` with status completed. If the user asked for changes, change the step, present it again, and call `request_approval` again.
 
-If `update-step-status --status completed` fails because the step is not yet approved, tell the user the exact command to run, with the real process directory and step ID filled in -- e.g. `/agentic-processes:process-approve <process-dir> <step-id>` -- not just the bare skill name. Bare `/process-approve` with no arguments relies on auto-detection that can fail to hand the forked skill any task at all; always give explicit arguments.
+Step approval is user-only. Only the user's click in the dialog sets `approved: true`. The agent does not approve in chat and does not edit `process.json`. While the dialog waits, the agent can only research (read, search, MCP tools, subagents). If the user closes the dialog, it opens again with their next prompt.
 
 **Examples of what is NOT approval:**
 - User confirms an assumption → mid-step answer, continue the step
 - User answers a clarifying question → mid-step answer, continue the step
 - User says "yes" to a suggested approach → mid-step answer, continue the step
+- User types "approved" in chat → not approval; call `request_approval`
 
 **Examples of what IS approval:**
-- User says "approved" / "approve all" after reviewing the deliverable file
-- User selects "Approve" from the pending-interaction options
+- User clicks Approve in the approval dialog (the only approval)
 
 ### Handling corrections at approval checkpoints
 

@@ -54,15 +54,54 @@
 No implementation. No plugin edits. (Only items S01–S03 may build a throwaway mod outside this repo.)
 
 ## 7. Research result
-_(empty until the research is done)_
+Planned and built 2026-10-10 as one feature: items H07, P02 and P03 together (plan page: https://claude.ai/artifact/E6mZkfXRWuKywfs63rU9pQ). Not committed.
 
 ### Claude Code version
-### Answers per question (1-8, each with evidence)
+`2.1.296 (Claude Code)`. Type file from the `plugin-authoring` skill for this build.
+
+### Answers per question
+1. Can a mod make approval user-only? Mostly: the agent cannot click, and the only writer of `approved` is the mod. The hand-edit rule is a guess for Bash (see open questions).
+2. `$.ui.ask` replaces the token and the skill: the dialog is the approval. In `claude -p` it rejects, so nothing is approved.
+3. A mod command was not needed: the tool plus the reopening dialog cover a closed dialog.
+4. A forked skill call and `agentId`: moot, the skill is gone. The new hooks pass subagent calls to the same rule.
+5. Bypasses of the old regex: moot, the approve command is gone. The new Bash rule reads the whole command text.
+6. Failure: the hand-edit guard has a `.catch` that refuses. The gate hooks leave a call alone when they fault (as the other hooks); the dialog never approves on a fault.
+7. Coexistence: the settings hook is removed, so no double token use.
+8. Mods off: the guard is gone. The settings-hook fallback was dropped (X01).
+
 ### Final verdict
-### Evidence (doc page + section, type-file names, repo file:line)
+**replace**
+
+### Design
+- The agent calls a tool the mod registers: `mcp__agentic-processes__request_approval` (`$.tool.register` at `session.start`, served by a `tool.call` hook). The call opens `$.ui.ask` with Approve and Request changes and waits. The answer is the tool result.
+- Only the mod writes `approved: true` in `process.json` (`$.fs.write`). The CLI has no approve command any more.
+- The gate is a record in `$.store` (`gate:<sessionId>`). While it is open the agent can research (Read, Glob, Grep, LS, WebFetch, WebSearch, MCP tools, `Agent`/`Task`) and log (`log-interaction`). Write, Edit, Bash and the rest are refused. A subagent's own calls follow the same rule.
+- A prompt while a gate is open goes through and opens the dialog again. The answer reaches the agent as a prompt of its own.
+- A `.catch` guard refuses `Write`, `Edit`, `MultiEdit` on a process file and a Bash command that names `process.json` and looks like a write. A script file that edits it still passes (the mod sees only its name).
+- No Reject option. The UI app is not kept in step (it moves into the mod).
+
+### Implemented
+- New `hooks/on-approval-gate/on-approval-gate.ts` (tool, hand-edit guard) and `hooks/infra/approval-gate/approval-gate.ts` (question, answer, `reopenPanel`, `isHandEdit`). Registered in `hooks/register.ts`; `hooks/on-user-prompt/on-user-prompt.ts` calls `reopenPanel` (a plugin has one `prompt.submit` hook).
+- `findPendingBlock` now reads the gate record and lets research through; the `.approve-token` Write exception is gone. `on-agent-stopping.ts` asks the agent to call `request_approval` and to complete an approved step.
+- Removed: `scripts/block-approve-step.sh`, `scripts/hook_extract_process_dir.py`, `skills/process-approve/`, the `PreToolUse` entry in `hooks/hooks.json`, `cmd_approve_step`, `cmd_write_pending`, `_check_pending_approval` and the pending models (`scripts/process_manager.py`, `scripts/models.py`, `types/`), `approve-step` and `write-pending` in the log-gated list.
+- Texts rewritten: `skills/process-continue`, `process-new`, `process-state-update`, `agents/step-executor.md`, `docs/process-management.md`.
+- Tests: `claude plugin test .` 125 pass; `claude plugin validate .` passes (one `logo` warning). `scripts/test_view_resolution.py` passes without its write-pending test.
+
+### Evidence
+- Repo before: `scripts/block-approve-step.sh`, `skills/process-approve/SKILL.md:26`, `hooks/infra/pending-checkpoint/pending-checkpoint.ts:19-20` (the Write exception).
+- Type file: `tool.register`, `ui.ask`, `tool.call` (`deny`, `.catch`), `store`, `fs.write`.
+
 ### Open questions
-### Risks
+- Not run in a live session (S01): `$.ui.ask` as the approval dialog (time the user takes, terminal and Desktop), `$.tool.register` with `isDeferred: false`, a tool call held for the answer, `$.store` across a restart, `$.fs.write` of `process.json`, `$.prompt.submit` after the hook has returned, a refused prompt never needed.
+- A test host has no screen, so `$.ui.ask` is dismissed there. The answers are tested through `askGate`, not through the tool.
+- Order of the new `tool.call` hooks against `on-pending-checkpoint`, `on-agent-editing` and `on-todo-tool`: not tested.
+- If mods are off, nothing guards approval (X01).
+- Step views (option `data` for steps with a `view`) were part of `write-pending`; they go with the UI move and are not rebuilt.
+- A hand edit through a script file passes. Closed fully only when the mod is the only writer of the process file (P01).
+- `.approve-token` and `pending-interaction.json` may still sit in old process folders; nothing reads them.
+
 ### What a later plan must decide
+- Whether the Bash write rule is enough, or the mod becomes the only writer (P01).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "H07"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

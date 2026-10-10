@@ -10,8 +10,8 @@ function world(on: On, { status = 'running', bound = 'S1', pending = false } = {
     [`${DIR}/.session`]: bound,
     [`${DIR}/process.json`]: JSON.stringify({ status, steps: [{ id: 's1', status: 'running' }] }),
   }
-  if (pending) all[`${DIR}/pending-interaction.json`] = '{}'
   mock.env(on, { HOME: '/h' })
+  mock.store(on, pending ? { 'gate:S1': { dir: DIR, stepId: 's1' } } : {})
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async (_$, e) => ({ value: e.path in all }))

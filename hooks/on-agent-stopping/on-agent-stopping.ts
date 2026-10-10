@@ -1,11 +1,12 @@
 import type { Register } from 'claude-code'
-import type { Step, StepView } from '../infra/agentic-process-types/agentic-process-types'
-import { findAgenticProcessDir, readAgenticProcess, hasApprovalCheckpoint, hasAgenticProcessInstance, isProcessRunning } from '../infra/agentic-process-repository/agentic-process-repository'
+import type { Step } from '../infra/agentic-process-types/agentic-process-types'
+import { findAgenticProcessDir, readAgenticProcess, hasAgenticProcessInstance, isProcessRunning } from '../infra/agentic-process-repository/agentic-process-repository'
 import { isStepExecutorRunning } from '../infra/step-executors/step-executors'
 import { findLogOwed } from '../infra/log-first/log-first'
 import { createRepromptLimiter } from '../infra/reprompt-limiter/reprompt-limiter'
 import { isMainAgentAnswer } from '../infra/mod-events/mod-events'
-import type { FileSystem, ListAgents } from '../infra/ports/ports'
+import { hasOpenGate } from '../infra/approval-gate/approval-gate'
+import type { FileSystem, Gate, GateStore, ListAgents } from '../infra/ports/ports'
 
 // When the main agent ends a turn while its process still has work, send it a prompt that starts a new turn.
 // Read top to bottom: the mods API, the entry point, the rules, the texts. Shared code is in ../infra.
@@ -25,12 +26,17 @@ type Prompt = { key: string; text: string } // key = step id + state; the re-pro
 // ── The mods API, as the infra functions need it ────────────────────────────
 
 const filesOf = ($: any): FileSystem => ({
-  home: () => $.env.get('HOME'),
+  home: async () => (await $.env.get('HOME')) ?? (await $.env.get('USERPROFILE')), // Windows has no HOME in every shell
   list: path => $.fs.list(path),
   exists: path => $.fs.exists(path),
   read: path => $.fs.read(path),
 })
 const agentsOf = ($: any): ListAgents => () => $.agent.list()
+const gatesOf = ($: any): GateStore => ({
+  get: async sessionId => ((await $.store.get(`gate:${sessionId}`)) as Gate | undefined) ?? undefined,
+  set: (sessionId, gate) => $.store.set(`gate:${sessionId}`, gate),
+  clear: sessionId => $.store.delete(`gate:${sessionId}`),
+})
 
 // Not awaited: the new turn only starts once the current one has ended.
 const startNewTurn = ($: any, text: string) => { void $.prompt.submit({ text }) }
@@ -65,7 +71,7 @@ async function promptToContinue($: any, sessionId: string): Promise<Prompt | und
 
   const agenticProcessDir = await findAgenticProcessDir(files, sessionId)
   if (!hasAgenticProcessInstance(agenticProcessDir)) return
-  if (await hasApprovalCheckpoint(files, agenticProcessDir)) return
+  if (await hasOpenGate(gatesOf($), sessionId)) return
 
   const agenticProcess = await readAgenticProcess(files, agenticProcessDir)
   if (!isProcessRunning(agenticProcess)) return
@@ -73,9 +79,12 @@ async function promptToContinue($: any, sessionId: string): Promise<Prompt | und
   const runningStep = agenticProcess.steps?.find(s => s.status === 'in_progress')
   const pendingStep = agenticProcess.steps?.find(s => s.status === 'pending')
 
-  // An approval step is in progress: its checkpoint must exist before the agent stops,
+  // An approval step is in progress: the agent must ask the user before it stops,
   // and no later step may start while the user has not approved this one.
-  if (runningStep?.approvalRequired) return promptForRunningStep($, runningStep, agenticProcessDir)
+  if (runningStep?.approvalRequired && !runningStep.approved) return promptForRunningStep($, runningStep, agenticProcessDir)
+
+  // The user approved the step: the agent must complete it before anything else.
+  if (runningStep?.approvalRequired) return completeApprovedStepPrompt(runningStep, agenticProcessDir)
 
   // No approval is open and a step has not started: the agent must delegate it, not stop.
   if (pendingStep) return startNextStepPrompt(pendingStep, agenticProcessDir)
@@ -84,7 +93,7 @@ async function promptToContinue($: any, sessionId: string): Promise<Prompt | und
   if (runningStep) return promptForRunningStep($, runningStep, agenticProcessDir)
 }
 
-// Wait for the step's executor. With no executor, an approval step needs its checkpoint and any other step is lost.
+// Wait for the step's executor. With no executor, an approval step needs the user's answer and any other step is lost.
 async function promptForRunningStep($: any, step: Step, agenticProcessDir: string): Promise<Prompt> {
   if (await isStepExecutorRunning(agentsOf($))) return waitForExecutorPrompt(step, agenticProcessDir)
   return step.approvalRequired ? approvalCheckpointPrompt(step, agenticProcessDir) : lostStepPrompt(step, agenticProcessDir)
@@ -115,41 +124,25 @@ function startNextStepPrompt(step: Step, agenticProcessDir: string): Prompt {
     key: `${step.id}:pending`,
     text: `Process has remaining steps — do not stop yet.\n\nNext step to execute: ${describeStep(step)}\nProcess dir: ${agenticProcessDir}\n\n` +
       'Continue by delegating the next step to the step-executor subagent.\n' +
-      'Only stop at approval checkpoints (after creating pending-interaction.json via process_manager.py write-pending) or after all steps are complete.',
+      'Only stop while the user decides on an approval (after calling request_approval) or after all steps are complete.',
   }
 }
 
-type CheckpointOption = { id: string; label: string; isDefault?: boolean; data?: unknown }
-const CHECKPOINT_OPTIONS: CheckpointOption[] = [
-  { id: 'approve', label: 'Approve', isDefault: true },
-  { id: 'reject', label: 'Reject' },
-  { id: 'modify', label: 'Request Changes' },
-]
-
 function approvalCheckpointPrompt(step: Step, agenticProcessDir: string): Prompt {
-  const text = step.view ? approvalTextWithView(step, step.view, agenticProcessDir) : plainApprovalText(step, agenticProcessDir)
-  return { key: `${step.id}:approval`, text }
+  return {
+    key: `${step.id}:approval`,
+    text: `Approval required — step "${step.name}" has approvalRequired: true and the user has not approved it.\n` +
+      `Process dir: ${agenticProcessDir}\n\n` +
+      'Before stopping, you must:\n  1. Present your deliverables to the user\n' +
+      '  2. Call the tool request_approval. It shows the user a dialog and waits for the click. The answer is the result.\n\n' +
+      'Only the user can approve. Do not approve in chat and do not edit process files.',
+  }
 }
 
-function plainApprovalText(step: Step, agenticProcessDir: string): string {
-  return `Approval checkpoint required — step "${step.name}" has approvalRequired: true but no pending-interaction.json exists.\n\n` +
-    'Before stopping, you must:\n  1. Present your deliverables to the user\n' +
-    `  2. ${howToCreateCheckpoint(agenticProcessDir, CHECKPOINT_OPTIONS)}`
-}
-
-// The view says which options must carry a `data` object, and what keys it needs.
-function approvalTextWithView(step: Step, view: StepView, agenticProcessDir: string): string {
-  const operationIds = view.operationIds ?? []
-  const dataFor = (id: string) => view.mockData?.[id] ?? {}
-  const schema = operationIds.map(id => `  - "${id}": data must include: ${JSON.stringify(Object.keys(dataFor(id)))}`).join('\n')
-  const options = CHECKPOINT_OPTIONS.map(o => (operationIds.includes(o.id) ? { ...o, data: dataFor(o.id) } : o))
-  return `Approval checkpoint required — step "${step.name}" resolves to view "${view.name}". ` +
-    'Its pending-interaction.json options must each include a matching `data` object.\n\n' +
-    `Required schema (derived from this view's mockData):\n${schema}\n\n${howToCreateCheckpoint(agenticProcessDir, options)}`
-}
-
-function howToCreateCheckpoint(agenticProcessDir: string, options: CheckpointOption[]): string {
-  return 'Create the checkpoint with the process-state-update skill: `write-pending`\n' +
-    `  --process-dir "${agenticProcessDir}"\n  --options '${JSON.stringify(options)}'\n\n` +
-    'After creating the checkpoint, stopping is allowed.'
+function completeApprovedStepPrompt(step: Step, agenticProcessDir: string): Prompt {
+  return {
+    key: `${step.id}:approved`,
+    text: `${describeStep(step)} is approved but not completed — do not stop yet.\nProcess dir: ${agenticProcessDir}\n\n` +
+      'Complete it with the tool update_step_status (status completed).',
+  }
 }

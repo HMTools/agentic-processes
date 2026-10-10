@@ -111,7 +111,6 @@ agentic-processes/                    # Plugin root
 ├── hooks/
 │   └── hooks.json                    # Unified hook configuration
 ├── scripts/                          # Hook and utility scripts
-│   ├── process_manager.py            # Process state management
 │   ├── template_manager.py           # Marketplace template operations
 │   ├── models.py                     # Shared data models
 │   └── ...hook scripts...
@@ -169,7 +168,7 @@ Steps are defined in subdirectories of each process template. Each step definiti
 
 ### Framework Steps
 
-**Framework steps** are cross-cutting workflow steps that are automatically injected into every process by `process_manager.py` at creation time. Template authors do not need to include them. Currently, two framework steps are auto-appended as the final steps of every process:
+**Framework steps** are cross-cutting workflow steps that are automatically injected into every process by the tool `create_process` at creation time. Template authors do not need to include them. Currently, two framework steps are auto-appended as the final steps of every process:
 
 - **Continuous Improvement** — Captures learnings, improvements, and patterns discovered during process execution.
 - **End Process Validation** — Validates that all process deliverables are complete and correct before closing.

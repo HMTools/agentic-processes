@@ -70,14 +70,48 @@ Known weaknesses seen in step 3:
 No implementation. No plugin edits. No building a mod. Do not run the CLI against real process state. (Only items S01-S03 may build a throwaway mod outside this repo.)
 
 ## 7. Research result
-_(empty until the research is done; fill these headings)_
-- Claude Code version (`claude --version`):
-- Answers to questions 1-7:
-- Final verdict:
-- Evidence (doc page + section, type-file name, repo `file:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+Planned and built 2026-10-10 (plan page: https://claude.ai/artifact/RbosiCyrHxicovi2etmevW). The first guess was `improve` (the UI app needed the CLI). The owner then said the UI app is obsolete, so the verdict is `replace`. Not committed.
+
+### Claude Code version
+`2.1.296 (Claude Code)`. Type file from the `plugin-authoring` skill for this build.
+
+### Answers to questions 1-7
+1. A mod can register a tool (`$.tool.register`, named `mcp__<plugin>__<name>`), served by a `tool.call` hook that returns `{ result }`. The tools do not run Python: the rules were ported, so the 30 s limit of `$.process.run` does not apply (it applies to the folder move only).
+2. Not needed: the tools use `$.fs`, `$.plugin.root` and `$.session.cwd()`. `$.process.run` is used for the folder move only.
+3. Moot: nothing in the plugin runs the script any more. A Bash command that writes a process file is refused by a text rule (see H07).
+4. Yes. A `tool.call` hook refuses Write, Edit and MultiEdit on `process.json`, `log.json`, `memory/*.json` and `improvement-findings/**` (path match, with `/` or `\`), and a Bash command that names one and looks like a write. A script file that edits one still passes.
+5. All 15 became tools (one for each command), behind tool search (`isDeferred: true`). They are listed only when the user runs `/process-new` or `/process-continue`, or the session already has a process, so a session with no process pays nothing. Cost of many tools: only names and short descriptions until the agent asks for a schema.
+6. Stale: the UI app is obsolete, so its Q&A calls are not kept. The Q&A commands were already removed from the CLI.
+7. If mods are off, the agent cannot change process state (no fallback, the script is gone). Item X01 decides whether a fallback is needed.
+
+### Final verdict
+**replace**
+
+### Implemented
+- New `hooks/on-process-tools/on-process-tools.ts`: lists the tools (`session.start` for a bound session, `command.run` for the two skills, and `on-user-prompt` for a session bound later), serves them, and binds a new process to the session (the shell hook only fired after an agent Write).
+- New `hooks/infra/process-manager/`: `create-process.ts`, `step-status.ts`, `memory.ts`, `log.ts`, `process-status.ts` (parent notice, folder move with `mkdir` and `mv`), `findings.ts`, `tools.ts` (names, input schemas, a check of required fields and enums), `process-files.ts` (a lock for each process folder, JSON read and write). The files are plain JSON, so a field the tools do not know survives a write (the Python classes dropped them).
+- Rules kept: approval check on completion, memory topic access, sub-process summary, parent notice, folder move, steps count in the log. Same answer shape `{status, files_written}`.
+- Hooks now match tool names, not command text: `log-owed.ts` (`LOG_TOOL`, `LOG_GATED_TOOLS`), `on-agent-editing.ts`, `pending-checkpoint.ts` (the log tool is an MCP tool, so it passes an open gate). The approval write takes the same lock.
+- Guard widened from `process.json` to every state file (`approval-gate.ts` `isHandEdit`).
+- Removed: `scripts/process_manager.py`, `scripts/test_view_resolution.py`. `scripts/models.py` keeps only the marketplace classes and the JSON helpers, because `template_manager.py` (P09) and `strip_files_changed.py` import them.
+- Texts rewritten: `skills/process-state-update` (the manual, now one page of tools), `process-new`, `process-continue`, `apply-improvements`, `agents/process-spawner.md`, `agents/step-executor.md`, `docs/`, `README.md`, the continuous-improvement framework step.
+- Tests: `claude plugin test .` 190 pass; `claude plugin validate .` passes (one `logo` warning). One test file for each module, run on a fake disk.
+
+### Evidence
+- Type file `claude-code.d.ts`: `tool.register` / `ToolSpec` (`isDeferred`), `tool.call` (`deny`, MCP input on `e`), `fs` (write creates folders; no move, no delete), `process.run`, `session.cwd`, `plugin.root`, `command.run`, global `crypto.randomUUID`.
+- Repo before: `scripts/process_manager.py` (1071 lines), `scripts/models.py`, `hooks/infra/log-owed/log-owed.ts` (text patterns).
+
+### Open questions
+- Not run in a live session (S01): `command.run` for a skill run (if the mod cannot see it, `create_process` is never listed); a tool listed in the middle of a session is callable at the next prompt; `$.fs.exists` on a folder; the folder move on each platform (`mv` through `$.process.run` on macOS and Linux, PowerShell on Windows).
+- Windows is covered by code and tests, but not run on Windows: the folder move uses one PowerShell command (`powershell -NoProfile -Command New-Item ...; Move-Item ...`) where macOS and Linux use `mkdir -p` and `mv`. Windows is detected with `OS=Windows_NT`. Paths with backslashes are turned into `/` at the tool entry, and a missing `HOME` falls back to `USERPROFILE`.
+- A crash in the middle of a write can leave a cut file (the script wrote a temp file and renamed it). The lock covers one mod, not two sessions.
+- The Bash write rule is a guess; a script file that edits a state file passes.
+- Resuming a process in a new session (`/process-continue`) still binds with the shell hook after an agent Write (item H08).
+- Where mods do not run, nothing changes process state (X01).
+
+### What a later plan must decide
+- Whether to keep a fallback for sessions without mods.
+- Whether the mod becomes the only writer even for the `.session` binding (H08).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P01"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

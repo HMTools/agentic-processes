@@ -1,18 +1,6 @@
 {
   "modules": ["./register.ts"],
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/block-approve-step.sh"]
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Write|StrReplace|Edit",

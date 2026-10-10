@@ -1,5 +1,5 @@
 import { test, expect } from 'claude-code/testing'
-import { raiseLogOwed, isLogOwed, clearLogOwed, isLogInteractionCommand, isLogGatedCommand } from './log-owed'
+import { raiseLogOwed, isLogOwed, clearLogOwed, LOG_TOOL, LOG_GATED_TOOLS } from './log-owed'
 import type { FileSystem } from '../ports/ports'
 
 const ACTIVE = '/h/.claude/agentic-processes/active'
@@ -27,16 +27,9 @@ test('one session does not owe for another', async () => {
   await raiseLogOwed(disk('S1'), 'S1')
   expect(isLogOwed('S2')).toBe(false)
 })
-test('finds the log command', () => {
-  expect(isLogInteractionCommand('python3 /x/scripts/process_manager.py log-interaction --process-dir /p')).toBe(true)
-  expect(isLogInteractionCommand('cd /p && python3 /x/process_manager.py log-interaction --step-id s1')).toBe(true)
-  expect(isLogInteractionCommand('echo process_manager.py log-interaction > x')).toBe(false)
-  expect(isLogInteractionCommand('python3 process_manager.py update-step-status')).toBe(false)
-})
-test('finds the commands that change the process', () => {
-  expect(isLogGatedCommand('python3 /x/process_manager.py update-step-status --step-id s1')).toBe(true)
-  expect(isLogGatedCommand('python3 /x/process_manager.py write-pending --process-dir /p')).toBe(true)
-  expect(isLogGatedCommand('python3 /x/process_manager.py write-pending --process-dir /p --delete')).toBe(false)
-  expect(isLogGatedCommand('python3 /x/process_manager.py list-findings --process-dir /p')).toBe(false)
-  expect(isLogGatedCommand('ls -la')).toBe(false)
+test('the log tool and the tools that change the process are named', () => {
+  expect(LOG_TOOL).toBe('mcp__agentic-processes__log_interaction')
+  expect(LOG_GATED_TOOLS).toContain('mcp__agentic-processes__update_step_status')
+  expect(LOG_GATED_TOOLS).not.toContain(LOG_TOOL)
+  expect(LOG_GATED_TOOLS).not.toContain('mcp__agentic-processes__list_findings')
 })

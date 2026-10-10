@@ -29,23 +29,13 @@ You will receive:
 4. **Handle sub-process creation** (if parent context provided):
    - Read parent's process.json to get parent ID, name, and the spawning step's UUID
    - Use the `process-new` skill with parent process path context AND parent metadata:
-     - `--parent-process-path`: parent directory path
-     - `--parent-id`: parent's process ID (from parent process.json)
-     - `--parent-name`: parent's process name (from parent process.json)
-     - `--return-to-step`: the sync-point step UUID in parent where execution returns
+     - `parentProcessPath`: parent directory path
+     - `parentId`: parent's process ID (from parent process.json)
+     - `parentName`: parent's process name (from parent process.json)
+     - `returnToStep`: the sync-point step UUID in parent where execution returns
    - Use the `process-state-update` skill to register child in parent's memory
-   - **Register child in parent's process.json** (required for UI diagram):
-     ```
-     python process_manager.py register-child-process \
-       --process-dir <parent-process-dir> \
-       --child-id <new-child-process-id> \
-       --child-name <child-process-name> \
-       --child-status running \
-       --spawned-at-step <step-UUID-that-triggered-spawn> \
-       --sync-point <sync-point-step-UUID> \
-       --child-process-path <child-process-dir>
-     ```
-     **Important**: `--spawned-at-step` must be the step's UUID (not its number).
+   - **Register child in parent's process.json**: call the tool `register_child_process` with `processDir` (the parent process dir), `childId`, `childName`, `childStatus: running`, `spawnedAtStep` (the step UUID that triggered the spawn), `syncPoint` (the sync-point step UUID), and `childProcessPath` (the child process dir).
+     **Important**: `spawnedAtStep` must be the step's UUID (not its number).
 
 5. **Return process info**:
    - Process ID

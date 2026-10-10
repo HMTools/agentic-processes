@@ -17,7 +17,6 @@ agentic-processes/                    # Plugin root
 ├── commands/                         # Auto-discovered commands
 ├── hooks/hooks.json                  # Hook configuration
 ├── scripts/                          # Hook and utility scripts
-│   ├── process_manager.py            # Process state management
 │   ├── template_manager.py           # Marketplace template operations
 │   └── ...hook scripts...
 ├── skills/                           # Skills for AI discoverability
@@ -246,7 +245,6 @@ agents/                              # Subagents
 commands/                            # Commands
 hooks/hooks.json                     # Hook configuration
 scripts/                             # Hook and utility scripts
-├── process_manager.py               # Process state management
 ├── template_manager.py              # Marketplace template operations
 ├── models.py                        # Shared data models
 └── ...hook scripts...

@@ -9,9 +9,10 @@ const step = (number: number, status: string) => ({ number, id: `s${number}`, na
 const json = `${DIR}/process.json`
 
 // fake ~/.claude/agentic-processes: one process folder bound to session S1; returns the prompts submitted
-function world(on: On, files: Record<string, string>, agents: { type: string; status: string }[] = []) {
+function world(on: On, files: Record<string, string>, agents: { type: string; status: string }[] = [], gate = false) {
   const submitted: string[] = []
   mock.env(on, { HOME: '/h' })
+  mock.store(on, gate ? { 'gate:S1': { dir: DIR, stepId: 's1' } } : {})
   const all = { [`${DIR}/.session`]: 'S1', ...files }
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async ($, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
@@ -30,8 +31,8 @@ test('no process for this session: no re-prompt', async ($, on) => {
   await end($)
   expect(sent).toEqual([])
 })
-test('approval waits: no re-prompt', async ($, on) => {
-  const sent = world(on, { [json]: proc('running', [step(1, 'pending')]), [`${DIR}/pending-interaction.json`]: '{}' })
+test('the user decides on an approval: no re-prompt', async ($, on) => {
+  const sent = world(on, { [json]: proc('running', [step(1, 'pending')]) }, [], true)
   await end($)
   expect(sent).toEqual([])
 })
@@ -87,26 +88,25 @@ test('a prompt from the user starts the count again', async ($, on) => {
 
 // approval checkpoint rule
 const approvalStep = (extra = {}) => ({ ...step(1, 'in_progress'), approvalRequired: true, ...extra })
-test('approval step, no checkpoint: re-prompt asks for it, before the pending rule', async ($, on) => {
+test('approval step, no answer yet: re-prompt asks for it, before the pending rule', async ($, on) => {
   const sent = world(on, { [json]: proc('running', [approvalStep(), step(2, 'pending')]) })
   await end($)
-  expect(sent[0]).toContain('Approval checkpoint required — step "Step 1 name"')
-  expect(sent[0]).toContain('write-pending')
-})
-test('approval step with a view: text lists the data schema', async ($, on) => {
-  const view = { name: 'V', operationIds: ['approve'], mockData: { approve: { note: 'x' } } }
-  const sent = world(on, { [json]: proc('running', [approvalStep({ view })]) })
-  await end($)
-  expect(sent[0]).toContain('resolves to view "V"')
-  expect(sent[0]).toContain('"approve": data must include: ["note"]')
+  expect(sent[0]).toContain('Approval required — step "Step 1 name"')
+  expect(sent[0]).toContain('request_approval')
 })
 test('approval step, step-executor alive: wait text', async ($, on) => {
   const sent = world(on, { [json]: proc('running', [approvalStep()]) }, [{ type: 'agentic-processes:step-executor', status: 'running' }])
   await end($)
   expect(sent[0]).toContain('still in progress')
 })
-test('approval step with a checkpoint file: no re-prompt', async ($, on) => {
-  const sent = world(on, { [json]: proc('running', [approvalStep()]), [`${DIR}/pending-interaction.json`]: '{}' })
+test('approved step: re-prompt asks to complete it, before the pending rule', async ($, on) => {
+  const sent = world(on, { [json]: proc('running', [approvalStep({ approved: true }), step(2, 'pending')]) })
+  await end($)
+  expect(sent[0]).toContain('is approved but not completed')
+  expect(sent[0]).toContain('update_step_status')
+})
+test('approval step with an open gate: no re-prompt', async ($, on) => {
+  const sent = world(on, { [json]: proc('running', [approvalStep()]) }, [], true)
   await end($)
   expect(sent).toEqual([])
 })
@@ -124,7 +124,7 @@ test('owed, and a process: re-prompt asks to log, names the folder and step', as
   expect(sent[0]).toContain('User interaction not yet logged')
   expect(sent[0]).toContain(`Process dir: ${DIR}`)
   expect(sent[0]).toContain('Step ID: s7')
-  expect(sent[0]).toContain('log-interaction')
+  expect(sent[0]).toContain('log_interaction')
 })
 test('owed, but no process for the session: no re-prompt', async ($, on) => {
   const sent = world(on, { [json]: proc('running', [step(1, 'completed')]), [`${DIR}/.session`]: 'other' })
@@ -133,7 +133,7 @@ test('owed, but no process for the session: no re-prompt', async ($, on) => {
   expect(sent).toEqual([])
 })
 test('owed, pending step and approval checkpoint: the log comes first', async ($, on) => {
-  const sent = world(on, { [json]: proc('running', [step(1, 'pending')]), [`${DIR}/pending-interaction.json`]: '{}' })
+  const sent = world(on, { [json]: proc('running', [step(1, 'pending')]) }, [], true)
   await owe($)
   await end($)
   expect(sent.length).toBe(1)

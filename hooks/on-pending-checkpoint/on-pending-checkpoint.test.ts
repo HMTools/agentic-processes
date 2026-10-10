@@ -5,11 +5,11 @@ const ACTIVE = '/h/.claude/agentic-processes/active'
 const DIR = `${ACTIVE}/p1`
 const process = JSON.stringify({ status: 'running', steps: [], currentState: { activeStep: { id: 's7' } } })
 
-// fake disk: one process folder bound to `bound`; the pending file is there or not
-function world(on: On, { pending = true, bound = 'S1' } = {}) {
+// fake disk: one process folder bound to `bound`; the gate is open or not
+function world(on: On, { gate = true, bound = 'S1' } = {}) {
   const all: Record<string, string> = { [`${DIR}/.session`]: bound, [`${DIR}/process.json`]: process }
-  if (pending) all[`${DIR}/pending-interaction.json`] = '{}'
   mock.env(on, { HOME: '/h' })
+  mock.store(on, gate ? { 'gate:S1': { dir: DIR, stepId: 's7' } } : {})
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async (_$, e) => ({ value: e.path in all }))
@@ -19,50 +19,43 @@ function world(on: On, { pending = true, bound = 'S1' } = {}) {
 const call = ($: any, tool: string, extra = {}) => $.tool.call({ tool, file_path: '/x', content: 'y', ...extra })
 const bash = ($: any, command: string) => call($, 'Bash', { command })
 
-for (const tool of ['Read', 'Glob', 'Grep', 'LS', 'WebFetch', 'WebSearch']) {
-  test(`pending: ${tool} passes`, async ($, on) => {
+// research passes: reads, MCP tools and a subagent
+for (const tool of ['Read', 'Glob', 'Grep', 'LS', 'WebFetch', 'WebSearch', 'Agent', 'Task', 'mcp__x__y', 'mcp__agentic-processes__request_approval']) {
+  test(`gate open: ${tool} passes`, async ($, on) => {
     world(on)
     expect((await call($, tool)).deny).toBeUndefined()
   })
 }
-for (const tool of ['Write', 'Edit', 'MultiEdit', 'NotebookEdit', 'Agent', 'Task', 'mcp__x__y', 'TodoWrite']) {
-  test(`pending: ${tool} is refused`, async ($, on) => {
+// writes, edits and Bash wait for the click
+for (const tool of ['Write', 'Edit', 'MultiEdit', 'NotebookEdit', 'TodoWrite']) {
+  test(`gate open: ${tool} is refused`, async ($, on) => {
     world(on)
-    const r = await call($, tool)
-    expect(r.deny).toContain('Approval checkpoint active')
+    const r = await call($, tool, { file_path: '/x/notes.md' })
+    expect(r.deny).toContain('Approval needed')
     expect(r.deny).toContain('Step ID: s7')
   })
 }
-test('pending: a Write to a process file is refused', async ($, on) => {
+test('gate open: Bash is refused', async ($, on) => {
   world(on)
-  expect((await call($, 'Write', { file_path: `${DIR}/log.json` })).deny).toContain('Approval checkpoint')
+  expect((await bash($, 'ls')).deny).toContain('Approval needed')
 })
-test('pending: the approve token in the bound folder passes', async ($, on) => {
+test('gate open: a Bash command that logs is refused', async ($, on) => {
   world(on)
-  expect((await call($, 'Write', { file_path: `${DIR}/.approve-token` })).deny).toBeUndefined()
+  expect((await bash($, 'python3 /x/scripts/process_manager.py log-interaction --process-dir /p')).deny).toContain('Approval needed')
 })
-test('pending: a token file elsewhere is refused', async ($, on) => {
+test('gate open: the log tool passes, as every MCP tool does', async ($, on) => {
   world(on)
-  expect((await call($, 'Write', { file_path: '/tmp/.approve-token' })).deny).toContain('Approval checkpoint')
+  expect((await call($, 'mcp__agentic-processes__log_interaction')).deny).toBeUndefined()
 })
-test('pending: a process_manager.py run passes', async ($, on) => {
+test('gate open: a subagent writing is refused too', async ($, on) => {
   world(on)
-  expect((await bash($, 'python3 /x/scripts/process_manager.py write-pending --process-dir /p --delete')).deny).toBeUndefined()
+  expect((await call($, 'Write', { agentId: 'a1' })).deny).toContain('Approval needed')
 })
-test('pending: a fake mention of process_manager.py is refused', async ($, on) => {
-  world(on)
-  expect((await bash($, 'echo process_manager.py; rm -rf x')).deny).toContain('Approval checkpoint')
-  expect((await bash($, 'ls # process_manager.py')).deny).toContain('Approval checkpoint')
+test('no gate: Write passes', async ($, on) => {
+  world(on, { gate: false })
+  expect((await call($, 'Write', { file_path: '/x/notes.md' })).deny).toBeUndefined()
 })
-test('pending: a subagent call is refused too', async ($, on) => {
-  world(on)
-  expect((await call($, 'Write', { agentId: 'a1' })).deny).toContain('Approval checkpoint')
-})
-test('no pending file: Write passes', async ($, on) => {
-  world(on, { pending: false })
-  expect((await call($, 'Write')).deny).toBeUndefined()
-})
-test('pending file of another session: Write passes', async ($, on) => {
+test('gate of a session with no process folder: Write passes', async ($, on) => {
   world(on, { bound: 'other' })
-  expect((await call($, 'Write')).deny).toBeUndefined()
+  expect((await call($, 'Write', { file_path: '/x/notes.md' })).deny).toBeUndefined()
 })

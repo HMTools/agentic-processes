@@ -127,11 +127,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H07-block-approve-step.md",
     "firstGuess": "replace",
     "source": "scripts/block-approve-step.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Replaced by a mod: the agent calls request_approval, the user clicks Approve in a dialog, the mod sets approved. No token, no approve command. A hand edit of process.json is refused (Bash by a text rule).",
+    "open": ["Live run not done (S01): dialog, held tool call, store across restart", "Mods off: nothing guards approval (X01)", "A script file that edits process.json still passes (P01)"],
+    "updated": "2026-10-10"
   },
   {
     "id": "H08",
@@ -179,11 +179,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P01-python-cli-process-manager.md",
     "firstGuess": "improve",
     "source": "scripts/process_manager.py",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "The Python process manager is replaced by 15 mod tools (typed input, same rules, same answers), listed when the user starts or resumes a process. One lock for each process folder. Hooks match tool names. The agent cannot edit a state file with Write, Edit or a Bash write.",
+    "open": ["Live run not done (S01): skill run seen by the mod, tool listed mid-session", "Folder move on Windows (PowerShell) and macOS/Linux (mv) not run on a real machine", "A cut file after a crash in the middle of a write", "Mods off: no way to change process state (X01)", "Resume still binds with the shell hook (H08)"],
+    "updated": "2026-10-10"
   },
   {
     "id": "P02",
@@ -192,11 +192,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P02-approval-wait-file.md",
     "firstGuess": "improve",
     "source": "scripts/process_manager.py (write-pending)",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "The pending file is gone. The gate is a record in the mod store. While it is open the agent can research, not write or act. A prompt reopens the dialog. No Reject option.",
+    "open": ["Live run not done (S01): dialog, held tool call, store across restart", "Mods off: nothing guards approval (X01)", "Step views (option data) go with the UI move"],
+    "updated": "2026-10-10"
   },
   {
     "id": "P03",
@@ -205,11 +205,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P03-process-approve-skill.md",
     "firstGuess": "replace",
     "source": "skills/process-approve/SKILL.md",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "The skill, the token and the approve command are removed. The mod tool and dialog replace them. The agent texts and docs are rewritten.",
+    "open": ["Live run not done (S01): dialog, held tool call, store across restart", "Mods off: nothing guards approval (X01)"],
+    "updated": "2026-10-10"
   },
   {
     "id": "P04",

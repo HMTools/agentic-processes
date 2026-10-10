@@ -4,18 +4,22 @@ import type { On } from 'claude-code'
 const ACTIVE = '/h/.claude/agentic-processes/active'
 const DIR = `${ACTIVE}/p1`
 const process = JSON.stringify({ status: 'running', steps: [], currentState: { activeStep: { id: 's7' } } })
-const LOG = 'python3 /x/scripts/process_manager.py log-interaction --process-dir /p'
+const LOG = 'mcp__agentic-processes__log_interaction'
+const LOG_INPUT = { processDir: DIR, stepId: 's7', request: 'r', reason: 'why', response: 'done' }
+const LOG_FILE = JSON.stringify({ type: 'log-file', steps: {}, processWideObservations: {} })
 
-// fake disk: one process folder bound to `bound`; the tool itself answers "done" (or an error)
-function world(on: On, { bound = 'S1', failTool = false } = {}) {
-  const all: Record<string, string> = { [`${DIR}/.session`]: bound, [`${DIR}/process.json`]: process }
+// fake disk: one process folder bound to `bound`, with a log; the process tools run for real on it
+function world(on: On, { bound = 'S1' } = {}) {
+  const all: Record<string, string> = { [`${DIR}/.session`]: bound, [`${DIR}/process.json`]: process, [`${DIR}/log.json`]: LOG_FILE }
   mock.env(on, { HOME: '/h' })
+  mock.store(on)
   on('session.id', async () => ({ value: 'S1' }))
   on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
   on('fs.exists', async (_$, e) => ({ value: e.path in all }))
   on('fs.read', async (_$, e) => ({ value: all[e.path] }))
+  on('fs.write', async (_$, e) => { all[e.path] = e.text; return { value: undefined } })
   on('prompt.submit', async () => ({ drop: 'test' }))
-  on('tool.call', async () => ({ result: 'done', text: 'done', ...(failTool ? { isError: true } : {}) }) as never)
+  on('tool.call', async () => ({ result: 'done', text: 'done' }) as never)
 }
 // the user sends a prompt: the agent owes a log entry
 const owe = ($: any) => $.prompt.submit({ text: 'please change the plan' })
@@ -51,37 +55,32 @@ test('log owed, call from a subagent: passes', async ($, on) => {
   expect((await call($, 'Write', { agentId: 'a1' })).deny).toBeUndefined()
 })
 
-// Bash
-test('log owed: an ordinary Bash command passes', async ($, on) => {
+// the process tools
+test('log owed: a tool that changes the process is refused', async ($, on) => {
+  world(on); await owe($)
+  expect((await call($, 'mcp__agentic-processes__update_step_status', { processDir: DIR, stepId: 's1', status: 'completed' })).deny).toContain('not yet logged')
+})
+test('log owed: a tool that only reads passes', async ($, on) => {
+  world(on); await owe($)
+  expect((await call($, 'mcp__agentic-processes__list_findings')).deny).toBeUndefined()
+})
+test('log owed: Bash passes, the process tools are the only way to change the process', async ($, on) => {
   world(on); await owe($)
   expect((await bash($, 'ls -la')).deny).toBeUndefined()
 })
-test('log owed: a command that changes the process is refused', async ($, on) => {
+test('the log tool succeeds: the log is no longer owed, and Write passes', async ($, on) => {
   world(on); await owe($)
-  expect((await bash($, 'python3 /x/process_manager.py update-step-status --step-id s1')).deny).toContain('not yet logged')
-})
-test('log owed: write-pending --delete passes', async ($, on) => {
-  world(on); await owe($)
-  expect((await bash($, 'python3 /x/process_manager.py write-pending --process-dir /p --delete')).deny).toBeUndefined()
-})
-test('the log command succeeds: the log is no longer owed, and Write passes', async ($, on) => {
-  world(on); await owe($)
-  expect((await bash($, LOG)).deny).toBeUndefined()
+  expect((await call($, LOG, LOG_INPUT)).deny).toBeUndefined()
   expect((await call($, 'Write')).deny).toBeUndefined()
 })
-test('the log command fails: the log is still owed', async ($, on) => {
-  world(on, { failTool: true }); await owe($)
-  await bash($, LOG)
-  expect((await call($, 'Write')).deny).toContain('not yet logged')
-})
-test('a fake mention of the log command does not clear it', async ($, on) => {
+test('the log tool fails: the log is still owed', async ($, on) => {
   world(on); await owe($)
-  await bash($, 'echo process_manager.py log-interaction > x')
+  await call($, LOG, { processDir: DIR }) // no step, no request: the tool answers an error
   expect((await call($, 'Write')).deny).toContain('not yet logged')
 })
 test('a new prompt owes a log again after the agent logged', async ($, on) => {
   world(on); await owe($)
-  await bash($, LOG)
+  await call($, LOG, LOG_INPUT)
   await owe($)
   expect((await call($, 'Write')).deny).toContain('not yet logged')
 })
