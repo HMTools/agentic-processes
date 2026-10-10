@@ -1,12 +1,12 @@
 ---
 name: process-state-update
-description: Update process state files (process.json, memory/<topic>.json, log.json, pending-interaction.json) via Python scripts. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, create approval checkpoints, or modify any process state file. Never use Write/Edit tools on process state files. Used by step-executor and process-continue agents.
+description: Update process state files (process.json, memory/<topic>.json, log.json) with the process tools. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, or modify any process state file. Never use Write/Edit or Bash on process state files. Used by step-executor and the process-run skill.
 user-invocable: false
 ---
 
 # Process State Update
 
-**Critical**: All process state mutations must go through `process_manager.py`. Never use Write/Edit tools on process state files — doing so will corrupt the process state.
+**Critical**: All process state changes go through the process tools of this plugin. The tools are `mcp__agentic-processes__<name>`; this page names them by `<name>`. Never use Write, Edit or Bash on process state files: the plugin refuses it, and a hand edit can corrupt the process.
 
 ## When to Use
 
@@ -14,409 +14,250 @@ Use this skill whenever you need to:
 - Update step status (pending → in_progress → completed)
 - Record memory entries after completing work
 - Log actions, reasoning, and user interactions
-- Create or delete pending interaction files for approval checkpoints
 - Update process-wide status or observations
 
-If you're working in the agentic-processes framework and need to modify any `.json` file in a process directory, you MUST use this skill.
+If you work in the agentic-processes framework and need to change any `.json` file in a process directory, use the tools on this page.
 
-## Locating the Script
+## Finding the tools
 
-All operations are invoked via `process_manager.py`, resolved relative to the plugin root:
+The tools are listed when the user starts or resumes a process. They sit behind tool search: search for the tool by its name (for example `update_step_status`), then call it. Each tool answers `{"status": "ok", "files_written": [...]}` or `{"status": "error", "message": "..."}`. Read the message of an error: it says what to do next.
 
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py <subcommand> ...
-```
-
-Always check stdout for `{"status": "ok", ...}` or `{"status": "error", "message": "..."}`.
+Every tool takes `processDir`, the absolute path of the process folder (for example `~/.claude/agentic-processes/active/process-name`, written out in full), except `list_findings` and `update_finding_status`. Lists and objects are real values, not JSON text.
 
 ---
 
-## Available Operations
+## Available Tools
 
-### update-step-status
+### update_step_status
 
-Change a step's status in `process.json`. Automatically sets `startedAt` when moving to `in_progress` and `completedAt` when moving to `completed`.
+Change a step's status in `process.json`. It sets `startedAt` when the step moves to `in_progress` and `completedAt` when it moves to `completed`.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-step-status \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --step-id "abc-123-uuid" \
-  --status in_progress
-```
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | Process folder |
+| `stepId` | Yes | Step id (UUID) |
+| `status` | Yes | `pending`, `in_progress`, `completed`, `skipped` or `awaiting_approval` |
 
-Valid statuses: `pending`, `in_progress`, `completed`, `skipped`, `awaiting_approval`
-
-**Note**: When completing a step with `approvalRequired: true`, the step must have `approved: true` (set by the user via `/process-approve` or the UI). If not yet approved, this command will fail with a message directing the user to approve first.
+**Note**: A step with `approvalRequired: true` cannot be completed until the user approved it. The user approves with a click in the dialog that the tool `request_approval` opens. If the step is not approved, this tool answers an error.
 
 ---
 
-### update-current-state
+### update_current_state
 
-Update the active step pointer in `process.json`. Supports optional substep tracking fields.
+Set the active step in `process.json`, with the substep if the step has substeps.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-current-state \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --step-id "abc-123-uuid" \
-  --step-name "Verify Changes" \
-  --summary "Reviewing applied changes for correctness" \
-  --total-substeps 10 \
-  --substep-number 3 \
-  --substep-name "Review Each File Systematically"
-```
-
-**Optional substep args** (provide `--substep-number` and `--substep-name` together):
-| Flag | Description |
-|------|-------------|
-| `--total-substeps` | Total number of substeps in the step (integer) |
-| `--substep-number` | Current substep number, 1-based (integer) |
-| `--substep-name` | Name of the current substep (string) |
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | Process folder |
+| `stepId`, `stepName` | Yes | The active step |
+| `summary` | Yes | What the step does now |
+| `details` | No | More detail |
+| `totalSubsteps` | No | Number of substeps (default 0) |
+| `substepNumber`, `substepName` | No | The current substep, 1-based; give both |
 
 ---
 
-### update-active-substep
+### update_active_substep
 
-Update only the active substep cursor within the current step, without re-specifying step identity fields. Use this for efficient substep-only updates when the step itself hasn't changed.
+Change only the substep of the active step, when the step itself did not change.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-active-substep \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --substep-number 4 \
-  --substep-name "Categorize and Assign Severity to Issues" \
-  --summary "Categorizing issues found during review"
-```
-
-**Args**:
-| Flag | Required | Description |
-|------|----------|-------------|
-| `--process-dir` | Yes | Process directory path |
-| `--substep-number` | Yes | Current substep number, 1-based (integer) |
-| `--substep-name` | Yes | Name of the current substep (string) |
-| `--summary` | No | Optionally update the actionSummary |
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | Process folder |
+| `substepNumber` | Yes | Current substep, 1-based |
+| `substepName` | Yes | Name of the substep |
+| `summary` | No | New action summary |
 
 ---
 
-### track-file-change
+### add_memory_entry
 
-Track a file operation in `currentState.activeStep.filesChanged`. Called automatically by the PostToolUse hook -- agents do not call this directly. Uses upsert-by-path: at most one entry per unique file path, latest operation always wins.
+Add or update what a step produced in `memory/<topic>.json`. If the step already has an entry in that topic, the decisions and files are appended and the information is merged. The tool also updates `memory/_cross-references.json`. The step name comes from `process.json`.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py track-file-change \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --file-path "src/app.ts" \
-  --operation edited \
-  --tool Edit
-```
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir`, `stepId` | Yes | Process folder and step |
+| `topic` | Yes | Topic file name, lowercase with hyphens: `context`, `identified-files`, `implementation-decisions` |
+| `info` | No | Object: information produced |
+| `decisions` | No | List of decisions made |
+| `files` | No | List of files modified or created |
 
-**Args**:
-| Flag | Required | Description |
-|------|----------|-------------|
-| `--process-dir` | Yes | Process directory path |
-| `--file-path` | Yes | Absolute path of the changed file |
-| `--operation` | Yes | One of: `created`, `edited`, `deleted` |
-| `--tool` | Yes | Tool name that performed the operation (Write, Edit, etc.) |
-
-**Note**: This is called by the PostToolUse hook script (`track-file-change.sh`), not by agents directly. The hook fires on every Write, Edit, or StrReplace tool use and records the file change in the active step.
+A step can write only the topics in its `memoryFileUsage.writeTo`. An empty list means no limit.
 
 ---
 
-### add-memory-entry
+### read_memory_topic
 
-Add or update a step entry in a memory topic file (`memory/<topic>.json`). If the step already exists in that topic file, new info/decisions/files are appended. Also updates `memory/_cross-references.json` with any new decisions and files.
+Read a memory topic file. A step can read only the topics in its `memoryFileUsage.readFrom`. `_cross-references` is always readable.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py add-memory-entry \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --step-id "abc-123-uuid" \
-  --topic context \
-  --info '{"approach": "reviewed user docs", "constraints": "must preserve API compatibility"}' \
-  --decisions '["Use incremental migration", "Maintain backward compatibility"]' \
-  --files '["api.py", "migration.sql"]'
-```
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir`, `stepId` | Yes | Process folder and step (for the access check) |
+| `topic` | Yes | Topic name |
 
-**Topic naming convention**: lowercase, hyphen-separated, describes the data content. Examples: `context`, `identified-files`, `implementation-decisions`, `findings`, `qa-sessions`.
-
-**Note**: The `--topic` argument specifies which memory file to write to. The step name is auto-resolved from process.json. Escape inner quotes as needed for your shell, e.g. `'{"key": "value"}'`.
+The answer is `{"status": "ok", "topic": "context", "data": {...}}`, or `"data": null` when the file does not exist.
 
 ---
 
-### read-memory-topic
+### add_log_entry
 
-Read a specific memory topic file with access validation. The step's `memoryFileUsage.readFrom` is checked to ensure access is allowed. `_cross-references` is always readable.
+Append to the entry of a step in `log.json`. Only the inputs you give are appended.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py read-memory-topic \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --step-id "abc-123-uuid" \
-  --topic context
-```
+| Input | Description |
+|-------|-------------|
+| `processDir`, `stepId` | Required: process folder and step |
+| `actions` | List of actions taken |
+| `reasoning` | List of reasoning entries |
+| `filesModified` | List of file paths modified |
+| `problems` | List of problems met (feeds the `continuous-improvement` analysis) |
+| `decisions` | List of decisions made |
+| `performanceNotes` | List of performance observations |
 
-Returns `{"status": "ok", "topic": "context", "data": {...}}` or `{"status": "ok", "topic": "context", "data": null}` if file doesn't exist.
-
----
-
-### add-log-entry
-
-Append actions, reasoning, problems, decisions, and performance notes to a step entry in `log.json`.
-
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py add-log-entry \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --step-id "abc-123-uuid" \
-  --actions '["Modified API endpoint", "Updated tests", "Added migration script"]' \
-  --reasoning '["Preserve backward compatibility", "Cover new edge cases"]' \
-  --files-modified '["api.py", "test_api.py", "migrate.py"]' \
-  --problems '["File conflict in api.py required manual resolution", "Test timeout on slow CI"]' \
-  --decisions '["Used incremental migration strategy", "Deferred index rebuild to off-hours"]' \
-  --performance-notes '["Step completed in 2 iterations instead of expected 1"]'
-```
-
-**Available flags** (all optional — only provided fields are appended):
-| Flag | Description |
-|------|-------------|
-| `--actions` | JSON array of actions taken during the step |
-| `--reasoning` | JSON array of agent reasoning entries |
-| `--files-modified` | JSON array of file paths modified |
-| `--problems` | JSON array of problems encountered (feeds `continuous-improvement` analysis) |
-| `--decisions` | JSON array of decisions made during the step |
-| `--performance-notes` | JSON array of performance observations |
-
-**Important**: Use `--problems` to log any issues, errors, workarounds, or unexpected situations encountered during step execution. The `continuous-improvement` step reads `problemsEncountered` from the log to identify systemic issues and save them as findings (see `write-finding` below).
+**Important**: Log every issue, error, workaround or surprise in `problems`. The `continuous-improvement` step reads `problemsEncountered` from the log to find systemic issues and save them as findings (see `write_finding`).
 
 ---
 
-### write-finding
+### log_interaction
 
-Save one improvement finding to the global findings store (`~/.claude/agentic-processes/improvement-findings/<templateId>/<processId>.json`, grouped by the process's own template UUID). Called only by the `continuous-improvement` step — never during a normal work step.
+Log a user interaction in `log.json`. The plugin sees this call succeed and stops asking for a log. Do this before anything else changes after a user prompt.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py write-finding \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --category "Documentation Enhancement" \
-  --title "Step X guidance doesn't mention Y" \
-  --what "..." --why "..." --impact "..." \
-  --scope '["docs/foo.md"]'
-```
-
-**Args**:
-| Flag | Required | Description |
-|------|----------|-------------|
-| `--process-dir` | Yes | Process directory path |
-| `--category` | Yes | One of the step's `improvementCategories` names |
-| `--title` | Yes | Short description of the finding |
-| `--what` | Yes | What the improvement would do |
-| `--why` | Yes | Why it's worth doing |
-| `--impact` | Yes | Expected impact |
-| `--scope` | No | JSON array of target file paths |
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir`, `stepId` | Yes | Process folder and step |
+| `request` | Yes | What the user asked |
+| `reason` | Yes | Why the user asked |
+| `response` | Yes | What you did |
+| `forImprovement` | No | `true` when the request points to an improvement of the process |
+| `potentialImprovement` | No | The improvement, in words |
 
 ---
 
-### list-findings
+### update_process_status
 
-Scan every process's finding file under the global findings store and return the matching records. Add `--template-id` to scope the scan to one template's subfolder. Used by the `apply-improvements` skill, never by a running process's own step.
+Change the status of the process. A finished process moves to its status folder: `completed/`, `failed/`, or back to `active/` for `running` and `paused`. The answer then has `relocated_to`: use that path from then on.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py list-findings --status open
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py list-findings --template-id 2932a013-81b1-487b-8f0c-991549eedeef
-```
-
-**Note**: `--template-id` is the template's own UUID (its `<name>.json`'s `"id"` field, or any of its processes' `process.json` → `metadata.templateId`) — not the template's readable name. Each returned finding's own `template` field carries the readable name for display.
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | Process folder |
+| `status` | Yes | `running`, `completed`, `failed` or `paused` |
+| `summary` | When completing a sub-process | What the sub-process did. The parent reads it. |
 
 ---
 
-### update-finding-status
+### register_child_process
 
-Record the outcome of a finding (`applied` / `rejected` / `deferred`) back into its process's finding file. Used only by the `apply-improvements` skill.
+Record a sub-process in the parent's `process.json` (`subProcessState.childProcesses`). A child with the same id is updated, not added twice.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-finding-status \
-  --process-id "<process-uuid>" --finding-id "<finding-uuid>" \
-  --status applied --notes "..." --files-modified '["docs/foo.md"]'
-```
-
-**Note**: `--process-id` alone is enough to locate the file — no `--template-id` needed, since process ids are globally unique.
-
----
-
-### log-interaction
-
-Log a user interaction in `log.json`. Also clears the `pending-log` flag (integrates with `enforce-log-first` hook).
-
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py log-interaction \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --step-id "abc-123-uuid" \
-  --request "User asked to skip validation step" \
-  --reason "User is confident changes are correct" \
-  --response "Skipped validation, moved to deployment"
-```
-
-Optional flags: `--for-improvement`, `--potential-improvement "Add auto-validation option"`
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | The parent's folder |
+| `childId`, `childName` | Yes | The child's id and name |
+| `childStatus` | Yes | `running`, `completed`, `failed` or `paused` |
+| `spawnedAtStep` | Yes | UUID of the parent step that started the child (not its number) |
+| `syncPoint` | Yes | UUID of the parent step that waits for the child |
+| `childProcessPath` | Yes | The child's folder |
 
 ---
 
-### write-pending
+### update_child_status
 
-**CRITICAL: Use this operation to create approval checkpoints. DO NOT create `pending-interaction.json` files directly with Write/Edit. That violates the core principle of this skill and will corrupt the process state.**
+Change the status of a child in the parent's `process.json`.
 
-Create or delete `pending-interaction.json` for approval checkpoints. This operation ensures the correct schema and structure.
-
-**Create approval checkpoint**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py write-pending \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --options '[{"id": "approve", "label": "Approve Changes", "isDefault": true}, {"id": "reject", "label": "Reject"}, {"id": "modify", "label": "Request Modifications"}]'
-```
-
-**Delete pending interaction**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py write-pending \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --delete
-```
-
-**Example: Database migration approval**
-```bash
-# CORRECT: Use write-pending operation
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py write-pending \
-  --process-dir ~/.claude/agentic-processes/active/process-db-migration \
-  --options '[{"id": "approve", "label": "Apply Migration", "isDefault": true}, {"id": "review", "label": "Review Scripts First"}, {"id": "reject", "label": "Cancel Migration"}]'
-
-# WRONG: Do NOT create the file directly
-# [X] DO NOT DO THIS: echo '{"options": [...]}' > pending-interaction.json
-# [X] DO NOT DO THIS: Write tool on pending-interaction.json
-```
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | The parent's folder |
+| `childId` | Yes | The child's id |
+| `childStatus` | Yes | `running`, `completed`, `failed` or `paused` |
 
 ---
 
-### update-process-status
+### update_log_observations
 
-Change the top-level process status in `process.json`.
+Append to `processWideObservations` in `log.json`. Steps like `apply-changes`, `review-verify-document` and `continuous-improvement` use it for patterns and recommendations. Every input is optional.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-process-status \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --status completed
-```
-
-Valid statuses: `running`, `completed`, `failed`, `paused`
-
----
-
-### register-child-process
-
-Register a child sub-process in the parent's `process.json` `subProcessState.childProcesses` array.
-Used when spawning sub-processes to make parent-child relationships visible in the UI diagram.
-
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py register-child-process \
-  --process-dir ~/.claude/agentic-processes/active/parent-process \
-  --child-id "child-uuid" \
-  --child-name "Child Process Name" \
-  --child-status running \
-  --spawned-at-step "step-uuid-that-spawned" \
-  --sync-point "step-uuid-where-parent-waits" \
-  --child-process-path ~/.claude/agentic-processes/active/child-process
-```
-
-**Important**: `--spawned-at-step` must be the step's UUID (not its number) — the UI diagram matches by step UUID.
-
-If a child with the same ID already exists, its entry is updated rather than duplicated.
+| Input | Description |
+|-------|-------------|
+| `processDir` | Required: process folder |
+| `patterns` | List of patterns detected |
+| `feedback` | List of user feedback summaries |
+| `metrics` | Object of efficiency metrics (merged) |
+| `recommendations` | List of recommendations for the future |
 
 ---
 
-### update-child-status
+### create_process
 
-Update the status of a child sub-process in the parent's `process.json`. Used when a child process completes or fails to keep the parent's diagram in sync.
+Create the files of a new process from a template. Only the process pane (`/process`) and sub-process steps use this.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-child-status \
-  --process-dir ~/.claude/agentic-processes/active/parent-process \
-  --child-id "child-uuid" \
-  --child-status completed
-```
-
-Valid statuses: `running`, `completed`, `failed`, `paused`
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | The new process folder |
+| `templatePath` | Yes | Path to the template JSON |
+| `name` | No | Process name; defaults to the template name |
+| `params` | No | Object: the parameters of the process |
+| `projectPath` | No | Absolute project path; defaults to the session folder |
+| `parentProcessPath`, `parentId`, `parentName`, `returnToStep` | No | For a sub-process |
 
 ---
 
-### update-log-observations
+### write_finding
 
-Append entries to the `processWideObservations` section of `log.json`. Used by steps like `apply-changes`, `review-verify-document`, and `continuous-improvement` to record cross-step patterns and recommendations.
+Save one improvement finding to the global store (`~/.claude/agentic-processes/improvement-findings/<templateId>/<processId>.json`). Only the `continuous-improvement` step calls it, never a normal work step.
 
-**Example**:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-log-observations \
-  --process-dir ~/.claude/agentic-processes/active/process-name \
-  --patterns '["Repeated file conflicts", "User prefers incremental changes"]' \
-  --feedback '["User requested more detailed logging"]' \
-  --recommendations '["Add conflict detection earlier", "Implement auto-merge for simple conflicts"]'
-```
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processDir` | Yes | Process folder |
+| `category` | Yes | One of the step's `improvementCategories` names |
+| `title` | Yes | Short description |
+| `what` | Yes | What the improvement does |
+| `why` | Yes | Why it is worth doing |
+| `impact` | Yes | Expected impact |
+| `scope` | No | List of target file paths |
 
-All flags are optional — only provided fields are appended/merged.
+---
+
+### list_findings
+
+Return the findings of every process. Only the `apply-improvements` skill calls it, never a running process.
+
+| Input | Description |
+|-------|-------------|
+| `status` | `open`, `applied`, `rejected` or `deferred` |
+| `templateId` | Only this template. It is the template's own UUID (the `"id"` of its JSON, or `metadata.templateId` of a process), not its name. Each finding has its readable name in `template`. |
+
+---
+
+### update_finding_status
+
+Record the outcome of a finding. Only the `apply-improvements` skill calls it.
+
+| Input | Required | Description |
+|-------|----------|-------------|
+| `processId` | Yes | The process UUID. It is enough to find the file. |
+| `findingId` | Yes | The finding UUID |
+| `status` | Yes | `applied`, `rejected` or `deferred` |
+| `notes` | No | Notes |
+| `filesModified` | No | List of file paths modified |
 
 ---
 
 ## Important Rules
 
-1. **Never use Write/Edit** directly on `process.json`, `memory/*.json`, `log.json`, or `pending-interaction.json` — always use this skill's operations
-2. **Always check stdout** for the result status after each command: `{"status": "ok"}` means success
-3. **Escape JSON properly** for your shell when passing `--info`, `--decisions`, `--files`, etc. as inline JSON
-4. **Always resolve the script via the plugin root**: `${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py` — never hardcode an absolute path, since the plugin can be installed anywhere on any OS
+1. **Never use Write, Edit or Bash** on `process.json`, `log.json`, `memory/*.json` or the findings store. The plugin refuses it. Use the tools above.
+2. **Always read the answer** of each tool: `{"status": "ok"}` is success, `{"status": "error", "message": ...}` says what failed.
+3. **Use full paths** for `processDir`. After `update_process_status` moves the folder, use the `relocated_to` path.
+4. **Approval is the user's.** Call `request_approval` and wait for the click. Do not try to set `approved` yourself.
 
 ---
 
 ## Common Mistakes (DO NOT DO THESE)
 
-### [WRONG] Creating pending-interaction.json directly
-**WRONG:**
-```python
-# DO NOT create the file with Write/Edit
-Write(file_path="pending-interaction.json", content="...")  # [X] WRONG!
-```
+### [WRONG] Using Write/Edit/Bash on process state files
+**WRONG:** `Write(file_path="process.json", content="...")` or `sed -i ... process.json` — the plugin refuses it, and a hand edit can corrupt the state.
 
-**CORRECT:**
-```bash
-# ALWAYS use write-pending operation
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py write-pending \
-  --process-dir "..." \
-  --options '[...]'
-```
+**CORRECT:** call the tool for the change: `update_step_status`, `add_memory_entry`, `add_log_entry`, and the others above.
 
-### [WRONG] Using relative paths
-**WRONG:**
-```bash
-python scripts/process_manager.py ...  # [X] Breaks if not in project root
-```
+### [WRONG] Building a shell command
+**WRONG:** `python3 .../process_manager.py update-step-status ...` — this script no longer exists.
 
-**CORRECT:**
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py ...  # [OK] Always works
-```
-
-### [WRONG] Using Write/Edit on process state files
-**WRONG:**
-```python
-# DO NOT use Write tool on process.json/memory.json/log.json
-Write(file_path="process.json", content="...")  # [X] CORRUPTS STATE!
-```
-
-**CORRECT:**
-```bash
-# ALWAYS use the appropriate process_manager.py operation
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py add-memory-entry ...
-```
+**CORRECT:** call the tool `update_step_status` with `processDir`, `stepId` and `status`.

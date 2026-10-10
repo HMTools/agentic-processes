@@ -33,6 +33,10 @@ If the task message includes a "User Corrections" section with content, you are 
 2. Apply only the requested corrections — do not redo the entire step
 3. Update process state via the `process-state-update` skill
 
+## Questions
+
+You cannot ask the user. If the step needs an answer, stop, list the questions in your result and say which step waits. The parent asks in the question dialog and starts the step again with the answers as "User Corrections".
+
 ## Pre-Step Initialization
 
 Before executing any step substeps, the step-executor automatically loads operating principles:
@@ -67,7 +71,7 @@ Before executing any step substeps, the step-executor automatically loads operat
 
 After loading operating principles and before executing substep 1, report the step's total substep count:
 - Count the substeps in `stepDefinition.substeps` array
-- Call `update-current-state` with `--total-substeps <count>` along with the step identity fields
+- Call the tool `update_current_state` with `totalSubsteps` set to the count, along with the step identity fields
 - This initializes the substep progress tracking for this step
 
 ### End-Step Verification (Updated)
@@ -90,7 +94,7 @@ The end-step verification now checks compliance with loaded principles:
 
 ### Sub-Process Orchestrator Guard
 
-If the step's `stepDefinition` is empty (no guidance, no substeps) and the step has a `subProcessTrigger` field, this is a sub-process orchestrator step. It should have been handled by the parent process driver (process-new/process-continue), which detects `subProcessTrigger` and spawns child processes. Do NOT improvise or execute based on the step name. Return an error: "This step requires sub-process spawning. It should be driven by the parent orchestrator, not the step-executor."
+If the step's `stepDefinition` is empty (no guidance, no substeps) and the step has a `subProcessTrigger` field, this is a sub-process orchestrator step. It should have been handled by the parent process driver (the process-run skill), which detects `subProcessTrigger` and spawns child processes. Do NOT improvise or execute based on the step name. Return an error: "This step requires sub-process spawning. It should be driven by the parent orchestrator, not the step-executor."
 
 ### Step Definition Resolution
 
@@ -108,13 +112,13 @@ No external file resolution is needed. The step-executor reads all instructions 
 1. **Read the step's `stepDefinition` from `process.json`** for complete guidance
 2. **Execute substeps** in sequence according to the step definition
 3. **Report substep progress**: At the start of each substep, update the active substep cursor via the `process-state-update` skill:
-   - Use `update-active-substep` with `--substep-number` (1-based) and `--substep-name` from the substep definition
-   - Optionally update `--summary` to reflect the substep's purpose
+   - Call the tool `update_active_substep` with `substepNumber` (1-based) and `substepName` from the substep definition
+   - Optionally update `summary` to reflect the substep's purpose
    - This enables the UI to show real-time substep-level progress
 4. **Update process files** using the `process-state-update` skill:
-   - Never use Write/Edit tools directly on process.json, memory.json, log.json, or pending-interaction.json
+   - Never use Write/Edit tools directly on process.json, memory.json, or log.json
    - Use the `process-state-update` skill for all state mutations
-5. **Handle approval checkpoints**: If the step has `approvalRequired: true`, prepare deliverables and return to parent for user approval. Step approval is user-only -- the agent cannot and should not approve steps. After the user approves (via `/process-approve` or the UI), the step will have `approved: true` set, and `update-step-status --status completed` will succeed.
+5. **Handle approval checkpoints**: If the step has `approvalRequired: true`, prepare deliverables and return to parent for user approval. Step approval is user-only -- the agent cannot and should not approve steps. The parent asks with the tool `request_approval`. After the user clicks Approve in the dialog, the step has `approved: true`, and the tool `update_step_status` will complete it.
 6. **Return completion status** with:
    - Step output/artifacts created
    - Any issues encountered

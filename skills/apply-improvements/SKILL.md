@@ -12,11 +12,9 @@ each finding the user approves, implements the real change.
 
 ## 1. Gather open findings
 
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py list-findings --status open
-```
+Call the tool `list_findings` with `status: open` (find it by tool search).
 
-Add `--template-id <id>` if the user asked to focus on one template (each finding's own
+Add `templateId` if the user asked to focus on one template (each finding's own
 `template` field has the readable name to show the user). Group similar findings across
 processes — same category, overlapping scope files — findings already sit together by
 template on disk, which makes "this keeps coming up for template X" easy to spot.
@@ -40,13 +38,7 @@ c. If approved: investigate the real current file(s), then implement the actual
    - Clean implementation: no "before/after" traceback comments — make it look like it was always there.
 d. Show the diff — what files were modified and what changed.
 e. Record the outcome:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/process_manager.py update-finding-status \
-  --process-id "<finding's processId>" --finding-id "<id>" \
-  --status applied --notes "..." --files-modified '["path"]'
-```
-   Use `--status rejected` or `--status deferred` (with `--notes` explaining why) when
-   not implementing.
+Call the tool `update_finding_status` with `processId` (the finding's processId), `findingId`, `status: applied`, `notes`, and `filesModified` (a list of paths). Use `status: rejected` or `status: deferred` (with `notes` explaining why) when not implementing.
 
 ## 4. Summarize
 
@@ -56,7 +48,7 @@ came from and the files touched.
 ## Notes
 
 - Never hand-edit files under `improvement-findings/` — always go through
-  `update-finding-status`. That directory is process state, same rule as `process.json`,
+  `update_finding_status`. That directory is process state, same rule as `process.json`,
   `log.json`, and `memory/*.json`.
 - If a target file belongs to a template the user doesn't own (a marketplace template),
   say so and stop — do not attempt the edit. This is a pre-existing gap this skill

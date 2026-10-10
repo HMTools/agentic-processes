@@ -25,17 +25,6 @@
       },
       "additionalProperties": false
     },
-    "FileChange": {
-      "type": "object",
-      "required": ["path", "operation", "tool", "timestamp"],
-      "properties": {
-        "path": { "type": "string" },
-        "operation": { "type": "string", "enum": ["created", "edited", "deleted"] },
-        "tool": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
-      },
-      "additionalProperties": false
-    },
     "ActiveStepSubstep": {
       "type": "object",
       "required": ["number", "name"],
@@ -54,11 +43,7 @@
         "actionSummary": { "type": "string" },
         "actionDetails": { "type": "string" },
         "totalSubsteps": { "type": "integer", "minimum": 0 },
-        "currentSubstep": { "$ref": "#/$defs/ActiveStepSubstep" },
-        "filesChanged": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/FileChange" }
-        }
+        "currentSubstep": { "$ref": "#/$defs/ActiveStepSubstep" }
       },
       "additionalProperties": false
     },
@@ -141,17 +126,6 @@
           "items": { "$ref": "#/$defs/ChildProcessRef" }
         },
         "nextSyncPoint": { "type": "string", "format": "uuid" }
-      },
-      "additionalProperties": false
-    },
-    "InteractionOption": {
-      "type": "object",
-      "required": ["id", "label"],
-      "properties": {
-        "id": { "type": "string" },
-        "label": { "type": "string" },
-        "description": { "type": "string" },
-        "isDefault": { "type": "boolean" }
       },
       "additionalProperties": false
     },
@@ -379,77 +353,11 @@
         }
       },
       "additionalProperties": false
-    },
-    "PendingInteractionFile": {
-      "type": "object",
-      "required": ["type", "options"],
-      "properties": {
-        "type": { "const": "pending-interaction" },
-        "options": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/InteractionOption" }
-        }
-      },
-      "additionalProperties": false
-    },
-    "QuestionStatus": {
-      "type": "string",
-      "enum": ["unanswered", "answered", "refined", "completed"]
-    },
-    "SessionStatus": {
-      "type": "string",
-      "enum": ["pending", "partial", "completed"]
-    },
-    "AnswerIteration": {
-      "type": "object",
-      "required": ["answer", "timestamp", "iteration"],
-      "properties": {
-        "answer": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "iteration": { "type": "integer", "minimum": 1 }
-      },
-      "additionalProperties": false
-    },
-    "QASessionQuestion": {
-      "type": "object",
-      "required": ["id", "topic", "question", "priority", "status", "answerHistory"],
-      "properties": {
-        "id": { "type": "string" },
-        "topic": { "type": "string" },
-        "question": { "type": "string" },
-        "priority": { "type": "string", "enum": ["required", "optional"] },
-        "context": { "type": "string" },
-        "options": { "type": "array", "items": { "type": "string" } },
-        "status": { "$ref": "#/$defs/QuestionStatus" },
-        "answerHistory": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/AnswerIteration" }
-        }
-      },
-      "additionalProperties": false
-    },
-    "QASessionFile": {
-      "type": "object",
-      "required": ["type", "stepId", "stepName", "timestamp", "questions", "status"],
-      "properties": {
-        "type": { "const": "qa-session" },
-        "stepId": { "type": "string", "format": "uuid" },
-        "stepName": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "questions": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/QASessionQuestion" }
-        },
-        "status": { "$ref": "#/$defs/SessionStatus" }
-      },
-      "additionalProperties": false
     }
   },
   "oneOf": [
     { "$ref": "#/$defs/ProcessInstance" },
     { "$ref": "#/$defs/MemoryFile" },
-    { "$ref": "#/$defs/LogFile" },
-    { "$ref": "#/$defs/PendingInteractionFile" },
-    { "$ref": "#/$defs/QASessionFile" }
+    { "$ref": "#/$defs/LogFile" }
   ]
 }

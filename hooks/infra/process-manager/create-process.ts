@@ -1,0 +1,125 @@
+import type { ManagerPorts } from '../ports/ports'
+import { fail, ok, readJson, writeJson } from './process-files'
+import type { Doc, Result } from './process-files'
+
+// A step definition is copied into the process, so the process does not change when the template does.
+const EMBED_FIELDS = ['output', 'guidance', 'substeps', 'flow', 'memoryFileUsage', 'parameters']
+const EXTRA_EMBED_FIELDS = ['improvementCategories', 'prioritization', 'workflow', 'successCriteria', 'complianceChecklist', 'searchModes', 'changeProposalFormat', 'captureTypes']
+
+const dirOf = (path: string) => path.slice(0, path.lastIndexOf('/'))
+
+// { id: path } for every `<folder>/<folder>.json` of the given `type` under `root`.
+async function registry(ports: ManagerPorts, root: string, type: string): Promise<Record<string, string>> {
+  const found: Record<string, string> = {}
+  let entries: { name: string; kind: string }[]
+  try { entries = await ports.files.list(root) } catch { return found }
+  for (const entry of entries.filter(e => e.kind === 'dir')) {
+    const path = `${root}/${entry.name}/${entry.name}.json`
+    if (!(await ports.files.exists(path))) continue
+    try {
+      const data = await readJson(ports, path)
+      if (data.type === type && data.id) found[data.id] = path
+    } catch { /* not a definition */ }
+  }
+  return found
+}
+
+const embed = (data: Doc): Doc => {
+  const out: Doc = {}
+  for (const field of [...EMBED_FIELDS, ...EXTRA_EMBED_FIELDS]) if (field in data) out[field] = data[field]
+  return out
+}
+
+export type CreateProcessArgs = {
+  processDir: string; templatePath: string; name?: string; params?: Doc; projectPath?: string
+  parentProcessPath?: string; parentId?: string; parentName?: string; returnToStep?: string
+}
+
+export async function createProcess(ports: ManagerPorts, a: CreateProcessArgs): Promise<Result> {
+  if (await ports.files.exists(`${a.processDir}/process.json`)) fail(`Process already exists at ${a.processDir}`)
+  if (!(await ports.files.exists(a.templatePath))) fail(`Template not found: ${a.templatePath}`)
+
+  const template = await readJson(ports, a.templatePath)
+  const templateName = template.name ?? a.templatePath.split('/').pop()!.replace(/\.json$/, '')
+  const templateDir = dirOf(a.templatePath)
+  const stepFiles = await registry(ports, templateDir, 'step')
+
+  const steps: Doc[] = []
+  for (const [i, def] of (template.steps ?? []).entries()) {
+    const ref = def.stepRef
+    let stepDefinition: Doc = {}
+    if (ref) {
+      if (stepFiles[ref]) stepDefinition = embed(await readJson(ports, stepFiles[ref]))
+      else {
+        // No fallback: the id must be found.
+        stepDefinition = def.stepDefinition ?? {}
+        if (!Object.keys(stepDefinition).length) fail(`Step definition UUID not found in template directory: ${ref}`)
+      }
+    } else {
+      stepDefinition = def.stepDefinition ?? {} // no stepRef: an orchestrator step
+    }
+
+    const step: Doc = { id: ports.uuid(), number: i, name: def.name ?? `Step ${i}`, status: 'pending', stepRef: ref || '' }
+    if (def.stepRefName != null) step.stepRefName = def.stepRefName
+    if (def.approvalRequired != null) step.approvalRequired = def.approvalRequired
+    step.stepDefinition = stepDefinition
+    for (const key of ['subProcessTrigger', 'loopBackTo', 'loopCondition', 'maxIterations']) if (def[key] != null) step[key] = def[key]
+    steps.push(step)
+  }
+
+  // The framework steps, such as continuous improvement, go at the end of every process.
+  const frameworkRoot = `${ports.pluginRoot}/framework-steps`
+  for (const entry of (await ports.files.list(frameworkRoot)).filter(e => e.kind === 'dir').sort((x, y) => x.name.localeCompare(y.name))) {
+    const path = `${frameworkRoot}/${entry.name}/${entry.name}.json`
+    if (!(await ports.files.exists(path))) continue
+    const data = await readJson(ports, path)
+    if (data.type !== 'framework-step') continue
+    const step: Doc = { id: ports.uuid(), number: steps.length, name: data.metadata?.title ?? entry.name, status: 'pending', stepRef: data.id ?? '', stepRefName: entry.name }
+    if (data.approvalRequired != null) step.approvalRequired = data.approvalRequired
+    step.stepDefinition = embed(data)
+    steps.push(step)
+  }
+
+  let parentProcess: Doc | undefined
+  if (a.parentProcessPath) {
+    if (a.parentId && a.parentName) {
+      parentProcess = { id: a.parentId, name: a.parentName, processPath: a.parentProcessPath, returnToStep: a.returnToStep ?? '' }
+    } else if (await ports.files.exists(`${a.parentProcessPath}/process.json`)) {
+      const parent = await readJson(ports, `${a.parentProcessPath}/process.json`)
+      parentProcess = { id: parent.id, name: parent.name, processPath: a.parentProcessPath, returnToStep: a.returnToStep ?? '' }
+    }
+  }
+
+  const now = ports.now()
+  const metadata: Doc = { template: templateName, created: now, lastUpdated: now }
+  if (template.id != null) metadata.templateId = template.id
+  if (template.category != null) metadata.templateCategory = template.category
+  metadata.projectPaths = [a.projectPath || (await ports.cwd())]
+  metadata.processPath = a.processDir
+
+  const first = steps[0]
+  const process: Doc = {
+    type: 'process-instance', id: ports.uuid(), name: a.name || templateName, metadata, status: 'running', parameters: a.params ?? {},
+    currentState: {
+      activeStep: {
+        id: first?.id ?? '', name: first?.name ?? '', actionSummary: 'Initializing process',
+        totalSubsteps: first ? (first.stepDefinition.substeps?.length ?? 0) : 0, actionDetails: 'Process created, ready to begin',
+      },
+    },
+    steps,
+  }
+  if (parentProcess) process.subProcessState = { parentProcess, childProcesses: [] }
+
+  const log: Doc = {
+    type: 'log-file',
+    metadata: { process: process.id, template: templateName, started: now, completed: null, parentProcessPath: a.parentProcessPath ?? null, subProcessPaths: [] },
+    steps: {},
+    processWideObservations: { patternsDetected: [], userFeedbackSummary: [], efficiencyMetrics: {}, recommendationsForFuture: [] },
+    executionMetrics: { totalSteps: steps.length, stepsCompleted: 0, currentStep: first?.id ?? '' },
+  }
+
+  await writeJson(ports, `${a.processDir}/process.json`, process)
+  await writeJson(ports, `${a.processDir}/memory/_cross-references.json`, { type: 'memory-cross-references', keyDecisions: [], filesModified: [], filesCreated: [], custom: {} })
+  await writeJson(ports, `${a.processDir}/log.json`, log)
+  return ok('process.json', 'memory/_cross-references.json', 'log.json')
+}

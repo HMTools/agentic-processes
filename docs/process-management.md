@@ -103,21 +103,13 @@ The `log.json` file must be updated:
 
 ### User-Only Approval Architecture
 
-Step approval is **user-only**. No agent or automated process can approve steps. Approval is enforced through three layers:
+Step approval is **user-only**. No agent or automated process can approve steps. The approval is a click in a dialog that the plugin's mod shows:
 
-1. **Skill Invocation Control**: The `process-approve` skill has `disable-model-invocation: true`, making it invisible to agents. Only users can invoke it via `/process-approve`.
-2. **Instruction Removal**: Agent-visible documentation contains no instructions for calling `approve-step`. Agents are told to inform the user to run `/process-approve` when approval is needed.
-3. **Hook Enforcement**: A PreToolUse hook (`block-approve-step.sh`) blocks any Bash command containing `approve-step` unless a `.approve-token` file exists (created only by the user-only skill).
+1. **The agent asks.** When a step with `approvalRequired: true` is done, the agent calls the tool `request_approval`. The mod opens a dialog with the step's name and output, and holds the call until the user answers.
+2. **The user clicks.** On Approve, the mod sets `approved: true` on the step in `process.json`. On Request changes, the user types what to change, and the agent reads it as the tool result. There is no Reject option: a step the user does not want gets changes requested.
+3. **Nothing else approves.** There is no approve command. The mod refuses a hand edit of a process file by the agent (`process.json`, `log.json`, `memory/*.json`, the findings): the Write and Edit tools, and Bash commands that write it. Only the process tools write them. The tool `update_step_status` still refuses completing on a step that is not approved.
 
-### How Approval Works
-
-**CLI channel** (Claude Code):
-- The user runs `/process-approve` which creates a `.approve-token`, calls `approve-step`, and sets `approved: true`
-- The hook consumes the token, allowing the command to execute
-
-**UI channel**:
-- The UI app calls `approve-step` directly via the command line (hooks do not apply outside Claude Code sessions)
-- No token is needed for UI-initiated approvals
+While a gate is open, the agent can only research: read, search, MCP tools and subagents. A write, an edit or a Bash command waits for the click (Bash can still log the user's prompt). If the user closes the dialog, it opens again with their next prompt. The gate is a record in the mod's store, so a restart does not lose it.
 
 ### Agent Role at Approval Checkpoints
 
@@ -125,22 +117,16 @@ When a step has `approvalRequired: true`, the agent's role is:
 
 1. **Check process.json** - Look for `"approvalRequired": true` on the current step
 2. **Present deliverables** to the user
-3. **Create approval checkpoint** via `write-pending` (creates `pending-interaction.json`)
-4. **WAIT** - Do NOT proceed until user responds
-5. **Log user response** in log.json via `log-interaction`
-6. **Delete the checkpoint** via `write-pending --delete`
-7. **Complete the step** via `update-step-status --status completed` (succeeds only if the user has approved)
-
-If step 7 fails because the step is not yet approved, inform the user they need to run `/process-approve` first.
+3. **Call `request_approval`** - The call waits for the user's click. The answer is the result.
+4. **Log user response** in log.json via the tool `log_interaction`
+5. **Complete the step** via the tool `update_step_status` (status completed) (succeeds only if the user has approved). If the user asked for changes, change the step and call `request_approval` again.
 
 ### Workflow Checklist (Before Completing Step)
 
 - [ ] Check if step has `approvalRequired: true`
-- [ ] If yes: Present deliverables and create pending checkpoint
-- [ ] Wait for user response
-- [ ] Log the user's response via `log-interaction`
-- [ ] Delete the pending checkpoint via `write-pending --delete`
-- [ ] Call `update-step-status --status completed` (user must have approved first)
+- [ ] If yes: Present deliverables and call `request_approval`
+- [ ] Log the user's answer via the tool `log_interaction`
+- [ ] Call the tool `update_step_status` with status completed (user must have approved first)
 
 ---
 
@@ -253,8 +239,8 @@ Place sync points where parent needs sub-process results:
    ├── Creates sub-process with parent reference
    └── Records child in parent's subProcessState
 
-3. COMPLETE: When sub-process finishes, process_manager.py auto-notifies parent
-   ├── update-process-status --status completed --summary "..."
+3. COMPLETE: When sub-process finishes, the mod auto-notifies parent
+   ├── update_process_status (status completed, with a summary)
    ├── Automatically updates child status in parent's process.json
    └── Adds completion summary to parent's memory/ directory
 
@@ -280,8 +266,8 @@ Template steps declare sub-process spawning via metadata:
 
 ### Parent Notification (Automatic)
 
-Parent notification is handled automatically by `process_manager.py`. When a sub-process completes:
-- `update-process-status --status completed --summary "..."` is called
+Parent notification is handled automatically by the tool `update_process_status`. When a sub-process completes:
+- `update_process_status` is called with status completed and a summary
 - The script detects the parent reference in `subProcessState.parentProcess`
 - It updates the child's status in the parent's `process.json`
 - It adds the completion summary to the parent's `memory/ directory`
