@@ -38,12 +38,14 @@ type View = { ox: number; oy: number; zoom: 0 | 1; hover?: string }
 
 const Graph: ClientModule<GProps, View> = (props, surface) => {
   const { Box, Text } = surface.elements
+  // Desktop can report a small or zero region size before and after layout: size the root by percent and clamp with a sane size.
+  const cols = surface.columns > 20 ? surface.columns : 80, rows = surface.rows > 4 ? surface.rows : 22
   const zoom = surface.state?.zoom ?? 1
   const map = layout(props, zoom)
   const active = map.nodes.find(p => p.active)
   // Start with the active step in the middle, until the user moves the view.
-  const view: View = surface.state ?? { ox: 0, oy: Math.max(0, (active ? active.y : 0) - Math.floor(surface.rows / 2)), zoom }
-  const clamp = (v: View): View => ({ ...v, ox: Math.max(0, Math.min(v.ox, Math.max(0, map.width - surface.columns))), oy: Math.max(0, Math.min(v.oy, Math.max(0, map.height - surface.rows))) })
+  const view: View = surface.state ?? { ox: 0, oy: Math.max(0, (active ? active.y : 0) - Math.floor(rows / 2)), zoom }
+  const clamp = (v: View): View => ({ ...v, ox: Math.max(0, Math.min(v.ox, Math.max(0, map.width - cols))), oy: Math.max(0, Math.min(v.oy, Math.max(0, map.height - rows))) })
   const set = (next: Partial<View>) => surface.setState(clamp({ ...(surface.state ?? view), ...next }))
 
   let drag: { x: number; y: number; ox: number; oy: number; moved: boolean } | undefined
@@ -89,7 +91,7 @@ const Graph: ClientModule<GProps, View> = (props, surface) => {
     })
   })
   return Box({
-    width: surface.columns || '100%', height: surface.rows || 20, overflow: 'hidden', flexDirection: 'column',
+    width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column',
     children: [...edges, ...boxes, Box({ ...{ position: 'absolute' as const, left: 0, bottom: 0 }, children: [Text({ dimColor: true, children: ['drag to move · + − size · press a step'] })] })],
   })
 }
