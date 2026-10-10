@@ -2,9 +2,9 @@ import { test, expect } from 'claude-code/testing'
 import { DIR, processFile, world } from './fake-world'
 import { PROCESS_TOOLS, TOOL_PREFIX, ensureProcessTools, runTool } from './tools'
 
-test('15 tools, one for each command of the old script, with a unique name and a schema', () => {
-  expect(PROCESS_TOOLS.length).toBe(15)
-  expect(new Set(PROCESS_TOOLS.map(t => t.name)).size).toBe(15)
+test('16 tools: one for each command of the old script, and bind_process, with a unique name and a schema', () => {
+  expect(PROCESS_TOOLS.length).toBe(16)
+  expect(new Set(PROCESS_TOOLS.map(t => t.name)).size).toBe(16)
   for (const t of PROCESS_TOOLS) {
     expect(t.inputSchema.type).toBe('object')
     expect(t.description.length).toBeGreaterThan(10)
@@ -39,11 +39,11 @@ test('the tools are listed once for each session, behind tool search, with the a
   const register = async (spec: any) => { listed.push(spec) }
   await ensureProcessTools(register, 'S-lazy')
   await ensureProcessTools(register, 'S-lazy')
-  expect(listed.length).toBe(16)
+  expect(listed.length).toBe(17)
   expect(listed.every(s => s.isDeferred)).toBe(true)
   expect(listed.map(s => s.name)).toContain('request_approval')
   await ensureProcessTools(register, 'S-other')
-  expect(listed.length).toBe(32)
+  expect(listed.length).toBe(34)
 })
 test('a failed registration is tried again next time', async () => {
   let fails = true

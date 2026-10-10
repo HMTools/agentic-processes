@@ -36,9 +36,8 @@ When `/process-continue` is invoked:
 
 ### 2. Bind Session to Process (MANDATORY — first action)
 
-1. Write an empty `.session` file in the process directory: `Write(.session, "")`
-2. The `bind-session-to-process` hook fills it with the new session ID
-3. Verify `.session` contains a non-empty session ID
+1. Call the tool `bind_process` (find it by tool search) with `processDir` the process directory
+2. If the answer is an error, stop and tell the user
 
 WITHOUT session binding, all enforcement hooks will be **silently disabled** for the entire session.
 

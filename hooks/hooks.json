@@ -1,17 +1,3 @@
 {
-  "modules": ["./register.ts"],
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|StrReplace|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/bind-session-to-process.sh"]
-          }
-        ]
-      }
-    ]
-  }
+  "modules": ["./register.ts"]
 }

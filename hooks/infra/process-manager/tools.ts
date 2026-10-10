@@ -1,6 +1,7 @@
 import type { ManagerPorts } from '../ports/ports'
 import { REQUEST_APPROVAL_TOOL } from '../approval-gate/approval-gate'
 import { TOOL_PREFIX } from '../mod-events/mod-events'
+import { bindSession } from './bind-session'
 import { createProcess } from './create-process'
 import { findingsTools } from './findings-tools'
 import { addLogEntry, logInteraction, updateLogObservations } from './log'
@@ -74,6 +75,7 @@ export const PROCESS_TOOLS: Tool[] = [
     recommendations: list('Recommendations for the future'),
   }, ['processDir'], updateLogObservations),
   ...findingsTools(processDir, str, list),
+  tool('bind_process', 'Link this session to a process, so the rules of the plugin apply to it. Do this first when you resume a process.', { processDir }, ['processDir'], (ports, a) => bindSession(ports, a.processDir)),
 ]
 
 export { TOOL_PREFIX }

@@ -32,4 +32,5 @@ export type ManagerPorts = {
   uuid(): string
   pluginRoot: string
   cwd(): Promise<string>
+  sessionId(): Promise<string>
 }

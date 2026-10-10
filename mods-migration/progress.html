@@ -140,11 +140,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/H08-bind-session-to-process.md",
     "firstGuess": "replace",
     "source": "scripts/bind-session-to-process.sh",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Replaced by a mod tool: bind_process writes the session id (also over an old one) and create_process uses the same function. The shell script and its hooks.json entry are deleted; the .session file stays as the link.",
+    "open": ["Live run not done: skill calls bind_process on a real resume (S01/S02)", "Is $.session.id() the same as the hook session_id, and does it change on /clear, /resume?", "No unbind when a session ends or a process leaves active/ (C01)", "First prompt after /process-continue runs before the link (H10)"],
+    "updated": "2026-10-10"
   },
   {
     "id": "H10",

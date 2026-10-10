@@ -51,15 +51,46 @@
 No implementation. No plugin edits. (Only items S01–S03 may build a throwaway mod outside this repo.)
 
 ## 7. Research result
-_(empty until the research is done)_
+
+Built instead of only researched, at the owner's request (plan page "Session Binding in the Mod", 4 decisions kept as proposed).
 
 ### Claude Code version
+2.1.296 (Claude Code)
+
 ### Answers per question (1-8, each with evidence)
+1. **Not verified live.** The mod uses `$.session.id()` for every check; tests fake it. Same string as the hook `session_id` and `${CLAUDE_SESSION_ID}` is assumed, not run (S02). A resumed session has a new id (item section 2), so the binding must be redone on resume.
+2. **Done: a tool the skill calls.** `bind_process` (`hooks/infra/process-manager/bind-session.ts`) is the first action of `skills/process-continue/SKILL.md` step 2. `create_process` binds through the same function (`hooks/on-process-tools/on-process-tools.ts`). A command-run guess was rejected: the process is chosen inside the skill, after the command starts.
+3. **Kept the file.** `.session` stays the link: `findAgenticProcessDir` (`hooks/infra/agentic-process-repository/agentic-process-repository.ts:8`) is the one reader and survives a restart. The UI app is obsolete, so no file is kept for it. A `$.store` map is left to C01.
+4. **No double write.** The settings hook is deleted, so only the mod writes. The tool writes only when the id differs.
+5. **Not verified.** Subagent calls carry `agentId` (README finding). `bind_process` is called by the main agent. Not run in a subagent.
+6. **Not done.** Nothing unbinds on `session.end` or when a process leaves `active/`. A stale id stays until the next resume. Left to C01.
+7. **Decided: no fallback.** Every process tool is a mod tool, so with mods off the plugin cannot change a process. A binding fallback has no job. The script is deleted.
+8. **Replace, with the file as source.** `bind_process` replaces an old id. Two live sessions that bind the same folder: the last write wins, as today. `$.fs.write` is not atomic; the file holds one short id.
+
 ### Final verdict
+**replace.** The tool `bind_process` and `create_process` write `.session`. The shell script and its `hooks.json` entry are deleted. The `.session` file stays.
+
 ### Evidence (doc page + section, type-file names, repo file:line)
+- Added: `hooks/infra/process-manager/bind-session.ts`, tool in `hooks/infra/process-manager/tools.ts`, `sessionId()` in `hooks/infra/ports/ports.ts`.
+- Changed: `hooks/on-process-tools/on-process-tools.ts`, `skills/process-continue/SKILL.md`, `hooks/hooks.json`, `types/process-instance.ts`.
+- Deleted: `scripts/bind-session-to-process.sh`.
+- Tests: `bind-session.test.ts`, `on-process-tools.test.ts`; `claude plugin test .` gave 206 pass, 0 fail.
+
 ### Open questions
+- Does `$.session.id()` equal the hook `session_id` and `${CLAUDE_SESSION_ID}`? (S02)
+- Does the id change on `/clear`, `/resume`, `/branch`, compaction? (S02)
+- Does the tool work from a subagent call?
+- Live run not done: skill calls `bind_process` in a real resume.
+
 ### Risks
+- The first prompt after `/process-continue` runs before the link (H10).
+- A resumed session is unlinked until the agent calls the tool. If the agent skips it, the rules stay off.
+- No unbind: a stale id of a dead session stays.
+
 ### What a later plan must decide
+- Move the session-to-process lookup into `$.store` or `$.state` (C01).
+- Unbind on process completion or `session.end`.
+- Link at `/process-continue` start if a process name can be known there.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "H08"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

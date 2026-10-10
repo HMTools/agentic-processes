@@ -32,6 +32,7 @@ export function world(initial: Record<string, unknown> = {}, { failMove = false 
     uuid: () => `id-${++counter}`,
     pluginRoot: '/plugin',
     cwd: async () => '/work',
+    sessionId: async () => 'S1',
   }
   const json = (path: string) => JSON.parse(disk[path])
   return { ports, disk, moved, json }

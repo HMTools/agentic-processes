@@ -100,7 +100,7 @@ export interface ProcessMetadata {
 
   /**
    * @deprecated Session binding moved to .session file in process directory.
-   * The bind-session-to-process hook writes the session ID to a dedicated
+   * The tools `create_process` and `bind_process` write the session ID to a dedicated
    * .session file (plain text) alongside process.json. Consumer hooks read
    * that file instead of grepping process.json. This field is no longer used.
    */

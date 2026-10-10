@@ -1,6 +1,7 @@
 import type { Register } from 'claude-code'
 import { findAgenticProcessDir, hasAgenticProcessInstance } from '../infra/agentic-process-repository/agentic-process-repository'
 import { PROCESS_TOOLS, TOOL_PREFIX, ensureProcessTools, runTool } from '../infra/process-manager/tools'
+import { bindSession } from '../infra/process-manager/bind-session'
 import { moveCommands, slash } from '../infra/process-manager/move'
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
 
@@ -31,6 +32,7 @@ const portsOf = ($: any): ManagerPorts => ({
   uuid: () => crypto.randomUUID(),
   pluginRoot: slash($.plugin.root),
   cwd: () => $.session.cwd(),
+  sessionId: () => $.session.id(),
 })
 const registerOf = ($: any) => (spec: Parameters<typeof $.tool.register>[0]) => $.tool.register(spec)
 
@@ -54,8 +56,7 @@ export const register: Register = on => {
     const args = e as any // the arguments of an MCP tool call sit on e itself
     const ports = portsOf($)
     const result = await runTool(ports, name, args)
-    // The shell hook that bound a session to its process ran after an agent Write. The tools write, so the first one binds.
-    if (name === 'create_process' && result.status === 'ok') await ports.write(`${args.processDir}/.session`, await $.session.id())
+    if (name === 'create_process' && result.status === 'ok') await bindSession(ports, args.processDir)
     const isError = result.status === 'error'
     return { result: { content: [{ type: 'text', text: JSON.stringify(result) }], isError }, ...(isError ? { isError: true } : {}) } as never
   })
