@@ -2,6 +2,9 @@ import type { ManagerPorts } from '../ports/ports'
 import { fail, locked, ok, readJson, readProcess, stepName, writeJson } from './process-files'
 import type { Doc, Result } from './process-files'
 
+// A repeated call must not add the same decision or file twice.
+const union = (old: string[] | undefined, added: string[]) => [...new Set([...(old ?? []), ...added])]
+
 // A step may read and write only the topics its definition lists. An empty or old-format list means no limit.
 async function validateTopicAccess(ports: ManagerPorts, dir: string, stepId: string, topic: string, access: 'readFrom' | 'writeTo'): Promise<void> {
   if (topic === '_cross-references') return
@@ -32,8 +35,8 @@ export const addMemoryEntry = (ports: ManagerPorts, a: AddMemoryArgs): Promise<R
   const existing = topic.entries[a.stepId]
   if (existing) {
     existing.informationProduced = { ...existing.informationProduced, ...info }
-    existing.decisionsMade = [...(existing.decisionsMade ?? []), ...decisions]
-    existing.filesModifiedCreated = [...(existing.filesModifiedCreated ?? []), ...files]
+    existing.decisionsMade = union(existing.decisionsMade, decisions)
+    existing.filesModifiedCreated = union(existing.filesModifiedCreated, files)
     existing.updatedAt = now
   } else {
     topic.entries[a.stepId] = {
@@ -49,8 +52,8 @@ export const addMemoryEntry = (ports: ManagerPorts, a: AddMemoryArgs): Promise<R
   const xref: Doc = (await ports.files.exists(xrefPath))
     ? await readJson(ports, xrefPath)
     : { type: 'memory-cross-references', keyDecisions: [], filesModified: [], filesCreated: [], custom: {} }
-  xref.keyDecisions = [...(xref.keyDecisions ?? []), ...decisions]
-  xref.filesModified = [...(xref.filesModified ?? []), ...files]
+  xref.keyDecisions = union(xref.keyDecisions, decisions)
+  xref.filesModified = union(xref.filesModified, files)
   await writeJson(ports, xrefPath, xref)
   return ok(`memory/${a.topic}.json`, 'memory/_cross-references.json')
 })

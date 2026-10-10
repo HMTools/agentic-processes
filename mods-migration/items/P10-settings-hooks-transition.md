@@ -59,14 +59,31 @@
 Research only. Do not edit `hooks/hooks.json` or any script, and do not build a mod. Whether to rely on mods being always on is item `X01`; the behavior of each script is items `H01`-`H11`.
 
 ## 7. Research result
-_(empty until the research is done)_
-- Claude Code version:
-- Answers to each question (with evidence):
-- Final verdict:
-- Evidence (doc page + section, type file name, repo `path:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built at the owner's request after the plan page "Mod Migration P06 to P12" (all 5 decisions kept as proposed).
+
+### Claude Code version
+2.1.296
+
+### Answers (short)
+1. `hooks/hooks.json` now holds only `modules` (`./register.ts`). The shell hooks were replaced one by one in the H items.
+2-3. Not relevant any more: no shell hook runs beside a mod rule, so nothing runs twice.
+4. Switches: `--safe-mode` and the admin settings turn mods off, and then no process tool exists. Recorded in the README.
+5. Cut-over: done, each script was removed when its mod rule had tests.
+6. `plugin.json` version raised to **3.0.0**. A Claude Code build without mods ignores the plugin's rules.
+7. Not checked: whether `claude plugin validate` warns about anything here (it passed with warnings in P04).
+
+### What changed
+Deleted `scripts/models.py`, `scripts/template_manager.py` (P09), and the two one-time scripts `strip_files_changed.py` and `migrate_embedded_steps.py`. The `scripts/` folder is gone. README updated.
+
+### Final verdict
+**replace.**
+
+### Risks
+A user on an old Claude Code build gets a plugin with no rules and no tools.
+
+### What a later plan must decide
+X01: what organisations that limit mods should do.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P10"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

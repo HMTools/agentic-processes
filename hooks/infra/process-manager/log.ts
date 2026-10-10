@@ -12,6 +12,9 @@ const LOG_LISTS: [keyof LogEntryArgs, string][] = [
   ['problems', 'problemsEncountered'], ['decisions', 'decisionsMade'], ['performanceNotes', 'performanceNotes'],
 ]
 
+// A repeated call must not add the same decision or file twice. Actions and notes can repeat on purpose.
+const DEDUPED = ['decisionsMade', 'filesModified']
+
 // The step's timestamp is a string in old logs and { startedAt, updatedAt } now.
 const touch = (entry: Doc, now: string) => {
   entry.timestamp = typeof entry.timestamp === 'object' && entry.timestamp !== null ? { ...entry.timestamp, updatedAt: now } : { startedAt: entry.timestamp, updatedAt: now }
@@ -24,7 +27,7 @@ export const addLogEntry = (ports: ManagerPorts, a: LogEntryArgs): Promise<Resul
   if (entry) {
     for (const [arg, field] of LOG_LISTS) {
       const items = a[arg] as string[] | undefined
-      if (items?.length) entry[field] = [...(entry[field] ?? []), ...items]
+      if (items?.length) entry[field] = DEDUPED.includes(field) ? [...new Set([...(entry[field] ?? []), ...items])] : [...(entry[field] ?? []), ...items]
     }
     touch(entry, now)
   } else {

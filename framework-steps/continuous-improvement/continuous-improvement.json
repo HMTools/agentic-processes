@@ -96,7 +96,7 @@
         "Detect repeated manual interventions",
         "TRACE ACTUAL EXECUTION: Review log.json to identify exactly which files were used during this process (which prompts, which steps, which templates)",
         "IDENTIFY ALL AFFECTED FILES: For each finding, find ALL files in the framework that could be affected - not just one obvious file",
-        "CHECK FRAMEWORK-WIDE IMPACT: Consider if the issue exists in multiple places (e.g., both process-new.md AND process-continue.md)",
+        "CHECK FRAMEWORK-WIDE IMPACT: Consider if the issue exists in multiple places (e.g., both the process pane and the process-run skill)",
         "VERIFY FILE USAGE: Before naming any file in a finding's scope, confirm that file was actually relevant to this process execution",
         "ROOT CAUSE ANALYSIS: Ask 'why did this happen?' at least 3 times to find the true root cause, not just the symptom",
         "DOCUMENT REASONING: For each finding, capture: (1) What files were actually used, (2) What files would need to change, (3) Why each file would need to change"

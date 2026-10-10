@@ -70,10 +70,32 @@ Test procedure for the spike. Do research from the docs first (step 1), then bui
 No changes to this repo. No real process state. The spike mod is not a production guard. Do not publish or install it into the user's real plugin set.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence (debug-log lines, doc section), final verdict, open questions, risks, what a later plan must decide. Record: tool names seen, field names in `e`, order observed in T5, time per call, whether the subagent is covered, behaviour of `.catch`, exact deny text rendering.)_
 
-## 7b. Cleanup (do after the result is written)
-Delete the mod folder under `~/.claude/dev-mods/<session-id>/guard-spike/`, the temp fixture folder, the debug log, and any marker file. Confirm `~/.claude/agentic-processes` is untouched (`git status` in this repo is clean apart from this item file). Run `/plugin` to confirm the mod is no longer listed.
+Closed from the built mod and its tests, at the owner's request after the plan page "Spikes and Policy: Last Mod Items" (decisions kept as proposed). No throwaway mod was run.
+
+### Claude Code version
+2.1.296
+
+### What the built mod proves (tests in the repo)
+- Parity: while a gate is open, Bash and Write are refused and a subagent write is refused too; the process tools and every MCP tool pass (`hooks/on-pending-checkpoint/on-pending-checkpoint.test.ts`).
+- A log owed refuses Write, Edit, MultiEdit, NotebookEdit, Agent and Task; reads and Bash pass; a call from a subagent passes; the log tool clears it (`on-agent-editing.test.ts`).
+- The agent cannot hand-edit a state file with Write, Edit or a Bash write: the gate hook refuses it (`on-approval-gate.ts`, with `.catch`, so a crash refuses too).
+- A subagent call carries `agentId`, and the guards use it (`on-todo-tool.ts:23`, `on-agent-editing.ts:31`).
+- Order against settings hooks (question 5) no longer matters: no settings hook is left (P10).
+
+### Not proven live
+- Q9: the refusal text reaches the model verbatim, with line breaks.
+- Q7: only `on-approval-gate.ts` has `.catch`. The other guards fail open on a throw or a time out (10 s per hook).
+- Q8: cost per call. Not measured. The mod reads the store and one file, no scan.
+
+### Final verdict
+**replace** (all guards are mod hooks).
+
+### Risks
+A guard that throws lets the call through. The gate guard is the one that matters most and has a handler.
+
+### What a later plan must decide
+Whether the log-first and todo guards also need `.catch`.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "S01"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

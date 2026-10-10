@@ -2,14 +2,13 @@ import type { Register } from 'claude-code'
 import { findAgenticProcessDir, hasAgenticProcessInstance, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 import { PROCESS_TOOLS, TOOL_PREFIX, ensureProcessTools, runTool } from '../infra/process-manager/tools'
 import { bindSession } from '../infra/process-manager/bind-session'
+import { listFindings } from '../infra/process-manager/findings'
+import { stepLine } from '../infra/process-pane/step-line'
 import { moveCommands, slash } from '../infra/process-manager/move'
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
 
 // The process tools: the agent changes process files with them, not with shell commands. The tools are listed when
-// the user starts or resumes a process (`/process-new`, `/process-continue`) or when a session already has one.
-
-const SKILLS = ['process-new', 'process-continue']
-const COMMANDS = SKILLS.flatMap(name => [name, `agentic-processes:${name}`])
+// the process pane starts or resumes a process (see ../on-process-pane) or when a session already has one.
 
 const filesOf = ($: any): FileSystem => ({
   home: async () => (await $.env.get('HOME')) ?? (await $.env.get('USERPROFILE')), // Windows has no HOME in every shell
@@ -41,20 +40,34 @@ const portsOf = ($: any): ManagerPorts => ({
     },
   },
 })
+// The line under the prompt. A surface that cannot draw it (VS Code, print mode) throws or ignores: the process goes on without it.
+async function showStepLine($: any, dir: string | undefined): Promise<void> {
+  try { await $.ui.status(dir ? await stepLine(filesOf($), dir) : '') } catch { /* no line */ }
+}
+// The tools that change where the process is.
+const LINE_TOOLS = ['create_process', 'bind_process', 'update_step_status', 'update_current_state', 'update_active_substep', 'update_process_status']
+
+// One message at session start when improvement findings wait. Nothing is shown for none.
+async function nudgeFindings($: any): Promise<void> {
+  try {
+    const open = ((await listFindings(portsOf($), { status: 'open' })).findings as unknown[]).length
+    if (open) await $.ui.toast(`${open} improvement finding${open === 1 ? '' : 's'} wait. Run /agentic-processes:apply-improvements to review ${open === 1 ? 'it' : 'them'}.`)
+  } catch { /* no message */ }
+}
+
 const registerOf = ($: any) => (spec: Parameters<typeof $.tool.register>[0]) => $.tool.register(spec)
 
 export const register: Register = on => {
   // A session that already has a process lists the tools at once.
   on('session.start', async ($, e, next) => {
-    if (hasAgenticProcessInstance(await findAgenticProcessDir(filesOf($), portsOf($).links, await $.session.id()))) {
+    const dir = await findAgenticProcessDir(filesOf($), portsOf($).links, await $.session.id())
+    if (hasAgenticProcessInstance(dir)) {
       await ensureProcessTools(registerOf($), await $.session.id())
+      await showStepLine($, dir)
     }
-    return next(e)
-  })
-
-  // The user starts or resumes a process.
-  on('command.run', { command: COMMANDS }, async ($, e, next) => {
-    await ensureProcessTools(registerOf($), await $.session.id())
+    await nudgeFindings($)
+    // The command that opens the process pane (see ../on-process-pane). A name that is taken throws, so it must not stop the session.
+    await $.command.register({ name: 'process', description: 'Start a new process or resume one', argumentHint: '[first field]' }).catch(() => {})
     return next(e)
   })
 
@@ -64,6 +77,7 @@ export const register: Register = on => {
     const ports = portsOf($)
     const result = await runTool(ports, name, args)
     if (name === 'create_process' && result.status === 'ok') await bindSession(ports, args.processDir)
+    if (LINE_TOOLS.includes(name)) await showStepLine($, args.processDir)
     const isError = result.status === 'error'
     return { result: { content: [{ type: 'text', text: JSON.stringify(result) }], isError }, ...(isError ? { isError: true } : {}) } as never
   })

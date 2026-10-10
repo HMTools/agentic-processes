@@ -57,14 +57,33 @@ Behaviour in plain words:
 No implementation. No plugin edits (do not delete `process-spawner` here; only report). No building a mod. (Only items S01-S03 may build a throwaway mod outside this repo; a spike on `$.agent` is S-series work, not this item.)
 
 ## 7. Research result
-_(empty until the research is done; fill these headings)_
-- Claude Code version (`claude --version`):
-- Answers to questions 1-8:
-- Final verdict:
-- Evidence (doc page + section, type-file name, repo `file:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built at the owner's request after the plan page "Mod Migration P06 to P12" (all 5 decisions kept as proposed).
+
+### Claude Code version
+2.1.296
+
+### Answers (short)
+1. Spawn by mod: not needed. The delegation skill (`context: fork` + `agent:`) already gives context isolation. No change.
+2. The agent stays a markdown file (`agents/step-executor.md`). Nothing gained by registering it from the mod.
+3. Crash detection: done. `isStepExecutorRunning` reads the agent list (`hooks/infra/step-executors/step-executors.ts:6`) and `on-agent-stopping.ts:100` starts the step again when no agent is alive. The 10-minute timer script is gone.
+4. Subagent tool calls carry `agentId`; the guards use it (`on-todo-tool.ts:23`, `on-agent-editing.ts:31`).
+5. Per-step model or tool list: not needed now. A later plan can add it with `agent.spawn`.
+6. Step guidance stays in `process.json`; the agent reads it. The JSON files are the contract.
+7. `process-spawner` was never called: before P04 the only mention was an optional list in the two old skills, which created sub-processes themselves. `process-run` does the same. **Deleted** (agent file, `AGENTS.md`, `README.md`).
+8. With mods off the agent and skill still load, but no process tool exists (see P10).
+
+### Final verdict
+**keep** (plus one deletion).
+
+### Evidence
+Repo: `step-executors.ts:6`, `on-agent-stopping.ts:100`, `AGENTS.md`, `README.md`. Search: grep of the repo for `process-spawner` found only its own file and two doc lines.
+
+### Risks
+A grep covers this plugin only, not other plugins that could name the agent.
+
+### What a later plan must decide
+Whether the mod, not the model, drives the step loop (H01).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P06"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

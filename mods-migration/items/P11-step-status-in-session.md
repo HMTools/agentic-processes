@@ -58,14 +58,32 @@
 Research only. No repo edits and no building a mod (a spike may be proposed, not built here). Not part of this item: a pane or band for the full UI (that is the later UI round, item `P12`). Related items: `P07` (the files read), `P12` (UI app), `C01` (the shared session lookup), `X01` (mods off).
 
 ## 7. Research result
-_(empty until the research is done)_
-- Claude Code version:
-- Answers to each question (with evidence):
-- Final verdict:
-- Evidence (doc page + section, type file name, repo `path:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built at the owner's request after the plan page "Mod Migration P06 to P12" (all 5 decisions kept as proposed).
+
+### Claude Code version
+2.1.296
+
+### Answers (short)
+1. The mod reads `process.json` with `$.fs` and the home folder from `$.env.get('HOME')`.
+2. The session link is in the mod store (H08); the line uses it. After `/clear` the user opens `/process` again, as in P04.
+3. `$.ui.status(text)`; an empty text clears it. It is drawn in the terminal and the Desktop app; the call is wrapped so other surfaces do nothing.
+4. Refresh after each process tool call, no timer: state only changes through the tools.
+5. Lines: `Step 3 of 7 · Draft the plan · part 2 of 4` and `Step 3 of 7 · Draft the plan · waits for you`. No toast per step.
+6. No bound process, a finished process, or a moved folder: the line is cleared. Several processes: the newest bound one shows.
+7. No spike needed.
+
+### What changed
+`hooks/infra/process-pane/step-line.ts` (+ test), `on-process-tools.ts` (`showStepLine` after the tools that change position and at session start), `on-process-pane.ts` (after Create or Resume).
+
+### Final verdict
+**improve** (read-only display).
+
+### Risks
+The pane and the tools hook each carry a small copy of `showStepLine`, because a mod cannot pass `$` into a function from another file.
+
+### What a later plan must decide
+Nothing.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P11"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

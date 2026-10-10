@@ -56,14 +56,48 @@ Behaviour in plain words:
 No implementation. No plugin edits. No building a mod. Do not start or resume real processes. (Only items S01-S03 may build a throwaway mod outside this repo.)
 
 ## 7. Research result
-_(empty until the research is done; fill these headings)_
-- Claude Code version (`claude --version`):
-- Answers to questions 1-7:
-- Final verdict:
-- Evidence (doc page + section, type-file name, repo `file:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built instead of only researched, at the owner's request (plan page "Process Pane in the Mod", 3 decisions kept as proposed).
+
+### Claude Code version
+2.1.296 (Claude Code)
+
+### Answers per question (1-7, each with evidence)
+1. **Command plus pane, then one prompt.** `/process` opens a pane (`$.ui.open`). A button callback sends `$.prompt.submit({ text, asUser: true })` (not awaited). Returning `{ text }` from the command was not used: the process is chosen inside the pane, after the command ended. Test: `on-process-pane.test.ts`.
+2. **The store holds the link, not a file.** `bindSession` (H08, C01) is called by the pane with `$.session.id()`. Not verified live: that this id equals the hook `session_id`, and what it does after `/clear`, `/resume`, `/branch` (S02). After `/clear` the user opens `/process` again, which binds the new id.
+3. **Not used.** The pane builds the state message once (`handoff` in `hooks/infra/process-pane/process-pane.ts`). `prompt.context` each turn was not needed and would cost cache. Replaces steps 3-6 of process-continue.
+4. **Mod: template list, fields, `create_process`, binding, state summary, process list. Model: step loop, approvals, sub-process steps, parameter choice (now the user's).** The sub-process steps (create child, register child) stay model-driven in the `process-run` skill; a `start_sub_process` tool is a later option.
+5. **Merged.** One command `/process`, two tabs. The names `/process-new` and `/process-continue` are gone. The UI app is obsolete, so nothing relies on them.
+6. **Not changed.** The model still drives the step loop. A mod-driven loop (mod starts each subagent) was not built; that stays a separate decision (see H01, P06).
+7. **No fallback.** The tools are mod tools, so with mods off the plugin cannot change a process. A skill fallback has no job. The pane needs the terminal or the Desktop app (no pane elsewhere).
+
+### Final verdict
+**replace.** The pane does what the two skills did before the step loop. One shared skill `process-run` keeps the loop, approval and sub-process text (about 110 lines, down from 369 in two skills; the sub-process text exists once now).
+
+### Evidence (doc page + section, type-file names, repo file:line)
+- Docs: mods interface (pane, `Input`, `Button`), mods api (`$.command.register`, `$.prompt.submit`), mods test (`$.ui.mount`).
+- Added: `hooks/infra/process-pane/process-pane.ts`, `hooks/on-process-pane/on-process-pane.ts`, `skills/process-run/SKILL.md`, and the two test files next to them.
+- Changed: `hooks/register.ts`, `hooks/on-process-tools/on-process-tools.ts` (registers the command; a plugin can have only one `session.start` hook without a matcher, and the old `command.run` hook for the skill names is gone), `agents/process-spawner.md` (calls `create_process`, not the skill), `agents/step-executor.md`, `skills/step-executor-delegation`, `skills/process-state-update`, `README.md`, `framework-steps/continuous-improvement`.
+- Deleted: `skills/process-new`, `skills/process-continue`.
+- Found by a test: a prompt sent with `asUser: true` still has `origin.kind: "plugin"`, so `on-user-prompt` skips it. The pane raises the log flag and restarts the re-prompt count itself (`handOff`).
+- Found by a test: an `Input` must have `onSubmit`. Enter in a field creates the process.
+- `claude plugin test .`: 218 pass, 0 fail. `claude plugin validate .`: passed with warnings.
+
+### Open questions
+- Live run not done: the pane in a real terminal and in the Desktop app.
+- Is `/process` free of a built-in name collision? The register call is wrapped so a clash does not stop the session.
+- Does `$.session.id()` equal the hook `session_id`, and what changes after `/clear`, `/resume`? (S02)
+- Does the model read the `process-run` skill when the hand-off asks for it? Not run live.
+
+### Risks
+- The first turn after Create or Resume now starts with the link in place (this removes the H08 risk "first prompt runs before the link"). A resume after `/clear` needs the user to open `/process` again, as before.
+- The pane keeps its state in module variables: a reload of the mod closes it back to the start.
+- Create shows an error line when a required field is empty. There is no disabled button.
+- Template install is not in the pane (P09). With no template, the New tab says so.
+
+### What a later plan must decide
+- Whether a mod tool should start sub-processes, to shorten `process-run` further.
+- Whether the mod, not the model, drives the step loop (H01, P06).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P04"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

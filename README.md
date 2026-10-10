@@ -15,7 +15,9 @@ Or use a local plugin directory (no marketplace needed):
 claude --plugin-dir /path/to/agentic-processes
 ```
 
-After installation, open the Marketplace in the UI to browse and install templates from configured marketplaces. This installs process templates to `~/.claude/agentic-processes/templates/processes/` and creates all required runtime directories.
+After installation, run `/process` and open the **Templates** tab to refresh the marketplaces and install templates. This installs process templates to `~/.claude/agentic-processes/templates/processes/`.
+
+The plugin is a Claude Code mod and needs a Claude Code build with mods. With mods off (an admin policy, an untrusted new folder, a crash or `--safe-mode`) it cannot change a process. The process skill then tells the user and stops. Under `--safe-mode` no plugin loads at all, so the user sees nothing from this plugin.
 
 ## Overview
 
@@ -50,7 +52,7 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 - No data loss between sessions
 
 ### AI Integration
-- Commands: `/process-new`, `/process-continue`
+- Command: `/process` (a pane with a New tab and a Continue tab)
 - Strict process adherence to prevent deviation
 - Proactive guidance for next steps
 - Subagent delegation for context isolation
@@ -59,33 +61,25 @@ The Agentic Process System enables structured, repeatable workflows for complex 
 
 ### 1. Install Templates from Marketplaces
 
-After installing the plugin, open the Marketplace in the UI to browse available templates and install the ones you need. The marketplace refreshes git-backed template repositories and lets you install individual templates to `~/.claude/agentic-processes/templates/`.
+After installing the plugin, run `/process` and open the **Templates** tab. Press Refresh to read the git-backed template repositories, then Install the ones you need. They go to `~/.claude/agentic-processes/templates/`.
 
 ### 2. Create a New Process
 
 Use the command:
 ```
-/process-new
+/process
 ```
 
-The system will:
-1. Check for existing similar processes
-2. List available templates from `~/.claude/agentic-processes/templates/processes/`
-3. Collect required parameters
-4. Resolve step definitions from subdirectories within the selected template
-5. Create process instance with expanded steps
+On the New tab:
+1. Pick a template from `~/.claude/agentic-processes/templates/processes/`
+2. Fill in its fields (required ones have a star) and press Create
+3. The plugin resolves the step definitions, creates the process instance and binds it to the session, then starts the first step
 
 ### 3. Continue an Existing Process
 
-To resume a process:
-```
-/process-continue
-```
-
-The system will:
-1. List all active processes
-2. Show current progress
-3. Resume from the last incomplete step
+To resume a process, use `/process` and open the Continue tab:
+1. Every active process shows with its current step and last change
+2. Pick one: the plugin binds it to the session and resumes from the last incomplete step
 
 ### 4. Process Structure
 
@@ -101,24 +95,18 @@ agentic-processes/                    # Plugin root
 ├── .claude-plugin/
 │   └── plugin.json                   # Claude Code plugin manifest
 ├── agents/                           # Root-level agents (auto-discovered)
-│   ├── step-executor.md
-│   └── process-spawner.md
+│   └── step-executor.md
 ├── framework-steps/                  # Auto-injected framework-level steps
 │   ├── continuous-improvement/
 │   │   └── continuous-improvement.json
 │   └── end-process-validation/
 │       └── end-process-validation.json
 ├── hooks/
-│   └── hooks.json                    # Unified hook configuration
-├── scripts/                          # Hook and utility scripts
-│   ├── template_manager.py           # Marketplace template operations
-│   ├── models.py                     # Shared data models
-│   └── ...hook scripts...
+│   ├── hooks.json                    # Loads the mod (register.ts)
+│   └── ...                           # The mod: one folder for each rule, infra/ for the code they share
 ├── skills/
-│   ├── process-new/
-│   │   └── SKILL.md                  # Start a new process from a template
-│   ├── process-continue/
-│   │   └── SKILL.md                  # Continue an existing process
+│   ├── process-run/
+│   │   └── SKILL.md                  # Run the steps of a bound process
 │   ├── process-state-update/
 │   │   └── SKILL.md                  # Update process state files
 ├── config/
@@ -206,13 +194,12 @@ Marketplaces are configured in `~/.claude/agentic-processes/config/marketplaces.
 
 ### Managing Marketplaces
 
-Use the Marketplace section in the UI Settings to:
-- **Add marketplace**: Register a new git repository as a marketplace
-- **Remove marketplace**: Unregister a marketplace
-- **Refresh**: Fetch latest template catalogs from all configured marketplaces
-- **Browse catalog**: Expand a marketplace to see all available templates
-- **Install/Uninstall**: Install specific templates from a marketplace
-- **Update**: Update installed templates when new versions are available
+The **Templates** tab of `/process` does these:
+- **Refresh**: Fetch the latest template catalogs from all enabled marketplaces
+- **Install / Update**: Copy a template from a marketplace cache, or update it when the marketplace has a newer version
+- **Remove**: Delete an installed template
+
+The same tab manages the marketplaces: **Add**, **Edit** (name, git address, branch, priority), **On/Off**, and **Remove** (press twice; it deletes the cache, not installed templates). They are kept in `~/.claude/agentic-processes/config/marketplaces.json`.
 
 ### Runtime Layout
 
@@ -295,7 +282,7 @@ Official templates live in the [agentic-processes-templates](https://github.com/
 For local/team-specific templates, add a custom marketplace:
 
 1. Create a git repo with the standard template structure (`templates/processes/`)
-2. Open the Marketplace in the UI Settings and add the repo as a marketplace
+2. Add it on the Templates tab of `/process` (Add marketplace)
 3. Refresh and install the templates you need
 
 ### Template Authoring

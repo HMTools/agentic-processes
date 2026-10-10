@@ -57,14 +57,39 @@
 Research only. No UI design, no repo edits (not even the possible bug in `main.ts`), no building a mod. Do not change JSON shapes (the contract). Related items: `P11` (a small status line inside the session, possibly this round), `P09` (marketplace CLI the UI calls), `P07` (files the UI reads), `X01` (what happens when mods are off).
 
 ## 7. Research result
-_(empty until the research is done)_
-- Claude Code version:
-- Answers to each question (with evidence):
-- Final verdict:
-- Evidence (doc page + section, type file name, repo `path:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built at the owner's request after the plan page "Mod Migration P06 to P12" (all 5 decisions kept as proposed).
+
+### Claude Code version
+2.1.296
+
+### Feature table: what each screen of the app becomes
+
+| The app does | In the mod |
+|---|---|
+| List of processes | Continue tab (P04) |
+| Approve a step | Mod dialog (P02) |
+| Questions | Question dialog (P05) |
+| Marketplace screen | Templates tab (P09) |
+| Step diagram, log, memory view | Later: a Steps tab (`Pane` with `Box` and `Text`) |
+| HTML view widgets | Dropped |
+| Several processes side by side, herdr control, template preview | Stay in Electron, or are dropped |
+
+### Answers (short)
+- Widgets: the gate is now a mod dialog (P02), so no widget has a job. `viewRef`, the view type and the code that copied a widget into a process are removed (`create-process.ts`, `types/view-definition.ts`, `types/process-instance.ts`, `types/template-definition.ts`). A template that still names a view keeps working: the name is ignored.
+- State changes: the mod reads files through the tools, so no file watcher is needed.
+- A click reaches the agent through `$.prompt.submit({ asUser: true })` or a tool; the agent still changes state through the tools.
+- Surfaces that cannot draw (VS Code, print mode): the status line and toasts are wrapped and do nothing there.
+- The JSON files are no longer a contract for the app (owner's decision of 2026-10-10).
+
+### Final verdict
+**later** for the screens; **drop** for the widgets.
+
+### Risks
+The `views/` folders and every `viewRef` line were removed from `agentic-processes-templates` (5 templates). Copies already installed under `~/.claude/agentic-processes/` still hold old `views/` folders and `viewRef`; they are ignored.
+
+### What a later plan must decide
+Build the Steps tab.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P12"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

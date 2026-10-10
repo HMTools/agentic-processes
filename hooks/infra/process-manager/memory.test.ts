@@ -49,3 +49,10 @@ test('read: a step may read the cross-references, and only the topics it lists',
   expect((await readMemoryTopic(w.ports, { processDir: DIR, stepId: 's1', topic: '_cross-references' })).data).toEqual(XREF)
   await expect(readMemoryTopic(w.ports, { processDir: DIR, stepId: 's1', topic: 'secret' })).rejects.toThrow('is not allowed to read from')
 })
+test('a repeated call adds no decision or file twice', async () => {
+  const w = setup()
+  const call = () => addMemoryEntry(w.ports, { processDir: DIR, stepId: 's1', topic: 'context', decisions: ['d1'], files: ['f1'] })
+  await call(); await call()
+  expect(w.json(`${DIR}/memory/context.json`).entries.s1).toMatchObject({ decisionsMade: ['d1'], filesModifiedCreated: ['f1'] })
+  expect(w.json(`${DIR}/memory/_cross-references.json`)).toMatchObject({ keyDecisions: ['d1'], filesModified: ['f1'] })
+})

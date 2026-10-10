@@ -218,11 +218,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P04-process-new-and-continue-skills.md",
     "firstGuess": "improve",
     "source": "skills/process-new, skills/process-continue",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Replaced by a pane the mod draws: /process has a New tab (template, fields, Create) and a Continue tab. The mod creates the files, binds the session and sends one message. One shared skill, process-run, keeps the step loop, approvals and sub-process text. The two old skills are deleted.",
+    "open": ["Live run not done: the pane in a real terminal and in the Desktop app", "Does the model read process-run when the hand-off asks for it?", "Is $.session.id() the same as the hook session_id, and what changes after /clear, /resume? (S02)", "Sub-process steps are still driven by the model; a start_sub_process tool is a later option"],
+    "updated": "2026-10-10"
   },
   {
     "id": "P05",
@@ -230,12 +230,12 @@ const ITEMS = /* ITEMS:START */ [
     "title": "Q&A session skill",
     "file": "items/P05-qna-session-skill.md",
     "firstGuess": "improve",
-    "source": "skills/process-QnA-session/SKILL.md",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "source": "skills/process-QnA-session/SKILL.md (deleted in 6bc5784)",
+    "status": "done",
+    "verdict": "remove",
+    "summary": "The Q&A session skill, its five CLI commands, the hook and the types were already deleted. Questions use the built-in AskUserQuestion dialog; answers are logged with log_interaction (one line in process-run); a subagent step hands its questions back to the parent (step-executor.md).",
+    "open": ["Can a mod hook see the answer of AskUserQuestion, to log it without the model?", "Can a subagent open the question dialog itself?"],
+    "updated": "2026-10-10"
   },
   {
     "id": "P06",
@@ -244,11 +244,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P06-step-executor-agent.md",
     "firstGuess": "keep",
     "source": "agents/step-executor.md, agents/process-spawner.md, skills/step-executor-delegation",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "keep",
+    "summary": "The step agent and its fork skill stay. A dead agent is found from the agent list, not a timer (already built). The unused process-spawner agent is deleted.",
+    "open": ["Does the step agent still print the operating principles each step (token cost)? Not changed here.", "Do hooks in a subagent see the parent's session id? The mod uses agentId, so it does not depend on it."],
+    "updated": "2026-10-10"
   },
   {
     "id": "P07",
@@ -257,11 +257,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P07-memory-log-findings-files.md",
     "firstGuess": "keep",
     "source": "scripts/process_manager.py, scripts/models.py",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "Memory, log and findings are mod tools since P01 (typed input, one lock for each folder, atomic write kept in the tool). Repeated calls no longer add a decision or file twice.",
+    "open": ["Is a lock between two sessions on one folder needed? The lock is per mod process."],
+    "updated": "2026-10-10"
   },
   {
     "id": "P08",
@@ -270,11 +270,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P08-continuous-improvement.md",
     "firstGuess": "keep",
     "source": "framework-steps/, skills/apply-improvements",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "improve",
+    "summary": "The improvement step and apply-improvements stay with the agent. The mod now shows one message at session start when findings wait.",
+    "open": ["Live check of the message in a real terminal not done.", "Marketplace-template findings stay out of mod scope."],
+    "updated": "2026-10-10"
   },
   {
     "id": "P09",
@@ -283,11 +283,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P09-template-marketplaces.md",
     "firstGuess": "keep",
     "source": "scripts/template_manager.py",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "The Python template manager is replaced by a TypeScript module and a Templates tab in /process: refresh, install or update, remove. Adding a marketplace is an edit of marketplaces.json.",
+    "open": ["Live check with the real git repo not done (tests use a fake git).", "Template version is the git hash of the whole cache, as before: one new commit marks every template as updatable."],
+    "updated": "2026-10-10"
   },
   {
     "id": "P10",
@@ -296,11 +296,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P10-settings-hooks-transition.md",
     "firstGuess": "keep, then remove",
     "source": "hooks/hooks.json",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "No settings hook and no Python is left in the plugin. hooks.json loads only the mod; version 3.0.0. With mods off the plugin cannot change a process (P04 chose no fallback).",
+    "open": ["Policy for organisations that switch mods off: item X01.", "Older Claude Code builds ignore mods, so no rule is enforced there."],
+    "updated": "2026-10-10"
   },
   {
     "id": "P11",
@@ -309,11 +309,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P11-step-status-in-session.md",
     "firstGuess": "improve",
     "source": "(new)",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "improve",
+    "summary": "One line under the prompt shows the step and part, and \"waits for you\" at an approval. It refreshes after each process tool call and clears when the process finishes.",
+    "open": ["Live check in a real terminal and Desktop not done.", "Whether Claude Code adds its own warning prefix to the line.", "After a child process finishes, the line clears until the next tool call."],
+    "updated": "2026-10-10"
   },
   {
     "id": "P12",
@@ -322,11 +322,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/P12-views-and-ui-app.md",
     "firstGuess": "later",
     "source": "../agentic-processes-templates (views), ../agentic-processes-ui",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "later",
+    "summary": "The UI app is not built for here. Its screens map to the mod as listed; HTML view widgets are dropped from the plugin because no gate uses them.",
+    "open": ["A Steps tab (step list, log, memory) is the main missing screen.", "The answer-question call in the app (main.ts:524-530) looks outdated; the app is obsolete, so it is only recorded."],
+    "updated": "2026-10-10"
   },
   {
     "id": "S01",
@@ -335,11 +335,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/S01-spike-guard.md",
     "firstGuess": "spike",
     "source": "(throwaway mod outside the repo)",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "The tool guard is built as mod hooks with tests: a gate and a log owed refuse tools, subagent writes are refused at a gate, reads and process tools pass. Live facts stay open.",
+    "open": ["Does the refusal text reach the model whole, including line breaks? Not run live.", "Only the approval-gate hook has a fail-closed handler; the other guards fail open if they throw or time out.", "Order against settings hooks is moot now: no settings hook is left."],
+    "updated": "2026-10-10"
   },
   {
     "id": "S02",
@@ -348,11 +348,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/S02-spike-session-link.md",
     "firstGuess": "spike",
     "source": "(throwaway mod outside the repo)",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "replace",
+    "summary": "The session-to-process link is a record in the mod store, set by the pane and the bind_process tool, read by one function. Whether the session id survives resume, continue, clear and branch is still open.",
+    "open": ["Is $.session.id() the same after --resume, --continue, /resume, /clear, /branch and compaction? Not run live.", "Does the mod load in the first launch of a new folder (trust prompt)? Docs: no mod loads until the user answers it."],
+    "updated": "2026-10-10"
   },
   {
     "id": "S03",
@@ -361,11 +361,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/S03-spike-stop-block.md",
     "firstGuess": "spike",
     "source": "(throwaway mod outside the repo)",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "improve",
+    "summary": "A stop cannot be vetoed by this mod: classic.Stop is skipped for user mods by the built-in guard. The mod re-prompts at turn end instead, 3 times at most, with tests.",
+    "open": ["Does a re-prompt work in claude -p? Not run.", "A real stop veto needs the plugin to count as the organization's mod (managed appendPlugins)."],
+    "updated": "2026-10-10"
   },
   {
     "id": "X01",
@@ -374,11 +374,11 @@ const ITEMS = /* ITEMS:START */ [
     "file": "items/X01-admin-policy-and-fallback.md",
     "firstGuess": "risk",
     "source": "docs: mods/admin; hooks/hooks.json",
-    "status": "todo",
-    "verdict": "",
-    "summary": "",
-    "open": [],
-    "updated": ""
+    "status": "done",
+    "verdict": "improve",
+    "summary": "When mods are off, the process skill finds no process tool, tells the user and stops. The policy table comes from the admin and troubleshoot docs. Organization facts stay open.",
+    "open": ["Which managed settings are deployed at the organization, and how is the plugin installed? A copy from a git marketplace counts as a user mod.", "Is the baseline Claude Code version 2.1.287 or later?", "Does --safe-mode load plugin skills? The troubleshoot page says no installed plugin loads at all.", "--bare and trust: do skills load? Unproven."],
+    "updated": "2026-10-10"
   }
 ] /* ITEMS:END */;
 const GROUPS={H:"Hook scripts",C:"Shared plumbing",P:"Other plugin parts",S:"Spikes",X:"Cross-cutting"};

@@ -47,14 +47,31 @@
 Research only. No repo edits and no building a mod. Do not redesign the finding format. Related items: `P07` (findings files), `P11` (status display in the session), `H01`-`H11` (hook scripts behind the principles).
 
 ## 7. Research result
-_(empty until the research is done)_
-- Claude Code version:
-- Answers to each question (with evidence):
-- Final verdict:
-- Evidence (doc page + section, type file name, repo `path:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built at the owner's request after the plan page "Mod Migration P06 to P12" (all 5 decisions kept as proposed).
+
+### Claude Code version
+2.1.296
+
+### Answers (short)
+1. Yes: `session.start` counts open findings with `listFindings` and calls `$.ui.toast` (`on-process-tools.ts`, `nudgeFindings`). It shows nothing for 0 and nothing if the call fails.
+2. A command to start the skill was not added. The message names `/agentic-processes:apply-improvements`.
+3. `$.model` has no tools, so the deep dive stays with the agent. The step stays as it is.
+4. No event fires when a process completes by itself; not needed.
+5. The self-audit in end-process-validation stays. The guard mods cover most principles, but the step is cheap.
+6. The marketplace-template gap is out of mod scope.
+
+### Final verdict
+**improve.**
+
+### Evidence
+Repo: `on-process-tools.ts` (`nudgeFindings`), test "a session start with open findings shows one message; with none, nothing".
+
+### Risks
+The toast shows 4 seconds and only in the terminal and the Desktop app.
+
+### What a later plan must decide
+Nothing.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P08"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

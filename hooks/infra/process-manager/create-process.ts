@@ -43,7 +43,6 @@ export async function createProcess(ports: ManagerPorts, a: CreateProcessArgs): 
   const templateName = template.name ?? a.templatePath.split('/').pop()!.replace(/\.json$/, '')
   const templateDir = dirOf(a.templatePath)
   const stepFiles = await registry(ports, templateDir, 'step')
-  const viewFiles = await registry(ports, `${templateDir}/views`, 'view')
 
   const steps: Doc[] = []
   for (const [i, def] of (template.steps ?? []).entries()) {
@@ -60,24 +59,11 @@ export async function createProcess(ports: ManagerPorts, a: CreateProcessArgs): 
       stepDefinition = def.stepDefinition ?? {} // no stepRef: an orchestrator step
     }
 
-    let view: Doc | undefined
-    if (def.viewRef) {
-      const viewPath = viewFiles[def.viewRef]
-      if (!viewPath) fail(`View UUID not found in template's views/ folder: ${def.viewRef}`)
-      const data = await readJson(ports, viewPath)
-      view = {}
-      for (const key of ['id', 'name', 'htmlFile', 'operationIds', 'mockData']) if (key in data) view[key] = data[key]
-      const htmlPath = `${dirOf(viewPath)}/${data.htmlFile}`
-      if (!(await ports.files.exists(htmlPath))) fail(`View "${data.name}" declares htmlFile "${data.htmlFile}" but it does not exist: ${htmlPath}`)
-      view.html = await ports.files.read(htmlPath)
-    }
-
     const step: Doc = { id: ports.uuid(), number: i, name: def.name ?? `Step ${i}`, status: 'pending', stepRef: ref || '' }
     if (def.stepRefName != null) step.stepRefName = def.stepRefName
     if (def.approvalRequired != null) step.approvalRequired = def.approvalRequired
     step.stepDefinition = stepDefinition
     for (const key of ['subProcessTrigger', 'loopBackTo', 'loopCondition', 'maxIterations']) if (def[key] != null) step[key] = def[key]
-    if (view) step.view = view
     steps.push(step)
   }
 

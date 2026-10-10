@@ -33,6 +33,10 @@ If the task message includes a "User Corrections" section with content, you are 
 2. Apply only the requested corrections — do not redo the entire step
 3. Update process state via the `process-state-update` skill
 
+## Questions
+
+You cannot ask the user. If the step needs an answer, stop, list the questions in your result and say which step waits. The parent asks in the question dialog and starts the step again with the answers as "User Corrections".
+
 ## Pre-Step Initialization
 
 Before executing any step substeps, the step-executor automatically loads operating principles:
@@ -90,7 +94,7 @@ The end-step verification now checks compliance with loaded principles:
 
 ### Sub-Process Orchestrator Guard
 
-If the step's `stepDefinition` is empty (no guidance, no substeps) and the step has a `subProcessTrigger` field, this is a sub-process orchestrator step. It should have been handled by the parent process driver (process-new/process-continue), which detects `subProcessTrigger` and spawns child processes. Do NOT improvise or execute based on the step name. Return an error: "This step requires sub-process spawning. It should be driven by the parent orchestrator, not the step-executor."
+If the step's `stepDefinition` is empty (no guidance, no substeps) and the step has a `subProcessTrigger` field, this is a sub-process orchestrator step. It should have been handled by the parent process driver (the process-run skill), which detects `subProcessTrigger` and spawns child processes. Do NOT improvise or execute based on the step name. Return an error: "This step requires sub-process spawning. It should be driven by the parent orchestrator, not the step-executor."
 
 ### Step Definition Resolution
 

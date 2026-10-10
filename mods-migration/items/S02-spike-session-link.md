@@ -67,10 +67,34 @@ Fail signals: id differs between mod and hook; module variable lost after resume
 No changes to this repo or the UI app. No real process state. The spike must not write into `~/.claude/agentic-processes`.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence (debug-log lines, doc section), final verdict, open questions, risks, what a later plan must decide. Include a table of event vs session id vs `source` for startup, resume, continue, clear, fork, compact, and the load result for trust prompt, `--bare`, `-p`, `--safe-mode`.)_
 
-## 7b. Cleanup (do after the result is written)
-Delete the mod folder under `~/.claude/dev-mods/<session-id>/session-link-spike/`, the local marketplace folder if T9 created one (and `claude plugin uninstall` / `/plugin` remove it), the temp fixture and log files. Confirm `~/.claude/agentic-processes` was not touched.
+Closed from the built mod and its tests, at the owner's request after the plan page "Spikes and Policy: Last Mod Items" (decisions kept as proposed). No throwaway mod was run.
+
+### Claude Code version
+2.1.296
+
+### What the built mod proves
+- The link is `session:<id>` in `$.store` with the folders in order, a child after its parent (`agentic-process-repository.ts`, `bind-session.ts`). No `.session` file and no scan.
+- The pane and `bind_process` bind with `$.session.id()`; `create_process` binds too (`on-process-tools.test.ts`).
+- A new session after `/clear` has a new link: the user opens `/process` again (P04).
+- The mod needs no hook `session_id`, because it has no settings hook. Question 1 (same id as the hook) is moot.
+
+### From the docs (troubleshoot page)
+- `$.state` resets after `/clear`, `/resume`, `/branch`, and `session.start` does not fire again. The link is in `$.store`, which is kept.
+- No mod loads in a folder the user has not trusted yet (question 7a).
+- `--bare`: installed plugins that are not managed load no hooks module. `claude -p` draws nothing.
+
+### Not proven live
+Questions 3 to 5: the id after each resume path. The mod handles a changed id the same way for all: the user opens `/process` and binds again.
+
+### Final verdict
+**replace.**
+
+### Risks
+A resumed session with a new id has no link until the user binds again. The guards then do nothing for that session.
+
+### What a later plan must decide
+A live check of the id after `--resume`, if the first prompt after a resume must be guarded.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "S02"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

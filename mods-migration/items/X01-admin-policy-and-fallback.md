@@ -69,7 +69,50 @@ Facts to verify from the docs are listed first, with where the owner's search st
 No implementation, no plugin edits, no changes to settings. Do not change the machine's managed settings. This item produces facts and questions for the owner and for a later plan.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence (doc page and section), the "what keeps running" matrix, final verdict, open questions for the Payoneer admin, risks, what a later plan must decide.)_
+
+Closed from the built mod and its tests, at the owner's request after the plan page "Spikes and Policy: Last Mod Items" (decisions kept as proposed). No throwaway mod was run.
+
+### Claude Code version
+2.1.296. Read on 2026-10-10: `plugins/mods/admin` and `plugins/mods/troubleshoot`. No setting was changed and no test was run.
+
+### What still runs when mods are off (from the docs)
+
+| Switch | Our mod | Skills and agents of the plugin | Settings hooks |
+|---|---|---|---|
+| `allowManagedModsOnly` (guard option) | Off if the plugin counts as a user's | Load ("stop a mod and leave the rest of its plugin working") | Keep running |
+| `allowManagedHooksOnly` | Off unless managed | Test | Blocked, including users' own |
+| `disableAllHooks` in managed settings | Off | Load | All off |
+| `disableAllHooks` in a user file | Off ("only managed plugins and built-in plugins run") | Test | Off for the user |
+| `--safe-mode` | Off | **No installed plugin loads at all** | Test |
+| `--bare` | Off for installed plugins | Test | Test |
+| New folder, trust not answered | Off until answered | Test | Test |
+| Rollout switch off | Off | Load | Not stated |
+| 3 worker crashes | Off until `/reload-plugins` | Load | Not stated |
+
+### Answers (short)
+- Detect a missing mod: the process skill looks for the tool `create_process` and stops with a message (`skills/process-run/SKILL.md`, "Mods off"). It works where the skills still load. Under `--safe-mode` the skill is not loaded either, so the user sees nothing from the plugin.
+- Fallback scripts: not kept (P10). No heartbeat file is needed.
+- The guard loads on a machine with managed settings, or for a Team or Enterprise sign-in. This machine has no managed settings file at `/Library/Application Support/ClaudeCode`.
+- A plugin installed from a git or GitHub marketplace is copied into the cache and counts as a **user's** mod: `allowManagedModsOnly` refuses it, and `appendPlugins` skips it. To count as the organization's, the marketplace must be a directory on each machine, named in managed settings by absolute path, the plugin listed by a relative path, and the plugin enabled in managed `enabledPlugins`.
+- Fail direction: a hook with no `.catch` fails open. Only the approval gate guard has one (S01).
+- Not covered by the docs read: Windows WSL Desktop sessions (no plugins), VS Code (hooks run, nothing draws).
+
+### Final verdict
+**improve** (the plugin stays; one check and one README line cover the off cases that can be covered).
+
+### Risks
+A policy that refuses the mod leaves the skills in place with no tools. The skill check handles that. `--safe-mode` shows the user nothing.
+
+### Questions only the organization can answer (Q21 to Q26)
+1. Are managed settings deployed on developer machines (file, MDM, admin console), and with which keys?
+2. Team or Enterprise plan, an API key, or a cloud provider? (This decides whether the guard loads.)
+3. How is `agentic-processes` installed and updated today (git marketplace, version pin)?
+4. Is there a policy mod (`prependPlugins`) that refuses mods that call `$.process.run` or `$.fs.write`? This mod calls both.
+5. What is the Claude Code baseline version, and who updates it?
+6. Is a copy of the marketplace directory on every machine acceptable, so the plugin counts as the organization's?
+
+### What a later plan must decide
+Whether to ask IT for the directory install, which also allows a real stop veto (S03).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "X01"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

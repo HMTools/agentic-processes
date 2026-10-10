@@ -15,7 +15,7 @@ Each task is one file in `items/`. Each file is written so that a person (or a C
 A Claude Code plugin whose JS/TS code runs **inside** Claude Code and handles events (a tool call, a submitted prompt, a stop, a session start). It can observe, rewrite or answer the event, add slash commands and tools, keep state, call a model, run processes, and draw panes. Docs: https://code.claude.com/docs/en/plugins/mods/overview. Settings hooks (shell commands in `hooks/hooks.json`) are a different thing: they run outside Claude Code.
 
 ## What is this plugin
-`agentic-processes` (v2.0.28, `.claude-plugin/plugin.json`) runs structured, resumable workflows ("processes") created from templates, with steps, approval gates and Q&A. It is a Claude Code plugin made of:
+`agentic-processes` (v2.0.28, `.claude-plugin/plugin.json`) runs structured, resumable workflows ("processes") created from templates, with steps, approval gates. Questions use the built-in dialog (P05). It is a Claude Code plugin made of:
 
 | Piece | Where | Role |
 |---|---|---|
@@ -24,7 +24,7 @@ A Claude Code plugin whose JS/TS code runs **inside** Claude Code and handles ev
 | Hook helpers | `scripts/parse_hook_input.py`, `scripts/hook_extract_process_dir.py` | Parse the hook JSON; extract `--process-dir` from a shell command |
 | Process manager | `scripts/process_manager.py` (23 subcommands; the module docstring lists 22) | The only supported writer of process state files |
 | Template manager | `scripts/template_manager.py` (11 subcommands) | Template marketplaces (git caches), install/uninstall |
-| Skills | `skills/*/SKILL.md` | `process-new`, `process-continue`, `process-approve`, `process-state-update`, `process-QnA-session`, `step-executor-delegation`, `apply-improvements` |
+| Skills | `skills/*/SKILL.md` | `process-new`, `process-continue`, `process-approve`, `process-state-update`, `step-executor-delegation`, `apply-improvements` |
 | Agents | `agents/step-executor.md`, `agents/process-spawner.md` | Run one step with isolated context; spawn child processes |
 | Framework steps | `framework-steps/` | Steps injected into every process: continuous improvement, end-process validation |
 | Types | `types/*.ts`, `types/schema.json` | Shape of process state files |
@@ -36,7 +36,7 @@ Sibling repos (read-only for this research; same parent folder `migrate-to-mod/`
 
 ## Runtime state (outside the repo)
 All under `~/.claude/agentic-processes/`:
-- `active/<process>/` (moves to a status folder when status changes, `process_manager.py` `STATUS_DIRS`) holding `process.json`, `log.json`, `memory/<topic>.json`, `qa-session.json`, `.session` (session id). The approval gate is a record in the mod's store (H07, P02, P03).
+- `active/<process>/` (moves to a status folder when status changes, `process_manager.py` `STATUS_DIRS`) holding `process.json`, `log.json`, `memory/<topic>.json`, `.session` (session id). The approval gate is a record in the mod's store (H07, P02, P03).
 - `flags/pending-log-<session>`: "a log entry is owed" flag.
 - `improvement-findings/<templateId>/<processId>.json`.
 - `templates/`, `config/`, `installed-templates.json`.
@@ -83,8 +83,7 @@ When all items are `done`, a final plan can order the migration. Not part of thi
 - Some matchers or tool names may be stale: `StrReplace`, `Task` (now maybe `Agent`), dead Bash branches in `enforce-log-first.sh` (H05, H06).
 - PreToolUse blocks print top-level `{"decision":"block"}`; the hooks reference says PreToolUse uses `hookSpecificOutput.permissionDecision` (H05, H06).
 - `.session` is also read by the UI app (`agentSessionManager.ts`) and by `process-approve`: it is a contract, not only a hook detail (H08, C01).
-- `process-QnA-session/SKILL.md` uses old subcommand names and cites a hook (`block-pending-on-qa.sh`) that does not exist (P05).
 - `process-approve` runs the step approval before deleting `pending-interaction.json`, but the CLI refuses while that file exists (P03).
-- The UI's Q&A calls to the process manager pass positional arguments where the CLI needs flags; and no UI call to the step approval was found (P01, P12).
+- The UI's Q&A calls to the process manager pass positional arguments where the CLI needs flags; the Q&A commands are gone, and no UI call to the step approval was found (P01, P12, P05).
 - `config/marketplaces.default.json` `autoRefreshOnStale` is never read (P09).
 - Three hooks-worker crashes unload every non-built-in mod until `/reload-plugins` (X01).

@@ -2,7 +2,6 @@ import { ChildProcessRef } from "./child-process-ref";
 import { ProcessStatus, StepStatus } from "./process-status";
 import { ProcessId, StepId, StepRef, ProcessPath, ISOTimestamp } from "./shared-types";
 import { EmbeddedStepDefinition } from "./step-definition";
-import { ViewDefinition } from "./view-definition";
 
 /**
  * Complete process instance as stored in process.json.
@@ -202,12 +201,6 @@ export interface ProcessStep {
 
   /** Embedded step definition with full execution guidance */
   stepDefinition: EmbeddedStepDefinition;
-
-  /**
-   * Resolved view (from the template's views/ folder via viewRef), embedded at
-   * process-creation time — same embedding pattern as stepDefinition itself
-   */
-  view?: ViewDefinition;
 }
 
 /**

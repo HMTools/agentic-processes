@@ -63,10 +63,29 @@
 No changes to this repo. No real process state. The spike must be easy to disable (never-block flag) so it cannot trap the session. Do not install it permanently.
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence (debug-log lines, doc section), final verdict, open questions, risks, what a later plan must decide. Include the exact block result shape, the `$.agent.list()` field list, and the combined-block behaviour from T6.)_
 
-## 7b. Cleanup (do after the result is written)
-Delete the mod folder under `~/.claude/dev-mods/<session-id>/stop-spike/`, the fixture folder, marker and log files, and any stray background subagent. Confirm `~/.claude/agentic-processes` untouched.
+Closed from the built mod and its tests, at the owner's request after the plan page "Spikes and Policy: Last Mod Items" (decisions kept as proposed). No throwaway mod was run.
+
+### Claude Code version
+2.1.296
+
+### What the built mod proves
+- A turn end with work left starts a new turn with a prompt: pending step, lost step, approval, log owed (`on-agent-stopping.ts`, 20 tests).
+- At most 3 re-prompts in a row, and a user prompt resets the count. A user interrupt and a subagent turn are never re-prompted.
+- A running step waits for its agent, found by `$.agent.list()` (P06), not a 10-minute timer.
+- `classic.Stop` is skipped for a user-tier mod by the built-in guard (`on-agent-stopping.ts:14-18`). The re-prompt through `turn.complete` is the workaround.
+
+### Not proven live
+Questions 7 to 9: behaviour in `claude -p`, and an Esc or `/exit` with a re-prompt pending (the mod ignores an interrupt).
+
+### Final verdict
+**improve** (re-prompt now; a real stop veto only for an organization's mod).
+
+### Risks
+A re-prompt is an extra turn, not a veto. The model can stop after 3.
+
+### What a later plan must decide
+Move to `classic.Stop` `{ block }` if the plugin is installed as the organization's mod (X01).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "S03"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

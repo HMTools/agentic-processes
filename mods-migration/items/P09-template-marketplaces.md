@@ -53,14 +53,40 @@
 Research only. No repo edits (including fixing the weaknesses above, which should only be listed) and no building a mod. The UI Marketplace screen stays as it is. Related items: `P12` (UI app), `X01` (mods off).
 
 ## 7. Research result
-_(empty until the research is done)_
-- Claude Code version:
-- Answers to each question (with evidence):
-- Final verdict:
-- Evidence (doc page + section, type file name, repo `path:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built at the owner's request after the plan page "Mod Migration P06 to P12" (all 5 decisions kept as proposed).
+
+### Claude Code version
+2.1.296
+
+### Answers (short)
+1. Templates stay outside the plugin (owner's decision): git marketplaces keep third-party sources possible.
+2. Refresh runs in the pane on a button press, with `$.process.run(argv, { timeoutMs: 120000 })`. No background refresh: `autoRefreshOnStale` was never read and is not added.
+3. The unused auto-refresh setting stays in the file and does nothing.
+4. The UI app is obsolete, so the mod is the only front end. The module adds a way to install templates without it.
+5. With mods off the tab does not exist; templates already installed still sit in the folder.
+6. A pane with buttons per row is used instead of a command with arguments.
+
+### What changed
+- New `hooks/infra/templates/templates.ts`: `refreshMarketplaces`, `catalog`, `installTemplate`, `removeTemplate`. Same files and shapes as before (`config/marketplaces.json`, `installed-templates.json`, `cache/sources/<name>`).
+- Fixed on the way: remove and install match on category and name, so two templates with one name in two categories no longer clash. A name must be plain (`[A-Za-z0-9_.-]+`) before any folder is deleted.
+- Windows uses one PowerShell command for copy and for remove.
+- Pane: third tab "Templates" (`on-process-pane.ts`).
+- Deleted: `scripts/template_manager.py`, `scripts/models.py`.
+- Added in a second step (plan "Marketplace Management in the Process Pane"): Add, Edit, On/Off and Remove of a marketplace on the Templates tab (`addMarketplace`, `updateMarketplace`, `toggleMarketplace`, `removeMarketplace`). Remove asks twice. A new address or branch drops the cache, because a pull would read the old remote. An address starting with "-" is refused, and `git clone` gets `--` before the address.
+- Not ported: `status`, `list-marketplaces` (the tab shows the same facts) and the legacy config migration.
+
+### Final verdict
+**replace.**
+
+### Evidence
+Repo: `templates.ts`, `templates.test.ts` (7 tests), `on-process-pane.test.ts` ("the Templates tab ...").
+
+### Risks
+`git` must be on the machine, as before. The test suite fakes git.
+
+### What a later plan must decide
+Nothing.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P09"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

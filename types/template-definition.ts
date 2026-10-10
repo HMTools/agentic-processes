@@ -66,8 +66,6 @@ export interface TemplateDefinition {
     stepRef: StepRef;
     /** Human-readable companion name for stepRef (display-only, never used for resolution) */
     stepRefName?: string;
-    /** Reference to a view definition UUID under this template's own views/ folder */
-    viewRef?: string;
     /** Full description of what this step does in this template's context */
     description?: string;
     /** Context variables passed to the step */

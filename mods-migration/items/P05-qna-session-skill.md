@@ -62,14 +62,23 @@ Behaviour in plain words:
 No implementation. No plugin edits (do not fix SKILL.md or the UI call). No building a mod. (Only items S01-S03 may build a throwaway mod outside this repo.)
 
 ## 7. Research result
-_(empty until the research is done; fill these headings)_
-- Claude Code version (`claude --version`):
+_(filled 2026-10-10)_
+- Claude Code version (`claude --version`): 2.1.296. Type file read from the public repo copy (`mods/types/claude-code.d.ts`, main).
 - Answers to questions 1-8:
-- Final verdict:
-- Evidence (doc page + section, type-file name, repo `file:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+  1. Claude Code ships `AskUserQuestion` (1-4 questions, 2-4 options, free text under "Other"). A mod can draw it (`ui.render` site `AskUserQuestion`) and `$.ui.ask` opens the same dialog. Nothing needs to mirror into `qa-session.json`: the file is gone.
+  2. `$.ui.ask(question, options | { options, header, multiSelect })` takes ONE question and returns the label, comma-joined labels, or free text. It rejects on dismiss and in `-p`. It has no field for priority or context.
+  3. Moot: the UI app is obsolete, and a native dialog is answered in the session.
+  4. Single tool vs five commands: the built-in dialog needs no tool. Model work left: ask, then call `log_interaction`.
+  5. Moot. `check-qa-session.sh` exited with 1, and the hooks reference says only exit 2 blocks (`docs/claude/claude-code-hooks-reference.md:265`), so it was most likely a no-op. Deleted anyway.
+  6. The `log.json` and `memory/qa-sessions.json` archive entries are gone with the feature. The answer is logged with `log_interaction` (one line added to `skills/process-run/SKILL.md`).
+  7. Moot: the UI calls and the CLI commands are both gone.
+  8. With mods off, the built-in dialog still works. Only the process tools need the mod (see P04).
+- Final verdict: **remove.** The feature was deleted in commit 6bc5784 (with H11). Questions use the built-in dialog.
+- Evidence (doc page + section, type-file name, repo `file:line`): type file `$.ui.ask`, `AskOptions`; `git show 6bc5784 --stat` (skill, `check-qa-session.sh`, 498 lines of `process_manager.py`, `types/qa-session.ts`); `skills/process-run/SKILL.md:35`; `hooks/infra/process-manager/tools.ts:57` (`log_interaction`); `agents/step-executor.md:31` (re-run with "User Corrections").
+- Changed by this item: one line in `process-run`, a "Questions" section in `agents/step-executor.md`, the Q&A lines in `mods-migration/README.md`, and the P05 entry in `progress.html`.
+- Open questions: Can a mod hook see the answer of `AskUserQuestion`, to log it without the model? Can a subagent open the dialog itself (not checked; the plan hands questions to the parent)?
+- Risks: Claude can forget `log_interaction` after a question, as it can for approvals. The installed copy of the plugin can still list `process-QnA-session` until a new release.
+- What a later plan must decide: Whether to add a mod hook that logs answers (needs the first open question answered).
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P05"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

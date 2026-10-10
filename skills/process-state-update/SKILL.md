@@ -1,6 +1,6 @@
 ---
 name: process-state-update
-description: Update process state files (process.json, memory/<topic>.json, log.json) with the process tools. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, or modify any process state file. Never use Write/Edit or Bash on process state files. Used by step-executor and process-continue agents.
+description: Update process state files (process.json, memory/<topic>.json, log.json) with the process tools. ALWAYS use this skill when working with agentic-processes — whenever you need to update step status, record memory, log actions, or modify any process state file. Never use Write/Edit or Bash on process state files. Used by step-executor and the process-run skill.
 user-invocable: false
 ---
 
@@ -187,7 +187,7 @@ Append to `processWideObservations` in `log.json`. Steps like `apply-changes`, `
 
 ### create_process
 
-Create the files of a new process from a template. Only the `process-new` skill and its sub-process steps use this.
+Create the files of a new process from a template. Only the process pane (`/process`) and sub-process steps use this.
 
 | Input | Required | Description |
 |-------|----------|-------------|

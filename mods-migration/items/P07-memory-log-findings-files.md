@@ -53,14 +53,32 @@
 Research only. No repo edits and no building a mod. Do not change the JSON file shapes (the UI contract). Related items: `P11` (reads the same files to show status), `P08` (findings workflow), `X01` (what runs when mods are off).
 
 ## 7. Research result
-_(empty until the research is done)_
-- Claude Code version:
-- Answers to each question (with evidence):
-- Final verdict:
-- Evidence (doc page + section, type file name, repo `path:line`):
-- Open questions:
-- Risks:
-- What a later plan must decide:
+
+Built at the owner's request after the plan page "Mod Migration P06 to P12" (all 5 decisions kept as proposed).
+
+### Claude Code version
+2.1.296
+
+### Answers (short)
+1. `$.fs.write` is the only mod write; the tools write whole files with it. The old rule "only the CLI writes" is now "only the mod tools write", and the agent cannot edit a state file with Write, Edit or Bash (P01).
+2. Typed tools exist: `add_memory_entry`, `read_memory_topic`, `add_log_entry`, `log_interaction`, `update_log_observations`, `write_finding`, `list_findings`, `update_finding_status` (`hooks/infra/process-manager/tools.ts`, `findings-tools.ts`).
+3. No Python is called, so the hook time limit does not apply.
+4. Done in the tool, not in a hook: `addMemoryEntry` and `addLogEntry` now skip a decision or file they already hold (`memory.ts`, `log.ts`; test "a repeated call adds no decision or file twice"). Actions and notes can repeat on purpose, so they are not deduplicated.
+5. A mod reads `~/.claude/...` through `$.fs` with `$.env.get('HOME')` (`on-process-tools.ts`).
+6. Mod state in `$.store` is not used for these files: they are large and per process. The UI-app reason is gone (the app is obsolete); the size reason stays.
+7. No TypeScript type for findings exists. Left as a finding; nothing reads it as a type now.
+
+### Final verdict
+**replace** (done in P01); this item adds repeat-safety.
+
+### Evidence
+Repo: `memory.ts:35-55`, `log.ts:27-33`, `memory.test.ts`, `findings.ts`.
+
+### Risks
+The log keeps repeated actions on purpose. A repeated decision that was meant (same text twice) is now stored once.
+
+### What a later plan must decide
+Whether to add a findings type file.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "P07"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set:

@@ -6,6 +6,7 @@ import { register as onTodoTool } from './on-todo-tool/on-todo-tool'
 import { register as onAgentEditing } from './on-agent-editing/on-agent-editing'
 import { register as onApprovalGate } from './on-approval-gate/on-approval-gate'
 import { register as onProcessTools } from './on-process-tools/on-process-tools'
+import { register as onProcessPane } from './on-process-pane/on-process-pane'
 
 export const register: Register = (on, options) => {
   onAgentStopping(on, options)
@@ -15,4 +16,5 @@ export const register: Register = (on, options) => {
   onTodoTool(on, options)
   onApprovalGate(on, options)
   onProcessTools(on, options)
+  onProcessPane(on, options)
 }

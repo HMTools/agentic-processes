@@ -14,6 +14,7 @@ function world(on: On, { bound = 'S1', env = { HOME: '/h' } as Record<string, st
     '/t/tpl.json': JSON.stringify({ name: 'T', steps: [{ name: 'Only', stepRef: '' }] }),
   }
   const registered: string[] = []
+  const toasts: string[] = [], lines: string[] = []
   mock.env(on, env)
   const store: Record<string, unknown> = { [`session:${bound}`]: [DIR] }
   on('store.get', async (_$, e: any) => ({ value: store[e.key] as never }))
@@ -21,14 +22,20 @@ function world(on: On, { bound = 'S1', env = { HOME: '/h' } as Record<string, st
   on('store.delete', async (_$, e: any) => { delete store[e.key]; return { value: undefined } as never })
   on('session.id', async () => ({ value: 'S1' }))
   on('session.cwd', async () => ({ value: '/work' }))
-  on('fs.list', async (_$, e) => ({ value: e.path === ACTIVE ? [{ name: 'p1', kind: 'dir', size: 0, mtimeMs: 0, isLink: false }] : [] }))
+  on('fs.list', async (_$, e) => {
+    const names = [...new Set(Object.keys(all).filter(p => p.startsWith(`${e.path}/`)).map(p => p.slice(e.path.length + 1).split('/')[0]))]
+    return { value: names.map(name => ({ name, kind: Object.keys(all).some(p => p.startsWith(`${e.path}/${name}/`)) ? 'dir' : 'file', size: 0, mtimeMs: 0, isLink: false })) }
+  })
   on('fs.exists', async (_$, e) => ({ value: e.path in all || Object.keys(all).some(p => p.startsWith(`${e.path}/`)) }))
   on('fs.read', async (_$, e) => ({ value: all[e.path] }))
   on('fs.write', async (_$, e) => { all[e.path] = e.text; return { value: undefined } })
   on('tool.register', async (_$, e: any) => { registered.push(e.name); return { value: { tool: `mcp__agentic-processes__${e.name}` } } as never })
   on('prompt.submit', async () => ({ drop: 'test' }))
   on('tool.call', async () => ({ result: 'done', text: 'done' }) as never)
-  return { all, registered, store }
+  on('session.start', async () => ({ cwd: '/work' }) as never)
+  on('ui.toast', async (_$, e: any) => { toasts.push(e.text); return { value: undefined } as never })
+  on('ui.status', async (_$, e: any) => { lines.push(e.text); return { value: undefined } as never })
+  return { all, registered, store, toasts, lines }
 }
 const answer = (r: any) => JSON.parse(r.result.content[0].text)
 
@@ -83,4 +90,23 @@ test('a prompt in a session with no process lists nothing', async ($, on) => {
   const w = world(on, { bound: 'other' })
   await $.prompt.submit({ text: 'hello' })
   expect(w.registered).toEqual([])
+})
+
+const finding = (status: string) => ({ id: 'f', status })
+test('a session start with open findings shows one message; with none, nothing', async ($, on) => {
+  const w = world(on)
+  w.all['/h/.claude/agentic-processes/improvement-findings/T/pid.json'] = JSON.stringify({ findings: [finding('open'), finding('open'), finding('applied')] })
+  await $.session.start({ source: 'startup', cwd: '/work' })
+  expect(w.toasts).toEqual(['2 improvement findings wait. Run /agentic-processes:apply-improvements to review them.'])
+  w.all['/h/.claude/agentic-processes/improvement-findings/T/pid.json'] = JSON.stringify({ findings: [finding('applied')] })
+  await $.session.start({ source: 'startup', cwd: '/work' })
+  expect(w.toasts).toHaveLength(1)
+})
+test('the line under the prompt follows the step tools, and clears when the process finishes', async ($, on) => {
+  const w = world(on)
+  on('process.run', async () => ({ value: { exitCode: 0, stdout: '', stderr: '', timedOut: false } }) as never)
+  await $.tool.call({ tool: TOOL('update_step_status'), processDir: DIR, stepId: 's1', status: 'in_progress' })
+  expect(w.lines.at(-1)).toBe('Step 1 of 1 · Design')
+  await $.tool.call({ tool: TOOL('update_process_status'), processDir: DIR, status: 'completed' })
+  expect(w.lines.at(-1)).toBe('')
 })
