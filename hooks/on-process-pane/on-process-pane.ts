@@ -2,7 +2,7 @@ import type { Register } from 'claude-code'
 import { findAgenticProcessDir, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 import { raiseLogOwed } from '../infra/log-owed/log-owed'
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
-import { boundView, deleteProcess, inFolder, stepDetail, listProcesses, listTemplates, resumeProcess, startProcess, waitingCount } from '../infra/process-pane/process-pane'
+import { boundView, deleteProcess, fingerprint, inFolder, stepDetail, listProcesses, listTemplates, resumeProcess, startProcess, waitingCount } from '../infra/process-pane/process-pane'
 import type { ProcessInfo, StepRow, Started, TemplateInfo } from '../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../infra/process-pane/status-look'
 import { moveCommands, slash } from '../infra/process-manager/move'
@@ -53,6 +53,7 @@ let loaded = false
 let timer: { cancel(): void } | undefined
 let seen = new Set<string>() // the processes that needed the user at the last look: a new one raises a toast
 let primed = false
+let lastPrint: string | undefined // the fingerprint of the process list at the last redraw
 let entries: CatalogEntry[] = []
 let markets: MarketplaceInfo[] = []
 let form: { original?: string; values: MarketplaceFields } | undefined // the Add or Edit form of a marketplace
@@ -134,15 +135,20 @@ async function handOff($: any, started: Started): Promise<void> {
 }
 
 // Read every process again, and say so with a toast when one starts to need the user. The first look raises none.
+// The pane redraws only when the list changed, so a redraw cannot swallow a click. A bound process reads its files on each draw, so it redraws each time.
 async function refresh($: any): Promise<void> {
+  let changed = true
   try {
     processes = await listProcesses(filesOf($))
+    const print = fingerprint(processes)
+    changed = print !== lastPrint
+    lastPrint = print
     const needing = processes.filter(p => needsUser(p.kind))
     if (primed) for (const p of needing) if (!seen.has(p.dir)) await $.ui.toast(`${p.name} ${LOOK[p.kind].word}`)
     seen = new Set(needing.map(p => p.dir))
     primed = true
   } catch { /* keep the last list */ }
-  $.ui.invalidate('ui.render')
+  if (changed || view === 'process') $.ui.invalidate('ui.render')
 }
 
 // The saved folder switch, and the timer that keeps the count and the badge current. A mod has no file watcher.

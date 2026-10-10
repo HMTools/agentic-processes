@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 import { ACTIVE, processFile, step, world } from '../process-manager/fake-world'
-import { boundView, deleteProcess, stepDetail, dirNameFor, handoff, inFolder, listProcesses, listTemplates, resumeProcess, startProcess, waitingCount } from './process-pane'
+import { boundView, deleteProcess, fingerprint, stepDetail, dirNameFor, handoff, inFolder, listProcesses, listTemplates, resumeProcess, startProcess, waitingCount } from './process-pane'
 
 const T = '/h/.claude/agentic-processes/templates/processes/dev/bug'
 const template = {
@@ -116,6 +116,14 @@ test('delete moves a running process to deleted/, keeps both when the name is ta
   await expect(deleteProcess(w.ports, '/h/.claude/agentic-processes/completed/p1')).rejects.toThrow('not a running process folder')
   await expect(deleteProcess(w.ports, `${ACTIVE}/p1/memory`)).rejects.toThrow('not a running process folder')
   await expect(deleteProcess(w.ports, `${ACTIVE}/../x`)).rejects.toThrow('not a running process folder')
+})
+
+test('the fingerprint changes with a step, a state or a time, and not with the order of reads', async () => {
+  const w = world({ [`${ACTIVE}/p1/process.json`]: processFile({ name: 'A' }, [step({ status: 'pending' })]) })
+  const before = fingerprint(await listProcesses(w.ports.files))
+  expect(fingerprint(await listProcesses(w.ports.files))).toBe(before)
+  w.disk[`${ACTIVE}/p1/process.json`] = JSON.stringify(processFile({ name: 'A' }, [step({ status: 'awaiting_approval' })]))
+  expect(fingerprint(await listProcesses(w.ports.files))).not.toBe(before)
 })
 
 test('the message names the next step and carries the step ids', () => {

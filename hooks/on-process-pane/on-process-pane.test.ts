@@ -191,6 +191,23 @@ test('Delete on a Continue card asks twice, then moves the folder; the process o
   expect(moves.flat().join(' ')).toContain(`${HOME}/deleted/p1`)
 })
 
+test('the timer redraws the list only when it changed, so a redraw cannot swallow a click', async ($, on) => {
+  let redraws = 0
+  on('ui.invalidate', async () => { redraws++; return { value: undefined } })
+  const w = world(on, { [`${HOME}/active/p1/process.json`]: process })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  await w.clock.advance(5000) // the first look
+  const seen = redraws
+  await w.clock.advance(5000)
+  await w.clock.advance(5000)
+  expect(redraws).toBe(seen) // nothing changed: no redraw
+  w.files[`${HOME}/active/p1/process.json`] = JSON.stringify({ ...process, metadata: { ...process.metadata, lastUpdated: '2026-02-02T10:00:00Z' } })
+  await w.clock.advance(5000)
+  expect(redraws).toBeGreaterThan(seen) // the process changed: one redraw
+  await ui.unmount()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

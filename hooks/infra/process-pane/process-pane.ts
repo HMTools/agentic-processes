@@ -227,3 +227,6 @@ export async function deleteProcess(ports: ManagerPorts, dir: string): Promise<s
   await ports.move(clean, target)
   return target
 }
+
+// A short text that changes when the Continue list or the waiting count changes. The pane redraws on the timer only when it changes.
+export const fingerprint = (list: ProcessInfo[]): string => list.map(p => `${p.dir}|${p.step}/${p.total}|${p.kind}|${p.updated}`).join(';')
