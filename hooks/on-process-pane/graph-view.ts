@@ -38,7 +38,7 @@ type View = { ox: number; oy: number; zoom: 0 | 1; hover?: string }
 
 const Graph: ClientModule<GProps, View> = (props, surface) => {
   const { Box, Text } = surface.elements
-  // Desktop can report a small or zero region size before and after layout: size the root by percent and clamp with a sane size.
+  // Desktop reports a small region size, and a percent height resolves to one row there: the root gets a fixed row count.
   const cols = surface.columns > 20 ? surface.columns : 80, rows = surface.rows > 4 ? surface.rows : 22
   const zoom = surface.state?.zoom ?? 1
   const map = layout(props, zoom)
@@ -91,7 +91,7 @@ const Graph: ClientModule<GProps, View> = (props, surface) => {
     })
   })
   return Box({
-    width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column',
+    width: '100%', height: rows, overflow: 'hidden', flexDirection: 'column',
     children: [...edges, ...boxes, Box({ ...{ position: 'absolute' as const, left: 0, bottom: 0 }, children: [Text({ dimColor: true, children: ['drag to move · + − size · press a step'] })] })],
   })
 }

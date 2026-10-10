@@ -47,7 +47,7 @@ let section: 'steps' | 'memory' | 'logs' | 'files' = 'steps' // the tab of the b
 let memTab: 'flow' | 'topics' | 'history' | 'diffs' = 'flow'
 let openTopic: string | undefined
 let showFramework = false
-let graphOn = true // Desktop: draw the steps as a graph (a Client), else as the timeline
+let graphOn = false // Desktop: draw the steps as a graph (a Client, behind the Graph button) or as the timeline (default, with SVG nodes)
 let allFolders = false // Continue shows every folder; kept in the store as `allFolders`
 let loaded = false
 let timer: { cancel(): void } | undefined

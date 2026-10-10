@@ -252,12 +252,15 @@ test('with a process bound to the session the pane shows its steps, and Back goe
   expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
 })
 
-test('on Desktop a bound process draws a graph in a Client, and the toggle goes back to the timeline', async ($, on) => {
+test('on Desktop a bound process draws the timeline, the Graph button draws a Client graph, and Timeline goes back', async ($, on) => {
   const dir = `${HOME}/active/p1`
   const w = world(on, { [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed' }, { id: 'b', number: 2, name: 'Build', status: 'pending' }] } })
   w.store['session:S1'] = [dir]
   await $.command.run({ command: 'process', args: '' })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Client', key: 'graph' })).toBeUndefined() // the timeline is the default on Desktop
+  expect(await ui.find({ type: 'Button', key: 'step-a' })).toBeDefined()
+  await ui.press({ key: 'mode-graph' })
   expect(await ui.find({ type: 'Client', key: 'graph' })).toBeDefined()
   expect(await ui.find({ type: 'Button', key: 'step-a' })).toBeUndefined()
   await ui.press({ key: 'mode-list' })
