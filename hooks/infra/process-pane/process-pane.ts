@@ -3,6 +3,8 @@ import { bindSession } from '../process-manager/bind-session'
 import { createProcess } from '../process-manager/create-process'
 import { slash } from '../process-manager/move'
 import type { Doc } from '../process-manager/process-files'
+import { needsUser, stepKind } from './status-look'
+import type { Kind } from './status-look'
 
 // What the process pane shows and does: the templates to start from, the processes to resume,
 // and the message that hands a bound process to the agent. The pane itself is in ../../on-process-pane.
@@ -11,7 +13,7 @@ export type TemplateInfo = {
   path: string; name: string; category: string
   fields: { name: string; required: boolean; example: string; description: string }[]
 }
-export type ProcessInfo = { dir: string; name: string; step: number; total: number; updated: string }
+export type ProcessInfo = { dir: string; name: string; step: number; total: number; updated: string; kind: Kind; folders: string[] }
 
 const rootOf = async (files: FileSystem) => {
   const home = await files.home()
@@ -44,6 +46,16 @@ export async function listTemplates(files: FileSystem): Promise<TemplateInfo[]> 
 const isDone = (step: Doc) => step.status === 'completed' || step.status === 'skipped'
 const nextStep = (process: Doc): Doc | undefined => (process.steps ?? []).find((s: Doc) => !isDone(s))
 
+// What state the whole process is in: a failed or paused process, then a step that waits, then done, else running.
+export function processKind(process: Doc): Kind {
+  const steps: Doc[] = process.steps ?? []
+  if (process.status === 'failed') return 'failed'
+  if (process.status === 'paused') return 'paused'
+  if (steps.some(s => s.status === 'awaiting_approval')) return 'waiting'
+  if (steps.length && steps.every(isDone)) return 'done'
+  return 'running'
+}
+
 // Every process in `active/`, the newest change first.
 export async function listProcesses(files: FileSystem): Promise<ProcessInfo[]> {
   const root = await rootOf(files)
@@ -56,9 +68,36 @@ export async function listProcesses(files: FileSystem): Promise<ProcessInfo[]> {
     const steps: Doc[] = process.steps ?? []
     const next = nextStep(process)
     const updated: string = process.metadata?.lastUpdated ?? ''
-    found.push({ dir, name: process.name ?? entry.name, step: next ? steps.indexOf(next) + 1 : steps.length, total: steps.length, updated: updated.slice(0, 16).replace('T', ' '), sort: updated })
+    const folders: string[] = process.metadata?.projectPaths ?? (process.metadata?.projectPath ? [process.metadata.projectPath] : [])
+    found.push({ dir, name: process.name ?? entry.name, step: next ? steps.indexOf(next) + 1 : steps.length, total: steps.length, updated: updated.slice(0, 16).replace('T', ' '), kind: processKind(process), folders, sort: updated })
   }
   return found.sort((a, b) => b.sort.localeCompare(a.sort)).map(({ sort, ...info }) => info)
+}
+
+const trimSlash = (path: string) => path.replace(/\/+$/, '')
+
+// The Continue tab shows the processes of this session's folder, or all of them. A process with no folder shows only in All.
+export const inFolder = (processes: ProcessInfo[], cwd: string, all: boolean) =>
+  all ? processes : processes.filter(p => p.folders.some(f => trimSlash(f) === trimSlash(cwd)))
+
+// The badge on the Continue tab: the processes that need the user.
+export const waitingCount = (processes: ProcessInfo[]) => processes.filter(p => needsUser(p.kind)).length
+
+export type BoundView = { name: string; step: number; total: number; kind: Kind; steps: { number: string; name: string; kind: Kind }[] }
+
+// What the pane shows for the one process bound to the session.
+export async function boundView(files: FileSystem, dir: string): Promise<BoundView | undefined> {
+  const process = await readDoc(files, `${dir}/process.json`)
+  if (!process) return
+  const steps: Doc[] = process.steps ?? []
+  const next = nextStep(process)
+  return {
+    name: process.name ?? dir.split('/').pop() ?? dir,
+    step: next ? steps.indexOf(next) + 1 : steps.length,
+    total: steps.length,
+    kind: processKind(process),
+    steps: steps.map((s, i) => ({ number: String(s.number ?? i + 1), name: s.name ?? s.id ?? `Step ${i + 1}`, kind: stepKind(s.status) })),
+  }
 }
 
 // The message the agent reads first: the facts it used to collect by reading files.

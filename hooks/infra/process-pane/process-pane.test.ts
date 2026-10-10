@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 import { ACTIVE, processFile, step, world } from '../process-manager/fake-world'
-import { dirNameFor, handoff, listProcesses, listTemplates, resumeProcess, startProcess } from './process-pane'
+import { boundView, dirNameFor, handoff, inFolder, listProcesses, listTemplates, resumeProcess, startProcess, waitingCount } from './process-pane'
 
 const T = '/h/.claude/agentic-processes/templates/processes/dev/bug'
 const template = {
@@ -36,9 +36,48 @@ test('processes list the next step and the newest change first', async () => {
     [`${ACTIVE}/new/process.json`]: processFile({ name: 'New', metadata: { lastUpdated: '2026-02-01T10:00:00Z' } }, [todo]),
   })
   expect(await listProcesses(w.ports.files)).toEqual([
-    { dir: `${ACTIVE}/new`, name: 'New', step: 1, total: 1, updated: '2026-02-01 10:00' },
-    { dir: `${ACTIVE}/old`, name: 'Old', step: 2, total: 2, updated: '2026-01-01 10:00' },
+    { dir: `${ACTIVE}/new`, name: 'New', step: 1, total: 1, updated: '2026-02-01 10:00', kind: 'running', folders: [] },
+    { dir: `${ACTIVE}/old`, name: 'Old', step: 2, total: 2, updated: '2026-01-01 10:00', kind: 'running', folders: [] },
   ])
+})
+
+test('a process is waiting, failed, paused or done by its steps and its status', async () => {
+  const waits = step({ id: 'a', number: 0, status: 'awaiting_approval' })
+  const done = step({ id: 'b', number: 1, status: 'completed' })
+  const w = world({
+    [`${ACTIVE}/w/process.json`]: processFile({ name: 'W', metadata: { lastUpdated: '4' } }, [waits]),
+    [`${ACTIVE}/f/process.json`]: processFile({ name: 'F', status: 'failed', metadata: { lastUpdated: '3' } }, [done]),
+    [`${ACTIVE}/p/process.json`]: processFile({ name: 'P', status: 'paused', metadata: { lastUpdated: '2' } }, [done]),
+    [`${ACTIVE}/d/process.json`]: processFile({ name: 'D', metadata: { lastUpdated: '1' } }, [done]),
+  })
+  const list = await listProcesses(w.ports.files)
+  expect(list.map(p => p.kind)).toEqual(['waiting', 'failed', 'paused', 'done'])
+  expect(waitingCount(list)).toBe(3)
+})
+
+test('the Continue list shows this folder, or all folders; a process with no folder shows only in All', async () => {
+  const todo = step({ id: 'a', number: 0 })
+  const w = world({
+    [`${ACTIVE}/here/process.json`]: processFile({ name: 'Here', metadata: { lastUpdated: '3', projectPaths: ['/work/'] } }, [todo]),
+    [`${ACTIVE}/there/process.json`]: processFile({ name: 'There', metadata: { lastUpdated: '2', projectPaths: ['/other'] } }, [todo]),
+    [`${ACTIVE}/none/process.json`]: processFile({ name: 'None', metadata: { lastUpdated: '1' } }, [todo]),
+  })
+  const list = await listProcesses(w.ports.files)
+  expect(inFolder(list, '/work', false).map(p => p.name)).toEqual(['Here'])
+  expect(inFolder(list, '/work', true).map(p => p.name)).toEqual(['Here', 'There', 'None'])
+})
+
+test('the bound view lists every step with its look', async () => {
+  const w = world({ [`${ACTIVE}/p1/process.json`]: processFile({ name: 'Invoice' }, [
+    step({ id: 'a', number: 1, name: 'Read', status: 'completed' }),
+    step({ id: 'b', number: 2, name: 'Approve', status: 'awaiting_approval' }),
+    step({ id: 'c', number: 3, name: 'Send', status: 'pending' }),
+  ]) })
+  expect(await boundView(w.ports.files, `${ACTIVE}/p1`)).toEqual({
+    name: 'Invoice', step: 2, total: 3, kind: 'waiting',
+    steps: [{ number: '1', name: 'Read', kind: 'done' }, { number: '2', name: 'Approve', kind: 'waiting' }, { number: '3', name: 'Send', kind: 'pending' }],
+  })
+  expect(await boundView(w.ports.files, `${ACTIVE}/gone`)).toBeUndefined()
 })
 
 test('the message names the next step and carries the step ids', () => {

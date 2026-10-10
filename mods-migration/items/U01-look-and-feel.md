@@ -46,7 +46,39 @@ Apply the design result of `U01` (look and feel) to every answer. If `U01` is no
 No implementation. No plugin edits. Do not edit the UI app. Do not change the JSON file shapes without saying so in the result (the UI app is obsolete, so they are free to change, but a later plan decides). Only `U01` may build a throwaway mod, outside this repo. The throwaway mod is allowed here (and only here in the U group).
 
 ## 7. Research result
-_(empty until the research is done; fill: Claude Code version, answers to each question with evidence, final verdict, open questions, risks, what a later plan must decide.)_
+Claude Code version: 2.1.296 (type file of build 2.1.295 read; docs `interface`, `reference`). Spike `ui-look-spike` built and run by the owner (`/look`, fake data). **Owner said: it works, and it looks good.** The owner ran it in the Claude Code app; no other feedback was given, so the terminal-only look and the exact widths were not judged separately.
+
+### Design language (what the spike drew)
+- **Card:** `Box` with `borderStyle="round"`, `paddingLeft/Right={1}`, `borderColor` by state (`warning` for waits, `inactive` otherwise), a keyed Box with `hover={{ borderColor: 'claude' }}`. Inside: status symbol + bold name + status word, a dim line `step 3 of 6 · 2 min ago`, a bar `█████░░░`.
+- **Tabs:** plain `Button`s with digit hotkeys, `dimColor` for the inactive tab, a count on Continue.
+- **Desktop only:** `Svg` icon rail beside the content (`alt` required, `width`, `height`, optional `isInteractive` for hover and tooltips). The terminal draws the tab row alone.
+- **Width:** read `e.props.bodyColumns`. Below about 52 columns: short tab labels, no bar, short step text. A footer in the spike shows surface, columns and mode.
+
+### Answers to section 4
+1. **Card props.** `Box`: flex layout, `columnGap`, `padding*`, `margin`, `width`, `height`, `borderStyle` (single, double, round, bold, singleDouble, doubleSingle, classic, arrow, dashed, quote), `borderColor`, `backgroundColor`, `position`, `hover`. `hover` may change `borderStyle`, `borderColor`, `backgroundColor` and offsets, never the layout; it needs a keyed `Box` (or a `scope`). Text `hover` is refused outside a keyed Box. Used and seen to render: round border, `borderColor`, `hover`, padding. A table of terminal against Desktop for every prop was not built; only the props above were seen.
+2. **Colors.** A color is a theme key or a name. Theme keys: text, inverseText, inactive, subtle, suggestion, remember, success, error, warning, merged, claude, permission, planMode, autoAccept, promptBorder, bashBorder, ide, diffAdded, diffRemoved (+ dimmed and word variants). A theme key follows the user's theme, so it is the safe choice; raw hex or names do not. The spike used only theme keys and the owner saw no problem; dark and light were not both checked.
+3. **Status vocabulary (symbol, ASCII, word, theme key):** waits `▲ ! waits for you warning`; running `● * running success`; done `✓ v done inactive`; failed `✕ x failed error`; paused `‖ = paused permission`; pending `○ o pending inactive`. Symbol plus word, so color is never the only signal. The `a` key in the spike switches to the ASCII set. Skipped is not drawn yet: use `–` and "skipped".
+4. **Widths.** `bodyColumns` is the width. A dock pane is beside the transcript in a wide fullscreen terminal; otherwise it is inline above the prompt. The spike handles two modes (about 52 columns is the switch). 60, 100 and 144 columns were not tested one by one.
+5. **Navigation.** Tabs as `Button`s with hotkeys 1 to 4 (worked). Tab and arrows move focus; they cannot be rebound. A sidebar column is Desktop only (`Svg` rail). See U02.
+6. **`Client`.** Not tried. The docs list it for both apps (own drawing, pointer input, a failed `Client` raises `ui.fault`). Whether it can draw a graph is **open**.
+7. **`Raster` and `Image`.** Not tried. Terminal only. The Desktop app has `Svg` instead.
+8. **Cost.** Redraw limit 10 a second, 30 for the visible pane; `$.ui.invalidate('ui.render')` or `$.state` writes redraw; a timer with `$.clock.every` is needed because a mod has no file watcher.
+9. **Mocks.** Replaced by the running spike. HTML mocks at 60 and 100 columns were not made.
+10. **Surfaces that cannot draw:** VS Code panel and `claude -p` (reading list, Overview). Fallback: `$.ui.status`, `$.ui.log`, or a command that returns `{ text }`. `e.surface` is `terminal`, `desktop`, `vscode` or `mobile`.
+
+### Gotchas found by running it (these cost a debug round)
+- A prop an element does not take makes the engine refuse the **whole tree** and draw its own, so the pane is blank. Seen: `key` on `Text` (Text has no `key`; `Box`, `Button` do).
+- A transcript line names the refusal: `<plugin>: ui.render (Pane) refused: <reason>; the engine drew its own`.
+- Give every `Button` an `onPress` (the spike's Approve button had none; fixed before the owner's final run, so whether it was required is unknown).
+- Write the module as `.tsx` and take elements from `$.ui.resolve(e)`.
+
+### Verdict and later plan
+Verdict **improve**: the process pane stays and gets the card look, status vocabulary and a Desktop rail. A later plan must decide: the final card content; a light-theme check; whether `Client` is worth a spike for the step diagram (U04); where the status vocabulary lives (one shared helper); an ASCII fallback switch.
+
+### Open questions
+- `Client` capability (graph, animation) on both apps.
+- Light theme and Desktop-against-terminal differences per prop.
+- 60, 100 and 144 column behaviour.
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U01"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.

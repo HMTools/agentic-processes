@@ -9,7 +9,11 @@ const PANE = {
 } as const
 
 const template = { type: 'template', name: 'bug', category: 'dev', parameters: { required: ['workItemId'], optional: [], definitions: { workItemId: { example: '7' } } }, steps: [{ name: 'Design', stepRef: 'r1' }] }
-const process = { name: 'Old fix', metadata: { lastUpdated: '2026-01-01T10:00:00Z' }, parameters: {}, steps: [{ id: 'a', number: 0, name: 'Design', status: 'pending' }] }
+const process = { name: 'Old fix', metadata: { lastUpdated: '2026-01-01T10:00:00Z', projectPaths: ['/work'] }, parameters: {}, steps: [{ id: 'a', number: 0, name: 'Design', status: 'pending' }] }
+const BAND = {
+  plugin: 'agentic-processes', component: 'AbovePrompt', requestId: 'band', surface: 'terminal', viewport: { columns: 100, rows: 30 },
+  props: { hasSurvey: false, isWorking: false, maxRows: 3, bodyColumns: 60, scroll: { offset: 0, bodyRows: 3 }, view: {} },
+} as const
 
 // A fake disk (path → text) with the stubs a pane needs. `sent` collects the prompts the mod submits.
 function world(on: On, disk: Record<string, unknown>) {
@@ -17,18 +21,24 @@ function world(on: On, disk: Record<string, unknown>) {
   const sent: { text: string; asUser?: boolean }[] = []
   const under = (folder: string) => Object.keys(files).filter(p => p.startsWith(`${folder}/`))
   mock.env(on, { HOME: '/h' })
-  mock.store(on, {})
+  const clock = mock.clock(on)
+  const store: Record<string, unknown> = {} // the mod's store, open to the test
+  on('store.get', async (_$, e: any) => ({ value: store[e.key] }))
+  on('store.set', async (_$, e: any) => { store[e.key] = e.value; return { value: undefined } })
+  on('store.delete', async (_$, e: any) => { delete store[e.key]; return { value: undefined } })
   on('session.id', async () => ({ value: 'S1' }))
   on('session.cwd', async () => ({ value: '/work' }))
   on('fs.list', async (_$, e) => ({ value: [...new Set(under(e.path).map(p => p.slice(e.path.length + 1).split('/')[0]))].map(name => ({ name, kind: under(`${e.path}/${name}`).length ? 'dir' : 'file', size: 0, mtimeMs: 0, isLink: false })) }))
   on('fs.exists', async (_$, e) => ({ value: e.path in files || under(e.path).length > 0 }))
   on('fs.read', async (_$, e) => ({ value: files[e.path] }))
   on('fs.write', async (_$, e) => { files[e.path] = e.text; return { value: undefined } })
+  const toasts: string[] = []
+  on('ui.toast', async (_$, e: any) => { toasts.push(e.text); return { value: undefined } })
   on('ui.open', async () => ({ value: { isPlaced: true } }))
   on('ui.close', async () => ({ value: undefined }))
   on('tool.register', async () => ({ value: undefined }))
   on('prompt.submit', async (_$, e) => { sent.push({ text: e.text, asUser: (e as any).origin?.asUser }); return { text: e.text } })
-  return { files, sent }
+  return { files, sent, store, toasts, clock }
 }
 
 test('/process opens the pane, and the Continue tab counts the processes', async ($, on) => {
@@ -110,4 +120,76 @@ test('marketplaces: Add saves a line, Off switches it, Remove needs two presses'
   await ui.press({ key: 'mk-remove-0' })
   expect(saved()).toEqual([])
   expect(runs).toEqual([['rm', '-rf', `${HOME}/cache/sources/team`]])
+})
+
+test('/process templates opens that tab, and another word still goes to the first field', async ($, on) => {
+  world(on, { [`${HOME}/config/marketplaces.json`]: { marketplaces: [] }, [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: 'templates' })
+  let ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Button', key: 'mk-add' })).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'process', args: '99' })
+  ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'template-0' })
+  expect(await ui.find({ type: 'Input', key: 'field-workItemId', value: '99' })).toBeDefined()
+})
+
+test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
+  const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
+  const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Button', key: 'process-0', label: 'Old fix' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'process-1' })).toBeUndefined()
+  await ui.press({ key: 'folder-all' })
+  expect(await ui.find({ type: 'Button', key: 'process-1' })).toBeDefined()
+  expect(w.store.allFolders).toBe(true)
+  await ui.press({ key: 'folder-here' })
+  expect(w.store.allFolders).toBe(false)
+})
+
+test('a step that waits puts a count on the Continue tab and on the button above the prompt', async ($, on) => {
+  const waiting = { ...process, steps: [{ id: 'a', number: 0, name: 'Approve', status: 'awaiting_approval' }] }
+  world(on, { [`${HOME}/active/p1/process.json`]: waiting })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Button', key: 'tab-continue', label: 'Continue ▲1' })).toBeDefined()
+  const band = await $.ui.mount(BAND)
+  expect(await band.find({ type: 'Button', key: 'band-open', label: 'Processes ▲ 1 wait' })).toBeDefined()
+})
+
+test('a process that starts to wait raises one toast within 5 seconds', async ($, on) => {
+  const w = world(on, { [`${HOME}/active/p1/process.json`]: process })
+  const clock = w.clock
+  await $.command.run({ command: 'process', args: 'continue' })
+  const band = await $.ui.mount(BAND) // the first look: nothing needs the user, and no toast
+  await clock.advance(5000)
+  expect(w.toasts).toEqual([])
+  w.files[`${HOME}/active/p1/process.json`] = JSON.stringify({ ...process, steps: [{ id: 'a', number: 0, name: 'Approve', status: 'awaiting_approval' }] })
+  await clock.advance(5000)
+  await clock.advance(5000)
+  expect(w.toasts).toEqual(['Old fix waits for you']) // not raised again for the same process
+  await band.unmount()
+})
+
+test('the Desktop surface draws the same tabs with a rail of icons', async ($, on) => {
+  world(on, { [`${HOME}/active/p1/process.json`]: process })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Svg' })).toBeDefined()
+  await ui.press({ key: 'tab-new' })
+  expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
+})
+
+test('with a process bound to the session the pane shows its steps, and Back goes to the list', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed' }, { id: 'b', number: 2, name: 'Build', status: 'pending' }] } })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: '✓ 1. Design' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '○ 2. Build' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'tab-new' })).toBeUndefined()
+  await ui.press({ key: 'back-list' })
+  expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
 })

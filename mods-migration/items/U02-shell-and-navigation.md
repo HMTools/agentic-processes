@@ -64,6 +64,15 @@ Claude Code version: 2.1.296 (docs read: mods `interface`, `api`, `reference`; t
 - The band is always on: it takes one row in every session and competes with other mods.
 - U01 is not done: the design here uses the current look.
 
+### Implemented (2026-10-10, owner chose plan then build)
+Built in the real mod, with the U01 card look. 246 tests pass (`claude plugin test .`), `claude plugin validate .` passes. Not yet seen in a running session by the owner.
+- `hooks/infra/process-pane/status-look.ts` (new): the status vocabulary (symbol, ASCII, word, theme key) and `stepKind`, `needsUser`.
+- `hooks/infra/process-pane/process-pane.ts`: `listProcesses` adds `kind` and `folders`; new `processKind`, `inFolder`, `waitingCount`, `boundView`.
+- `hooks/on-process-pane/on-process-pane.ts`: `/process [new | continue | templates | first field]`; cards with status; Continue tab with the This folder / All folders switch (saved in the store as `allFolders`, read again after /clear, /resume, /branch); a waiting badge on the Continue tab; the bound-process view with a Back to list button; a Desktop rail of `Svg` icons beside real tab buttons; short labels below 52 columns; the always-on button above the prompt (key 1); a 5 second timer that redraws and raises a toast when a process starts to wait.
+- `hooks/on-process-tools/on-process-tools.ts`: the command hint.
+- Differences from the plan: the toast comes from the timer, not from the tool call (covers other sessions too); on Desktop the tab buttons stay next to the icons because an `Svg` cannot take a press; no ASCII switch yet.
+- Open: key 1 on an empty prompt opens the pane, which may surprise someone who types a 1 as a prompt.
+
 
 ## 8. After the research: update the progress page
 Edit `../progress.html`: find the object with `"id": "U02"` between `/* ITEMS:START */` and `/* ITEMS:END */` and set `status`, `verdict`, `summary`, `open`, `updated` (today's date `YYYY-MM-DD`). Do not change other entries. Check the file still parses (`node --check` on the script) and open it in a browser.
