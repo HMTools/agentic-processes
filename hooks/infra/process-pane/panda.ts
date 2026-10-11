@@ -72,11 +72,22 @@ const GRIDS: Record<Pose, string[]> = {
 const HEADBAND: Record<Pose, string> = { surfing: '#3fbf7f', 'arms-up': '#4d8dff', waving: '#f2b13d', water: '#e5534b' }
 const COLORS: Record<string, string> = { K: '#23232b', W: '#f6f5ef', B: '#35b6ff', Y: '#ffd24a', V: '#2f6fe0' }
 
-export const PANDA_SIZE = { width: 40, height: 35 }
+// One pixel of light outline around the panda, so the black ears and arms show on the dark pane. There is no background.
+const OUTLINE = '#c9d2ea'
+export const PANDA_SIZE = { width: 72, height: 64 } // 18 by 16 pixels with the outline, 4 pixels each
 
 export function pandaSvg(pose: Pose): { source: string; width: number; height: number } {
-  const rects = GRIDS[pose].flatMap((row, y) => [...row].map((c, x) => c === '.' ? '' : `<rect x="${x}" y="${y}" width="1" height="1" fill="${c === 'H' ? HEADBAND[pose] : COLORS[c]}"/>`)).join('')
-  return { ...PANDA_SIZE, source: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 14" width="${PANDA_SIZE.width}" height="${PANDA_SIZE.height}" shape-rendering="crispEdges"><rect width="16" height="14" rx="2" fill="#9aa6cc"/>${rects}</svg>` }
+  const grid = GRIDS[pose]
+  const filled = (x: number, y: number) => (grid[y]?.[x] ?? '.') !== '.'
+  const rects: string[] = []
+  for (let y = -1; y <= grid.length; y++) {
+    for (let x = -1; x <= 16; x++) {
+      const c = grid[y]?.[x] ?? '.'
+      const color = c !== '.' ? (c === 'H' ? HEADBAND[pose] : COLORS[c]) : [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => filled(x + dx, y + dy)) ? OUTLINE : ''
+      if (color) rects.push(`<rect x="${x}" y="${y}" width="1" height="1" fill="${color}"/>`)
+    }
+  }
+  return { ...PANDA_SIZE, source: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 18 16" width="${PANDA_SIZE.width}" height="${PANDA_SIZE.height}" shape-rendering="crispEdges">${rects.join('')}</svg>` }
 }
 
 // The panda reacts to the notice at the top: arms up for a result, in the water for an error, else surfing. The notice clears itself, so the panda goes back.
