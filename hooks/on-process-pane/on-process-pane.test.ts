@@ -593,10 +593,20 @@ test('Sources is a tab of its own; with no source it says how to add one', async
   await $.command.run({ command: 'process', args: 'new' })
   const ui = await $.ui.mount(PANE)
   await ui.press({ key: 'tab-sources' })
-  expect(await ui.find({ type: 'Text', text: 'Sources of templates' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '0 sources' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'No source yet. Press Add marketplace and give a git address.' })).toBeDefined()
   await ui.press({ key: 'tab-new' })
   expect(await ui.find({ type: 'Input', key: 'search' })).toBeDefined()
+})
+
+test('a source is a card with its address, and the editor shows a hint under each label', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'tab-sources' })
+  await ui.press({ key: 'mk-add' })
+  expect(await ui.find({ type: 'Text', text: 'https://, ssh://, git@host: or a local path' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'mk-save' })).toBeDefined()
 })
 
 test('parity: the same facts and the same buttons show on the terminal and on Desktop', async ($, on) => {
