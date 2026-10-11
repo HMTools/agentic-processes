@@ -485,6 +485,63 @@ test('Delete of the process this session works on is refused, and Close makes it
   expect(await ui.find({ type: 'Text', text: 'This session works on that process. Close it first.' })).toBeDefined()
 })
 
+test('the step detail shows an empty part as a dim dash, and each step remembers its own tab', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, {
+    [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed', stepDefinition: { output: { description: 'a design' } } }, { id: 'b', number: 2, name: 'Build', status: 'pending', stepDefinition: { output: { description: 'a build' } } }] },
+    [`${dir}/log.json`]: { steps: { a: { actionsTaken: ['drew it'] } } },
+  })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'step-a' })
+  expect(await ui.find({ type: 'Text', text: '  a design' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Substeps' })).toBeDefined() // an empty part keeps its heading
+  expect(await ui.find({ type: 'Text', text: '  —' })).toBeDefined()
+  await ui.press({ key: 'dtab-execution' })
+  await ui.press({ key: 'step-next' }) // step b has its own tab: still Definition
+  expect(await ui.find({ type: 'Text', text: '  a build' })).toBeDefined()
+  await ui.press({ key: 'step-prev' }) // step a is on Execution as it was left
+  expect(await ui.find({ type: 'Text', text: '  drew it' })).toBeDefined()
+})
+
+test('Logs: Problems only keeps the steps that reported a problem; times show their date when not today', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, {
+    [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed' }, { id: 'b', number: 2, name: 'Build', status: 'completed' }] },
+    [`${dir}/log.json`]: { steps: { a: { timestamp: { started: '2026-01-02T09:05:00Z' }, actionsTaken: ['drew it'] }, b: { problemsEncountered: ['slow'] } } },
+  })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'sec-logs' })
+  expect(await ui.find({ type: 'Button', key: 'log-a' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '01-02 09:05' })).toBeDefined()
+  await ui.press({ key: 'logs-problems' })
+  expect(await ui.find({ type: 'Button', key: 'log-a' })).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'log-b' })).toBeDefined()
+})
+
+test('Memory: a long value is cut with a show more button, and Desktop draws the flow as a picture', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const long = 'x'.repeat(300)
+  const w = world(on, {
+    [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 1, name: 'Design', status: 'completed' }] },
+    [`${dir}/memory/plan.json`]: { entries: { a: { informationProduced: { goal: long } } } },
+  })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'sec-memory' })
+  await ui.press({ key: 'mem-topics' })
+  await ui.press({ key: 'topic-plan' })
+  expect(await ui.find({ type: 'Text', text: `    goal: ${'x'.repeat(120)}…` })).toBeDefined()
+  await ui.press({ key: 'more-plan:1:goal' })
+  expect(await ui.find({ type: 'Text', text: `    goal: ${long}` })).toBeDefined()
+  await ui.press({ key: 'more-plan:1:goal' })
+  expect(await ui.find({ type: 'Text', text: `    goal: ${'x'.repeat(120)}…` })).toBeDefined()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

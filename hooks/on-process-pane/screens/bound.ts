@@ -2,6 +2,7 @@ import type { StepRow } from '../../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../../infra/process-pane/status-look'
 import { nodeSegment, ring, titleText } from '../../infra/process-pane/rich'
 import { activityOf } from '../../infra/process-pane/activity'
+import { flowGrid } from '../../infra/process-pane/rich'
 import { say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
@@ -17,23 +18,24 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   if (detail) {
     const at = bound.steps.findIndex(s => s.id === detail.id)
     const move = (by: number) => () => { st.openStep = bound.steps[at + by]?.id; redraw() }
-    const block = (title: string, items: string[]) => items.length ? [line(title, { bold: true }), ...items.map(item => line(`  ${item}`))] : []
-    const tabButton = (name: typeof st.detailTab, label: string) => toggle(`dtab-${name}`, label, st.detailTab === name, () => { st.detailTab = name; redraw() })
-    const parts = st.detailTab === 'definition'
-      ? [...block('Produces', detail.produces), ...block('Substeps', detail.substeps), ...block('Reads memory', detail.reads), ...block('Writes memory', detail.writes)]
-      : [...block('Actions', detail.actions), ...block('Reasoning', detail.reasoning), ...block('Decisions', detail.decisions), ...block('Files', detail.files),
-         ...block('Produced', detail.produced.map(([k, v]) => `${k}: ${v}`)), ...block('Notes', detail.notes), ...block('Problems', detail.problems)]
+    // An empty part shows as a dim dash, so the reader sees it is empty and not missing. A step with nothing at all says so in one line.
+    const block = (title: string, items: string[]) => [line(title, { bold: true }), ...(items.length ? items.map(item => line(`  ${item}`)) : [line('  —', { dimColor: true })])]
+    const tabNow = st.detailTabs[detail.id] ?? 'definition' // each step keeps its own tab
+    const tabButton = (name: 'definition' | 'execution', label: string) => toggle(`dtab-${name}`, label, tabNow === name, () => { st.detailTabs[detail.id] = name; redraw() })
+    const lists = tabNow === 'definition'
+      ? [['Produces', detail.produces], ['Substeps', detail.substeps], ['Reads memory', detail.reads], ['Writes memory', detail.writes]] as const
+      : [['Actions', detail.actions], ['Reasoning', detail.reasoning], ['Decisions', detail.decisions], ['Files', detail.files], ['Produced', detail.produced.map(([k, v]) => `${k}: ${v}`)], ['Notes', detail.notes], ['Problems', detail.problems]] as const
+    const parts = lists.some(([, items]) => items.length) ? lists.flatMap(([title, items]) => block(title, [...items])) : []
     return card('step-detail', [
       Box({ flexDirection: 'row', columnGap: 1, children: k ? [line(`${detail.number}. ${detail.name}`, { bold: true }), k.kindPill(detail.kind)] : [line(symbolOf(detail.kind, false), { color: LOOK[detail.kind].color, bold: true }), line(`${detail.number}. ${detail.name}`, { bold: true }), kindWord(detail.kind)] }),
-      tabRow([tabButton('definition', 'Definition'), tabButton('execution', 'Execution')]),
-      line(' '),
-      ...(parts.length ? parts : [line(st.detailTab === 'definition' ? 'This step has no definition.' : 'Nothing recorded yet.', { dimColor: true })]),
-      line(' '),
       Box({ flexDirection: 'row', columnGap: 3, children: [
         nav('back-steps', st.section === 'logs' ? 'Back to logs' : 'Back to steps', () => { st.openStep = undefined; redraw() }),
         ...(at > 0 ? [nav('step-prev', `‹ ${bound.steps[at - 1].number}`, move(-1))] : []),
         ...(at >= 0 && at < bound.steps.length - 1 ? [nav('step-next', `${bound.steps[at + 1].number} ›`, move(1))] : []),
       ] }),
+      tabRow([tabButton('definition', 'Definition'), tabButton('execution', 'Execution')]),
+      line(' '),
+      ...(parts.length ? parts : [line(tabNow === 'definition' ? 'This step has no definition.' : 'Nothing recorded yet.', { dimColor: true })]),
     ], needsUser(detail.kind))
   }
   const stepRows = (s: StepRow, i: number) => [
@@ -96,35 +98,54 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   const none = (text: string) => line(text, { dimColor: true })
   const sub = (name: typeof st.memTab, label: string) => toggle(`mem-${name}`, label, st.memTab === name, () => { st.memTab = name; redraw() })
   const toLine = (items: string[]) => items.join(', ') || '-'
+  const LONG = 120 // a value longer than this is cut, with a button for the rest
   const topicRows = (t: (typeof v.mem.topics)[number]) => [
     Button({ key: `topic-${t.topic}`, label: `${st.openTopic === t.topic ? '▾' : '▸'} ${t.topic}`, plain: true, onPress: () => { st.openTopic = st.openTopic === t.topic ? undefined : t.topic; redraw() } }),
     ...(st.openTopic === t.topic ? t.entries.flatMap(en => [
       line(`  step ${en.step} ${en.stepName}`, { bold: true }),
-      ...en.values.map(([key, val]) => line(`    ${key}: ${val}`)),
+      ...en.values.flatMap(([key, val]) => {
+        const id = `${t.topic}:${en.step}:${key}`
+        if (val.length <= LONG) return [line(`    ${key}: ${val}`)]
+        const open = st.openValues.has(id)
+        return [line(`    ${key}: ${open ? val : `${val.slice(0, LONG)}…`}`), Button({ key: `more-${id}`, label: open ? '    show less' : '    show more', plain: true, dimColor: true, onPress: () => { if (!st.openValues.delete(id)) st.openValues.add(id); redraw() } })]
+      }),
       ...en.decisions.map(d => line(`    decision: ${d}`)), ...en.files.map(f => line(`    file: ${f}`)), ...en.notes.map(n => line(`    note: ${n}`)),
     ]) : []),
   ]
+  // Desktop: which step reads and writes which topic, as the same picture the template details draw.
+  const stepNumbers = bound.steps.map(s => Number(s.number))
+  const flowCells = Object.fromEntries(v.mem.topics.map(t => [t.topic, stepNumbers.map(n => {
+    const w = t.writtenBy.includes(String(n)), r = t.readBy.includes(String(n))
+    return w && r ? 'R/W' as const : w ? 'W' as const : r ? 'R' as const : '' as const
+  })]))
+  const flowPicture = [picture(flowGrid(v.mem.topics.map(t => t.topic), flowCells, stepNumbers), 'Which step reads and writes which memory topic', 150 + 44 * stepNumbers.length + 4, 26 + 28 * v.mem.topics.length), line('W writes · R reads · R/W both', { dimColor: true })]
   const diffColor = (l: string) => (l[0] === '+' ? 'success' : l[0] === '-' ? 'error' : 'warning')
   const memoryBody = [
     tabRow([sub('flow', 'Flow'), sub('topics', 'Topics'), sub('history', 'History'), sub('diffs', 'Diffs')]),
     line(' '),
     ...(!v.mem.topics.length ? [none('No memory yet. A step writes memory when it runs.')]
-      : st.memTab === 'flow' ? v.mem.topics.map(t => line(`${t.topic}  ·  written by ${toLine(t.writtenBy)}  ·  read by ${toLine(t.readBy)}`))
+      : st.memTab === 'flow' ? (rich ? flowPicture : v.mem.topics.map(t => line(`${t.topic}  ·  written by ${toLine(t.writtenBy)}  ·  read by ${toLine(t.readBy)}`)))
       : st.memTab === 'topics' ? (k ? [k.stack(v.mem.topics.map(t => k.card(`tcard-${t.topic}`, topicRows(t))))] : v.mem.topics.flatMap(topicRows))
       : st.memTab === 'history' ? (v.mem.history.length ? v.mem.history.map(en => line(`${en.updated.slice(0, 16).replace('T', ' ')}  ${en.topic}  step ${en.step}  ·  ${en.values.length} values`)) : [none('No entries yet.')])
       : (v.mem.diffs.length ? v.mem.diffs.flatMap(d => [line(`${d.topic}: step ${d.from} → step ${d.to}`, { bold: true }), ...d.lines.map(l => line(`  ${l}`, { color: diffColor(l) }))]) : [none('No topic has two entries that differ.')])),
   ]
-  const clock = (t?: string) => (t ? t.slice(11, 16) || t.slice(0, 16) : '')
+  const today = new Date().toISOString().slice(0, 10)
+  // The time of day, and the date too when it is not today.
+  const clock = (t?: string) => (t ? (t.length >= 16 ? `${t.slice(0, 10) === today ? '' : `${t.slice(5, 10)} `}${t.slice(11, 16)}` : t.slice(0, 16)) : '')
   const logRows = (r: (typeof v.logs)[number]) => [
     Box({ key: `logrow-${r.id}`, flexDirection: 'row', columnGap: 1, children: [
       ...(k ? [k.kindPill(r.kind)] : [line(symbolOf(r.kind, false), { color: LOOK[r.kind].color })]),
-      Button({ key: `log-${r.id}`, label: `${r.number}. ${r.name}`, plain: true, onPress: () => { st.openStep = r.id; st.detailTab = 'execution'; redraw() } }),
+      Button({ key: `log-${r.id}`, label: `${r.number}. ${r.name}`, plain: true, onPress: () => { st.openStep = r.id; st.detailTabs[r.id] = 'execution'; redraw() } }),
       ...(clock(r.started) ? [line(`${clock(r.started)}${r.completed ? ` – ${clock(r.completed)}` : ''}`, { dimColor: true })] : []),
     ] }),
     ...(narrow ? [] : r.actions.slice(0, 2).map(a => line(`    ${a}`, { dimColor: true }))),
     ...(narrow ? [] : r.problems.slice(0, 2).map(p => line(`    problem: ${p}`, { color: 'error' }))),
   ]
-  const logsBody = v.logs.length ? (k ? [k.stack(v.logs.map(r => k.card(`logcard-${r.id}`, logRows(r))))] : v.logs.flatMap(logRows)) : [none('No log yet. The agent writes one for each step it finishes.')]
+  const shownLogs = v.logs.filter(r => !st.problemsOnly || r.problems.length)
+  const logsBody = !v.logs.length ? [none('No log yet. The agent writes one for each step it finishes.')] : [
+    toggle('logs-problems', 'Problems only', st.problemsOnly, () => { st.problemsOnly = !st.problemsOnly; redraw() }),
+    ...(shownLogs.length ? (k ? [k.stack(shownLogs.map(r => k.card(`logcard-${r.id}`, logRows(r))))] : shownLogs.flatMap(logRows)) : [none('No step reported a problem.')]),
+  ]
   const fileRow = (r: (typeof v.rows)[number], i: number) => (k ? (x: unknown) => k.card(`filecard-${i}`, [x]) : (x: unknown) => x)(Box({ key: `filerow-${i}`, flexDirection: 'row', columnGap: 2, children: [
     r.openable ? Button({ key: `file-${r.path}`, label: r.name, plain: true, onPress: async () => { say('error', await openInViewer(r.path, e.surface)); redraw() } }) : line(r.name, { dimColor: true }),
     ...(r.step ? [line(`step ${r.step}`, { dimColor: true })] : []),

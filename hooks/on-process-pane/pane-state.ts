@@ -13,7 +13,9 @@ export const st = {
   boundDir: undefined as string | undefined,
   shown: undefined as string | undefined, // the process the pane draws: the bound one, or a sub-process or the parent the user opened
   openStep: undefined as string | undefined, // the step whose detail shows, if any
-  detailTab: 'definition' as 'definition' | 'execution',
+  detailTabs: {} as Record<string, 'definition' | 'execution'>, // the tab of the step detail, remembered for each step
+  problemsOnly: false, // Logs: only the steps that reported a problem
+  openValues: new Set<string>(), // Memory: the long values that show in full
   favorites: new Set<string>(), // starred templates (`category/name`), kept in the store as `favorites`
   query: '', // the search words of the New tab
   category: undefined as string | undefined, // the chip: a category, the favorites, or all
