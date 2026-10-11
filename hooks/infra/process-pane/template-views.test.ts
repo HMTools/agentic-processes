@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 import { world } from '../process-manager/fake-world'
-import { FAVORITES, matches, mergeTemplates, templateDetail } from './template-views'
+import { FAVORITES, groupRows, lastUsedNames, matches, mergeTemplates, templateDetail } from './template-views'
 import type { TemplateInfo } from './process-pane'
 import type { CatalogEntry } from '../templates/templates'
 
@@ -52,4 +52,18 @@ test('template detail: purpose, parameters, steps from their step files, and the
   expect(d.steps[2]).toMatchObject({ output: '', reads: [], writes: [] }) // a step file that is missing still shows its name
   expect(d.flow).toEqual({ topics: ['cause', 'patch'], cells: { cause: ['W', 'R/W', ''], patch: ['', 'W', ''] } })
   expect(await templateDetail(w.ports.files, '/t/gone.json')).toBeUndefined()
+})
+
+test('groups: favorites, then last used, then categories; a template shows once; missing ones go last', () => {
+  const rows = mergeTemplates([info('dev', 'a'), info('dev', 'b'), info('dev', 'c'), info('ops', 'd')], [entry('ops', 'e', 'available')])
+  const g = groupRows(rows, new Set(['dev/a']), ['b', 'dev/a', 'd', 'gone'], true)
+  expect(g.favorites.map(r => r.key)).toEqual(['dev/a'])
+  expect(g.last.map(r => r.key)).toEqual(['dev/b', 'ops/d'])
+  expect(g.groups.map(x => [x.category, x.rows.map(r => r.name)])).toEqual([['dev', ['c']]])
+  expect(g.missing.map(r => r.key)).toEqual(['ops/e'])
+  expect(groupRows(rows, new Set(['dev/a']), ['b'], false).groups.map(x => x.rows.length)).toEqual([3, 1])
+})
+
+test('last used: the newest process first, each template once', () => {
+  expect(lastUsedNames([{ template: 'a', updatedMs: 1 }, { template: 'b', updatedMs: 9 }, { template: 'a', updatedMs: 5 }, { updatedMs: 99 }])).toEqual(['b', 'a'])
 })

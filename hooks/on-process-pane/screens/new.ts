@@ -1,6 +1,7 @@
 import { missingFields, startProcess } from '../../infra/process-pane/process-pane'
-import { FAVORITES, matches, mergeTemplates, templateDetail } from '../../infra/process-pane/template-views'
+import { FAVORITES, groupRows, lastUsedNames, matches, mergeTemplates, templateDetail } from '../../infra/process-pane/template-views'
 import type { TemplateRow } from '../../infra/process-pane/template-views'
+import { ago } from '../../infra/process-pane/activity'
 import { HEX, flowGrid } from '../../infra/process-pane/rich'
 import { installTemplate, refreshMarketplaces, removeTemplate } from '../../infra/templates/templates'
 import { askAgain, noteRefresh, say, st } from '../pane-state'
@@ -55,6 +56,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
         ...(row.state !== 'available' ? [Button({ key: `tpl-remove-${row.key}`, label: st.sure === `tpl:${row.key}` ? 'Sure?' : 'Remove', plain: true, onPress: () => { if (st.sure === `tpl:${row.key}`) return templateJob(ports => removeTemplate(ports, row)); askAgain(`tpl:${row.key}`); redraw() } })] : []),
       ] }),
       Box({ flexDirection: 'row', columnGap: 1, children: [star(row.key, 'td-fav'), line(`${row.category} / ${row.title}`, { bold: true }), line(wordOf[row.state], { dimColor: true })] }),
+      ...(d ? [line(`${row.category}  ·  ${row.entry ? `from ${row.entry.marketplace}  ·  ` : ''}${d.steps.length} steps${d.steps.some(s => s.approval) ? `  ·  ${d.steps.filter(s => s.approval).length} ask${d.steps.filter(s => s.approval).length === 1 ? 's' : ''} for approval` : ''}`, { dimColor: true }), line(d.steps.map(s => `${s.number}. ${s.name}${s.approval ? ' 🔒' : ''}`).join('  ›  '))] : []),
       tabRow([tdTabButton('overview', 'Overview'), tdTabButton('steps', narrow ? 'Steps' : `Steps${d ? ` ·${d.steps.length}` : ''}`), tdTabButton('flow', narrow ? 'Flow' : 'Memory flow'), tdTabButton('raw', 'Raw')]),
       line(' '),
       ...(st.tdTab === 'overview' ? overview : st.tdTab === 'steps' ? stepsBody : st.tdTab === 'flow' ? flowBody : rawBody),
@@ -63,16 +65,26 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
     const cats = [...new Set(allRows.map(r => r.category))].sort()
     const chip = (id: string, label: string, value: string | undefined) => toggle(id, label, st.category === value, () => { st.category = value; redraw() })
     const shownRows = matches(allRows, st.query, st.category, st.favorites)
-    const stateHex = { installed: HEX.running, update: HEX.waiting, available: HEX.pending } as const
-    const richTemplate = (r: TemplateRow) => k!.card(`tcard-${r.key}`, [
-      Box({ flexDirection: 'row', columnGap: 1, children: [star(r.key, `fav-${r.key}`), line(`${r.category} / ${r.title}`, { bold: true }), k!.pill(wordOf[r.state], stateHex[r.state])] }),
+    const parts = groupRows(shownRows, st.favorites, lastUsedNames(st.processes), !st.category)
+    const open = (r: TemplateRow) => () => { st.detailKey = r.key; st.tdTab = 'overview'; st.tdStep = undefined; st.message = '' }
+    // One template: its name without the category, "update available" only when it matters, two lines of purpose, its buttons.
+    const item = (r: TemplateRow) => (k ? k.card : card)(`tcard-${r.key}`, [
+      Box({ flexDirection: 'row', columnGap: 1, children: [
+        star(r.key, `fav-${r.key}`), line(r.title, { bold: true }),
+        ...(r.state === 'update' ? [k ? k.pill('update available', HEX.waiting) : line('update available', { dimColor: true })] : []),
+      ] }),
       ...(r.steps != null ? [line(`${r.steps} steps`, { dimColor: true })] : []),
-      ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 90 ? `${r.purpose.slice(0, 89)}…` : r.purpose, { dimColor: true })]),
+      ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 170 ? `${r.purpose.slice(0, 169)}…` : r.purpose, { dimColor: true })]),
       Box({ flexDirection: 'row', columnGap: 1, children: [
         ...(r.template ? [start(r)] : []), ...(r.entry && r.state !== 'installed' ? [install(r)] : []),
-        Button({ key: `template-${r.key}`, label: 'Details', variant: 'secondary', onPress: () => { st.detailKey = r.key; st.tdTab = 'overview'; st.tdStep = undefined; st.message = ''; redraw() } }),
+        Button({ key: `template-${r.key}`, label: 'Details', variant: 'secondary', onPress: () => { open(r)(); redraw() } }),
       ] }),
     ])
+    const header = (title: string) => line(title, { bold: true, dimColor: true })
+    const section = (title: string, rows: TemplateRow[]) => rows.length ? [header(title), ...(k ? [k.stack(rows.map(item))] : rows.map(item))] : []
+    const missingOpen = st.showMissing || !!st.query
+    const synced = Math.max(0, ...st.markets.map(m => (m.lastSynced ? Date.parse(m.lastSynced) : 0) || 0))
+    const sources = st.markets.filter(m => m.enabled).length
     return [
       ...(st.processes.length ? [] : [line('Pick a template. Claude runs it and stops for your approval at gates.', { dimColor: true })]), // a hint for a first run
       Input({ key: 'search', label: 'Search', placeholder: 'name, category or purpose', value: st.query, onInput: (text: string) => { st.query = text; redraw() }, onSubmit: (text: string) => { st.query = text; redraw() } }),
@@ -80,21 +92,21 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
       Box({ flexDirection: 'row', columnGap: narrow ? 1 : 2, flexWrap: 'wrap', children: [
         chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${st.favorites.size ? ` ·${st.favorites.size}` : ''}`, FAVORITES), ...cats.map(c => chip(`cat-${c}`, `${c}${narrow ? '' : ` ·${allRows.filter(r => r.category === c).length}`}`, c)),
       ] }),
-      line(' '),
-      ...(shownRows.length ? (k ? [k.stack(shownRows.map(richTemplate))] : shownRows.map(r => card(`tcard-${r.key}`, [
-        Box({ flexDirection: 'row', columnGap: 1, children: [
-          star(r.key, `fav-${r.key}`),
-          Button({ key: `template-${r.key}`, plain: true, label: `${r.category} / ${r.title}`, onPress: () => { st.detailKey = r.key; st.tdTab = 'overview'; st.tdStep = undefined; st.message = ''; redraw() } }),
-          line(`${r.steps != null && !narrow ? `${r.steps} steps  ·  ` : ''}${wordOf[r.state]}`, { dimColor: true }),
-        ] }),
-        ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 90 ? `${r.purpose.slice(0, 89)}…` : r.purpose, { dimColor: true })]),
-        Box({ flexDirection: 'row', columnGap: 2, children: [...(r.template ? [start(r)] : []), ...(r.entry && r.state !== 'installed' ? [install(r)] : [])] }),
-      ]))) : [line(st.category === FAVORITES && !st.favorites.size ? 'No favorite yet. Press ☆ next to a template.' : allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
-      line(' '),
-      Box({ flexDirection: 'row', columnGap: 3, children: [
-        Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : 'Refresh', plain: true, onPress: () => templateJob(async ports => { const lines = await refreshMarketplaces(ports); noteRefresh(lines); return lines.join('\n') }, 'refresh') }),
+      // One line: how many match, how old the list is, and the buttons that were at the end of the list.
+      Box({ flexDirection: 'row', columnGap: 2, flexWrap: 'wrap', children: [
+        line(`${st.query || st.category ? `${shownRows.length} of ${allRows.length}` : allRows.length} templates${st.markets.length ? `  ·  ${sources} source${sources === 1 ? '' : 's'}${synced ? `  ·  synced ${ago(synced, Date.now())}` : ''}` : ''}`, { dimColor: true }),
+        Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : '↻ Refresh', plain: true, onPress: () => templateJob(async ports => { const lines = await refreshMarketplaces(ports); noteRefresh(lines); return lines.join('\n') }, 'refresh') }),
         Button({ key: 'mk-open', label: 'Marketplaces', plain: true, onPress: () => { st.tab = 'templates'; st.message = ''; redraw() } }),
       ] }),
+      line(' '),
+      ...(shownRows.length ? [
+        ...section('★ Favorites', parts.favorites), ...section('Last used', parts.last),
+        ...parts.groups.flatMap(g => section(st.category === FAVORITES ? '★ Favorites' : g.category, g.rows)),
+        ...(parts.missing.length ? [
+          Button({ key: 'fold-missing', label: `${missingOpen ? '▾' : '▸'} Not installed ·${parts.missing.length}`, plain: true, onPress: () => { st.showMissing = !st.showMissing; redraw() } }),
+          ...(missingOpen ? (k ? [k.stack(parts.missing.map(item))] : parts.missing.map(item)) : []),
+        ] : []),
+      ] : [line(st.category === FAVORITES && !st.favorites.size ? 'No favorite yet. Press ☆ next to a template.' : allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
     ]
   }
 }

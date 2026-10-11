@@ -90,7 +90,8 @@ test('the New list shows the marketplace templates with a state, and Install mak
   })
   await $.command.run({ command: 'process', args: '' })
   const ui = await $.ui.mount(PANE)
-  expect(await ui.find({ type: 'Text', text: 'not installed' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'tpl-install-dev/bug' })).toBeUndefined() // the templates you do not have sit in a closed group
+  await ui.press({ key: 'fold-missing' })
   expect(await ui.find({ type: 'Button', key: 'start-dev/bug' })).toBeUndefined() // only an installed template can start
   await ui.press({ key: 'tpl-install-dev/bug' })
   expect(runs.map(r => r[0]).filter(c => c !== 'git')).toEqual(['rm', 'mkdir', 'cp'])
@@ -598,6 +599,18 @@ test('parity: the same facts and the same buttons show on the terminal and on De
   }
   const band = await $.ui.mount(BAND)
   expect(await band.find({ type: 'Button', key: 'band-open' })).toBeDefined()
+})
+
+test('the New list shows a count line, a header for each category, and no category in the card title', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: '1 templates' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'dev' })).toBeDefined() // the group header
+  expect(await ui.find({ type: 'Text', text: /^dev \// })).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'tpl-refresh' })).toBeDefined()
+  await ui.press({ key: 'template-dev/bug' })
+  expect(await ui.find({ type: 'Text', text: /^dev {2}·/ })).toBeDefined() // the source line of the detail
 })
 
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {

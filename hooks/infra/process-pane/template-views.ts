@@ -31,6 +31,30 @@ export function matches(rows: TemplateRow[], query: string, category: string | u
     .sort((a, b) => Number(favorites.has(b.key)) - Number(favorites.has(a.key)) || a.key.localeCompare(b.key))
 }
 
+// The New list in parts: starred templates, the last ones you started, the rest by category, and the ones you do not have.
+// A template shows once. `lastUsed` holds template names, newest first.
+export type TemplateGroups = { favorites: TemplateRow[]; last: TemplateRow[]; groups: { category: string; rows: TemplateRow[] }[]; missing: TemplateRow[] }
+export function groupRows(rows: TemplateRow[], favorites: ReadonlySet<string>, lastUsed: string[], withTop: boolean): TemplateGroups {
+  const have = rows.filter(r => r.state !== 'available')
+  const fav = withTop ? have.filter(r => favorites.has(r.key)) : []
+  const last: TemplateRow[] = []
+  for (const name of withTop ? lastUsed : []) {
+    const r = have.find(x => x.name === name || x.key === name)
+    if (r && !fav.includes(r) && !last.includes(r) && last.length < 3) last.push(r)
+  }
+  const groups: TemplateGroups['groups'] = []
+  for (const r of have) {
+    if (fav.includes(r) || last.includes(r)) continue
+    const g = groups.find(x => x.category === r.category)
+    if (g) g.rows.push(r); else groups.push({ category: r.category, rows: [r] })
+  }
+  return { favorites: fav, last, groups: groups.sort((a, b) => a.category.localeCompare(b.category)), missing: rows.filter(r => r.state === 'available') }
+}
+
+// The templates of your processes, newest first, once each.
+export const lastUsedNames = (processes: { template?: string; updatedMs?: number }[]): string[] =>
+  [...new Set(processes.filter(p => p.template).sort((a, b) => (b.updatedMs ?? 0) - (a.updatedMs ?? 0)).map(p => p.template!))]
+
 export type Access = 'R' | 'W' | 'R/W' | ''
 export type TemplateStep = { number: number; name: string; approval: boolean; purpose: string; guidance: string[]; substeps: string[]; output: string; reads: string[]; writes: string[] }
 export type TemplateDetail = {

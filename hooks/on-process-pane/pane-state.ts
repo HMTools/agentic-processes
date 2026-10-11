@@ -18,6 +18,7 @@ export const st = {
   openValues: new Set<string>(), // Memory: the long values that show in full
   favorites: new Set<string>(), // starred templates (`category/name`), kept in the store as `favorites`
   query: '', // the search words of the New tab
+  showMissing: false, // the folded group of templates you do not have is open
   category: undefined as string | undefined, // the chip: a category, the favorites, or all
   detailKey: undefined as string | undefined, // the template whose detail shows
   tdTab: 'overview' as 'overview' | 'steps' | 'flow' | 'raw',
