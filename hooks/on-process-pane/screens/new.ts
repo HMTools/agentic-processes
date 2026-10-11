@@ -170,9 +170,11 @@ export async function formScreen(c: Ctx): Promise<unknown[]> {
     ...(narrow ? [] : [line('Tell Claude what you want. It fills the fields below.', { dimColor: true })]),
     Input({
       key: 'describe', placeholder: 'e.g. a template for payflow feature work, used for PR reviews', value: st.describe, autoFocus: true,
-      onInput: (text: string) => { st.describe = text },
+      onInput: (text: string) => { st.describe = text; redraw() }, // the frame below shows all of it
       submitLabel: st.busy === 'fill' ? 'Filling…' : 'Fill ✦', onSubmit: async (text: string) => { st.describe = text; await fill(template, purpose, text) },
     }),
+    // The field is one line in Claude Code, so a frame five lines tall shows the whole text wrapped.
+    Box({ key: 'describe-text', flexDirection: 'column', minHeight: 5, borderStyle: 'round', borderColor: 'inactive', paddingLeft: 1, paddingRight: 1, children: [line(st.describe || ' ')] }),
   ] })
   const fields = template.fields.map(field)
   // Above Create: what is left, or "ready".
