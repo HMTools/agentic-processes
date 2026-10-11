@@ -125,13 +125,14 @@ async function closeProcess($: any): Promise<void> {
   $.ui.invalidate('ui.render')
 }
 async function resumeAndHandOff($: any, dir: string, note?: string): Promise<void> { await handOff($, await resumeProcess(portsOf($), dir, note)) }
-async function handOff($: any, started: Started): Promise<void> {
+async function handOff($: any, started: Started, toast?: string): Promise<void> {
   if ('error' in started) { say('error', started.error); $.ui.invalidate('ui.render'); return }
   const sessionId = await $.session.id()
   await ensureProcessTools(spec => $.tool.register(spec), sessionId)
   await showStepLine($, started.dir)
   await raiseLogOwed(filesOf($), linksOf($), sessionId)
   startCountingAgain()
+  if (toast) { try { await $.ui.toast(toast) } catch { /* a surface that cannot show a toast */ } }
   await $.ui.close({ id: PANE })
   $.prompt.submit({ text: started.text, asUser: true }) // not awaited: it resolves when the turn starts
 }
@@ -334,6 +335,7 @@ export const register: Register = on => {
     const tabDefs = [
       { name: 'new', key: 'tab-new', label: 'New', short: 'New', go: show('new') },
       { name: 'continue', key: 'tab-continue', label: `Continue${badge}`, short: `Cont${badge}`, go: show('continue') },
+      { name: 'templates', key: 'tab-sources', label: 'Sources', short: 'Src', go: show('templates') },
     ] as const
     const tabs = tabRow(tabDefs.map(t => toggle(t.key, narrow ? t.short : t.label, st.tab === t.name, t.go)))
 
@@ -349,7 +351,7 @@ export const register: Register = on => {
       approve: async stepId => answerGate($, await approveFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId)),
       requestChanges: async (stepId, reason) => answerGate($, await requestChangesFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId, reason)),
       close: () => closeProcess($),
-      templateJob: (job, busy) => templateJob($, job, busy), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: started => handOff($, started), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
+      templateJob: (job, busy) => templateJob($, job, busy), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: (started, toast) => handOff($, started, toast), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
     }
     // One strip at the top for every result and error. A symbol and a color say which: never color alone.
     const tone = { info: 'inactive', success: 'success', error: 'error' }[st.kind]

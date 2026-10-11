@@ -158,10 +158,13 @@ export async function listMarketplaces(ports: TemplatePorts): Promise<Marketplac
   return found
 }
 
+// What a git address can look like. This checks the shape only: no network call.
+const ADDRESS = /^(https?:\/\/|ssh:\/\/|git:\/\/|file:\/\/|git@[\w.-]+:|[/~.]|[A-Za-z]:[\\/])/
 // The address and the branch go to `git clone`: a leading "-" would be read as an option.
 function checked(f: Partial<MarketplaceFields>): void {
   if (f.name !== undefined) plain(f.name)
   if (f.url !== undefined && (!f.url.trim() || f.url.startsWith('-'))) throw new Error('Give a git address that does not start with "-"')
+  if (f.url !== undefined && !ADDRESS.test(f.url.trim())) throw new Error('A git address starts with https://, ssh://, git@host: or is a local path')
   if (f.branch && !/^[\w][\w./-]*$/.test(f.branch)) throw new Error('Not a branch name: ' + f.branch)
   if (f.priority && !/^\d+$/.test(f.priority)) throw new Error('Priority is a whole number')
 }

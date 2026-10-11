@@ -542,6 +542,64 @@ test('Memory: a long value is cut with a show more button, and Desktop draws the
   expect(await ui.find({ type: 'Text', text: `    goal: ${'x'.repeat(120)}…` })).toBeDefined()
 })
 
+const described = { ...template, parameters: { required: ['workItemId'], optional: [], definitions: { workItemId: { example: '7', description: 'the work item number' } } } }
+
+test('the New tab has a clear button for the search, counts on the category chips, and a hint for empty favorites', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Button', key: 'search-clear' })).toBeUndefined()
+  await ui.input({ key: 'search', text: 'fix', kind: 'change' })
+  await ui.press({ key: 'search-clear' })
+  expect(await ui.find({ type: 'Button', key: 'search-clear' })).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'cat-dev', text: 'dev ·1' })).toBeDefined()
+  await ui.press({ key: 'cat-fav' })
+  expect(await ui.find({ type: 'Text', text: 'No favorite yet. Press ☆ next to a template.' })).toBeDefined()
+})
+
+test('the field form shows each description, and Started <name> toasts before the pane closes', async ($, on) => {
+  const w = world(on, { [`${T}/bug.json`]: described, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'start-dev/bug' })
+  expect(await ui.find({ type: 'Text', text: '  the work item number' })).toBeDefined()
+  await ui.input({ key: 'field-workItemId', text: '7', kind: 'change' })
+  await ui.press({ key: 'create' })
+  expect(w.toasts).toContain('Started bug')
+})
+
+test('Sources is a tab of its own; with no source it says how to add one', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'tab-sources' })
+  expect(await ui.find({ type: 'Text', text: 'Sources of templates' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'No source yet. Press Add marketplace and give a git address.' })).toBeDefined()
+  await ui.press({ key: 'tab-new' })
+  expect(await ui.find({ type: 'Input', key: 'search' })).toBeDefined()
+})
+
+test('parity: the same facts and the same buttons show on the terminal and on Desktop', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, {
+    [`${dir}/process.json`]: { ...process, status: 'failed', metadata: { ...process.metadata, template: 'bug-fix' }, steps: [{ id: 'a', number: 0, name: 'Build', status: 'failed' }, { id: 'b', number: 1, name: 'Ship', status: 'pending', approvalRequired: true }] },
+    [`${dir}/log.json`]: { steps: { a: { problemsEncountered: ['tests did not pass'] } } },
+  }, {})
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({ ...PANE, surface })
+    expect(await ui.find({ type: 'Text', text: 'tests did not pass' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'retry' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'close-process' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'back-list' })).toBeDefined()
+    for (const key of ['sec-steps', 'sec-memory', 'sec-logs', 'sec-files']) expect(await ui.find({ type: 'Button', key })).toBeDefined()
+    await ui.unmount()
+  }
+  const band = await $.ui.mount(BAND)
+  expect(await band.find({ type: 'Button', key: 'band-open' })).toBeDefined()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

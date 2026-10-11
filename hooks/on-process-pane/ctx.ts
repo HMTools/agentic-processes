@@ -28,7 +28,7 @@ export interface Ctx {
   ports: () => ManagerPorts
   store: { set(key: string, value: unknown): unknown }
   templateJob: (job: (ports: TemplatePorts) => Promise<string | void>, busy?: string) => Promise<void>
-  handOff: (started: Started) => Promise<void>
+  handOff: (started: Started, toast?: string) => Promise<void> // `toast` shows before the pane closes
   openInViewer: (path: string, surface: string) => Promise<string>
   refresh: () => Promise<void>
   gate: PaneGate | undefined // the approval step of the bound process, and whether the pane can answer it

@@ -1,9 +1,9 @@
-import { startProcess } from '../../infra/process-pane/process-pane'
+import { missingFields, startProcess } from '../../infra/process-pane/process-pane'
 import { FAVORITES, matches, mergeTemplates, templateDetail } from '../../infra/process-pane/template-views'
 import type { TemplateRow } from '../../infra/process-pane/template-views'
 import { HEX, flowGrid } from '../../infra/process-pane/rich'
 import { installTemplate, refreshMarketplaces, removeTemplate } from '../../infra/templates/templates'
-import { askAgain, say, st } from '../pane-state'
+import { askAgain, noteRefresh, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function newScreen(c: Ctx): Promise<unknown[]> {
@@ -76,8 +76,9 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
     return [
       ...(st.processes.length ? [] : [line('Pick a template. Claude runs it and stops for your approval at gates.', { dimColor: true })]), // a hint for a first run
       Input({ key: 'search', label: 'Search', placeholder: 'name, category or purpose', value: st.query, onInput: (text: string) => { st.query = text; redraw() }, onSubmit: (text: string) => { st.query = text; redraw() } }),
+      ...(st.query ? [Button({ key: 'search-clear', label: '× Clear the search', plain: true, dimColor: true, onPress: () => { st.query = ''; redraw() } })] : []),
       Box({ flexDirection: 'row', columnGap: narrow ? 1 : 2, flexWrap: 'wrap', children: [
-        chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${st.favorites.size ? ` ·${st.favorites.size}` : ''}`, FAVORITES), ...cats.map(c => chip(`cat-${c}`, c, c)),
+        chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${st.favorites.size ? ` ·${st.favorites.size}` : ''}`, FAVORITES), ...cats.map(c => chip(`cat-${c}`, `${c}${narrow ? '' : ` ·${allRows.filter(r => r.category === c).length}`}`, c)),
       ] }),
       line(' '),
       ...(shownRows.length ? (k ? [k.stack(shownRows.map(richTemplate))] : shownRows.map(r => card(`tcard-${r.key}`, [
@@ -88,10 +89,10 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
         ] }),
         ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 90 ? `${r.purpose.slice(0, 89)}…` : r.purpose, { dimColor: true })]),
         Box({ flexDirection: 'row', columnGap: 2, children: [...(r.template ? [start(r)] : []), ...(r.entry && r.state !== 'installed' ? [install(r)] : [])] }),
-      ]))) : [line(allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
+      ]))) : [line(st.category === FAVORITES && !st.favorites.size ? 'No favorite yet. Press ☆ next to a template.' : allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
       line(' '),
       Box({ flexDirection: 'row', columnGap: 3, children: [
-        Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : 'Refresh', plain: true, onPress: () => templateJob(async ports => (await refreshMarketplaces(ports)).join('\n'), 'refresh') }),
+        Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : 'Refresh', plain: true, onPress: () => templateJob(async ports => { const lines = await refreshMarketplaces(ports); noteRefresh(lines); return lines.join('\n') }, 'refresh') }),
         Button({ key: 'mk-open', label: 'Marketplaces', plain: true, onPress: () => { st.tab = 'templates'; st.message = ''; redraw() } }),
       ] }),
     ]
@@ -99,21 +100,22 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
 }
 
 export async function formScreen(c: Ctx): Promise<unknown[]> {
-  const { Box, Button, Input, handOff, line, ports, redraw } = c
+  const { Box, Button, Input, handOff, line, narrow, ports, redraw } = c
   const template = st.chosen!
-  const create = async () => handOff(await startProcess(ports(), template, st.values))
+  const create = async () => handOff(await startProcess(ports(), template, st.values), `Started ${template.name}`)
+  const missing = missingFields(template, st.values)
   return [
     line(`${template.category} / ${template.name}`, { bold: true }),
-    ...template.fields.map((f, i) => Input({
+    ...template.fields.flatMap((f, i) => [Input({
       key: `field-${f.name}`, label: f.required ? `${f.name} *` : f.name, placeholder: f.example ? `e.g. ${f.example}` : f.description,
       value: st.values[f.name] ?? '', ...(i === 0 ? { autoFocus: true } : {}),
       onInput: (text: string) => { st.values[f.name] = text },
       submitLabel: 'create', onSubmit: async (text: string) => { st.values[f.name] = text; await create() }, // Enter in a field creates
-    })),
+    }), ...(f.description && !narrow ? [line(`  ${f.description}`, { dimColor: true })] : [])]),
     Box({
       flexDirection: 'row', columnGap: 3,
       children: [
-        Button({ key: 'create', label: 'Create', onPress: create }),
+        Button({ key: 'create', label: 'Create', dimColor: missing.length > 0, onPress: create }), // dim until the required fields are filled; a press still says what is missing
         Button({ key: 'back', label: 'Back', plain: true, onPress: () => { st.chosen = undefined; st.message = ''; redraw() } }),
       ],
     }),

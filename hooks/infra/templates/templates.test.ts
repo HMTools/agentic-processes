@@ -93,6 +93,8 @@ test('add: defaults, and a duplicate name, a bad name, a dash address and a bad 
   await expect(addMarketplace(ports, { ...FIELDS, name: '../x' })).rejects.toThrow('Not a plain name')
   await expect(addMarketplace(ports, { ...FIELDS, name: 'a', url: '--upload-pack=x' })).rejects.toThrow('does not start with "-"')
   await expect(addMarketplace(ports, { ...FIELDS, name: 'a', priority: 'x' })).rejects.toThrow('whole number')
+  await expect(addMarketplace(ports, { ...FIELDS, name: 'a', url: 'team.git' })).rejects.toThrow('starts with https://')
+  for (const url of ['https://x/t.git', 'ssh://h/t.git', 'git@github.com:o/t.git', '/srv/t', './t', 'C:\\t']) await addMarketplace(ports, { ...FIELDS, name: `ok-${url.length}-${url.charCodeAt(0)}`, url })
 })
 test('toggle flips enabled; list shows the cache', async () => {
   const { ports, w } = setup(cacheFiles)

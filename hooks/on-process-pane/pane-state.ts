@@ -45,6 +45,7 @@ export const st = {
   chosen: undefined as TemplateInfo | undefined,
   values: {} as Record<string, string>,
   message: '',
+  sourceErrors: {} as Record<string, string>, // the last refresh error of each marketplace
   filter: 'all' as 'all' | 'needs' | 'running' | 'done' | 'failed', // the chip of the Continue list
   kind: 'info' as NoticeKind, // how the strip at the top draws the message
   at: 0, // the tick of the timer when the message was set: it clears after two ticks (5 to 10 seconds)
@@ -67,4 +68,15 @@ export function say(kind: NoticeKind, text: string): void {
 export function askAgain(what: string): void {
   st.sure = what
   st.sureAt = st.ticks
+}
+
+// Keep what a refresh said about each marketplace: a line "name: ... failed (why)" is an error, any other line clears it.
+export function noteRefresh(lines: string[]): void {
+  for (const line of lines) {
+    const at = line.indexOf(': ')
+    if (at < 0) continue
+    const name = line.slice(0, at), what = line.slice(at + 2)
+    if (/failed/.test(what)) st.sourceErrors[name] = what
+    else delete st.sourceErrors[name]
+  }
 }
