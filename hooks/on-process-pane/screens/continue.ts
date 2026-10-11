@@ -2,7 +2,7 @@ import { deleteProcess, inFolder, resumeProcess } from '../../infra/process-pane
 import type { ProcessInfo } from '../../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../../infra/process-pane/status-look'
 import { HEX, progressBar } from '../../infra/process-pane/rich'
-import { activityOf, ago } from '../../infra/process-pane/activity'
+import { activityOf, ago, isIdle } from '../../infra/process-pane/activity'
 import { stateWord } from '../../infra/process-pane/band'
 import { askAgain, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
@@ -15,9 +15,12 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
     const activity = activityOf(p.kind, p.lastLogMs, now)
     // What it is, where it is, why it needs you, and how long ago it changed.
     const where = `${p.template ? `${p.template}  ·  ` : ''}step ${p.step} of ${p.total}${p.stepName ? `  ·  ${p.stepName}` : ''}`
-    const why = `${stateWord(p)}${p.updatedMs !== undefined ? `  ·  ${ago(p.updatedMs, now)}` : ''}`
+    // Each fact once: the pill says the state, so a running card says how old it is and how long it wrote no log.
+    const idle = isIdle(p.kind, p.lastLogMs, now)
+    const age = p.updatedMs !== undefined ? ago(p.updatedMs, now) : ''
+    const why = p.kind === 'running' ? [age, activity?.text].filter(Boolean).join('  ·  ') : `${stateWord(p)}${age ? `  ·  ${age}` : ''}`
     const view = () => { st.view = 'process'; st.shown = p.dir; st.openStep = undefined; st.section = 'steps'; st.message = ''; redraw() } // read only: the session keeps its own process
-    const activityLine = activity ? [line(activity.text, activity.quiet ? { color: 'warning' } : { dimColor: true })] : []
+    const whyLine = line(why, activity?.quiet ? { color: 'warning' } : { dimColor: true })
     const filled = p.kind === 'done' ? 20 : Math.round(((p.step - 1) / Math.max(1, p.total)) * 20)
     const resume = async () => handOff(await resumeProcess(ports(), p.dir))
     // Delete moves the folder to deleted/ and asks twice. The process this session works on stays.
@@ -30,17 +33,17 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
     }
     if (k) {
       return k.card(`card-${i}`, [
-        Box({ flexDirection: 'row', columnGap: 1, children: [line(p.name, { bold: true }), k.kindPill(p.kind)] }),
+        Box({ flexDirection: 'row', columnGap: 1, children: [line(p.name, { bold: true }), idle ? k.pill('idle', HEX.waiting) : k.kindPill(p.kind)] }),
         line(where, { dimColor: true }),
-        line(why, { dimColor: true }),
-        ...activityLine,
-        ...(narrow ? [] : [picture(progressBar(p.kind === 'done' ? p.total : p.step - 1, p.total, p.kind, 240), `step ${p.step} of ${p.total}`, 240, 8)]),
-        Box({ flexDirection: 'row', columnGap: 1, children: [
+        whyLine,
+        ...(narrow ? [] : [Box({ flexDirection: 'row', columnGap: 1, children: [picture(progressBar(p.kind === 'done' ? p.total : p.step - 1, p.total, p.kind, 240), `step ${p.step} of ${p.total}`, 240, 8), line(`step ${p.step} of ${p.total}`, { dimColor: true })] })]),
+        // One filled Resume; View and Delete are quiet words. Delete asks twice: the first press shows a red Sure?.
+        Box({ flexDirection: 'row', columnGap: 1, paddingTop: 1, children: [
           k.action(`process-${i}`, 'Resume', resume, 'go'),
-          Button({ key: `view-${i}`, label: 'View', variant: 'secondary', onPress: view }),
-          Button({ key: `del-${i}`, label: st.sure === p.dir ? 'Sure?' : 'Delete', variant: 'secondary', onPress: deletePress }),
+          Button({ key: `view-${i}`, label: 'View', plain: true, dimColor: true, onPress: view }),
+          st.sure === p.dir ? Button({ key: `del-${i}`, plain: true, onPress: deletePress, children: [line('Sure?', { color: 'error' })] }) : Button({ key: `del-${i}`, label: 'Delete', plain: true, dimColor: true, onPress: deletePress }),
         ] }),
-      ], { hot: needsUser(p.kind), edge: HEX[p.kind] })
+      ], { hot: needsUser(p.kind), edge: idle ? HEX.waiting : HEX[p.kind] })
     }
     return card(`card-${i}`, [
       Box({
@@ -49,13 +52,12 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
           line(symbolOf(p.kind, false), { color: look.color, bold: true }),
           Button({ key: `process-${i}`, plain: true, label: p.name, onPress: resume }),
           Button({ key: `view-${i}`, plain: true, label: 'View', dimColor: true, onPress: view }),
-          line(look.word, { color: look.color }),
+          line(idle ? 'idle' : look.word, { color: idle ? 'warning' : look.color }),
           Button({ key: `del-${i}`, label: st.sure === p.dir ? 'Sure?' : 'Delete', plain: true, dimColor: st.sure !== p.dir, onPress: deletePress }),
         ],
       }),
       line(narrow ? `step ${p.step}/${p.total}` : where, { dimColor: true }),
-      ...(narrow ? [] : [line(why, { dimColor: true })]),
-      ...activityLine,
+      ...(narrow ? (activity?.quiet ? [whyLine] : []) : [whyLine]),
       ...(narrow ? [] : [rich ? picture(progressBar(p.kind === 'done' ? p.total : p.step - 1, p.total, p.kind, 240), `step ${p.step} of ${p.total}`, 240, 8) : line('█'.repeat(filled).padEnd(20, '░'), { color: look.color })]),
     ], needsUser(p.kind))
   }
@@ -67,19 +69,17 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
   const visible = here.filter(filter[2])
   const chips = Box({ flexDirection: 'row', columnGap: 1, flexWrap: 'wrap', children: FILTERS.map(([id, label, test]) => {
     const n = here.filter(test).length
-    return toggle(`flt-${id}`, `${label}${n && id !== 'all' && !narrow ? ` ·${n}` : ''}`, st.filter === id, () => { st.filter = id; redraw() })
+    return toggle(`flt-${id}`, `${label}${n && !narrow ? ` ·${n}` : ''}`, st.filter === id, () => { st.filter = id; redraw() })
   }) })
   const setFolders = (all: boolean) => async () => { st.allFolders = all; await store.set('allFolders', all); redraw() }
-  const folderSwitch = Box({
-    flexDirection: 'row', columnGap: 2,
-    children: [
-      toggle('folder-here', 'This folder', !st.allFolders, setFolders(false)),
-      toggle('folder-all', 'All folders', st.allFolders, setFolders(true)),
-    ],
-  })
+  // One line under the chips: what you see, and one button for the other choice.
+  const countLine = Box({ flexDirection: 'row', columnGap: 2, paddingBottom: 1, children: [
+    line(`${here.length} process${here.length === 1 ? '' : 'es'} in ${st.allFolders ? 'all folders' : 'this folder'}`, { dimColor: true }),
+    st.allFolders ? Button({ key: 'folder-here', label: 'This folder only', plain: true, onPress: setFolders(false) }) : Button({ key: 'folder-all', label: 'All folders', plain: true, onPress: setFolders(true) }),
+  ] })
   return [
-    folderSwitch,
     ...(here.length > 1 || st.filter !== 'all' ? [chips] : []),
+    countLine,
     ...(visible.length
       ? (k ? [k.stack(visible.map(processCard))] : visible.map(processCard))
       : here.length ? [line('No process matches this filter. Press All.', { dimColor: true })]

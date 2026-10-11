@@ -1,5 +1,5 @@
 import { test, expect } from 'claude-code/testing'
-import { activityOf, ago } from './activity'
+import { activityOf, ago, isIdle } from './activity'
 
 const NOW = 1_000_000_000_000
 const back = (minutes: number) => NOW - minutes * 60_000
@@ -22,4 +22,12 @@ test('a time ago reads as minutes, hours, yesterday or days', () => {
   expect(ago(NOW - 3 * 3_600_000, NOW)).toBe('3 h ago')
   expect(ago(NOW - 30 * 3_600_000, NOW)).toBe('yesterday')
   expect(ago(NOW - 4 * 86_400_000, NOW)).toBe('4 days ago')
+})
+
+test('a long silence is said in hours and days, and a run with no log for a day is idle', () => {
+  expect(activityOf('running', back(180), NOW)?.text).toBe('no log for 3 h')
+  expect(activityOf('running', back(17354), NOW)?.text).toBe('no log for 12 days')
+  expect(isIdle('running', back(1439), NOW)).toBe(false)
+  expect(isIdle('running', back(1440), NOW)).toBe(true)
+  expect(isIdle('done', back(1440), NOW)).toBe(false)
 })
