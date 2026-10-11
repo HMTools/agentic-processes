@@ -68,14 +68,12 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
   } else {
     const cats = [...new Set(allRows.map(r => r.category))].sort()
     const pick = (value: string | undefined) => () => { st.category = value; redraw() }
-    // One chip for both surfaces: Desktop a dot and a block (see rich-ui), the terminal a theme-colored dot and a reversed block.
+    // One chip for both surfaces: a colored block at look 3 and up (see rich-ui), else a label button.
     const chip = (id: string, label: string, value: string | undefined, hex: string, word?: string, count?: number) => {
       const active = st.category === value
       if (k && st.look >= 3) return k.colorChip(id, label, active, hex, pick(value), count) // raw colors on text are a look 3 step: below it Desktop draws what the terminal draws
-      const dot = word ? [Text({ children: ['● '], color: word })] : []
-      return Button({ key: id, plain: true, onPress: pick(value), children: active
-        ? [Text({ children: [` ${word ? '● ' : ''}${label}${count == null ? '' : ` ${count}`} `], inverse: true, bold: true })]
-        : [...dot, Text({ children: [label], dimColor: !word }), ...(count == null ? [] : [Text({ children: [` ${count}`], dimColor: true })])] })
+      // A Button with text children is refused by Claude Code 2.1.293 (the Desktop app): it needs a label. So below look 3 the chip is a label button.
+      return toggle(id, `${label}${count == null ? '' : ` ·${count}`}`, active, pick(value))
     }
     const colorOf = (category: string) => PALETTE.categories[categoryIndex(category, cats)]
     const shownRows = matches(allRows, st.query, st.category, st.favorites)
