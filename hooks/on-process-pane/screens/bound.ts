@@ -6,8 +6,8 @@ import { st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function boundScreen(c: Ctx): Promise<unknown> {
-  const { resume } = c
-  const { Box, Button, Client, card, detail, e, files, k, line, narrow, nav, openInViewer, picture, redraw, rich, tabRow, toggle, views } = c
+  const { resume, gate, approve, requestChanges } = c
+  const { Box, Button, Input, Client, card, detail, e, files, k, line, narrow, nav, openInViewer, picture, redraw, rich, tabRow, toggle, views } = c
   const bound = c.bound!
   // A process is bound to the session: the pane shows that one process, or the detail of one of its steps.
   const look = LOOK[bound.kind]
@@ -138,6 +138,28 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   ]
   const stepsBody = graph ? [graph] : [...(k ? [k.stack(bound.steps.flatMap(stepCards))] : bound.steps.flatMap(stepRows))]
   const title = titleText(bound.name)
+  // The approval step: while it runs, a line says approval comes after it; when the agent asked and no dialog is open, the pane has the buttons.
+  const next = gate ? bound.steps[bound.steps.findIndex(s => s.id === gate.stepId) + 1] : undefined
+  const gateCard = !gate ? [] : gate.state === 'working'
+    ? [line(`Step ${gate.number} "${gate.name}" needs your approval when it is done.`, { dimColor: true })]
+    : [card('gate', [
+      Box({ flexDirection: 'row', columnGap: 1, children: [line(`Step ${gate.number} "${gate.name}" needs your approval`, { bold: true }), ...(k ? [k.kindPill('waiting')] : [])] }),
+      ...(gate.output ? [line(gate.output, { dimColor: true })] : []),
+      ...(gate.state === 'dialog'
+        ? [line('Claude asked in a dialog. Answer the dialog that is open.', { dimColor: true })]
+        : [
+          line(`Approve: ${next ? `runs step ${next.number} "${next.name}"` : 'the process ends'}. Request changes: step ${gate.number} runs again.`, { dimColor: true }),
+          Box({ flexDirection: 'row', columnGap: 1, children: [
+            Button({ key: 'gate-approve', label: 'Approve', ...(k ? { variant: 'primary' } : {}), onPress: () => approve(gate.stepId) }),
+            Button({ key: 'gate-changes', label: st.changing ? 'Cancel' : 'Request changes', ...(k ? { variant: 'secondary' } : { plain: true }), onPress: () => { st.changing = !st.changing; st.reason = ''; redraw() } }),
+          ] }),
+          ...(st.changing ? [
+            Input({ key: 'gate-reason', label: 'What should change?', value: st.reason, autoFocus: true, onInput: (text: string) => { st.reason = text }, submitLabel: 'send', onSubmit: async (text: string) => { st.reason = text; if (text.trim()) await requestChanges(gate.stepId, text) } }),
+            Button({ key: 'gate-send', label: 'Send changes', dimColor: !st.reason.trim(), plain: true, onPress: () => (st.reason.trim() ? requestChanges(gate.stepId, st.reason) : undefined) }),
+          ] : []),
+        ]),
+      ...(st.message ? [line(st.message, { color: 'error' })] : []),
+    ], gate.state === 'ready')]
   const activity = activityOf(bound.kind, st.processes.find(p => p.dir === bound.dir)?.lastLogMs, Date.now())
   const activityLine = activity ? [line(activity.text, activity.quiet ? { color: 'warning' } : { dimColor: true })] : []
   // A failed or paused process says why it stopped, and has one button to go on. The button hands the agent the process again, with one extra line.
@@ -162,6 +184,7 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
       : [Box({ flexDirection: 'row', columnGap: 1, children: [line(symbolOf(bound.kind, false), { color: look.color, bold: true }), line(bound.name, { bold: true }), line(look.word, { color: look.color })] }),
         line(`Step ${bound.step} of ${bound.total}`, { dimColor: true }), ...activityLine]),
     ...attentionCard,
+    ...gateCard,
     sectionTabs,
     line(' '),
     ...(st.section === 'memory' ? memoryBody : st.section === 'logs' ? logsBody : st.section === 'files' ? filesBody : stepsBody),

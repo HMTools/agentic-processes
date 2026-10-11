@@ -1,5 +1,5 @@
 import { test, expect } from 'claude-code/testing'
-import { APPROVE, CHANGES, askGate, findApprovalStep, hasOpenGate, isHandEdit, questionFor, reopenPanel } from './approval-gate'
+import { APPROVE, CHANGES, approveFromPane, askGate, findApprovalStep, gateForPane, hasOpenGate, isHandEdit, questionFor, reopenPanel, requestChangesFromPane } from './approval-gate'
 import type { Ask, FileSystem, Gate, GateStore } from '../ports/ports'
 
 const DIR = '/h/.claude/agentic-processes/active/p1'
@@ -146,3 +146,59 @@ for (const command of [`cat ${P}`, `ls ${P} 2>/dev/null`, 'python3 /x/process_ma
   test(`hand edit: Bash passes: ${command.slice(0, 40)}`, () => expect(isHandEdit({ tool: 'Bash', command })).toBe(false))
 }
 test('hand edit: other tools pass', () => expect(isHandEdit({ tool: 'Read', file_path: P })).toBe(false))
+
+// ── The same answer from the pane ──
+const doc = (extra = {}) => ({ steps: [{ ...step, ...extra }] })
+
+test('the gate card is working until the agent asks, dialog while the question is open, ready when it was dismissed', () => {
+  expect(gateForPane(doc(), undefined, DIR)).toMatchObject({ state: 'working', stepId: 's1', number: '1', name: 'Design', output: 'The design · Output: design.md' })
+  expect(gateForPane(doc(), { dir: DIR, stepId: 's9' }, DIR)?.state).toBe('working') // a gate for another step
+  expect(gateForPane(doc(), { dir: '/other', stepId: 's1' }, DIR)?.state).toBe('working') // a gate for another process
+  expect(gateForPane(doc(), { ...gate, dialog: true }, DIR)?.state).toBe('dialog')
+  expect(gateForPane(doc(), gate, DIR)?.state).toBe('ready')
+  expect(gateForPane(doc({ approved: true }), gate, DIR)).toBeUndefined()
+  expect(gateForPane({ steps: [{ ...step, status: 'pending' }] }, gate, DIR)).toBeUndefined()
+})
+
+test('while the question is open the gate says so, and a dismissed question gives the pane the buttons', async () => {
+  const w = world()
+  let during: Gate | undefined
+  await askGate(w.files, w.write, w.store, async () => { during = await w.store.get('S1'); throw new Error('dismissed') }, 'S1', gate)
+  expect(during?.dialog).toBe(true)
+  expect((await w.store.get('S1'))?.dialog).toBeUndefined()
+})
+
+test('Approve in the pane writes approved under the same rules as the dialog, closes the gate and returns the text for the agent', async () => {
+  const w = world()
+  const answer = await approveFromPane(w.files, w.write, w.store, 'S1', DIR, 's1')
+  expect(answer).toEqual({ text: 'The user approved step 1 "Design". Complete it with the tool update_step_status (status completed).' })
+  expect(JSON.parse(w.written[`${DIR}/process.json`]).steps[0].approved).toBe(true)
+  expect(await hasOpenGate(w.store, 'S1')).toBe(false)
+})
+
+test('Approve in the pane is refused while the agent has not asked, while the dialog is open, and for a step that is not the one that waits', async () => {
+  const w = world()
+  await w.store.clear('S1')
+  expect(await approveFromPane(w.files, w.write, w.store, 'S1', DIR, 's1')).toEqual({ error: 'The agent has not asked for approval yet.' })
+  await w.store.set('S1', { ...gate, dialog: true })
+  expect(await approveFromPane(w.files, w.write, w.store, 'S1', DIR, 's1')).toEqual({ error: 'Answer the dialog that is open.' })
+  await w.store.set('S1', gate)
+  expect(await approveFromPane(w.files, w.write, w.store, 'S1', DIR, 's2')).toEqual({ error: 'That step no longer waits for approval.' })
+  expect(w.written).toEqual({})
+  expect(await hasOpenGate(w.store, 'S1')).toBe(true) // nothing was answered, so the gate stays
+})
+
+test('a step approved a moment ago cannot be approved again from a card that was drawn before', async () => {
+  const w = world(processJson({ approved: true }))
+  expect(await approveFromPane(w.files, w.write, w.store, 'S1', DIR, 's1')).toEqual({ error: 'That step no longer waits for approval.' })
+  expect(w.written).toEqual({})
+})
+
+test('Request changes in the pane sends the reason, approves nothing and closes the gate', async () => {
+  const w = world()
+  const answer = await requestChangesFromPane(w.files, w.write, w.store, 'S1', DIR, 's1', ' use blue ')
+  expect(answer).toEqual({ text: 'The user asked for changes to step 1 "Design": use blue\nChange the step. When it is ready, call request_approval again.' })
+  expect(w.written).toEqual({})
+  expect(await hasOpenGate(w.store, 'S1')).toBe(false)
+  expect(await requestChangesFromPane(world().files, w.write, world().store, 'S1', DIR, 's1', '  ')).toMatchObject({ text: expect.stringContaining('(no text given)') })
+})

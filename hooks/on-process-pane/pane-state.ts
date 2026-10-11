@@ -43,5 +43,7 @@ export const st = {
   chosen: undefined as TemplateInfo | undefined,
   values: {} as Record<string, string>,
   message: '',
+  changing: false, // the gate card asks for the reason of a change request
+  reason: '', // what the user typed there
   firstArg: '', // the text typed after the command: goes into the first field of the template that gets picked
 }

@@ -344,6 +344,60 @@ test('a failed process shows why and a Retry button that hands the agent the pro
   expect(w.sent[0].text).toContain('The user pressed Retry on step 0 "Build"')
 })
 
+const gated = (extra = {}) => ({ ...process, status: 'running', steps: [{ id: 'a', number: 3, name: 'Gate', status: 'in_progress', approvalRequired: true, stepDefinition: { output: { description: 'The report' } }, ...extra }, { id: 'b', number: 4, name: 'Ship', status: 'pending' }] })
+
+test('the gate card has no buttons while the agent has not asked, and a line says approval comes after', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: gated() })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'Step 3 "Gate" needs your approval when it is done.' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'gate-approve' })).toBeUndefined()
+})
+
+test('the gate card has no buttons while the agent\'s dialog is open', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: gated() })
+  w.store['session:S1'] = [dir]
+  w.store['gate:S1'] = { dir, stepId: 'a', dialog: true }
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'Claude asked in a dialog. Answer the dialog that is open.' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'gate-approve' })).toBeUndefined()
+})
+
+test('Approve on the gate card approves the step, closes the gate and tells the agent', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: gated() })
+  w.store['session:S1'] = [dir]
+  w.store['gate:S1'] = { dir, stepId: 'a' }
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'Approve: runs step 4 "Ship". Request changes: step 3 runs again.' })).toBeDefined()
+  await ui.press({ key: 'gate-approve' })
+  expect(JSON.parse(w.files[`${dir}/process.json`]).steps[0].approved).toBe(true)
+  expect(w.store['gate:S1']).toBeUndefined()
+  expect(w.sent[0].text).toContain('The user approved step 3 "Gate"')
+})
+
+test('Request changes on the gate card needs a reason, sends it, and approves nothing', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: gated() })
+  w.store['session:S1'] = [dir]
+  w.store['gate:S1'] = { dir, stepId: 'a' }
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'gate-changes' })
+  await ui.press({ key: 'gate-send' }) // no reason yet: nothing is sent
+  expect(w.sent).toEqual([])
+  await ui.input({ key: 'gate-reason', text: 'use blue', kind: 'change' })
+  await ui.press({ key: 'gate-send' })
+  expect(w.sent[0].text).toContain('use blue')
+  expect(JSON.parse(w.files[`${dir}/process.json`]).steps[0].approved).toBeUndefined()
+  expect(w.store['gate:S1']).toBeUndefined()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

@@ -13,7 +13,7 @@ export type ListAgents = () => Promise<{ type: string; status: string }[]>
 export type FileWriter = (path: string, text: string) => Promise<void>
 
 // One open approval gate for each session. The mod keeps it in its store, so a restart does not lose it.
-export type Gate = { dir: string; stepId: string }
+export type Gate = { dir: string; stepId: string; dialog?: boolean } // dialog: the question is on screen now
 export type GateStore = {
   get(sessionId: string): Promise<Gate | undefined>
   set(sessionId: string, gate: Gate): Promise<void>

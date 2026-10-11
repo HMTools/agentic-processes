@@ -1,5 +1,8 @@
 import type { Register } from 'claude-code'
-import { findAgenticProcessDir, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
+import { findAgenticProcessDir, readAgenticProcess, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
+import { approveFromPane, gateForPane, requestChangesFromPane } from '../infra/approval-gate/approval-gate'
+import type { PaneAnswer } from '../infra/approval-gate/approval-gate'
+import type { Gate, GateStore } from '../infra/ports/ports'
 import { raiseLogOwed } from '../infra/log-owed/log-owed'
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
 import { boundView, fingerprint, stepDetail, listProcesses, listTemplates, resumeProcess, waitingCount } from '../infra/process-pane/process-pane'
@@ -86,6 +89,21 @@ async function templateJob($: any, job: (ports: TemplatePorts) => Promise<string
 
 // The process is bound. Close the pane and hand it to the agent as the user's own prompt.
 // The prompt hook skips prompts from the plugin, so the work it does for a user prompt is done here.
+const gatesOf = ($: any): GateStore => ({
+  get: async sessionId => ((await $.store.get(`gate:${sessionId}`)) as Gate | undefined) ?? undefined,
+  set: (sessionId, gate) => $.store.set(`gate:${sessionId}`, gate),
+  clear: sessionId => $.store.delete(`gate:${sessionId}`),
+})
+// The approval step of a process, and what the pane may do with it: the same facts the approval dialog works from.
+async function paneGate($: any, dir: string) {
+  return gateForPane(await readAgenticProcess(filesOf($), dir), await gatesOf($).get(await $.session.id()), dir)
+}
+// An answer from the gate card: an error shows in the pane, an approval or a change request reaches the agent as a prompt, like the dialog's answer.
+async function answerGate($: any, answer: PaneAnswer): Promise<void> {
+  if ('error' in answer) st.message = answer.error
+  else { st.message = ''; st.changing = false; st.reason = ''; $.prompt.submit({ text: answer.text }) } // not awaited: it resolves when the turn starts
+  $.ui.invalidate('ui.render')
+}
 async function resumeAndHandOff($: any, dir: string, note?: string): Promise<void> { await handOff($, await resumeProcess(portsOf($), dir, note)) }
 async function handOff($: any, started: Started): Promise<void> {
   if ('error' in started) { st.message = started.error; $.ui.invalidate('ui.render'); return }
@@ -133,7 +151,7 @@ async function viewFingerprint($: any): Promise<string> {
   if (st.view !== 'process' || !st.shown) return ''
   const files = filesOf($)
   const detail = st.openStep ? await stepDetail(files, st.shown, st.openStep) : undefined
-  return JSON.stringify([await boundView(files, st.shown), detail, detail ? undefined : await readViews(files, st.shown)])
+  return JSON.stringify([await boundView(files, st.shown), detail, detail ? undefined : await readViews(files, st.shown), await paneGate($, st.shown)])
 }
 
 // The saved folder switch, and the timer that keeps the count and the badge current. A mod has no file watcher.
@@ -303,6 +321,9 @@ export const register: Register = on => {
     const ctx: Ctx = {
       e, Box, Text, Button, Input, Svg, Client, line, narrow, rich, picture, k, toggle, tabRow, nav, card, redraw, cwd, bound, detail, views,
       files: filesOf($), ports: () => portsOf($), store: { set: (key: string, value: unknown) => $.store.set(key, value) },
+      gate: bound ? await paneGate($, bound.dir) : undefined,
+      approve: async stepId => answerGate($, await approveFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId)),
+      requestChanges: async (stepId, reason) => answerGate($, await requestChangesFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId, reason)),
       templateJob: job => templateJob($, job), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: started => handOff($, started), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
     }
     let body: unknown[]

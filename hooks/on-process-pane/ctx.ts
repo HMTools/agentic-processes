@@ -1,4 +1,5 @@
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
+import type { PaneGate } from '../infra/approval-gate/approval-gate'
 import type { Started, boundView, stepDetail } from '../infra/process-pane/process-pane'
 import type { TemplatePorts } from '../infra/templates/templates'
 import type { richKit } from './rich-ui'
@@ -30,5 +31,8 @@ export interface Ctx {
   handOff: (started: Started) => Promise<void>
   openInViewer: (path: string, surface: string) => Promise<string>
   refresh: () => Promise<void>
+  gate: PaneGate | undefined // the approval step of the bound process, and whether the pane can answer it
+  approve: (stepId: string) => Promise<void>
+  requestChanges: (stepId: string, reason: string) => Promise<void>
   resume: (dir: string, note?: string) => Promise<void> // bind the process again and hand it to the agent, with one extra line
 }
