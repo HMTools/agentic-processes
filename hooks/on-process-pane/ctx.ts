@@ -27,7 +27,7 @@ export interface Ctx {
   files: FileSystem
   ports: () => ManagerPorts
   store: { set(key: string, value: unknown): unknown }
-  templateJob: (job: (ports: TemplatePorts) => Promise<string | void>) => Promise<void>
+  templateJob: (job: (ports: TemplatePorts) => Promise<string | void>, busy?: string) => Promise<void>
   handOff: (started: Started) => Promise<void>
   openInViewer: (path: string, surface: string) => Promise<string>
   refresh: () => Promise<void>

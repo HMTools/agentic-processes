@@ -43,7 +43,25 @@ export const st = {
   chosen: undefined as TemplateInfo | undefined,
   values: {} as Record<string, string>,
   message: '',
+  kind: 'info' as NoticeKind, // how the strip at the top draws the message
+  at: 0, // the tick of the timer when the message was set: it clears after two ticks (5 to 10 seconds)
+  ticks: 0,
+  sureAt: 0, // the tick when the first Remove or Delete press was made: it is taken back at the next tick
+  busy: undefined as string | undefined, // the key of the template job that runs now
   changing: false, // the gate card asks for the reason of a change request
   reason: '', // what the user typed there
   firstArg: '', // the text typed after the command: goes into the first field of the template that gets picked
+}
+
+export type NoticeKind = 'info' | 'success' | 'error'
+// Say something in the strip at the top of the pane. An empty text clears it.
+export function say(kind: NoticeKind, text: string): void {
+  st.message = text
+  st.kind = kind
+  st.at = st.ticks
+}
+// The first press of a two-press button (Delete, Remove). The timer takes it back.
+export function askAgain(what: string): void {
+  st.sure = what
+  st.sureAt = st.ticks
 }

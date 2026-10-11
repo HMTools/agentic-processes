@@ -42,7 +42,17 @@ const gatesOf = ($: any): GateStore => ({
 })
 
 // Not awaited: the new turn only starts once the current one has ended.
-const startNewTurn = ($: any, text: string) => { void $.prompt.submit({ text }) }
+// A guard that blocks or re-prompts the agent says so in a toast: the user then knows why Claude changed course. One toast in 30 seconds for the same text.
+let lastToast = ''
+let lastToastMs = 0
+async function say($: any, text: string): Promise<void> {
+  const now = Date.now()
+  if (text === lastToast && now - lastToastMs < 30_000) return
+  lastToast = text
+  lastToastMs = now
+  try { await $.ui.toast(text) } catch { /* a surface that cannot show a toast */ }
+}
+const startNewTurn = ($: any, text: string) => { void say($, 'Process: Claude stopped early, so the process asked it to carry on.'); void $.prompt.submit({ text }) }
 
 // The user's own prompt starts the count again (called by the prompt hook in ../on-user-prompt).
 export const startCountingAgain = () => repromptLimiter.reset()

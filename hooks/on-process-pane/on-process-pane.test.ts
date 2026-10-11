@@ -398,6 +398,32 @@ test('Request changes on the gate card needs a reason, sends it, and approves no
   expect(w.store['gate:S1']).toBeUndefined()
 })
 
+test('a result shows in one strip at the top and clears after two ticks of the timer', async ($, on) => {
+  const w = world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'start-dev/bug' })
+  await ui.press({ key: 'create' })
+  expect(await ui.find({ type: 'Box', key: 'strip' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Fill in: workItemId' })).toBeDefined()
+  await w.clock.advance(5000)
+  expect(await ui.find({ type: 'Box', key: 'strip' })).toBeDefined() // one tick: still there
+  await w.clock.advance(5000)
+  expect(await ui.find({ type: 'Box', key: 'strip' })).toBeUndefined()
+})
+
+test('Remove on a template needs two presses, and the first is taken back at the next tick', async ($, on) => {
+  const w = world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'template-dev/bug' })
+  expect(await ui.find({ type: 'Button', key: 'tpl-remove-dev/bug', label: 'Remove' })).toBeDefined()
+  await ui.press({ key: 'tpl-remove-dev/bug' })
+  expect(await ui.find({ type: 'Button', key: 'tpl-remove-dev/bug', label: 'Sure?' })).toBeDefined()
+  await w.clock.advance(5000)
+  expect(await ui.find({ type: 'Button', key: 'tpl-remove-dev/bug', label: 'Remove' })).toBeDefined()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

@@ -18,7 +18,7 @@ import { stepLine } from '../infra/process-pane/step-line'
 import { catalog, listMarketplaces } from '../infra/templates/templates'
 import type { TemplatePorts } from '../infra/templates/templates'
 import { startCountingAgain } from '../on-agent-stopping/on-agent-stopping'
-import { COMMANDS, PANE, REFRESH_MS, TABS, st } from './pane-state'
+import { COMMANDS, PANE, REFRESH_MS, TABS, say, st } from './pane-state'
 import type { Ctx } from './ctx'
 import { boundScreen } from './screens/bound'
 import { continueScreen } from './screens/continue'
@@ -77,13 +77,18 @@ async function showStepLine($: any, dir: string): Promise<void> {
 }
 
 // Run one template job, then read the catalog and the installed templates again. A failure is shown in the pane.
-async function templateJob($: any, job: (ports: TemplatePorts) => Promise<string | void>): Promise<void> {
+// `busy` names the job: its button says so while the job runs, and a second press does nothing.
+async function templateJob($: any, job: (ports: TemplatePorts) => Promise<string | void>, busy?: string): Promise<void> {
+  if (st.busy) return
   try {
     const ports = await templatePortsOf($)
     st.sure = undefined // any other action takes the first Remove press back
-    st.message = (await job(ports)) ?? ''
+    st.busy = busy
+    if (busy) $.ui.invalidate('ui.render') // draw the busy button before the job starts
+    say('success', (await job(ports)) ?? '')
     ;[st.entries, st.templates, st.markets] = await Promise.all([catalog(ports), listTemplates(filesOf($)), listMarketplaces(ports)])
-  } catch (error) { st.message = error instanceof Error ? error.message : String(error) }
+  } catch (error) { say('error', error instanceof Error ? error.message : String(error)) }
+  st.busy = undefined
   $.ui.invalidate('ui.render')
 }
 
@@ -100,13 +105,13 @@ async function paneGate($: any, dir: string) {
 }
 // An answer from the gate card: an error shows in the pane, an approval or a change request reaches the agent as a prompt, like the dialog's answer.
 async function answerGate($: any, answer: PaneAnswer): Promise<void> {
-  if ('error' in answer) st.message = answer.error
-  else { st.message = ''; st.changing = false; st.reason = ''; $.prompt.submit({ text: answer.text }) } // not awaited: it resolves when the turn starts
+  if ('error' in answer) say('error', answer.error)
+  else { say('info', ''); st.changing = false; st.reason = ''; $.prompt.submit({ text: answer.text }) } // not awaited: it resolves when the turn starts
   $.ui.invalidate('ui.render')
 }
 async function resumeAndHandOff($: any, dir: string, note?: string): Promise<void> { await handOff($, await resumeProcess(portsOf($), dir, note)) }
 async function handOff($: any, started: Started): Promise<void> {
-  if ('error' in started) { st.message = started.error; $.ui.invalidate('ui.render'); return }
+  if ('error' in started) { say('error', started.error); $.ui.invalidate('ui.render'); return }
   const sessionId = await $.session.id()
   await ensureProcessTools(spec => $.tool.register(spec), sessionId)
   await showStepLine($, started.dir)
@@ -120,12 +125,16 @@ async function handOff($: any, started: Started): Promise<void> {
 // The pane redraws only when the list, or what the open bound view reads, changed. A redraw cannot then swallow a click.
 async function refresh($: any): Promise<void> {
   let changed = true
+  st.ticks++
+  let expired = false
+  if (st.message && st.ticks - st.at >= 2) { say('info', ''); expired = true } // a result stays for 5 to 10 seconds
+  if (st.sure && st.ticks - st.sureAt >= 1) { st.sure = undefined; expired = true } // the first Delete or Remove press is taken back
   try {
     st.processes = await listProcesses(filesOf($))
     const now = Date.now()
     const print = fingerprint(st.processes) + st.processes.map(p => activityOf(p.kind, p.lastLogMs, now)?.text ?? '').join('|') // the minute text is part of what the pane draws
     const viewPrint = await viewFingerprint($)
-    changed = print !== st.lastPrint || viewPrint !== st.lastViewPrint
+    changed = expired || print !== st.lastPrint || viewPrint !== st.lastViewPrint
     st.lastPrint = print
     st.lastViewPrint = viewPrint
     const needing = st.processes.filter(p => needsUser(p.kind))
@@ -324,15 +333,20 @@ export const register: Register = on => {
       gate: bound ? await paneGate($, bound.dir) : undefined,
       approve: async stepId => answerGate($, await approveFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId)),
       requestChanges: async (stepId, reason) => answerGate($, await requestChangesFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId, reason)),
-      templateJob: job => templateJob($, job), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: started => handOff($, started), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
+      templateJob: (job, busy) => templateJob($, job, busy), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: started => handOff($, started), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
     }
+    // One strip at the top for every result and error. A symbol and a color say which: never color alone.
+    const tone = { info: 'inactive', success: 'success', error: 'error' }[st.kind]
+    const strip = st.message ? [k
+      ? Box({ key: 'strip', flexDirection: 'row', columnGap: 1, borderStyle: 'round', borderColor: tone, paddingLeft: 1, paddingRight: 1, children: [line({ info: '•', success: '✓', error: '✕' }[st.kind], { color: tone }), line(st.message, { color: tone })] })
+      : Box({ key: 'strip', flexDirection: 'row', columnGap: 1, children: [line({ info: '•', success: '✓', error: '✕' }[st.kind], { color: tone }), line(st.message, { color: tone })] })] : []
     let body: unknown[]
     if (st.tab === 'templates') body = await sourcesScreen(ctx)
     else if (st.tab === 'continue') body = await continueScreen(ctx)
     else if (!st.chosen) body = await newScreen(ctx)
     else body = await formScreen(ctx)
-    if (bound) return boundScreen(ctx)
-    const main = Box({ flexDirection: 'column', children: [tabs, line(' '), ...body, ...(st.message ? [line(st.message, { color: st.tab === 'templates' || (st.tab === 'new' && !st.chosen) || st.message.startsWith('Moved to') ? undefined : 'red' })] : [])] })
+    if (bound) return Box({ flexDirection: 'column', children: [...strip, await boundScreen(ctx)] })
+    const main = Box({ flexDirection: 'column', children: [...strip, tabs, line(' '), ...body] })
     return main
   })
 }

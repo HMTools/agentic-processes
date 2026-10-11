@@ -28,6 +28,18 @@ const gatesOf = ($: any): GateStore => ({
 
 const reply = (text: string) => ({ result: { content: [{ type: 'text', text }], isError: false } }) as never
 
+
+// A guard that blocks or re-prompts the agent says so in a toast: the user then knows why Claude changed course. One toast in 30 seconds for the same text.
+let lastToast = ''
+let lastToastMs = 0
+async function say($: any, text: string): Promise<void> {
+  const now = Date.now()
+  if (text === lastToast && now - lastToastMs < 30_000) return
+  lastToast = text
+  lastToastMs = now
+  try { await $.ui.toast(text) } catch { /* a surface that cannot show a toast */ }
+}
+
 export const register: Register = on => {
   on('tool.call', { tool: FULL_TOOL }, async ($, e) => {
     const sessionId = await $.session.id()
@@ -42,7 +54,9 @@ export const register: Register = on => {
     return reply((await askGate(files, writerOf($), gates, askOf($), sessionId, gate)) ?? 'The approval dialog is already open. Wait for the user.')
   })
 
-  on('tool.call', { tool: ['Write', 'Edit', 'MultiEdit', 'Bash'] }, ($, e, next) =>
-    isHandEdit(e as any) ? { deny: HAND_EDIT_TEXT } : next(e),
-  ).catch(($, e, next) => (next.called ? next(e) : { deny: HAND_EDIT_TEXT }))
+  on('tool.call', { tool: ['Write', 'Edit', 'MultiEdit', 'Bash'] }, async ($, e, next) => {
+    if (!isHandEdit(e as any)) return next(e)
+    await say($, 'Process: Claude tried to edit a process file by hand. The call was refused.')
+    return { deny: HAND_EDIT_TEXT }
+  }).catch(($, e, next) => (next.called ? next(e) : { deny: HAND_EDIT_TEXT }))
 }

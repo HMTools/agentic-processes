@@ -3,7 +3,7 @@ import { FAVORITES, matches, mergeTemplates, templateDetail } from '../../infra/
 import type { TemplateRow } from '../../infra/process-pane/template-views'
 import { HEX, flowGrid } from '../../infra/process-pane/rich'
 import { installTemplate, refreshMarketplaces, removeTemplate } from '../../infra/templates/templates'
-import { st } from '../pane-state'
+import { askAgain, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function newScreen(c: Ctx): Promise<unknown[]> {
@@ -14,7 +14,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
   const toggleFavorite = (key: string) => () => { if (!st.favorites.delete(key)) st.favorites.add(key); return saveFavorites() }
   const star = (key: string, id: string) => Button({ key: id, label: st.favorites.has(key) ? '★' : '☆', plain: true, onPress: toggleFavorite(key) })
   const wordOf = { installed: 'installed', update: 'update available', available: 'not installed' } as const
-  const install = (r: TemplateRow) => Button({ key: `tpl-install-${r.key}`, label: r.state === 'update' ? 'Update' : 'Install', onPress: () => templateJob(ports => installTemplate(ports, r.entry!)) })
+  const install = (r: TemplateRow) => Button({ key: `tpl-install-${r.key}`, label: st.busy === `install-${r.key}` ? 'Installing…' : r.state === 'update' ? 'Update' : 'Install', onPress: () => templateJob(ports => installTemplate(ports, r.entry!), `install-${r.key}`) })
   const start = (r: TemplateRow) => Button({
     key: `start-${r.key}`, label: 'Start', variant: 'primary',
     onPress: () => { st.chosen = r.template; st.values = r.template!.fields[0] && st.firstArg ? { [r.template!.fields[0].name]: st.firstArg } : {}; st.message = ''; redraw() },
@@ -46,13 +46,13 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
         line('W writes · R reads · R/W both', { dimColor: true })]
       : [line('This template defines no memory topics.', { dimColor: true })]
     const rawBody = row.template
-      ? [Button({ key: 'raw-open', label: 'Open file in the viewer', onPress: async () => { st.message = await openInViewer(row.template!.path, e.surface); redraw() } }), line(narrow ? '' : (e.surface === 'desktop' ? 'The system opener opens the file.' : 'The editor (code) opens the file.'), { dimColor: true })]
+      ? [Button({ key: 'raw-open', label: 'Open file in the viewer', onPress: async () => { say('error', await openInViewer(row.template!.path, e.surface)); redraw() } }), line(narrow ? '' : (e.surface === 'desktop' ? 'The system opener opens the file.' : 'The editor (code) opens the file.'), { dimColor: true })]
       : [line('Install this template to open its file.', { dimColor: true })]
     return [card('tdetail', [
       Box({ flexDirection: 'row', columnGap: 3, children: [
         nav('td-back', 'Back', () => { st.detailKey = undefined; st.tdStep = undefined; st.message = ''; redraw() }),
         ...(row.template ? [start(row)] : []), ...(row.entry && row.state !== 'installed' ? [install(row)] : []),
-        ...(row.state !== 'available' ? [Button({ key: `tpl-remove-${row.key}`, label: 'Remove', plain: true, onPress: () => templateJob(ports => removeTemplate(ports, row)) })] : []),
+        ...(row.state !== 'available' ? [Button({ key: `tpl-remove-${row.key}`, label: st.sure === `tpl:${row.key}` ? 'Sure?' : 'Remove', plain: true, onPress: () => { if (st.sure === `tpl:${row.key}`) return templateJob(ports => removeTemplate(ports, row)); askAgain(`tpl:${row.key}`); redraw() } })] : []),
       ] }),
       Box({ flexDirection: 'row', columnGap: 1, children: [star(row.key, 'td-fav'), line(`${row.category} / ${row.title}`, { bold: true }), line(wordOf[row.state], { dimColor: true })] }),
       tabRow([tdTabButton('overview', 'Overview'), tdTabButton('steps', narrow ? 'Steps' : `Steps${d ? ` ·${d.steps.length}` : ''}`), tdTabButton('flow', narrow ? 'Flow' : 'Memory flow'), tdTabButton('raw', 'Raw')]),
@@ -91,7 +91,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
       ]))) : [line(allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
       line(' '),
       Box({ flexDirection: 'row', columnGap: 3, children: [
-        Button({ key: 'tpl-refresh', label: 'Refresh', plain: true, onPress: () => templateJob(async ports => (await refreshMarketplaces(ports)).join('\n')) }),
+        Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : 'Refresh', plain: true, onPress: () => templateJob(async ports => (await refreshMarketplaces(ports)).join('\n'), 'refresh') }),
         Button({ key: 'mk-open', label: 'Marketplaces', plain: true, onPress: () => { st.tab = 'templates'; st.message = ''; redraw() } }),
       ] }),
     ]

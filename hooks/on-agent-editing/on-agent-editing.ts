@@ -20,6 +20,18 @@ const linksOf = ($: any): SessionLinks => ({
   get: async sessionId => ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? [],
 })
 
+
+// A guard that blocks or re-prompts the agent says so in a toast: the user then knows why Claude changed course. One toast in 30 seconds for the same text.
+let lastToast = ''
+let lastToastMs = 0
+async function say($: any, text: string): Promise<void> {
+  const now = Date.now()
+  if (text === lastToast && now - lastToastMs < 30_000) return
+  lastToast = text
+  lastToastMs = now
+  try { await $.ui.toast(text) } catch { /* a surface that cannot show a toast */ }
+}
+
 export const register: Register = on => {
   on('tool.call', { tool: [...EDIT_TOOLS, LOG_TOOL, ...LOG_GATED_TOOLS] }, async ($, e, next) => {
     const sessionId = await $.session.id()
@@ -30,6 +42,7 @@ export const register: Register = on => {
     }
     if (e.agentId) return next(e)
     const logOwed = await findLogOwed(filesOf($), linksOf($), sessionId)
-    return logOwed ? { deny: logOwed.text } : next(e)
+    if (logOwed) { await say($, 'Process: Claude must log your last prompt before it edits files.'); return { deny: logOwed.text } }
+    return next(e)
   })
 }

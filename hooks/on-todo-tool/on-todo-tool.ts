@@ -18,12 +18,26 @@ const linksOf = ($: any): SessionLinks => ({
   get: async sessionId => ((await $.store.get(sessionKey(sessionId))) as string[] | undefined) ?? [],
 })
 
+
+// A guard that blocks or re-prompts the agent says so in a toast: the user then knows why Claude changed course. One toast in 30 seconds for the same text.
+let lastToast = ''
+let lastToastMs = 0
+async function say($: any, text: string): Promise<void> {
+  const now = Date.now()
+  if (text === lastToast && now - lastToastMs < 30_000) return
+  lastToast = text
+  lastToastMs = now
+  try { await $.ui.toast(text) } catch { /* a surface that cannot show a toast */ }
+}
+
 export const register: Register = on => {
   on('tool.call', { tool: TODO_TOOLS }, async ($, e, next) => {
     if (e.agentId) return next(e)
     const files = filesOf($)
     const agenticProcessDir = await findAgenticProcessDir(files, linksOf($), await $.session.id())
     if (!hasAgenticProcessInstance(agenticProcessDir)) return next(e)
-    return isProcessRunning(await readAgenticProcess(files, agenticProcessDir)) ? { deny: TEXT } : next(e)
+    if (!isProcessRunning(await readAgenticProcess(files, agenticProcessDir))) return next(e)
+    await say($, 'Process: todo tools are off while a process runs.')
+    return { deny: TEXT }
   })
 }

@@ -1,6 +1,6 @@
 import { addMarketplace, refreshMarketplaces, removeMarketplace, toggleMarketplace, updateMarketplace } from '../../infra/templates/templates'
 import type { MarketplaceFields } from '../../infra/templates/templates'
-import { st } from '../pane-state'
+import { askAgain, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function sourcesScreen(c: Ctx): Promise<unknown[]> {
@@ -12,7 +12,7 @@ export async function sourcesScreen(c: Ctx): Promise<unknown[]> {
       Button({ key: `mk-toggle-${i}`, label: m.enabled ? 'Off' : 'On', plain: true, onPress: () => templateJob(ports => toggleMarketplace(ports, m.name)) }),
       Button({ key: `mk-edit-${i}`, label: 'Edit', plain: true, onPress: () => { st.form = { original: m.name, values: { name: m.name, url: m.url, branch: m.branch, priority: String(m.priority) } }; st.message = ''; redraw() } }),
       // Remove deletes the cache: the first press asks, the second removes.
-      Button({ key: `mk-remove-${i}`, label: st.sure === m.name ? 'Sure?' : 'Remove', plain: true, onPress: () => { if (st.sure === m.name) return templateJob(ports => removeMarketplace(ports, m.name)); st.sure = m.name; redraw() } }),
+      Button({ key: `mk-remove-${i}`, label: st.sure === m.name ? 'Sure?' : 'Remove', plain: true, onPress: () => { if (st.sure === m.name) return templateJob(ports => removeMarketplace(ports, m.name)); askAgain(m.name); redraw() } }),
     ],
   }))
   const fields: [keyof MarketplaceFields, string][] = [['name', 'name *'], ['url', 'git address *'], ['branch', 'branch (main)'], ['priority', 'priority (100)']]
@@ -38,7 +38,7 @@ export async function sourcesScreen(c: Ctx): Promise<unknown[]> {
     Button({ key: 'mk-add', label: 'Add marketplace', plain: true, onPress: () => { st.form = { values: { name: '', url: '', branch: '', priority: '' } }; st.message = ''; redraw() } }),
     line(' '),
     Box({ flexDirection: 'row', columnGap: 3, children: [
-      Button({ key: 'tpl-refresh', label: 'Refresh', onPress: () => templateJob(async ports => (await refreshMarketplaces(ports)).join('\n')) }),
+      Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : 'Refresh', onPress: () => templateJob(async ports => (await refreshMarketplaces(ports)).join('\n'), 'refresh') }),
       nav('mk-back', 'Back to templates', () => { st.tab = 'new'; st.message = ''; redraw() }),
     ] }),
   ]

@@ -21,9 +21,22 @@ const gatesOf = ($: any): GateStore => ({
   clear: sessionId => $.store.delete(`gate:${sessionId}`),
 })
 
+
+// A guard that blocks or re-prompts the agent says so in a toast: the user then knows why Claude changed course. One toast in 30 seconds for the same text.
+let lastToast = ''
+let lastToastMs = 0
+async function say($: any, text: string): Promise<void> {
+  const now = Date.now()
+  if (text === lastToast && now - lastToastMs < 30_000) return
+  lastToast = text
+  lastToastMs = now
+  try { await $.ui.toast(text) } catch { /* a surface that cannot show a toast */ }
+}
+
 export const register: Register = on => {
   on('tool.call', async ($, e, next) => {
     const text = await findPendingBlock(filesOf($), linksOf($), gatesOf($), await $.session.id(), e as any)
-    return text ? { deny: text } : next(e)
+    if (text) { await say($, 'Process: a step waits for your approval, so Claude cannot go on.'); return { deny: text } }
+    return next(e)
   })
 }

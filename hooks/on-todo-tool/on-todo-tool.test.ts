@@ -19,6 +19,14 @@ function world(on: On, { status = 'running', bound = 'S1', pending = false } = {
 }
 const call = ($: any, tool: string, extra = {}) => $.tool.call({ tool, ...extra })
 
+test('a refused todo call raises one toast, and the same refusal within 30 seconds raises none', async ($, on) => {
+  world(on)
+  const toasts: string[] = []
+  on('ui.toast', async (_$, e: any) => { toasts.push(e.text); return { value: undefined } })
+  await call($, 'TaskCreate')
+  await call($, 'TaskUpdate')
+  expect(toasts).toEqual(['Process: todo tools are off while a process runs.'])
+})
 for (const tool of ['TaskCreate', 'TaskUpdate', 'TaskGet', 'TaskList', 'TodoWrite']) {
   test(`running: ${tool} is refused`, async ($, on) => {
     world(on)

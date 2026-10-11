@@ -3,7 +3,7 @@ import type { ProcessInfo } from '../../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../../infra/process-pane/status-look'
 import { progressBar } from '../../infra/process-pane/rich'
 import { activityOf } from '../../infra/process-pane/activity'
-import { st } from '../pane-state'
+import { askAgain, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function continueScreen(c: Ctx): Promise<unknown[]> {
@@ -16,10 +16,10 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
     const resume = async () => handOff(await resumeProcess(ports(), p.dir))
     // Delete moves the folder to deleted/ and asks twice. The process this session works on stays.
     const deletePress = async () => {
-      if (p.dir === st.boundDir) { st.message = 'This session works on that process. Close it first.'; redraw(); return }
-      if (st.sure !== p.dir) { st.sure = p.dir; st.message = ''; redraw(); return }
+      if (p.dir === st.boundDir) { say('error', 'This session works on that process. Close it first.'); redraw(); return }
+      if (st.sure !== p.dir) { askAgain(p.dir); say('info', ''); redraw(); return }
       st.sure = undefined
-      try { st.message = `Moved to ${await deleteProcess(ports(), p.dir)}` } catch (error) { st.message = error instanceof Error ? error.message : String(error) }
+      try { say('success', `Moved to ${await deleteProcess(ports(), p.dir)}`) } catch (error) { say('error', error instanceof Error ? error.message : String(error)) }
       await refresh()
     }
     if (k) {

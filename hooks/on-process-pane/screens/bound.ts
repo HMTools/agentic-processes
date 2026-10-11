@@ -2,7 +2,7 @@ import type { StepRow } from '../../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../../infra/process-pane/status-look'
 import { nodeSegment, ring, titleText } from '../../infra/process-pane/rich'
 import { activityOf } from '../../infra/process-pane/activity'
-import { st } from '../pane-state'
+import { say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function boundScreen(c: Ctx): Promise<unknown> {
@@ -125,7 +125,7 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   ]
   const logsBody = v.logs.length ? (k ? [k.stack(v.logs.map(r => k.card(`logcard-${r.id}`, logRows(r))))] : v.logs.flatMap(logRows)) : [none('No log yet. The agent writes one for each step it finishes.')]
   const fileRow = (r: (typeof v.rows)[number], i: number) => (k ? (x: unknown) => k.card(`filecard-${i}`, [x]) : (x: unknown) => x)(Box({ key: `filerow-${i}`, flexDirection: 'row', columnGap: 2, children: [
-    r.openable ? Button({ key: `file-${r.path}`, label: r.name, plain: true, onPress: async () => { st.message = await openInViewer(r.path, e.surface); redraw() } }) : line(r.name, { dimColor: true }),
+    r.openable ? Button({ key: `file-${r.path}`, label: r.name, plain: true, onPress: async () => { say('error', await openInViewer(r.path, e.surface)); redraw() } }) : line(r.name, { dimColor: true }),
     ...(r.step ? [line(`step ${r.step}`, { dimColor: true })] : []),
   ] }))
   const framework = v.rows.filter(r => !r.output)
@@ -134,7 +134,6 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
     ...(outputs.length ? outputs.map(fileRow) : [none('No output file yet. A step lists its files when it finishes.')]),
     ...(framework.length ? [Button({ key: 'fw-toggle', label: `${st.showFramework ? '▾' : '▸'} Framework files (${framework.length})`, plain: true, dimColor: true, onPress: () => { st.showFramework = !st.showFramework; redraw() } })] : []),
     ...(st.showFramework ? framework.map(fileRow) : []),
-    ...(st.message ? [line(st.message, { color: 'error' })] : []),
   ]
   const stepsBody = graph ? [graph] : [...(k ? [k.stack(bound.steps.flatMap(stepCards))] : bound.steps.flatMap(stepRows))]
   const title = titleText(bound.name)
@@ -158,7 +157,6 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
             Button({ key: 'gate-send', label: 'Send changes', dimColor: !st.reason.trim(), plain: true, onPress: () => (st.reason.trim() ? requestChanges(gate.stepId, st.reason) : undefined) }),
           ] : []),
         ]),
-      ...(st.message ? [line(st.message, { color: 'error' })] : []),
     ], gate.state === 'ready')]
   const activity = activityOf(bound.kind, st.processes.find(p => p.dir === bound.dir)?.lastLogMs, Date.now())
   const activityLine = activity ? [line(activity.text, activity.quiet ? { color: 'warning' } : { dimColor: true })] : []
