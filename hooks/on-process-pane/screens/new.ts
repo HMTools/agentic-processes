@@ -111,7 +111,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
       // One quiet line: how many match and how old the list is, with Refresh at the far end.
       Box({ flexDirection: 'row', columnGap: 2, children: [
         line(`${st.query || st.category ? `${shownRows.length} of ${allRows.length}` : allRows.length} templates${synced ? `  ·  synced ${ago(synced, Date.now())}` : ''}`, { dimColor: true }),
-        Box({ flexGrow: 1 }),
+        Box({ flexGrow: 1, children: [line('')] }), // the spacer: an element with no children is refused
         Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : '↻ Refresh', plain: true, onPress: () => templateJob(async ports => { const lines = await refreshMarketplaces(ports); noteRefresh(lines); return lines.join('\n') }, 'refresh') }),
       ] }),
       line(' '),

@@ -35,7 +35,7 @@ export function richKit({ Box, Text, Button, Svg }: any, look = 4) {
   // The ground of the pane: the slate that replaces the black.
   const ground = (children: unknown[]) => look < 2 ? Box({ flexDirection: 'column', children }) : Box({ flexDirection: 'column', ...(look >= 4 ? { minHeight: '100%' } : {}), backgroundColor: PALETTE.ground, paddingLeft: 1, paddingRight: 1, paddingTop: 1, children })
   // A row of buttons with no frame: the open one is the primary button. `right` sits at the far end of the row.
-  const segmented = (buttons: unknown[], right: unknown[] = []) => Box({ flexDirection: 'row', columnGap: 1, children: right.length ? [...buttons, Box({ flexGrow: 1 }), ...right] : buttons })
+  const segmented = (buttons: unknown[], right: unknown[] = []) => Box({ flexDirection: 'row', columnGap: 1, children: right.length ? [...buttons, Box({ flexGrow: 1, children: [Text({ children: [''] })] }), ...right] : buttons })
   const tab = (key: string, label: string, active: boolean, onPress: () => void) => Button({ key, label, variant: active ? 'primary' : 'secondary', onPress })
   const stack = (children: unknown[]) => Box({ flexDirection: 'column', rowGap: 1, children })
   const wrap = (children: unknown[]) => Box({ flexDirection: 'row', flexWrap: 'wrap', columnGap: 1, marginLeft: 3, children })

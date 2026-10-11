@@ -1,6 +1,6 @@
 # Mods migration: research pack
 
-Goal: find out which parts of the `agentic-processes` plugin can be replaced or improved by a **Claude Code mod**, so that a later plan can migrate the plugin system. This folder started as **research tasks only**. All items are now `done` and the plugin is migrated (v3.18.1): the section "Research result" (7) of each item is the record. The `U` items (UI) were planned with a visual plan page and then built in the mod, so the "No implementation" line in the section "Out of scope" (6) of those items is history.
+Goal: find out which parts of the `agentic-processes` plugin can be replaced or improved by a **Claude Code mod**, so that a later plan can migrate the plugin system. This folder started as **research tasks only**. All items are now `done` and the plugin is migrated (v3.18.2): the section "Research result" (7) of each item is the record. The `U` items (UI) were planned with a visual plan page and then built in the mod, so the "No implementation" line in the section "Out of scope" (6) of those items is history.
 
 Each task is one file in `items/`. Each file is written so that a person (or a Claude session) with **no earlier context** can pick it up, research it, and record the result. Progress is tracked in `progress.html`.
 
