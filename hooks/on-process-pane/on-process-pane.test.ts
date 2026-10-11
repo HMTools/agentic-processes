@@ -613,6 +613,18 @@ test('the New list shows a count line, a header for each category, and no catego
   expect(await ui.find({ type: 'Text', text: /^dev {2}·/ })).toBeDefined() // the source line of the detail
 })
 
+test('/process look sets how much color Desktop draws, and says the range for a wrong value', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template })
+  const said = async (args: string) => ((await $.command.run({ command: 'process', args })) as any)?.text as string
+  expect(await said('look')).toContain('Give 0 to 4')
+  expect(await said('look 9')).toContain('Give 0 to 4')
+  expect(await said('look 0')).toBe('Look 0 set.')
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Button', key: 'tab-new' })).toBeDefined() // the old look still draws
+  await ui.unmount()
+  expect(await said('look 4')).toBe('Look 4 set.')
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

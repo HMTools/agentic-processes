@@ -18,6 +18,7 @@ export const st = {
   openValues: new Set<string>(), // Memory: the long values that show in full
   favorites: new Set<string>(), // starred templates (`category/name`), kept in the store as `favorites`
   query: '', // the search words of the New tab
+  look: 1, // how much color Desktop draws: 0 none, 1 cards and group titles, 2 + the ground, 3 + colored buttons and chips, 4 + the ground fills the height
   showMissing: false, // the folded group of templates you do not have is open
   category: undefined as string | undefined, // the chip: a category, the favorites, or all
   detailKey: undefined as string | undefined, // the template whose detail shows

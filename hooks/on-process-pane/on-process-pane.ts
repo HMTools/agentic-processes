@@ -186,6 +186,8 @@ async function ensureLoaded($: any): Promise<void> {
     st.allFolders = (await $.store.get('allFolders')) === true
     st.favorites = new Set(((await $.store.get('favorites')) as string[] | undefined) ?? [])
     st.debugClicks = (await $.store.get('debugClicks')) === true
+    const look = await $.store.get('look')
+    if (typeof look === 'number' && look >= 0 && look <= 4) st.look = look
   }
   if (!st.timer) {
     try { st.timer = $.clock.every(REFRESH_MS, () => refresh($)) } catch { /* no timer: the pane refreshes when it opens */ }
@@ -228,8 +230,8 @@ async function openInViewer($: any, path: string, surface: string): Promise<stri
 }
 
 const HELP = ['/process          open the pane: the bound process, or the list', '/process new      pick a template and start a process', '/process continue pick a process to go on with',
-  '/process templates  add or refresh marketplaces', '/process <text>   start from a template, with the text in its first field', '/process debug    toasts for each press, to find a lost click'].join('\n')
-const WORDS = ['new', 'continue', 'templates', 'help', 'debug']
+  '/process templates  add or refresh marketplaces', '/process <text>   start from a template, with the text in its first field', '/process debug    toasts for each press, to find a lost click', '/process look 0-4  how much color Desktop draws; 0 is none'].join('\n')
+const WORDS = ['new', 'continue', 'templates', 'help', 'debug', 'look']
 // The number of single-letter edits between two words: enough to tell a typo from a first field.
 function distance(a: string, b: string): number {
   const row = Array.from({ length: b.length + 1 }, (_, i) => i)
@@ -252,6 +254,15 @@ export const register: Register = on => {
       st.debugClicks = !st.debugClicks
       await $.store.set('debugClicks', st.debugClicks)
       return { text: `Click debug ${st.debugClicks ? 'on: each press and focus move shows a toast' : 'off'}` } as never
+    }
+    if (word.toLowerCase() === 'look') { // /process look 0..4: if the pane draws nothing on Desktop, a color the app refuses is the cause; 0 is the old look
+      await ensureLoaded($)
+      const level = Number(others[0])
+      if (!Number.isInteger(level) || level < 0 || level > 4) return { text: `Look is ${st.look}. Give 0 to 4: 0 no color, 1 cards and group titles, 2 + the ground, 3 + colored buttons and chips, 4 + the ground fills the height.` } as never
+      st.look = level
+      await $.store.set('look', level)
+      $.ui.invalidate('ui.render')
+      return { text: `Look ${level} set.` } as never
     }
     if (word.toLowerCase() === 'help') return { text: HELP } as never
     const named = TABS.find(t => t === word.toLowerCase())
@@ -315,7 +326,7 @@ export const register: Register = on => {
     const narrow = ((e.props as any).bodyColumns ?? 60) < 52 // short labels, no bar
     const rich = !!Svg && e.surface === 'desktop' // Desktop draws small SVG pictures (see infra/process-pane/rich): status nodes, bars, a ring. The terminal never does.
     const picture = (source: string, alt: string, width: number, height: number) => Svg({ source, alt, width, height, isInteractive: true })
-    const k = rich ? richKit({ Box, Text, Button, Svg }) : undefined // the Desktop look: cards, pills, chips (see rich-ui)
+    const k = rich ? richKit({ Box, Text, Button, Svg }, st.look) : undefined // the Desktop look: cards, pills, chips (see rich-ui)
     // A tab-like button: the open one is the primary button on Desktop, and the other dim text elsewhere.
     const toggle = (key: string, label: string, active: boolean, onPress: () => void) => (k ? k.tab(key, label, active, onPress) : Button({ key, label, plain: true, dimColor: !active, onPress }))
     // A row of tabs: one segmented control on Desktop.
