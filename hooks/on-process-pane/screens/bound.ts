@@ -121,7 +121,7 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
     ...(narrow ? [] : r.actions.slice(0, 2).map(a => line(`    ${a}`, { dimColor: true }))),
     ...(narrow ? [] : r.problems.slice(0, 2).map(p => line(`    problem: ${p}`, { color: 'error' }))),
   ]
-  const logsBody = v.logs.length ? (k ? [k.stack(v.logs.map(r => k.card(`logcard-${r.id}`, logRows(r))))] : v.logs.flatMap(logRows)) : [none('No log yet.')]
+  const logsBody = v.logs.length ? (k ? [k.stack(v.logs.map(r => k.card(`logcard-${r.id}`, logRows(r))))] : v.logs.flatMap(logRows)) : [none('No log yet. The agent writes one for each step it finishes.')]
   const fileRow = (r: (typeof v.rows)[number], i: number) => (k ? (x: unknown) => k.card(`filecard-${i}`, [x]) : (x: unknown) => x)(Box({ key: `filerow-${i}`, flexDirection: 'row', columnGap: 2, children: [
     r.openable ? Button({ key: `file-${r.path}`, label: r.name, plain: true, onPress: async () => { st.message = await openInViewer(r.path, e.surface); redraw() } }) : line(r.name, { dimColor: true }),
     ...(r.step ? [line(`step ${r.step}`, { dimColor: true })] : []),
@@ -129,7 +129,7 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   const framework = v.rows.filter(r => !r.output)
   // A file never opens inside the pane: a press hands it to the viewer (see openInViewer).
   const filesBody = [
-    ...(outputs.length ? outputs.map(fileRow) : [none('No output file yet.')]),
+    ...(outputs.length ? outputs.map(fileRow) : [none('No output file yet. A step lists its files when it finishes.')]),
     ...(framework.length ? [Button({ key: 'fw-toggle', label: `${st.showFramework ? '▾' : '▸'} Framework files (${framework.length})`, plain: true, dimColor: true, onPress: () => { st.showFramework = !st.showFramework; redraw() } })] : []),
     ...(st.showFramework ? framework.map(fileRow) : []),
     ...(st.message ? [line(st.message, { color: 'error' })] : []),

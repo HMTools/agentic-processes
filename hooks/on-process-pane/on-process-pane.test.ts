@@ -289,6 +289,28 @@ test('Desktop draws cards, pills and chips: every screen mounts, and each contro
   expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
 })
 
+test('/process help lists the words; a near miss asks "did you mean"; free text still opens the pane', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  expect(((await $.command.run({ command: 'process', args: 'help' })) as any).text).toContain('/process continue')
+  expect(((await $.command.run({ command: 'process', args: 'contine' })) as any).text).toContain('Did you mean "/process continue"?')
+  expect(((await $.command.run({ command: 'process', args: '7' })) as any).text).toBeUndefined() // a work item number goes to the first field
+  expect(((await $.command.run({ command: 'process', args: 'fix the login bug' })) as any).text).toBeUndefined()
+})
+
+test('the New tab hints at a first run only while there is no process', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'Pick a template. Claude runs it and stops for your approval at gates.' })).toBeDefined()
+})
+
+test('the New tab shows no first-run hint once a process exists', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${HOME}/active/p1/process.json`]: process })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'Pick a template. Claude runs it and stops for your approval at gates.' })).toBeUndefined()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

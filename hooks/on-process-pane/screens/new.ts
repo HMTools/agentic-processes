@@ -74,6 +74,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
       ] }),
     ])
     return [
+      ...(st.processes.length ? [] : [line('Pick a template. Claude runs it and stops for your approval at gates.', { dimColor: true })]), // a hint for a first run
       Input({ key: 'search', label: 'Search', placeholder: 'name, category or purpose', value: st.query, onInput: (text: string) => { st.query = text; redraw() }, onSubmit: (text: string) => { st.query = text; redraw() } }),
       Box({ flexDirection: 'row', columnGap: narrow ? 1 : 2, flexWrap: 'wrap', children: [
         chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${st.favorites.size ? ` ·${st.favorites.size}` : ''}`, FAVORITES), ...cats.map(c => chip(`cat-${c}`, c, c)),
@@ -87,7 +88,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
         ] }),
         ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 90 ? `${r.purpose.slice(0, 89)}…` : r.purpose, { dimColor: true })]),
         Box({ flexDirection: 'row', columnGap: 2, children: [...(r.template ? [start(r)] : []), ...(r.entry && r.state !== 'installed' ? [install(r)] : [])] }),
-      ]))) : [line(allRows.length ? 'No template matches. Clear the search or press All.' : 'No template yet. Press Refresh to read the marketplaces.', { dimColor: true })]),
+      ]))) : [line(allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
       line(' '),
       Box({ flexDirection: 'row', columnGap: 3, children: [
         Button({ key: 'tpl-refresh', label: 'Refresh', plain: true, onPress: () => templateJob(async ports => (await refreshMarketplaces(ports)).join('\n')) }),

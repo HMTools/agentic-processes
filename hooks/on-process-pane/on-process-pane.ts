@@ -180,6 +180,20 @@ async function openInViewer($: any, path: string, surface: string): Promise<stri
   return `Could not open the file with ${tries.map(t => t[0]).join(' or ')}. The file is ${path}`
 }
 
+const HELP = ['/process          open the pane: the bound process, or the list', '/process new      pick a template and start a process', '/process continue pick a process to go on with',
+  '/process templates  add or refresh marketplaces', '/process <text>   start from a template, with the text in its first field', '/process debug    toasts for each press, to find a lost click'].join('\n')
+const WORDS = ['new', 'continue', 'templates', 'help', 'debug']
+// The number of single-letter edits between two words: enough to tell a typo from a first field.
+function distance(a: string, b: string): number {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i)
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0]
+    row[0] = i
+    for (let j = 1; j <= b.length; j++) { const tmp = row[j]; row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = tmp }
+  }
+  return row[b.length]
+}
+
 export const register: Register = on => {
   // The command is registered in on-process-tools: a plugin can have only one session.start hook without a matcher.
   // A first word that is a tab name opens that tab. Any other text goes to the first field, as before.
@@ -192,7 +206,10 @@ export const register: Register = on => {
       await $.store.set('debugClicks', st.debugClicks)
       return { text: `Click debug ${st.debugClicks ? 'on: each press and focus move shows a toast' : 'off'}` } as never
     }
+    if (word.toLowerCase() === 'help') return { text: HELP } as never
     const named = TABS.find(t => t === word.toLowerCase())
+    const close = !named && !others.length ? WORDS.find(w => word.length > 3 && distance(w, word.toLowerCase()) <= 2) : undefined
+    if (close) return { text: `Did you mean "/process ${close}"? Text that is not a tab name goes into the first field of the template you pick.` } as never
     await openPane($, named, named ? others.join(' ') : text)
     return {}
   })
