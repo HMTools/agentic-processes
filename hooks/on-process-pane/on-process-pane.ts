@@ -5,6 +5,8 @@ import type { PaneAnswer } from '../infra/approval-gate/approval-gate'
 import type { Gate, GateStore } from '../infra/ports/ports'
 import { clearLogOwed, raiseLogOwed } from '../infra/log-owed/log-owed'
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
+import { fillFields, fillQuestion, parseAnswer } from '../infra/process-pane/fill-fields'
+import type { TemplateInfo } from '../infra/process-pane/process-pane'
 import { boundView, fingerprint, stepDetail, listProcesses, listTemplates, resumeProcess, waitingCount } from '../infra/process-pane/process-pane'
 import { activityOf, ago } from '../infra/process-pane/activity'
 import { bandView } from '../infra/process-pane/band'
@@ -87,6 +89,35 @@ async function templateJob($: any, job: (ports: TemplatePorts) => Promise<string
     if (busy) $.ui.invalidate('ui.render') // draw the busy button before the job starts
     say('success', (await job(ports)) ?? '')
     ;[st.entries, st.templates, st.markets] = await Promise.all([catalog(ports), listTemplates(filesOf($)), listMarketplaces(ports)])
+  } catch (error) { say('error', error instanceof Error ? error.message : String(error)) }
+  st.busy = undefined
+  $.ui.invalidate('ui.render')
+}
+
+// Claude fills the Start form from the text. A fork of the session knows what was talked about; a new session has nothing to fork, so a fresh call answers.
+// The reply is only text for the fields: it is read as JSON, and the user presses Create.
+async function fillJob($: any, template: TemplateInfo, purpose: string, text: string): Promise<void> {
+  if (st.busy) return
+  if (!text.trim()) { say('error', 'Write what you want first.'); $.ui.invalidate('ui.render'); return }
+  st.busy = 'fill'
+  $.ui.invalidate('ui.render') // draw the busy button before the call starts
+  try {
+    const question = fillQuestion(template, purpose, st.values, text)
+    let reply: any = await $.model.fork({ prompt: question })
+    if (!reply.isAnswered && reply.reason === 'nothing-to-fork') reply = await $.model.complete({ model: 'sonnet', prompt: question, timeoutMs: 30_000 })
+    if (!reply.isAnswered) say('error', `Claude gave no answer (${reply.reason}).`)
+    else {
+      const parsed = parseAnswer(template, reply.text)
+      if ('error' in parsed) say('error', parsed.error)
+      else {
+        const done = fillFields(template, st.values, parsed.answer)
+        st.values = done.values
+        st.filled = new Set([...st.filled, ...done.filled])
+        st.offers = done.offers
+        st.openFields = done.open
+        say('success', done.filled.length || Object.keys(done.offers).length ? '' : 'Nothing in your text fits a field.')
+      }
+    }
   } catch (error) { say('error', error instanceof Error ? error.message : String(error)) }
   st.busy = undefined
   $.ui.invalidate('ui.render')
@@ -362,7 +393,7 @@ export const register: Register = on => {
       approve: async stepId => answerGate($, await approveFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId)),
       requestChanges: async (stepId, reason) => answerGate($, await requestChangesFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId, reason)),
       close: () => closeProcess($),
-      templateJob: (job, busy) => templateJob($, job, busy), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: (started, toast) => handOff($, started, toast), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
+      templateJob: (job, busy) => templateJob($, job, busy), fill: (template, purpose, text) => fillJob($, template, purpose, text), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: (started, toast) => handOff($, started, toast), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
     }
     // One strip at the top for every result and error. A symbol and a color say which: never color alone.
     const tone = { info: 'inactive', success: 'success', error: 'error' }[st.kind]

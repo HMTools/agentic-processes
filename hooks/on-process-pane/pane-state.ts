@@ -47,6 +47,10 @@ export const st = {
   chosen: undefined as TemplateInfo | undefined,
   purposeOpen: false, // the Start form shows the whole purpose
   values: {} as Record<string, string>,
+  describe: '', // the free text of the Start form: Claude fills the fields from it
+  filled: new Set<string>(), // fields Claude filled, marked until the user edits them
+  offers: {} as Record<string, string>, // typed fields Claude would change: Replace or Keep
+  openFields: [] as string[], // fields Claude left empty because the text does not cover them
   message: '',
   sourceErrors: {} as Record<string, string>, // the last refresh error of each marketplace
   filter: 'all' as 'all' | 'needs' | 'running' | 'done' | 'failed', // the chip of the Continue list
@@ -58,6 +62,14 @@ export const st = {
   changing: false, // the gate card asks for the reason of a change request
   reason: '', // what the user typed there
   firstArg: '', // the text typed after the command: goes into the first field of the template that gets picked
+}
+
+// A new form starts with no text, marks or offers.
+export function resetFill(): void {
+  st.describe = ''
+  st.filled = new Set()
+  st.offers = {}
+  st.openFields = []
 }
 
 export type NoticeKind = 'info' | 'success' | 'error'

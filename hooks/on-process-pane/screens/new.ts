@@ -4,7 +4,7 @@ import type { TemplateRow } from '../../infra/process-pane/template-views'
 import { ago } from '../../infra/process-pane/activity'
 import { CATEGORY_KEYS, HEX, PALETTE, categoryIndex, flowGrid } from '../../infra/process-pane/rich'
 import { installTemplate, refreshMarketplaces, removeTemplate } from '../../infra/templates/templates'
-import { askAgain, noteRefresh, say, st } from '../pane-state'
+import { askAgain, noteRefresh, resetFill, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function newScreen(c: Ctx): Promise<unknown[]> {
@@ -21,7 +21,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
     return k ? k.action(`tpl-install-${r.key}`, label, press) : Button({ key: `tpl-install-${r.key}`, label, onPress: press })
   }
   const start = (r: TemplateRow) => {
-    const press = () => { st.chosen = r.template; st.values = r.template!.fields[0] && st.firstArg ? { [r.template!.fields[0].name]: st.firstArg } : {}; st.purposeOpen = false; st.message = ''; redraw() }
+    const press = () => { st.chosen = r.template; st.values = r.template!.fields[0] && st.firstArg ? { [r.template!.fields[0].name]: st.firstArg } : {}; st.purposeOpen = false; st.message = ''; resetFill(); redraw() }
     return k ? k.action(`start-${r.key}`, 'Start', press, 'go') : Button({ key: `start-${r.key}`, label: 'Start', variant: 'primary', onPress: press })
   }
   if (row) {
@@ -128,7 +128,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
 }
 
 export async function formScreen(c: Ctx): Promise<unknown[]> {
-  const { Box, Button, Input, card, files, handOff, k, line, narrow, ports, redraw } = c
+  const { Box, Button, Input, card, files, fill, handOff, k, line, narrow, ports, redraw } = c
   const template = st.chosen!
   const create = async () => handOff(await startProcess(ports(), template, st.values), `Started ${template.name}`)
   const missing = missingFields(template, st.values)
@@ -144,15 +144,35 @@ export async function formScreen(c: Ctx): Promise<unknown[]> {
     ...(d ? d.steps.map(s => Box({ key: `step-${s.number}`, flexDirection: 'row', columnGap: 1, children: [line(String(s.number), { bold: true }), line(s.name), ...(s.approval ? [k ? k.pill('asks you 🔒', HEX.waiting) : line('🔒 asks you', { color: 'warning' })] : [])] })) : []),
   ]
   const heading = (title: string, hex: string, key: string) => (k ? k.heading(title, hex) : line(title, { bold: true, color: key }))
-  // A field: the label with a star (or "optional"), the hint, then the input at full width. Enter in the field creates.
-  const field = (f: (typeof template.fields)[number], i: number) => Box({ key: `fld-${f.name}`, flexDirection: 'column', children: [
-    Box({ flexDirection: 'row', columnGap: 1, children: [line(f.name, { bold: true }), f.required ? line('*', { color: 'warning' }) : line('optional', { dimColor: true })] }),
+  // A field: the label with a star (or "optional"), a mark when Claude filled it, the hint, then the input at full width. Enter in the field creates.
+  // When Claude would change a field the user typed, Claude's text shows under it with Replace and Keep.
+  const field = (f: (typeof template.fields)[number]) => Box({ key: `fld-${f.name}`, flexDirection: 'column', children: [
+    Box({ flexDirection: 'row', columnGap: 1, children: [
+      line(f.name, { bold: true }), f.required ? line('*', { color: 'warning' }) : line('optional', { dimColor: true }),
+      ...(st.filled.has(f.name) ? [line('✦ from your text', { dimColor: true })] : []),
+      ...(st.openFields.includes(f.name) && !st.values[f.name]?.trim() ? [line('not in your text', { color: 'warning' })] : []),
+    ] }),
     ...(f.description && !narrow ? [line(f.description, { dimColor: true })] : []),
     Input({
       key: `field-${f.name}`, placeholder: f.example ? `e.g. ${f.example}` : f.description,
-      value: st.values[f.name] ?? '', ...(i === 0 ? { autoFocus: true } : {}),
-      onInput: (text: string) => { const was = missingFields(template, st.values).length; st.values[f.name] = text; if (missingFields(template, st.values).length !== was) redraw() }, // redraw only when the hint changes
+      value: st.values[f.name] ?? '',
+      onInput: (text: string) => { const was = missingFields(template, st.values).length; st.values[f.name] = text; st.filled.delete(f.name); if (missingFields(template, st.values).length !== was) redraw() }, // redraw only when the hint changes
       submitLabel: 'Enter ↵', onSubmit: async (text: string) => { st.values[f.name] = text; await create() },
+    }),
+    ...(st.offers[f.name] ? [Box({ flexDirection: 'row', columnGap: 1, children: [
+      line(`Claude: ${st.offers[f.name].length > 60 ? `${st.offers[f.name].slice(0, 59)}…` : st.offers[f.name]}`, { dimColor: true }),
+      Button({ key: `replace-${f.name}`, label: 'Replace', plain: true, onPress: () => { st.values[f.name] = st.offers[f.name]; st.filled.add(f.name); delete st.offers[f.name]; redraw() } }),
+      Button({ key: `keep-${f.name}`, label: 'Keep mine', plain: true, onPress: () => { delete st.offers[f.name]; redraw() } }),
+    ] })] : []),
+  ] })
+  // Describe it: one free text above the fields. Enter in it asks Claude to fill them (the fork of this session knows what was talked about).
+  const describe = Box({ key: 'fld-describe', flexDirection: 'column', children: [
+    Box({ flexDirection: 'row', columnGap: 1, children: [line('Describe it', { bold: true }), line('optional', { dimColor: true })] }),
+    ...(narrow ? [] : [line('Tell Claude what you want. It fills the fields below.', { dimColor: true })]),
+    Input({
+      key: 'describe', placeholder: 'e.g. a template for payflow feature work, used for PR reviews', value: st.describe, autoFocus: true,
+      onInput: (text: string) => { st.describe = text },
+      submitLabel: st.busy === 'fill' ? 'Filling…' : 'Fill ✦', onSubmit: async (text: string) => { st.describe = text; await fill(template, purpose, text) },
     }),
   ] })
   const fields = template.fields.map(field)
@@ -169,7 +189,7 @@ export async function formScreen(c: Ctx): Promise<unknown[]> {
   })
   const blocks = [
     heading('What runs', '#9aa3b8', 'inactive'), k ? k.card('form-head', headBody) : card('form-head', headBody),
-    heading('What you give', PALETTE.favorites, 'warning'), ...(k ? [k.stack(fields)] : fields), actions,
+    heading('What you give', PALETTE.favorites, 'warning'), ...(k ? [k.stack([describe, ...fields])] : [describe, ...fields]), actions,
   ]
   return k ? [k.stack(blocks)] : blocks.flatMap(b => [b, line(' ')])
 }

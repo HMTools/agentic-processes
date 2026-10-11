@@ -1,6 +1,7 @@
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
 import type { PaneGate } from '../infra/approval-gate/approval-gate'
 import type { Started, boundView, stepDetail } from '../infra/process-pane/process-pane'
+import type { TemplateInfo } from '../infra/process-pane/process-pane'
 import type { TemplatePorts } from '../infra/templates/templates'
 import type { richKit } from './rich-ui'
 import type { readViews } from './on-process-pane'
@@ -28,6 +29,7 @@ export interface Ctx {
   ports: () => ManagerPorts
   store: { set(key: string, value: unknown): unknown }
   templateJob: (job: (ports: TemplatePorts) => Promise<string | void>, busy?: string) => Promise<void>
+  fill: (template: TemplateInfo, purpose: string, text: string) => Promise<void> // Claude fills the Start form from the text
   handOff: (started: Started, toast?: string) => Promise<void> // `toast` shows before the pane closes
   openInViewer: (path: string, surface: string) => Promise<string>
   refresh: () => Promise<void>

@@ -795,3 +795,24 @@ test('a step opens its detail with two tabs; Back and the arrows move around; a 
   await ui.press({ key: 'parent' })
   expect(await ui.find({ type: 'Button', key: 'step-a' })).toBeDefined()
 })
+
+test('Describe fills the empty fields from Claude, offers Replace for a typed one, and falls back to a fresh call with no history', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: { ...described, parameters: { required: ['workItemId', 'title'], optional: [], definitions: { workItemId: {}, title: {} } } }, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  const asked: string[] = []
+  const usage = { input_tokens: 1, output_tokens: 1 }
+  on('model.fork', async () => ({ value: { isAnswered: false, reason: 'nothing-to-fork', usage } }) as never)
+  on('model.complete', async (_$, e: any) => { asked.push(e.prompt); return { value: { isAnswered: true, text: 'Sure: {"workItemId":"9","title":"Fix it","zzz":"x"}', usage } } as never })
+  await $.command.run({ command: 'process', args: 'new' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'start-dev/bug' })
+  await ui.input({ key: 'field-workItemId', text: '7', kind: 'change' })
+  await ui.input({ key: 'describe', text: 'bug 9 about login', kind: 'submit' })
+  expect(asked[0]).toContain('Text: bug 9 about login')
+  expect(asked[0]).toContain('workItemId = "7"')
+  expect(await ui.find({ type: 'Text', text: '✦ from your text' })).toBeDefined() // title was empty, so it is filled
+  expect(await ui.find({ type: 'Button', key: 'replace-workItemId' })).toBeDefined() // 7 was typed: Claude says 9
+  await ui.press({ key: 'keep-workItemId' })
+  expect(await ui.find({ type: 'Button', key: 'replace-workItemId' })).toBeUndefined()
+  await ui.input({ key: 'describe', text: '', kind: 'submit' })
+  expect(await ui.find({ type: 'Text', text: 'Write what you want first.' })).toBeDefined()
+})
