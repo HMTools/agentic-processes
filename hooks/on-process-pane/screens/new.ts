@@ -119,23 +119,46 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
 }
 
 export async function formScreen(c: Ctx): Promise<unknown[]> {
-  const { Box, Button, Input, handOff, line, narrow, ports, redraw } = c
+  const { Box, Button, Input, card, files, handOff, k, line, narrow, ports, redraw } = c
   const template = st.chosen!
   const create = async () => handOff(await startProcess(ports(), template, st.values), `Started ${template.name}`)
   const missing = missingFields(template, st.values)
-  return [
-    line(`${template.category} / ${template.name}`, { bold: true }),
-    ...template.fields.flatMap((f, i) => [Input({
-      key: `field-${f.name}`, label: f.required ? `${f.name} *` : f.name, placeholder: f.example ? `e.g. ${f.example}` : f.description,
+  const d = await templateDetail(files, template.path)
+  const asks = d ? d.steps.filter(s => s.approval).length : 0
+  const purpose = d?.purpose ?? ''
+  // The header: name, category, purpose cut to two lines, a chip for each step (a lock on an approval step), one count line.
+  const headBody = [
+    Box({ flexDirection: 'row', columnGap: 1, children: [line(template.name, { bold: true }), ...(k ? [k.pill(template.category, HEX.waiting)] : [line(`(${template.category})`, { dimColor: true })])] }),
+    ...(purpose ? [line(purpose.length > 170 ? `${purpose.slice(0, 169)}…` : purpose, { dimColor: true })] : []),
+    ...(d && d.steps.length ? [
+      k ? Box({ flexDirection: 'row', flexWrap: 'wrap', columnGap: 1, children: d.steps.map(s => k.chip(`${s.number} ${s.name}${s.approval ? ' 🔒' : ''}`, s.approval ? 'active' : 'idle')) })
+        : line(d.steps.map(s => `${s.number} ${s.name}${s.approval ? ' 🔒' : ''}`).join(' › ')),
+      line(`${d.steps.length} step${d.steps.length === 1 ? '' : 's'}${asks ? `  ·  asks for your approval ${asks === 1 ? 'once' : `${asks} times`}` : ''}`, { dimColor: true }),
+    ] : []),
+  ]
+  // A field: the label with a star (or "optional"), the hint, then the input at full width. Enter in the field creates.
+  const field = (f: (typeof template.fields)[number], i: number) => Box({ key: `fld-${f.name}`, flexDirection: 'column', children: [
+    Box({ flexDirection: 'row', columnGap: 1, children: [line(f.name, { bold: true }), f.required ? line('*', { color: 'warning' }) : line('optional', { dimColor: true })] }),
+    ...(f.description && !narrow ? [line(f.description, { dimColor: true })] : []),
+    Input({
+      key: `field-${f.name}`, placeholder: f.example ? `e.g. ${f.example}` : f.description,
       value: st.values[f.name] ?? '', ...(i === 0 ? { autoFocus: true } : {}),
-      onInput: (text: string) => { st.values[f.name] = text },
-      submitLabel: 'create', onSubmit: async (text: string) => { st.values[f.name] = text; await create() }, // Enter in a field creates
-    }), ...(f.description && !narrow ? [line(`  ${f.description}`, { dimColor: true })] : [])]),
+      onInput: (text: string) => { const was = missingFields(template, st.values).length; st.values[f.name] = text; if (missingFields(template, st.values).length !== was) redraw() }, // redraw only when the hint changes
+      submitLabel: 'Create', onSubmit: async (text: string) => { st.values[f.name] = text; await create() },
+    }),
+  ] })
+  const fields = template.fields.map(field)
+  // Beside Create: what is left, or "ready".
+  const hint = missing.length ? line(`${missing.length} field${missing.length === 1 ? '' : 's'} left: ${missing.join(', ')}`, { color: 'warning' }) : line('ready', { color: 'success' })
+  return [
+    k ? k.card('form-head', headBody) : card('form-head', headBody),
+    ...(k ? [k.stack(fields)] : fields),
     Box({
       flexDirection: 'row', columnGap: 3,
       children: [
-        Button({ key: 'create', label: 'Create', dimColor: missing.length > 0, onPress: create }), // dim until the required fields are filled; a press still says what is missing
+        k ? k.action('create', 'Create', create, 'go') : Button({ key: 'create', label: 'Create', dimColor: missing.length > 0, onPress: create }), // a press with a field empty still says what is missing
         Button({ key: 'back', label: 'Back', plain: true, onPress: () => { st.chosen = undefined; st.message = ''; redraw() } }),
+        hint,
       ],
     }),
   ]

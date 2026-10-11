@@ -67,6 +67,16 @@ test('Create refuses an empty required field, then starts the process and hands 
   expect(Object.keys(w.files).some(p => /\/active\/bug-\d{8}-\d{6}\/process\.json$/.test(p))).toBe(true)
 })
 
+test('the Start form names the missing field, then says ready', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'start-dev/bug' })
+  expect(await ui.find({ type: 'Text', text: '1 field left: workItemId' })).toBeDefined()
+  await ui.input({ key: 'field-workItemId', text: '7', kind: 'change' })
+  expect(await ui.find({ type: 'Text', text: 'ready' })).toBeDefined()
+})
+
 test('Resume binds the process and hands it to the agent', async ($, on) => {
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process })
   await $.command.run({ command: 'process', args: '' })
@@ -563,7 +573,7 @@ test('the field form shows each description, and Started <name> toasts before th
   await $.command.run({ command: 'process', args: 'new' })
   const ui = await $.ui.mount(PANE)
   await ui.press({ key: 'start-dev/bug' })
-  expect(await ui.find({ type: 'Text', text: '  the work item number' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'the work item number' })).toBeDefined()
   await ui.input({ key: 'field-workItemId', text: '7', kind: 'change' })
   await ui.press({ key: 'create' })
   expect(w.toasts).toContain('Started bug')
