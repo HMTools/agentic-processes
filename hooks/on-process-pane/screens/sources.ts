@@ -37,7 +37,7 @@ export async function sourcesScreen(c: Ctx): Promise<unknown[]> {
     Input({
       key: `mk-field-${key}`, value: st.form!.values[key], ...(i === 0 ? { autoFocus: true } : {}),
       onInput: (text: string) => { st.form!.values[key] = text },
-      submitLabel: 'save', onSubmit: async (text: string) => { st.form!.values[key] = text; await save() },
+      submitLabel: '', onSubmit: async (text: string) => { st.form!.values[key] = text; await save() }, // an empty word: the Save button below is the one that shows
     }),
   ] })
   const editorBody = st.form && [
