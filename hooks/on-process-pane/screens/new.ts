@@ -71,7 +71,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
     // One chip for both surfaces: Desktop a dot and a block (see rich-ui), the terminal a theme-colored dot and a reversed block.
     const chip = (id: string, label: string, value: string | undefined, hex: string, word?: string, count?: number) => {
       const active = st.category === value
-      if (k) return k.colorChip(id, label, active, hex, pick(value), count)
+      if (k && st.look >= 3) return k.colorChip(id, label, active, hex, pick(value), count) // raw colors on text are a look 3 step: below it Desktop draws what the terminal draws
       const dot = word ? [Text({ children: ['● '], color: word })] : []
       return Button({ key: id, plain: true, onPress: pick(value), children: active
         ? [Text({ children: [` ${word ? '● ' : ''}${label}${count == null ? '' : ` ${count}`} `], inverse: true, bold: true })]
