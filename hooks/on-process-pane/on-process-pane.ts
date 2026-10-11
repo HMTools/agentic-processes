@@ -124,7 +124,7 @@ async function fillJob($: any, template: TemplateInfo, purpose: string, text: st
   $.ui.invalidate('ui.render')
 }
 
-// The process is bound. Close the pane and hand it to the agent as the user's own prompt.
+// The process is bound. Show its steps in the pane and hand it to the agent as the user's own prompt.
 // The prompt hook skips prompts from the plugin, so the work it does for a user prompt is done here.
 const gatesOf = ($: any): GateStore => ({
   get: async sessionId => ((await $.store.get(`gate:${sessionId}`)) as Gate | undefined) ?? undefined,
@@ -165,7 +165,14 @@ async function handOff($: any, started: Started, toast?: string): Promise<void> 
   await raiseLogOwed(filesOf($), linksOf($), sessionId)
   startCountingAgain()
   if (toast) { try { await $.ui.toast(toast) } catch { /* a surface that cannot show a toast */ } }
-  await $.ui.close({ id: PANE })
+  // The pane stays open and shows the steps of this process (Create and Resume both come here).
+  st.boundDir = started.dir
+  st.view = 'process'
+  st.shown = started.dir
+  st.openStep = undefined
+  st.section = 'steps'
+  st.message = ''
+  $.ui.invalidate('ui.render')
   $.prompt.submit({ text: started.text, asUser: true }) // not awaited: it resolves when the turn starts
 }
 

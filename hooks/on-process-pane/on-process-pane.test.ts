@@ -65,6 +65,8 @@ test('Create refuses an empty required field, then starts the process and hands 
   expect(w.sent[0].asUser).toBe(true)
   expect(w.sent[0].text).toContain('I started the process "bug"')
   expect(Object.keys(w.files).some(p => /\/active\/bug-\d{8}-\d{6}\/process\.json$/.test(p))).toBe(true)
+  expect(await ui.find({ type: 'Button', key: 'tab-new' })).toBeUndefined() // the pane moved on from the Start form to the steps of the new process
+  expect(await ui.find({ type: 'Button', key: 'sec-steps' })).toBeDefined()
 })
 
 test('the Start form names the missing field, then says ready', async ($, on) => {
