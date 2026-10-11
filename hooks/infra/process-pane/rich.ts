@@ -6,7 +6,7 @@ import type { Kind } from './status-look'
 export const HEX: Record<Kind, string> = { waiting: '#f2b13d', running: '#3ecf8e', done: '#5aa88a', failed: '#ef6a5e', paused: '#a58bff', pending: '#6b7280' }
 // The colors of the pane on Desktop, in one place. Raw colors: a surface that does not know one draws its own, so a fill can fall back to the old look.
 export const PALETTE = {
-  ground: '#181c27', card: '#222839', border: '#333b52', go: '#d97757', slate: '#3b4666', favorites: '#f2b13d', last: '#6ea8ff',
+  ground: '#181c27', neutral: '#d5d9e6', card: '#222839', border: '#333b52', go: '#d97757', slate: '#3b4666', favorites: '#f2b13d', last: '#6ea8ff',
   categories: ['#4fd1c5', '#a58bff', '#f472b6', '#7bd88f', '#f59e6c', '#8fa8ff'],
 }
 // The theme words the terminal uses for the same six, in the same order.

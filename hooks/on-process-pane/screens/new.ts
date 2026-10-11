@@ -8,7 +8,7 @@ import { askAgain, noteRefresh, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function newScreen(c: Ctx): Promise<unknown[]> {
-  const { Box, Button, Input, card, e, files, k, line, narrow, nav, openInViewer, picture, ports, redraw, rich, store, tabRow, templateJob, toggle } = c
+  const { Box, Button, Input, Text, card, e, files, k, line, narrow, nav, openInViewer, picture, ports, redraw, rich, store, tabRow, templateJob, toggle } = c
   const allRows = mergeTemplates(st.templates, st.entries)
   const row = st.detailKey ? allRows.find(r => r.key === st.detailKey) : undefined
   const saveFavorites = async () => { await store.set('favorites', [...st.favorites]); redraw() }
@@ -68,7 +68,15 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
   } else {
     const cats = [...new Set(allRows.map(r => r.category))].sort()
     const pick = (value: string | undefined) => () => { st.category = value; redraw() }
-    const chip = (id: string, label: string, value: string | undefined, hex?: string) => (k && hex ? k.colorChip(id, label, st.category === value, hex, pick(value)) : toggle(id, label, st.category === value, pick(value)))
+    // One chip for both surfaces: Desktop a dot and a block (see rich-ui), the terminal a theme-colored dot and a reversed block.
+    const chip = (id: string, label: string, value: string | undefined, hex: string, word?: string, count?: number) => {
+      const active = st.category === value
+      if (k) return k.colorChip(id, label, active, hex, pick(value), count)
+      const dot = word ? [Text({ children: ['● '], color: word })] : []
+      return Button({ key: id, plain: true, onPress: pick(value), children: active
+        ? [Text({ children: [` ${word ? '● ' : ''}${label}${count == null ? '' : ` ${count}`} `], inverse: true, bold: true })]
+        : [...dot, Text({ children: [label], dimColor: !word }), ...(count == null ? [] : [Text({ children: [` ${count}`], dimColor: true })])] })
+    }
     const colorOf = (category: string) => PALETTE.categories[categoryIndex(category, cats)]
     const shownRows = matches(allRows, st.query, st.category, st.favorites)
     const parts = groupRows(shownRows, st.favorites, lastUsedNames(st.processes), !st.category)
@@ -91,19 +99,20 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
     const section = (title: string, rows: TemplateRow[], hex: string, key: string, category?: string) => rows.length ? [header(title, hex, key), ...(k ? [k.stack(rows.map(r => item(r, hex)))] : rows.map(r => item(r)))] : []
     const missingOpen = st.showMissing || !!st.query
     const synced = Math.max(0, ...st.markets.map(m => (m.lastSynced ? Date.parse(m.lastSynced) : 0) || 0))
-    const sources = st.markets.filter(m => m.enabled).length
     return [
       ...(st.processes.length ? [] : [line('Pick a template. Claude runs it and stops for your approval at gates.', { dimColor: true })]), // a hint for a first run
-      Input({ key: 'search', label: 'Search', placeholder: 'name, category or purpose', value: st.query, onInput: (text: string) => { st.query = text; redraw() }, onSubmit: (text: string) => { st.query = text; redraw() } }),
+      Input({ key: 'search', placeholder: 'Search by name, category or purpose', value: st.query, onInput: (text: string) => { st.query = text; redraw() }, onSubmit: (text: string) => { st.query = text; redraw() } }),
       ...(st.query ? [Button({ key: 'search-clear', label: '× Clear the search', plain: true, dimColor: true, onPress: () => { st.query = ''; redraw() } })] : []),
       Box({ flexDirection: 'row', columnGap: narrow ? 1 : 2, flexWrap: 'wrap', children: [
-        chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${st.favorites.size ? ` ·${st.favorites.size}` : ''}`, FAVORITES, PALETTE.favorites), ...cats.map(c => chip(`cat-${c}`, `${c}${narrow ? '' : ` ·${allRows.filter(r => r.category === c).length}`}`, c, colorOf(c))),
+        chip('cat-all', 'All', undefined, PALETTE.neutral), chip('cat-fav', '★ Favorites', FAVORITES, PALETTE.favorites, 'warning', st.favorites.size || undefined),
+        ...cats.map(c => chip(`cat-${c}`, c, c, colorOf(c), CATEGORY_KEYS[categoryIndex(c, cats)], narrow ? undefined : allRows.filter(r => r.category === c).length)),
       ] }),
-      // One line: how many match, how old the list is, and the buttons that were at the end of the list.
-      Box({ flexDirection: 'row', columnGap: 2, flexWrap: 'wrap', children: [
-        line(`${st.query || st.category ? `${shownRows.length} of ${allRows.length}` : allRows.length} templates${st.markets.length ? `  ·  ${sources} source${sources === 1 ? '' : 's'}${synced ? `  ·  synced ${ago(synced, Date.now())}` : ''}` : ''}`, { dimColor: true }),
+      line(' '),
+      // One quiet line: how many match and how old the list is, with Refresh at the far end.
+      Box({ flexDirection: 'row', columnGap: 2, children: [
+        line(`${st.query || st.category ? `${shownRows.length} of ${allRows.length}` : allRows.length} templates${synced ? `  ·  synced ${ago(synced, Date.now())}` : ''}`, { dimColor: true }),
+        Box({ flexGrow: 1 }),
         Button({ key: 'tpl-refresh', label: st.busy === 'refresh' ? 'Refreshing…' : '↻ Refresh', plain: true, onPress: () => templateJob(async ports => { const lines = await refreshMarketplaces(ports); noteRefresh(lines); return lines.join('\n') }, 'refresh') }),
-        Button({ key: 'mk-open', label: 'Marketplaces', plain: true, onPress: () => { st.tab = 'templates'; st.message = ''; redraw() } }),
       ] }),
       line(' '),
       ...(shownRows.length ? [
@@ -113,7 +122,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
           Button({ key: 'fold-missing', label: `${missingOpen ? '▾' : '▸'} Not installed ·${parts.missing.length}`, plain: true, onPress: () => { st.showMissing = !st.showMissing; redraw() } }),
           ...(missingOpen ? (k ? [k.stack(parts.missing.map(r => item(r)))] : parts.missing.map(r => item(r))) : []),
         ] : []),
-      ] : [line(st.category === FAVORITES && !st.favorites.size ? 'No favorite yet. Press ☆ next to a template.' : allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
+      ] : [line(st.category === FAVORITES && !st.favorites.size ? 'No favorite yet. Press ☆ next to a template.' : allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Open the Sources tab, then press Add marketplace, to get templates.'), { dimColor: true })]),
     ]
   }
 }

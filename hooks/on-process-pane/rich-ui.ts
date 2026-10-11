@@ -24,10 +24,13 @@ export function richKit({ Box, Text, Button, Svg }: any, look = 4) {
   const action = (key: string, label: string, onPress: () => void, tone: 'go' | 'slate' = 'slate') => look < 3
     ? Button({ key, label, variant: tone === 'go' ? 'primary' : 'secondary', onPress })
     : Button({ key, plain: true, onPress, children: [Text({ children: [` ${label} `], color: '#ffffff', backgroundColor: tone === 'go' ? PALETTE.go : PALETTE.slate, bold: tone === 'go' })] })
-  // A filter chip in a group color: the open one is a block of it.
-  const colorChip = (key: string, label: string, active: boolean, color: string, onPress: () => void) => look < 3
-    ? Button({ key, label, variant: active ? 'primary' : 'secondary', onPress })
-    : Button({ key, plain: true, onPress, children: [Text({ children: [` ${label} `], ...(active ? { color: '#111111', backgroundColor: color, bold: true } : { color }) })] })
+  // A filter chip: a dot in the group color and the name, a dim count; the open one is a block of the color. Look 0 keeps the plain button.
+  // The neutral color (All) has no dot.
+  const colorChip = (key: string, label: string, active: boolean, color: string, onPress: () => void, count?: number) => look < 1
+    ? Button({ key, label: count == null ? label : `${label} ·${count}`, variant: active ? 'primary' : 'secondary', onPress })
+    : Button({ key, plain: true, onPress, children: active
+      ? [Text({ children: [` ${color === PALETTE.neutral ? '' : '● '}${label}${count == null ? '' : ` ${count}`} `], color: '#111111', backgroundColor: color, bold: true })]
+      : [...(color === PALETTE.neutral ? [] : [Text({ children: ['● '], color })]), Text({ children: [label] }), ...(count == null ? [] : [Text({ children: [` ${count}`], dimColor: true })])] })
   const heading = (title: string, color: string) => (look >= 1 ? Text({ children: [`● ${title}`], color, bold: true }) : Text({ children: [title], bold: true, dimColor: true }))
   // The ground of the pane: the slate that replaces the black.
   const ground = (children: unknown[]) => look < 2 ? Box({ flexDirection: 'column', children }) : Box({ flexDirection: 'column', ...(look >= 4 ? { minHeight: '100%' } : {}), backgroundColor: PALETTE.ground, paddingLeft: 1, paddingRight: 1, paddingTop: 1, children })
