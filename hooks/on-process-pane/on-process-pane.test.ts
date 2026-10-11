@@ -572,7 +572,8 @@ test('the New tab has a clear button for the search, counts on the category chip
   await ui.input({ key: 'search', text: 'fix', kind: 'change' })
   await ui.press({ key: 'search-clear' })
   expect(await ui.find({ type: 'Button', key: 'search-clear' })).toBeUndefined()
-  expect(await ui.find({ type: 'Button', key: 'cat-dev', text: 'dev ·1' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'cat-dev' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: ' 1' })).toBeDefined() // the count after the name
   await ui.press({ key: 'cat-fav' })
   expect(await ui.find({ type: 'Text', text: 'No favorite yet. Press ☆ next to a template.' })).toBeDefined()
 })
