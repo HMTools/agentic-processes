@@ -424,6 +424,67 @@ test('Remove on a template needs two presses, and the first is taken back at the
   expect(await ui.find({ type: 'Button', key: 'tpl-remove-dev/bug', label: 'Remove' })).toBeDefined()
 })
 
+const proc = (name: string, status: string, extra = {}) => ({ ...process, name, status: 'running', metadata: { ...process.metadata, template: 'bug-fix' }, steps: [{ id: 'a', number: 0, name: 'Design', status }], ...extra })
+
+test('a Continue card says what it is, where it is, why it needs you and how long ago it changed', async ($, on) => {
+  world(on, { [`${HOME}/active/p1/process.json`]: proc('Old fix', 'awaiting_approval') })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'bug-fix  ·  step 1 of 1  ·  Design' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^approve step 0  ·  \d+ days ago$/ })).toBeDefined()
+})
+
+test('the Continue chips filter by state', async ($, on) => {
+  world(on, { [`${HOME}/active/a/process.json`]: proc('Waiting one', 'awaiting_approval'), [`${HOME}/active/b/process.json`]: proc('Running one', 'in_progress') })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Button', text: 'Waiting one' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', text: 'Running one' })).toBeDefined()
+  await ui.press({ key: 'flt-needs' })
+  expect(await ui.find({ type: 'Button', text: 'Waiting one' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', text: 'Running one' })).toBeUndefined()
+  await ui.press({ key: 'flt-failed' })
+  expect(await ui.find({ type: 'Text', text: 'No process matches this filter. Press All.' })).toBeDefined()
+  await ui.press({ key: 'flt-all' })
+  expect(await ui.find({ type: 'Button', text: 'Running one' })).toBeDefined()
+})
+
+test('View opens a process read only: the session keeps no link, and the pane says so', async ($, on) => {
+  const w = world(on, { [`${HOME}/active/p1/process.json`]: proc('Old fix', 'in_progress') })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'view-0' })
+  expect(await ui.find({ type: 'Text', text: 'Viewing only. The session does not work on this process.' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'close-process' })).toBeUndefined()
+  expect(w.store['session:S1']).toBeUndefined()
+  expect(w.sent).toEqual([])
+  await ui.press({ key: 'back-list' })
+  expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
+})
+
+test('Close lets the session go of its process, keeps the files, and says so', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: proc('Old fix', 'in_progress') })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'close-process' })
+  expect(w.store['session:S1']).toEqual([])
+  expect(w.files[`${dir}/process.json`]).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Closed. This session no longer works on that process.' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
+})
+
+test('Delete of the process this session works on is refused, and Close makes it possible', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: proc('Old fix', 'in_progress') })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'del-0' })
+  expect(await ui.find({ type: 'Text', text: 'This session works on that process. Close it first.' })).toBeDefined()
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })

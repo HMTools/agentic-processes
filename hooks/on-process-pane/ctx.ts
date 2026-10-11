@@ -34,5 +34,6 @@ export interface Ctx {
   gate: PaneGate | undefined // the approval step of the bound process, and whether the pane can answer it
   approve: (stepId: string) => Promise<void>
   requestChanges: (stepId: string, reason: string) => Promise<void>
+  close: () => Promise<void> // the session lets go of the bound process
   resume: (dir: string, note?: string) => Promise<void> // bind the process again and hand it to the agent, with one extra line
 }

@@ -3,10 +3,10 @@ import { findAgenticProcessDir, readAgenticProcess, sessionKey } from '../infra/
 import { approveFromPane, gateForPane, requestChangesFromPane } from '../infra/approval-gate/approval-gate'
 import type { PaneAnswer } from '../infra/approval-gate/approval-gate'
 import type { Gate, GateStore } from '../infra/ports/ports'
-import { raiseLogOwed } from '../infra/log-owed/log-owed'
+import { clearLogOwed, raiseLogOwed } from '../infra/log-owed/log-owed'
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
 import { boundView, fingerprint, stepDetail, listProcesses, listTemplates, resumeProcess, waitingCount } from '../infra/process-pane/process-pane'
-import { activityOf } from '../infra/process-pane/activity'
+import { activityOf, ago } from '../infra/process-pane/activity'
 import { bandView } from '../infra/process-pane/band'
 import type { Started } from '../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../infra/process-pane/status-look'
@@ -109,6 +109,21 @@ async function answerGate($: any, answer: PaneAnswer): Promise<void> {
   else { say('info', ''); st.changing = false; st.reason = ''; $.prompt.submit({ text: answer.text }) } // not awaited: it resolves when the turn starts
   $.ui.invalidate('ui.render')
 }
+// The session lets go of the bound process. The files stay; the guards and the line under the prompt stop. A parent process, if there is one, is bound again.
+async function closeProcess($: any): Promise<void> {
+  const id = await $.session.id()
+  const dirs = (((await $.store.get(sessionKey(id))) as string[] | undefined) ?? []).filter(d => d !== st.boundDir)
+  await $.store.set(sessionKey(id), dirs)
+  clearLogOwed(id)
+  try { await $.ui.status(undefined) } catch { /* a surface that cannot draw it */ }
+  st.boundDir = await findAgenticProcessDir(filesOf($), linksOf($), id)
+  st.view = 'list'
+  st.tab = 'continue'
+  st.shown = st.boundDir
+  st.openStep = undefined
+  say('success', 'Closed. This session no longer works on that process.')
+  $.ui.invalidate('ui.render')
+}
 async function resumeAndHandOff($: any, dir: string, note?: string): Promise<void> { await handOff($, await resumeProcess(portsOf($), dir, note)) }
 async function handOff($: any, started: Started): Promise<void> {
   if ('error' in started) { say('error', started.error); $.ui.invalidate('ui.render'); return }
@@ -132,7 +147,7 @@ async function refresh($: any): Promise<void> {
   try {
     st.processes = await listProcesses(filesOf($))
     const now = Date.now()
-    const print = fingerprint(st.processes) + st.processes.map(p => activityOf(p.kind, p.lastLogMs, now)?.text ?? '').join('|') // the minute text is part of what the pane draws
+    const print = fingerprint(st.processes) + st.processes.map(p => `${activityOf(p.kind, p.lastLogMs, now)?.text ?? ''}${ago(p.updatedMs, now)}`).join('|') // the minute text is part of what the pane draws
     const viewPrint = await viewFingerprint($)
     changed = expired || print !== st.lastPrint || viewPrint !== st.lastViewPrint
     st.lastPrint = print
@@ -333,6 +348,7 @@ export const register: Register = on => {
       gate: bound ? await paneGate($, bound.dir) : undefined,
       approve: async stepId => answerGate($, await approveFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId)),
       requestChanges: async (stepId, reason) => answerGate($, await requestChangesFromPane(filesOf($), (path, text) => $.fs.write(path, text), gatesOf($), await $.session.id(), bound!.dir, stepId, reason)),
+      close: () => closeProcess($),
       templateJob: (job, busy) => templateJob($, job, busy), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: started => handOff($, started), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
     }
     // One strip at the top for every result and error. A symbol and a color say which: never color alone.

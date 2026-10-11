@@ -12,3 +12,15 @@ export function activityOf(kind: Kind, lastLogMs: number | undefined, now: numbe
   if (minutes >= NO_LOG_MINUTES) return { text: `no log for ${minutes} min`, quiet: true }
   return { text: minutes < 1 ? 'last log just now' : `last log ${minutes} min ago`, quiet: false }
 }
+
+// "just now", "5 min ago", "3 h ago", "yesterday", "4 days ago": how long ago a process changed.
+export function ago(ms: number | undefined, now: number): string {
+  if (ms === undefined) return ''
+  const minutes = Math.max(0, Math.floor((now - ms) / 60_000))
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes} min ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours} h ago`
+  const days = Math.floor(hours / 24)
+  return days === 1 ? 'yesterday' : `${days} days ago`
+}

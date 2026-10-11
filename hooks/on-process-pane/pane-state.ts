@@ -43,6 +43,7 @@ export const st = {
   chosen: undefined as TemplateInfo | undefined,
   values: {} as Record<string, string>,
   message: '',
+  filter: 'all' as 'all' | 'needs' | 'running' | 'done' | 'failed', // the chip of the Continue list
   kind: 'info' as NoticeKind, // how the strip at the top draws the message
   at: 0, // the tick of the timer when the message was set: it clears after two ticks (5 to 10 seconds)
   ticks: 0,

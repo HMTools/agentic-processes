@@ -35,10 +35,10 @@ test('processes list the next step and the newest change first', async () => {
     [`${ACTIVE}/old/process.json`]: processFile({ name: 'Old', metadata: { lastUpdated: '2026-01-01T10:00:00Z' } }, [done, todo]),
     [`${ACTIVE}/new/process.json`]: processFile({ name: 'New', metadata: { lastUpdated: '2026-02-01T10:00:00Z' } }, [todo]),
   })
-  expect(await listProcesses(w.ports.files)).toEqual([
-    { dir: `${ACTIVE}/new`, name: 'New', step: 1, total: 1, updated: '2026-02-01 10:00', kind: 'running', folders: [] },
-    { dir: `${ACTIVE}/old`, name: 'Old', step: 2, total: 2, updated: '2026-01-01 10:00', kind: 'running', folders: [] },
-  ])
+  const found = await listProcesses(w.ports.files)
+  expect(found.map(p => p.name)).toEqual(['New', 'Old'])
+  expect(found[0]).toMatchObject({ dir: `${ACTIVE}/new`, step: 1, total: 1, updated: '2026-02-01 10:00', kind: 'running', folders: [], updatedMs: Date.parse('2026-02-01T10:00:00Z') })
+  expect(found[1]).toMatchObject({ dir: `${ACTIVE}/old`, step: 2, total: 2, updated: '2026-01-01 10:00', kind: 'running', folders: [] })
 })
 
 test('a process is waiting, failed, paused or done by its steps and its status', async () => {

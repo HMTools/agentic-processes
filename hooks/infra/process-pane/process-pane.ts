@@ -17,6 +17,9 @@ export type ProcessInfo = {
   dir: string; name: string; step: number; total: number; updated: string; kind: Kind; folders: string[]
   waitStep?: string // the number of the step that waits for approval
   lastLogMs?: number // when the log was written last (a running process only, if the surface tells)
+  template?: string // the template it was made from
+  stepName?: string // the step to do next
+  updatedMs?: number // the time of the last change
 }
 
 const rootOf = async (files: FileSystem) => {
@@ -78,6 +81,8 @@ export async function listProcesses(files: FileSystem): Promise<ProcessInfo[]> {
     const logTime = kind === 'running' ? (await list(files, dir)).find(e => e.name === 'log.json')?.mtimeMs : undefined
     const lastLogMs = logTime ? logTime : undefined // 0 means the surface does not tell
     found.push({ dir, name: process.name ?? entry.name, step: next ? steps.indexOf(next) + 1 : steps.length, total: steps.length, updated: updated.slice(0, 16).replace('T', ' '), kind, folders,
+      ...(process.metadata?.template ? { template: String(process.metadata.template) } : {}), ...(next?.name ? { stepName: String(next.name) } : {}),
+      ...(Number.isFinite(Date.parse(updated)) ? { updatedMs: Date.parse(updated) } : {}),
       ...(waiting ? { waitStep: String(waiting.number ?? steps.indexOf(waiting) + 1) } : {}), ...(lastLogMs !== undefined ? { lastLogMs } : {}), sort: updated })
   }
   return found.sort((a, b) => b.sort.localeCompare(a.sort)).map(({ sort, ...info }) => info)

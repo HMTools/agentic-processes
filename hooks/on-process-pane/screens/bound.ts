@@ -6,9 +6,10 @@ import { say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function boundScreen(c: Ctx): Promise<unknown> {
-  const { resume, gate, approve, requestChanges } = c
+  const { resume, gate, approve, requestChanges, close } = c
   const { Box, Button, Input, Client, card, detail, e, files, k, line, narrow, nav, openInViewer, picture, redraw, rich, tabRow, toggle, views } = c
   const bound = c.bound!
+  const own = bound.dir === st.boundDir // View opens another process read only: it has no buttons that act on the session
   // A process is bound to the session: the pane shows that one process, or the detail of one of its steps.
   const look = LOOK[bound.kind]
   const kindWord = (kind: keyof typeof LOOK) => line(LOOK[kind].word, { color: LOOK[kind].color })
@@ -139,7 +140,7 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   const title = titleText(bound.name)
   // The approval step: while it runs, a line says approval comes after it; when the agent asked and no dialog is open, the pane has the buttons.
   const next = gate ? bound.steps[bound.steps.findIndex(s => s.id === gate.stepId) + 1] : undefined
-  const gateCard = !gate ? [] : gate.state === 'working'
+  const gateCard = !gate || !own ? [] : gate.state === 'working'
     ? [line(`Step ${gate.number} "${gate.name}" needs your approval when it is done.`, { dimColor: true })]
     : [card('gate', [
       Box({ flexDirection: 'row', columnGap: 1, children: [line(`Step ${gate.number} "${gate.name}" needs your approval`, { bold: true }), ...(k ? [k.kindPill('waiting')] : [])] }),
@@ -165,8 +166,8 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   const attentionCard = attention ? [card('attention', [
     Box({ flexDirection: 'row', columnGap: 1, children: [line(bound.kind === 'failed' ? `Step ${attention.number} failed` : 'The process is paused', { bold: true }), ...(k ? [k.kindPill(bound.kind)] : [])] }),
     line(attention.reason || (bound.kind === 'failed' ? 'The log holds no error text.' : `It stopped at step ${attention.number} "${attention.name}".`), { dimColor: true }),
-    Button({ key: 'retry', label: bound.kind === 'failed' ? 'Retry step' : 'Resume', ...(k ? { variant: 'primary' } : {}),
-      onPress: () => resume(bound.dir, bound.kind === 'failed' ? `The user pressed Retry on step ${attention.number} "${attention.name}". Run that step again.` : 'The user pressed Resume on a paused process.') }),
+    ...(!own ? [line('Resume it from the list to go on.', { dimColor: true })] : [Button({ key: 'retry', label: bound.kind === 'failed' ? 'Retry step' : 'Resume', ...(k ? { variant: 'primary' } : {}),
+      onPress: () => resume(bound.dir, bound.kind === 'failed' ? `The user pressed Retry on step ${attention.number} "${attention.name}". Run that step again.` : 'The user pressed Resume on a paused process.') })]),
   ], true)] : []
   return card('bound', [
     ...(bound.parent ? [nav('parent', `↑ ${bound.parent.name}`, goTo(bound.parent.dir))] : []),
@@ -181,12 +182,16 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
       ] })]
       : [Box({ flexDirection: 'row', columnGap: 1, children: [line(symbolOf(bound.kind, false), { color: look.color, bold: true }), line(bound.name, { bold: true }), line(look.word, { color: look.color })] }),
         line(`Step ${bound.step} of ${bound.total}`, { dimColor: true }), ...activityLine]),
+    ...(own ? [] : [line('Viewing only. The session does not work on this process.', { dimColor: true })]),
     ...attentionCard,
     ...gateCard,
     sectionTabs,
     line(' '),
     ...(st.section === 'memory' ? memoryBody : st.section === 'logs' ? logsBody : st.section === 'files' ? filesBody : stepsBody),
     line(' '),
-    nav('back-list', k ? '← Back to list' : 'Back to list', () => { st.view = 'list'; st.tab = 'continue'; st.shown = st.boundDir; redraw() }),
+    Box({ flexDirection: 'row', columnGap: 3, children: [
+      nav('back-list', k ? '← Back to list' : 'Back to list', () => { st.view = 'list'; st.tab = 'continue'; st.shown = st.boundDir; redraw() }),
+      ...(own ? [Button({ key: 'close-process', label: 'Close process', ...(k ? { variant: 'secondary' } : { plain: true, dimColor: true }), onPress: close })] : []),
+    ] }),
   ], needsUser(bound.kind))
 }

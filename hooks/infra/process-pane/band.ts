@@ -12,7 +12,7 @@ export type Band = { parts: BandPart[]; text: string; hot: boolean }
 const TONE: Record<Kind, BandPart['tone']> = { waiting: 'warning', failed: 'error', paused: 'permission', running: 'success', done: 'dim', pending: 'dim' }
 
 // What the bound process is doing, in the words the user acts on.
-const stateWord = (p: ProcessInfo) =>
+export const stateWord = (p: ProcessInfo) =>
   p.kind === 'waiting' ? (p.waitStep ? `approve step ${p.waitStep}` : 'waits for you') : p.kind === 'running' ? 'running' : LOOK[p.kind].word
 
 // "▲2 approve · ✕1 failed · ‖1 paused", without the kinds that have none.
