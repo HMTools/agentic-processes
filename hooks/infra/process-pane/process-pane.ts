@@ -13,7 +13,11 @@ export type TemplateInfo = {
   path: string; name: string; category: string; title: string; purpose: string; stepCount: number
   fields: { name: string; required: boolean; example: string; description: string }[]
 }
-export type ProcessInfo = { dir: string; name: string; step: number; total: number; updated: string; kind: Kind; folders: string[] }
+export type ProcessInfo = {
+  dir: string; name: string; step: number; total: number; updated: string; kind: Kind; folders: string[]
+  waitStep?: string // the number of the step that waits for approval
+  lastLogMs?: number // when the log was written last (a running process only, if the surface tells)
+}
 
 const rootOf = async (files: FileSystem) => {
   const home = await files.home()
@@ -69,7 +73,12 @@ export async function listProcesses(files: FileSystem): Promise<ProcessInfo[]> {
     const next = nextStep(process)
     const updated: string = process.metadata?.lastUpdated ?? ''
     const folders: string[] = process.metadata?.projectPaths ?? (process.metadata?.projectPath ? [process.metadata.projectPath] : [])
-    found.push({ dir, name: process.name ?? entry.name, step: next ? steps.indexOf(next) + 1 : steps.length, total: steps.length, updated: updated.slice(0, 16).replace('T', ' '), kind: processKind(process), folders, sort: updated })
+    const kind = processKind(process)
+    const waiting = steps.find(s => s.status === 'awaiting_approval')
+    const logTime = kind === 'running' ? (await list(files, dir)).find(e => e.name === 'log.json')?.mtimeMs : undefined
+    const lastLogMs = logTime ? logTime : undefined // 0 means the surface does not tell
+    found.push({ dir, name: process.name ?? entry.name, step: next ? steps.indexOf(next) + 1 : steps.length, total: steps.length, updated: updated.slice(0, 16).replace('T', ' '), kind, folders,
+      ...(waiting ? { waitStep: String(waiting.number ?? steps.indexOf(waiting) + 1) } : {}), ...(lastLogMs !== undefined ? { lastLogMs } : {}), sort: updated })
   }
   return found.sort((a, b) => b.sort.localeCompare(a.sort)).map(({ sort, ...info }) => info)
 }
@@ -86,7 +95,18 @@ export const waitingCount = (processes: ProcessInfo[]) => processes.filter(p => 
 export type SubstepRow = { number: number; name: string; active: boolean }
 export type ChildRow = { name: string; kind: Kind; dir: string; returnsTo?: string }
 export type StepRow = { id: string; number: string; name: string; kind: Kind; active: boolean; substeps: SubstepRow[]; children: ChildRow[] }
-export type BoundView = { dir: string; name: string; step: number; total: number; kind: Kind; parent?: { name: string; dir: string }; steps: StepRow[] }
+export type Attention = { number: string; name: string; reason: string } // why a failed or paused process stopped
+export type BoundView = { dir: string; name: string; step: number; total: number; kind: Kind; parent?: { name: string; dir: string }; steps: StepRow[]; attention?: Attention }
+
+// The step a failed or paused process stopped at, and the last problem its log holds. Empty reason: the log says nothing.
+async function attentionOf(files: FileSystem, dir: string, process: Doc, kind: Kind): Promise<Attention | undefined> {
+  if (kind !== 'failed' && kind !== 'paused') return
+  const steps: Doc[] = process.steps ?? []
+  const step = steps.find(s => s.status === 'failed') ?? nextStep(process)
+  if (!step) return
+  const problems = strings((await readDoc(files, `${dir}/log.json`))?.steps?.[step.id]?.problemsEncountered)
+  return { number: String(step.number ?? steps.indexOf(step) + 1), name: step.name ?? step.id ?? '', reason: problems[problems.length - 1] ?? '' }
+}
 
 // A recorded sub-process status, as a symbol kind.
 const childKind = (status: string): Kind => (status === 'completed' ? 'done' : status === 'failed' ? 'failed' : status === 'paused' ? 'paused' : 'running')
@@ -100,12 +120,14 @@ export async function boundView(files: FileSystem, dir: string): Promise<BoundVi
   const active = process.currentState?.activeStep
   const children: Doc[] = process.subProcessState?.childProcesses ?? []
   const parent = process.subProcessState?.parentProcess
+  const attention = await attentionOf(files, dir, process, processKind(process))
   return {
     dir,
     name: process.name ?? dir.split('/').pop() ?? dir,
     step: next ? steps.indexOf(next) + 1 : steps.length,
     total: steps.length,
     kind: processKind(process),
+    ...(attention ? { attention } : {}),
     ...(parent?.processPath ? { parent: { name: parent.name ?? parent.processPath, dir: parent.processPath } } : {}),
     steps: steps.map((s, i) => {
       const isActive = !!active && s.id === active.id && !isDone(s)
@@ -165,7 +187,7 @@ export async function stepDetail(files: FileSystem, dir: string, stepId: string)
 }
 
 // The message the agent reads first: the facts it used to collect by reading files.
-export function handoff(kind: 'new' | 'resume', dir: string, process: Doc): string {
+export function handoff(kind: 'new' | 'resume', dir: string, process: Doc, note?: string): string {
   const steps: Doc[] = process.steps ?? []
   const next = nextStep(process)
   const rows = steps.map(s => `  ${isDone(s) ? '✓' : s === next ? '→' : ' '} ${s.number}. ${s.name} (${s.status}) id=${s.id}`)
@@ -175,6 +197,7 @@ export function handoff(kind: 'new' | 'resume', dir: string, process: Doc): stri
     `Parameters: ${JSON.stringify(process.parameters ?? {})}`,
     `Steps:\n${rows.join('\n')}`,
     next ? `Next: step ${next.number} "${next.name}".` : 'Every step is done.',
+    ...(note ? [note] : []),
     'Use the process-run skill and carry on from the next step.',
   ].join('\n')
 }
@@ -206,10 +229,11 @@ export async function startProcess(ports: ManagerPorts, template: TemplateInfo, 
   } catch (error) { return { error: error instanceof Error ? error.message : String(error) } }
 }
 
-export async function resumeProcess(ports: ManagerPorts, dir: string): Promise<Started> {
+// `note` is one extra line for the agent, for example that the user pressed Retry.
+export async function resumeProcess(ports: ManagerPorts, dir: string, note?: string): Promise<Started> {
   try {
     await bindSession(ports, dir)
-    return { text: handoff('resume', dir, JSON.parse(await ports.files.read(`${dir}/process.json`))), dir }
+    return { text: handoff('resume', dir, JSON.parse(await ports.files.read(`${dir}/process.json`)), note), dir }
   } catch (error) { return { error: error instanceof Error ? error.message : String(error) } }
 }
 
@@ -229,4 +253,4 @@ export async function deleteProcess(ports: ManagerPorts, dir: string): Promise<s
 }
 
 // A short text that changes when the Continue list or the waiting count changes. The pane redraws on the timer only when it changes.
-export const fingerprint = (list: ProcessInfo[]): string => list.map(p => `${p.dir}|${p.step}/${p.total}|${p.kind}|${p.updated}`).join(';')
+export const fingerprint = (list: ProcessInfo[]): string => list.map(p => `${p.dir}|${p.step}/${p.total}|${p.kind}|${p.updated}|${p.waitStep ?? ''}`).join(';')

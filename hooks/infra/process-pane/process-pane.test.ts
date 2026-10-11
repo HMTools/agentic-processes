@@ -169,3 +169,32 @@ test('resume of a folder outside active/ answers with an error', async () => {
   const w = world({ '/h/x/process.json': {} })
   expect(await resumeProcess(w.ports, '/h/x')).toEqual({ error: 'Not a folder in active/: /h/x' })
 })
+
+test('a waiting step puts its number on the process; a running one gets the time of its log if the surface tells', async () => {
+  const w = world({
+    [`${ACTIVE}/w/process.json`]: processFile({ name: 'W' }, [step({ id: 'a', number: 0, status: 'completed' }), step({ id: 'b', number: 1, status: 'awaiting_approval' })]),
+    [`${ACTIVE}/r/process.json`]: processFile({ name: 'R' }, [step({ id: 'a', number: 0, status: 'in_progress' })]),
+  })
+  const files = { ...w.ports.files, list: async (path: string) => (await w.ports.files.list(path)).map(e => (e.name === 'log.json' ? { ...e, mtimeMs: 42_000 } : e)) }
+  const found = await listProcesses(files)
+  expect(found.find(i => i.name === 'W')).toMatchObject({ kind: 'waiting', waitStep: '1' })
+  expect(found.find(i => i.name === 'W')?.lastLogMs).toBeUndefined()
+})
+test('a failed process has a reason from the log of its failed step; a paused one names the step it stopped at', async () => {
+  const w = world({
+    [`${ACTIVE}/f/process.json`]: processFile({ name: 'F', status: 'failed' }, [step({ id: 'a', number: 0, name: 'Design', status: 'completed' }), step({ id: 'b', number: 1, name: 'Build', status: 'failed' })]),
+    [`${ACTIVE}/f/log.json`]: { steps: { b: { problemsEncountered: ['first', 'tests did not pass'] } } },
+    [`${ACTIVE}/p/process.json`]: processFile({ name: 'P', status: 'paused' }, [step({ id: 'a', number: 0, name: 'Design', status: 'pending' })]),
+  })
+  expect((await boundView(w.ports.files, `${ACTIVE}/f`))?.attention).toEqual({ number: '1', name: 'Build', reason: 'tests did not pass' })
+  expect((await boundView(w.ports.files, `${ACTIVE}/p`))?.attention).toEqual({ number: '0', name: 'Design', reason: '' })
+})
+test('a running process has no attention card', async () => {
+  const w = world({ [`${ACTIVE}/r/process.json`]: processFile({ name: 'R' }, [step({ id: 'a', number: 0, status: 'in_progress' })]) })
+  expect((await boundView(w.ports.files, `${ACTIVE}/r`))?.attention).toBeUndefined()
+})
+test('resume adds one extra line for the agent', async () => {
+  const w = world({ [`${ACTIVE}/r/process.json`]: processFile({ name: 'R' }, [step({ id: 'a', number: 0, status: 'failed' })]) })
+  const started = await resumeProcess(w.ports, `${ACTIVE}/r`, 'The user pressed Retry on step 0.')
+  expect('text' in started && started.text).toContain('The user pressed Retry on step 0.')
+})

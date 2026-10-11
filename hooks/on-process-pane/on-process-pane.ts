@@ -2,7 +2,9 @@ import type { Register } from 'claude-code'
 import { findAgenticProcessDir, sessionKey } from '../infra/agentic-process-repository/agentic-process-repository'
 import { raiseLogOwed } from '../infra/log-owed/log-owed'
 import type { FileSystem, ManagerPorts } from '../infra/ports/ports'
-import { boundView, fingerprint, stepDetail, listProcesses, listTemplates, waitingCount } from '../infra/process-pane/process-pane'
+import { boundView, fingerprint, stepDetail, listProcesses, listTemplates, resumeProcess, waitingCount } from '../infra/process-pane/process-pane'
+import { activityOf } from '../infra/process-pane/activity'
+import { bandView } from '../infra/process-pane/band'
 import type { Started } from '../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../infra/process-pane/status-look'
 import { moveCommands, slash } from '../infra/process-manager/move'
@@ -84,6 +86,7 @@ async function templateJob($: any, job: (ports: TemplatePorts) => Promise<string
 
 // The process is bound. Close the pane and hand it to the agent as the user's own prompt.
 // The prompt hook skips prompts from the plugin, so the work it does for a user prompt is done here.
+async function resumeAndHandOff($: any, dir: string, note?: string): Promise<void> { await handOff($, await resumeProcess(portsOf($), dir, note)) }
 async function handOff($: any, started: Started): Promise<void> {
   if ('error' in started) { st.message = started.error; $.ui.invalidate('ui.render'); return }
   const sessionId = await $.session.id()
@@ -101,7 +104,8 @@ async function refresh($: any): Promise<void> {
   let changed = true
   try {
     st.processes = await listProcesses(filesOf($))
-    const print = fingerprint(st.processes)
+    const now = Date.now()
+    const print = fingerprint(st.processes) + st.processes.map(p => activityOf(p.kind, p.lastLogMs, now)?.text ?? '').join('|') // the minute text is part of what the pane draws
     const viewPrint = await viewFingerprint($)
     changed = print !== st.lastPrint || viewPrint !== st.lastViewPrint
     st.lastPrint = print
@@ -234,13 +238,15 @@ export const register: Register = on => {
   // The button above the prompt: always there, with the count of processes that need the user. Key 1 opens the pane.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     await ensureLoaded($)
-    const { Box, Button } = $.ui.resolve(e)
-    const count = waitingCount(st.processes)
+    const { Box, Button, Text } = $.ui.resolve(e)
+    const band = bandView(st.processes, st.boundDir, Date.now())
     const theirs = await next(e).catch(() => undefined) // a mod after this one that fails must not blank the button
     return Box({
       flexDirection: 'column',
       children: [
-        Button({ key: 'band-open', label: count ? `Processes ${symbolOf('waiting', false)} ${count} wait` : 'Processes', plain: true, dimColor: !count, onPress: () => openPane($) }),
+        // The parts carry a theme color each (a state is also a word and a symbol, never color alone).
+        Button({ key: 'band-open', plain: true, dimColor: !band.hot && !st.boundDir, onPress: () => openPane($),
+          children: band.parts.map(part => (part.tone ? Text({ children: [part.text], ...(part.tone === 'dim' ? { dimColor: true } : { color: part.tone }) }) : part.text)) }),
         ...(theirs ? [theirs] : []), // keep what the mods after this one draw
       ],
     })
@@ -297,7 +303,7 @@ export const register: Register = on => {
     const ctx: Ctx = {
       e, Box, Text, Button, Input, Svg, Client, line, narrow, rich, picture, k, toggle, tabRow, nav, card, redraw, cwd, bound, detail, views,
       files: filesOf($), ports: () => portsOf($), store: { set: (key: string, value: unknown) => $.store.set(key, value) },
-      templateJob: job => templateJob($, job), handOff: started => handOff($, started), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
+      templateJob: job => templateJob($, job), resume: (dir, note) => resumeAndHandOff($, dir, note), handOff: started => handOff($, started), openInViewer: (path, surface) => openInViewer($, path, surface), refresh: () => refresh($),
     }
     let body: unknown[]
     if (st.tab === 'templates') body = await sourcesScreen(ctx)

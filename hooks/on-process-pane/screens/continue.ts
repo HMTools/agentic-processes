@@ -2,6 +2,7 @@ import { deleteProcess, inFolder, resumeProcess } from '../../infra/process-pane
 import type { ProcessInfo } from '../../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../../infra/process-pane/status-look'
 import { progressBar } from '../../infra/process-pane/rich'
+import { activityOf } from '../../infra/process-pane/activity'
 import { st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
@@ -9,6 +10,8 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
   const { Box, Button, card, cwd, handOff, k, line, narrow, picture, redraw, refresh, rich, toggle, ports, store } = c
   const processCard = (p: ProcessInfo, i: number) => {
     const look = LOOK[p.kind]
+    const activity = activityOf(p.kind, p.lastLogMs, Date.now())
+    const activityLine = activity ? [line(activity.text, activity.quiet ? { color: 'warning' } : { dimColor: true })] : []
     const filled = p.kind === 'done' ? 20 : Math.round(((p.step - 1) / Math.max(1, p.total)) * 20)
     const resume = async () => handOff(await resumeProcess(ports(), p.dir))
     // Delete moves the folder to deleted/ and asks twice. The process this session works on stays.
@@ -23,6 +26,7 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
       return k.card(`card-${i}`, [
         Box({ flexDirection: 'row', columnGap: 1, children: [line(p.name, { bold: true }), k.kindPill(p.kind)] }),
         line(`step ${p.step} of ${p.total}  ·  ${p.updated}`, { dimColor: true }),
+        ...activityLine,
         ...(narrow ? [] : [picture(progressBar(p.kind === 'done' ? p.total : p.step - 1, p.total, p.kind, 240), `step ${p.step} of ${p.total}`, 240, 8)]),
         Box({ flexDirection: 'row', columnGap: 1, children: [
           Button({ key: `process-${i}`, label: 'Resume', variant: 'primary', onPress: resume }),
@@ -41,6 +45,7 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
         ],
       }),
       line(narrow ? `step ${p.step}/${p.total}` : `step ${p.step} of ${p.total}  ·  ${p.updated}`, { dimColor: true }),
+      ...activityLine,
       ...(narrow ? [] : [rich ? picture(progressBar(p.kind === 'done' ? p.total : p.step - 1, p.total, p.kind, 240), `step ${p.step} of ${p.total}`, 240, 8) : line('█'.repeat(filled).padEnd(20, '░'), { color: look.color })]),
     ], needsUser(p.kind))
   }

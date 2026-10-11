@@ -16,7 +16,7 @@ const BAND = {
 } as const
 
 // A fake disk (path → text) with the stubs a pane needs. `sent` collects the prompts the mod submits.
-function world(on: On, disk: Record<string, unknown>) {
+function world(on: On, disk: Record<string, unknown>, mtimes: Record<string, number> = {}) {
   const files: Record<string, string> = Object.fromEntries(Object.entries(disk).map(([k, v]) => [k, JSON.stringify(v)]))
   const sent: { text: string; asUser?: boolean }[] = []
   const under = (folder: string) => Object.keys(files).filter(p => p.startsWith(`${folder}/`))
@@ -28,7 +28,7 @@ function world(on: On, disk: Record<string, unknown>) {
   on('store.delete', async (_$, e: any) => { delete store[e.key]; return { value: undefined } })
   on('session.id', async () => ({ value: 'S1' }))
   on('session.cwd', async () => ({ value: '/work' }))
-  on('fs.list', async (_$, e) => ({ value: [...new Set(under(e.path).map(p => p.slice(e.path.length + 1).split('/')[0]))].map(name => ({ name, kind: under(`${e.path}/${name}`).length ? 'dir' : 'file', size: 0, mtimeMs: 0, isLink: false })) }))
+  on('fs.list', async (_$, e) => ({ value: [...new Set(under(e.path).map(p => p.slice(e.path.length + 1).split('/')[0]))].map(name => ({ name, kind: under(`${e.path}/${name}`).length ? 'dir' : 'file', size: 0, mtimeMs: mtimes[`${e.path}/${name}`] ?? 0, isLink: false })) }))
   on('fs.exists', async (_$, e) => ({ value: e.path in files || under(e.path).length > 0 }))
   on('fs.read', async (_$, e) => ({ value: files[e.path] }))
   on('fs.write', async (_$, e) => { files[e.path] = e.text; return { value: undefined } })
@@ -311,6 +311,39 @@ test('the New tab shows no first-run hint once a process exists', async ($, on) 
   expect(await ui.find({ type: 'Text', text: 'Pick a template. Claude runs it and stops for your approval at gates.' })).toBeUndefined()
 })
 
+test('the band names the bound process and its state, and says when a running process has gone quiet', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, { [`${dir}/process.json`]: { ...process, steps: [{ id: 'a', number: 3, name: 'Gate', status: 'awaiting_approval' }] } })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const band = await $.ui.mount(BAND)
+  expect(await band.find({ type: 'Text', text: '▲ Old fix · step 1/1 · approve step 3' })).toBeDefined()
+})
+
+test('a running process that wrote no log for 12 minutes shows an amber note, and a fresh one a quiet note', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const run = { ...process, status: 'running', steps: [{ id: 'a', number: 0, name: 'Design', status: 'in_progress' }] }
+  world(on, { [`${dir}/process.json`]: run, [`${dir}/log.json`]: {} }, { [`${dir}/log.json`]: Date.now() - 12 * 60_000 })
+  await $.command.run({ command: 'process', args: 'continue' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'no log for 12 min' })).toBeDefined()
+})
+
+test('a failed process shows why and a Retry button that hands the agent the process with one extra line', async ($, on) => {
+  const dir = `${HOME}/active/p1`
+  const w = world(on, {
+    [`${dir}/process.json`]: { ...process, status: 'failed', steps: [{ id: 'a', number: 0, name: 'Build', status: 'failed' }] },
+    [`${dir}/log.json`]: { steps: { a: { problemsEncountered: ['tests did not pass'] } } },
+  })
+  w.store['session:S1'] = [dir]
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'tests did not pass' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'retry', label: 'Retry step' })).toBeDefined()
+  await ui.press({ key: 'retry' })
+  expect(w.sent[0].text).toContain('The user pressed Retry on step 0 "Build"')
+})
+
 test('Continue shows this folder at first, and the switch shows every folder and is saved', async ($, on) => {
   const other = { ...process, name: 'Elsewhere', metadata: { lastUpdated: '2026-01-02T10:00:00Z', projectPaths: ['/other'] } }
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process, [`${HOME}/active/p2/process.json`]: other })
@@ -332,7 +365,7 @@ test('a step that waits puts a count on the Continue tab and on the button above
   const ui = await $.ui.mount(PANE)
   expect(await ui.find({ type: 'Button', key: 'tab-continue', label: 'Continue ▲1' })).toBeDefined()
   const band = await $.ui.mount(BAND)
-  expect(await band.find({ type: 'Button', key: 'band-open', label: 'Processes ▲ 1 wait' })).toBeDefined()
+  expect(await band.find({ type: 'Button', key: 'band-open', label: 'Processes ▲1 approve' })).toBeDefined()
 })
 
 test('a process that starts to wait raises one toast within 5 seconds', async ($, on) => {

@@ -3,7 +3,7 @@
 
 export type FileSystem = {
   home(): Promise<string | undefined>
-  list(path: string): Promise<{ name: string; kind: string }[]>
+  list(path: string): Promise<{ name: string; kind: string; mtimeMs?: number }[]>
   exists(path: string): Promise<boolean>
   read(path: string): Promise<string>
 }

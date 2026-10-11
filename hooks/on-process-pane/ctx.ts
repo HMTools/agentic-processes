@@ -30,4 +30,5 @@ export interface Ctx {
   handOff: (started: Started) => Promise<void>
   openInViewer: (path: string, surface: string) => Promise<string>
   refresh: () => Promise<void>
+  resume: (dir: string, note?: string) => Promise<void> // bind the process again and hand it to the agent, with one extra line
 }

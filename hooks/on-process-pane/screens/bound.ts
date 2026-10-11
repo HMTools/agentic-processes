@@ -1,10 +1,12 @@
 import type { StepRow } from '../../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../../infra/process-pane/status-look'
 import { nodeSegment, ring, titleText } from '../../infra/process-pane/rich'
+import { activityOf } from '../../infra/process-pane/activity'
 import { st } from '../pane-state'
 import type { Ctx } from '../ctx'
 
 export async function boundScreen(c: Ctx): Promise<unknown> {
+  const { resume } = c
   const { Box, Button, Client, card, detail, e, files, k, line, narrow, nav, openInViewer, picture, redraw, rich, tabRow, toggle, views } = c
   const bound = c.bound!
   // A process is bound to the session: the pane shows that one process, or the detail of one of its steps.
@@ -136,6 +138,16 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
   ]
   const stepsBody = graph ? [graph] : [...(k ? [k.stack(bound.steps.flatMap(stepCards))] : bound.steps.flatMap(stepRows))]
   const title = titleText(bound.name)
+  const activity = activityOf(bound.kind, st.processes.find(p => p.dir === bound.dir)?.lastLogMs, Date.now())
+  const activityLine = activity ? [line(activity.text, activity.quiet ? { color: 'warning' } : { dimColor: true })] : []
+  // A failed or paused process says why it stopped, and has one button to go on. The button hands the agent the process again, with one extra line.
+  const attention = bound.attention
+  const attentionCard = attention ? [card('attention', [
+    Box({ flexDirection: 'row', columnGap: 1, children: [line(bound.kind === 'failed' ? `Step ${attention.number} failed` : 'The process is paused', { bold: true }), ...(k ? [k.kindPill(bound.kind)] : [])] }),
+    line(attention.reason || (bound.kind === 'failed' ? 'The log holds no error text.' : `It stopped at step ${attention.number} "${attention.name}".`), { dimColor: true }),
+    Button({ key: 'retry', label: bound.kind === 'failed' ? 'Retry step' : 'Resume', ...(k ? { variant: 'primary' } : {}),
+      onPress: () => resume(bound.dir, bound.kind === 'failed' ? `The user pressed Retry on step ${attention.number} "${attention.name}". Run that step again.` : 'The user pressed Resume on a paused process.') }),
+  ], true)] : []
   return card('bound', [
     ...(bound.parent ? [nav('parent', `↑ ${bound.parent.name}`, goTo(bound.parent.dir))] : []),
     ...(rich
@@ -144,10 +156,12 @@ export async function boundScreen(c: Ctx): Promise<unknown> {
         Box({ flexDirection: 'column', children: [
           Box({ flexDirection: 'row', columnGap: 1, children: [picture(title.source, bound.name, title.width, title.height), k!.kindPill(bound.kind)] }),
           line(`Step ${bound.step} of ${bound.total}${bound.steps[bound.step - 1] ? `  ·  ${bound.steps[bound.step - 1].name}` : ''}`, { dimColor: true }),
+          ...activityLine,
         ] }),
       ] })]
       : [Box({ flexDirection: 'row', columnGap: 1, children: [line(symbolOf(bound.kind, false), { color: look.color, bold: true }), line(bound.name, { bold: true }), line(look.word, { color: look.color })] }),
-        line(`Step ${bound.step} of ${bound.total}`, { dimColor: true })]),
+        line(`Step ${bound.step} of ${bound.total}`, { dimColor: true }), ...activityLine]),
+    ...attentionCard,
     sectionTabs,
     line(' '),
     ...(st.section === 'memory' ? memoryBody : st.section === 'logs' ? logsBody : st.section === 'files' ? filesBody : stepsBody),
