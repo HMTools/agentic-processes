@@ -15,6 +15,7 @@ import { LOOK, needsUser, symbolOf } from '../infra/process-pane/status-look'
 import { moveCommands, slash } from '../infra/process-manager/move'
 import { ensureProcessTools } from '../infra/process-manager/tools'
 import { richKit } from './rich-ui'
+import { pandaSvg, poseOf } from '../infra/process-pane/panda'
 import { filesView, logView, memoryView, tabCounts } from '../infra/process-pane/process-views'
 import { stepLine } from '../infra/process-pane/step-line'
 import { catalog, listMarketplaces } from '../infra/templates/templates'
@@ -408,6 +409,9 @@ export const register: Register = on => {
     // On Desktop the whole screen sits on one slate ground, not the black of the app.
     const screen = (children: unknown[]) => (k ? k.ground(children) : Box({ flexDirection: 'column', children }))
     if (bound) return screen([...strip, await boundScreen(ctx)])
-    return screen([...strip, tabs, line(' '), ...body])
+    // On Desktop the surfer panda stands before the tabs; its pose follows the notice at the top.
+    const panda = rich ? pandaSvg(poseOf(st.kind, st.message)) : undefined
+    const header = panda ? Box({ key: 'header', flexDirection: 'row', columnGap: 2, alignItems: 'center', children: [picture(panda.source, 'Surfer panda', panda.width, panda.height), tabs] }) : tabs
+    return screen([...strip, header, line(' '), ...body])
   })
 }

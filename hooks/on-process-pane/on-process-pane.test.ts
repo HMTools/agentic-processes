@@ -698,6 +698,7 @@ test('the Desktop surface draws the same tabs with a rail of icons', async ($, o
   await $.command.run({ command: 'process', args: 'continue' })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect(await ui.find({ type: 'Svg' })).toBeDefined()
+  expect(await ui.find({ type: 'Svg', alt: 'Surfer panda' })).toBeDefined() // the panda stands before the tabs
   await ui.press({ key: 'tab-new' })
   expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
 })
@@ -712,6 +713,7 @@ test('with a process bound to the session the pane shows its steps, and Back goe
   expect(await ui.find({ type: 'Button', key: 'step-b', label: '2. Build' })).toBeDefined()
   expect(await ui.find({ type: 'Button', key: 'tab-new' })).toBeUndefined()
   expect(await ui.find({ type: 'Svg' })).toBeUndefined() // the terminal draws no pictures
+  expect(await ui.find({ type: 'Svg', alt: 'Surfer panda' })).toBeUndefined() // and no panda
   await ui.press({ key: 'back-list' })
   expect(await ui.find({ type: 'Button', key: 'tab-continue' })).toBeDefined()
 })
