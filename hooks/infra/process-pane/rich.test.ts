@@ -1,5 +1,5 @@
 import { test, expect } from 'claude-code/testing'
-import { esc, flowGrid, HEX, nodeSegment, progressBar, ring, softPill, titleText } from './rich'
+import { PALETTE, categoryIndex, esc, flowGrid, HEX, nodeSegment, progressBar, ring, softPill, titleText } from './rich'
 import type { Kind } from './status-look'
 
 const KINDS: Kind[] = ['waiting', 'running', 'done', 'failed', 'paused', 'pending']
@@ -47,4 +47,13 @@ test('softPill and titleText: sized to the text, and escape it', () => {
   expect(p.width > softPill('done', '#f2b13d').width).toBe(true)
   const t = titleText('A <b> & C')
   expect(t.source.includes('A &lt;b&gt; &amp; C')).toBe(true)
+})
+
+test('a category keeps its color: the place among the sorted names, not the order they came in', () => {
+  expect(categoryIndex('development', ['infrastructure', 'development'])).toBe(0)
+  expect(categoryIndex('infrastructure', ['development', 'infrastructure', 'infrastructure'])).toBe(1)
+  expect(categoryIndex('gone', ['a'])).toBe(0)
+  const many = Array.from({ length: 8 }, (_, i) => `c${i}`)
+  expect(categoryIndex('c7', many)).toBe(1) // the seventh color is the first again
+  expect(PALETTE.categories).toHaveLength(6)
 })

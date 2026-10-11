@@ -2,7 +2,7 @@ import { missingFields, startProcess } from '../../infra/process-pane/process-pa
 import { FAVORITES, groupRows, lastUsedNames, matches, mergeTemplates, templateDetail } from '../../infra/process-pane/template-views'
 import type { TemplateRow } from '../../infra/process-pane/template-views'
 import { ago } from '../../infra/process-pane/activity'
-import { HEX, flowGrid } from '../../infra/process-pane/rich'
+import { CATEGORY_KEYS, HEX, PALETTE, categoryIndex, flowGrid } from '../../infra/process-pane/rich'
 import { installTemplate, refreshMarketplaces, removeTemplate } from '../../infra/templates/templates'
 import { askAgain, noteRefresh, say, st } from '../pane-state'
 import type { Ctx } from '../ctx'
@@ -15,11 +15,15 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
   const toggleFavorite = (key: string) => () => { if (!st.favorites.delete(key)) st.favorites.add(key); return saveFavorites() }
   const star = (key: string, id: string) => Button({ key: id, label: st.favorites.has(key) ? '★' : '☆', plain: true, onPress: toggleFavorite(key) })
   const wordOf = { installed: 'installed', update: 'update available', available: 'not installed' } as const
-  const install = (r: TemplateRow) => Button({ key: `tpl-install-${r.key}`, label: st.busy === `install-${r.key}` ? 'Installing…' : r.state === 'update' ? 'Update' : 'Install', onPress: () => templateJob(ports => installTemplate(ports, r.entry!), `install-${r.key}`) })
-  const start = (r: TemplateRow) => Button({
-    key: `start-${r.key}`, label: 'Start', variant: 'primary',
-    onPress: () => { st.chosen = r.template; st.values = r.template!.fields[0] && st.firstArg ? { [r.template!.fields[0].name]: st.firstArg } : {}; st.message = ''; redraw() },
-  })
+  const install = (r: TemplateRow) => {
+    const label = st.busy === `install-${r.key}` ? 'Installing…' : r.state === 'update' ? 'Update' : 'Install'
+    const press = () => templateJob(ports => installTemplate(ports, r.entry!), `install-${r.key}`)
+    return k ? k.action(`tpl-install-${r.key}`, label, press) : Button({ key: `tpl-install-${r.key}`, label, onPress: press })
+  }
+  const start = (r: TemplateRow) => {
+    const press = () => { st.chosen = r.template; st.values = r.template!.fields[0] && st.firstArg ? { [r.template!.fields[0].name]: st.firstArg } : {}; st.message = ''; redraw() }
+    return k ? k.action(`start-${r.key}`, 'Start', press, 'go') : Button({ key: `start-${r.key}`, label: 'Start', variant: 'primary', onPress: press })
+  }
   if (row) {
     // The detail of one template: purpose and parameters, the steps, the memory flow, and the file.
     const d = row.template ? await templateDetail(files, row.template.path) : undefined
@@ -63,12 +67,14 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
     ])]
   } else {
     const cats = [...new Set(allRows.map(r => r.category))].sort()
-    const chip = (id: string, label: string, value: string | undefined) => toggle(id, label, st.category === value, () => { st.category = value; redraw() })
+    const pick = (value: string | undefined) => () => { st.category = value; redraw() }
+    const chip = (id: string, label: string, value: string | undefined, hex?: string) => (k && hex ? k.colorChip(id, label, st.category === value, hex, pick(value)) : toggle(id, label, st.category === value, pick(value)))
+    const colorOf = (category: string) => PALETTE.categories[categoryIndex(category, cats)]
     const shownRows = matches(allRows, st.query, st.category, st.favorites)
     const parts = groupRows(shownRows, st.favorites, lastUsedNames(st.processes), !st.category)
     const open = (r: TemplateRow) => () => { st.detailKey = r.key; st.tdTab = 'overview'; st.tdStep = undefined; st.message = '' }
     // One template: its name without the category, "update available" only when it matters, two lines of purpose, its buttons.
-    const item = (r: TemplateRow) => (k ? k.card : card)(`tcard-${r.key}`, [
+    const item = (r: TemplateRow, edge?: string) => (k ? (key: string, children: unknown[]) => k.card(key, children, { edge: edge ?? colorOf(r.category) }) : card)(`tcard-${r.key}`, [
       Box({ flexDirection: 'row', columnGap: 1, children: [
         star(r.key, `fav-${r.key}`), line(r.title, { bold: true }),
         ...(r.state === 'update' ? [k ? k.pill('update available', HEX.waiting) : line('update available', { dimColor: true })] : []),
@@ -77,11 +83,12 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
       ...(narrow || !r.purpose ? [] : [line(r.purpose.length > 170 ? `${r.purpose.slice(0, 169)}…` : r.purpose, { dimColor: true })]),
       Box({ flexDirection: 'row', columnGap: 1, children: [
         ...(r.template ? [start(r)] : []), ...(r.entry && r.state !== 'installed' ? [install(r)] : []),
-        Button({ key: `template-${r.key}`, label: 'Details', variant: 'secondary', onPress: () => { open(r)(); redraw() } }),
+        k ? k.action(`template-${r.key}`, 'Details', () => { open(r)(); redraw() }) : Button({ key: `template-${r.key}`, label: 'Details', variant: 'secondary', onPress: () => { open(r)(); redraw() } }),
       ] }),
     ])
-    const header = (title: string) => line(title, { bold: true, dimColor: true })
-    const section = (title: string, rows: TemplateRow[]) => rows.length ? [header(title), ...(k ? [k.stack(rows.map(item))] : rows.map(item))] : []
+    // A group title in its color: a hex on Desktop, a theme word in the terminal.
+    const header = (title: string, hex: string, key: string) => (k ? k.heading(title, hex) : line(title, { bold: true, color: key }))
+    const section = (title: string, rows: TemplateRow[], hex: string, key: string, category?: string) => rows.length ? [header(title, hex, key), ...(k ? [k.stack(rows.map(r => item(r, hex)))] : rows.map(r => item(r)))] : []
     const missingOpen = st.showMissing || !!st.query
     const synced = Math.max(0, ...st.markets.map(m => (m.lastSynced ? Date.parse(m.lastSynced) : 0) || 0))
     const sources = st.markets.filter(m => m.enabled).length
@@ -90,7 +97,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
       Input({ key: 'search', label: 'Search', placeholder: 'name, category or purpose', value: st.query, onInput: (text: string) => { st.query = text; redraw() }, onSubmit: (text: string) => { st.query = text; redraw() } }),
       ...(st.query ? [Button({ key: 'search-clear', label: '× Clear the search', plain: true, dimColor: true, onPress: () => { st.query = ''; redraw() } })] : []),
       Box({ flexDirection: 'row', columnGap: narrow ? 1 : 2, flexWrap: 'wrap', children: [
-        chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${st.favorites.size ? ` ·${st.favorites.size}` : ''}`, FAVORITES), ...cats.map(c => chip(`cat-${c}`, `${c}${narrow ? '' : ` ·${allRows.filter(r => r.category === c).length}`}`, c)),
+        chip('cat-all', 'All', undefined), chip('cat-fav', `★ Favorites${st.favorites.size ? ` ·${st.favorites.size}` : ''}`, FAVORITES, PALETTE.favorites), ...cats.map(c => chip(`cat-${c}`, `${c}${narrow ? '' : ` ·${allRows.filter(r => r.category === c).length}`}`, c, colorOf(c))),
       ] }),
       // One line: how many match, how old the list is, and the buttons that were at the end of the list.
       Box({ flexDirection: 'row', columnGap: 2, flexWrap: 'wrap', children: [
@@ -100,11 +107,11 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
       ] }),
       line(' '),
       ...(shownRows.length ? [
-        ...section('★ Favorites', parts.favorites), ...section('Last used', parts.last),
-        ...parts.groups.flatMap(g => section(st.category === FAVORITES ? '★ Favorites' : g.category, g.rows)),
+        ...section('★ Favorites', parts.favorites, PALETTE.favorites, 'warning'), ...section('Last used', parts.last, PALETTE.last, 'suggestion'),
+        ...parts.groups.flatMap(g => section(st.category === FAVORITES ? '★ Favorites' : g.category, g.rows, st.category === FAVORITES ? PALETTE.favorites : colorOf(g.category), st.category === FAVORITES ? 'warning' : CATEGORY_KEYS[categoryIndex(g.category, cats)])),
         ...(parts.missing.length ? [
           Button({ key: 'fold-missing', label: `${missingOpen ? '▾' : '▸'} Not installed ·${parts.missing.length}`, plain: true, onPress: () => { st.showMissing = !st.showMissing; redraw() } }),
-          ...(missingOpen ? (k ? [k.stack(parts.missing.map(item))] : parts.missing.map(item)) : []),
+          ...(missingOpen ? (k ? [k.stack(parts.missing.map(r => item(r)))] : parts.missing.map(r => item(r))) : []),
         ] : []),
       ] : [line(st.category === FAVORITES && !st.favorites.size ? 'No favorite yet. Press ☆ next to a template.' : allRows.length ? 'No template matches. Clear the search or press All.' : (st.markets.length ? 'No template yet. Press Refresh to read the marketplaces.' : 'No marketplace yet. Press Marketplaces, then Add marketplace, to get templates.'), { dimColor: true })]),
     ]

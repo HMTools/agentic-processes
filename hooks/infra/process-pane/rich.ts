@@ -4,6 +4,15 @@ import type { Kind } from './status-look'
 // An Svg takes no press, so every picture sits beside a real Button. The terminal never calls these.
 
 export const HEX: Record<Kind, string> = { waiting: '#f2b13d', running: '#3ecf8e', done: '#5aa88a', failed: '#ef6a5e', paused: '#a58bff', pending: '#6b7280' }
+// The colors of the pane on Desktop, in one place. Raw colors: a surface that does not know one draws its own, so a fill can fall back to the old look.
+export const PALETTE = {
+  ground: '#181c27', card: '#222839', border: '#333b52', go: '#d97757', slate: '#3b4666', favorites: '#f2b13d', last: '#6ea8ff',
+  categories: ['#4fd1c5', '#a58bff', '#f472b6', '#7bd88f', '#f59e6c', '#8fa8ff'],
+}
+// The theme words the terminal uses for the same six, in the same order.
+export const CATEGORY_KEYS = ['success', 'remember', 'permission', 'claude', 'merged', 'planMode'] as const
+// A category has the same color after every reload: its place among the sorted names.
+export const categoryIndex = (name: string, all: string[]): number => Math.max(0, [...new Set(all)].sort().indexOf(name)) % PALETTE.categories.length
 const MUTED = '#2a2f3a', TEXT = '#c9cedb'
 
 export const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]!)

@@ -1,7 +1,7 @@
 import { deleteProcess, inFolder, resumeProcess } from '../../infra/process-pane/process-pane'
 import type { ProcessInfo } from '../../infra/process-pane/process-pane'
 import { LOOK, needsUser, symbolOf } from '../../infra/process-pane/status-look'
-import { progressBar } from '../../infra/process-pane/rich'
+import { HEX, progressBar } from '../../infra/process-pane/rich'
 import { activityOf, ago } from '../../infra/process-pane/activity'
 import { stateWord } from '../../infra/process-pane/band'
 import { askAgain, say, st } from '../pane-state'
@@ -36,11 +36,11 @@ export async function continueScreen(c: Ctx): Promise<unknown[]> {
         ...activityLine,
         ...(narrow ? [] : [picture(progressBar(p.kind === 'done' ? p.total : p.step - 1, p.total, p.kind, 240), `step ${p.step} of ${p.total}`, 240, 8)]),
         Box({ flexDirection: 'row', columnGap: 1, children: [
-          Button({ key: `process-${i}`, label: 'Resume', variant: 'primary', onPress: resume }),
+          k.action(`process-${i}`, 'Resume', resume, 'go'),
           Button({ key: `view-${i}`, label: 'View', variant: 'secondary', onPress: view }),
           Button({ key: `del-${i}`, label: st.sure === p.dir ? 'Sure?' : 'Delete', variant: 'secondary', onPress: deletePress }),
         ] }),
-      ], { hot: needsUser(p.kind) })
+      ], { hot: needsUser(p.kind), edge: HEX[p.kind] })
     }
     return card(`card-${i}`, [
       Box({

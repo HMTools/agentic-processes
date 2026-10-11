@@ -363,8 +363,9 @@ export const register: Register = on => {
     else if (st.tab === 'continue') body = await continueScreen(ctx)
     else if (!st.chosen) body = await newScreen(ctx)
     else body = await formScreen(ctx)
-    if (bound) return Box({ flexDirection: 'column', children: [...strip, await boundScreen(ctx)] })
-    const main = Box({ flexDirection: 'column', children: [...strip, tabs, line(' '), ...body] })
-    return main
+    // On Desktop the whole screen sits on one slate ground, not the black of the app.
+    const screen = (children: unknown[]) => (k ? k.ground(children) : Box({ flexDirection: 'column', children }))
+    if (bound) return screen([...strip, await boundScreen(ctx)])
+    return screen([...strip, tabs, line(' '), ...body])
   })
 }
