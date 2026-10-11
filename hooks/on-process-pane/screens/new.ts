@@ -174,7 +174,7 @@ export async function formScreen(c: Ctx): Promise<unknown[]> {
       submitLabel: st.busy === 'fill' ? 'Filling…' : 'Fill ✦', onSubmit: async (text: string) => { st.describe = text; await fill(template, purpose, text) },
     }),
     // The field is one line in Claude Code, so a frame five lines tall shows the whole text wrapped.
-    Box({ key: 'describe-text', flexDirection: 'column', minHeight: 5, borderStyle: 'round', borderColor: 'inactive', paddingLeft: 1, paddingRight: 1, children: [line(st.describe || ' ')] }),
+    Box({ key: 'describe-text', flexDirection: 'column', minHeight: 5, borderStyle: 'round', borderColor: 'inactive', paddingLeft: 1, paddingRight: 1, children: [line('Your text', { dimColor: true }), line(st.describe || ' ')] }),
   ] })
   const fields = template.fields.map(field)
   // Above Create: what is left, or "ready".
