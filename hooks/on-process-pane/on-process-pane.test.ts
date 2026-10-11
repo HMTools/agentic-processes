@@ -77,6 +77,15 @@ test('the Start form names the missing field, then says ready', async ($, on) =>
   expect(await ui.find({ type: 'Text', text: 'ready' })).toBeDefined()
 })
 
+test('the Start form has two headings and a hint above Create', async ($, on) => {
+  world(on, { [`${T}/bug.json`]: template, [`${T}/design/design.json`]: { type: 'step', id: 'r1' } })
+  await $.command.run({ command: 'process', args: '' })
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'start-dev/bug' })
+  expect(await ui.find({ type: 'Text', text: 'What runs' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'What you give' })).toBeDefined()
+})
+
 test('Resume binds the process and hands it to the agent', async ($, on) => {
   const w = world(on, { [`${HOME}/active/p1/process.json`]: process })
   await $.command.run({ command: 'process', args: '' })

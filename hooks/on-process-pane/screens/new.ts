@@ -21,7 +21,7 @@ export async function newScreen(c: Ctx): Promise<unknown[]> {
     return k ? k.action(`tpl-install-${r.key}`, label, press) : Button({ key: `tpl-install-${r.key}`, label, onPress: press })
   }
   const start = (r: TemplateRow) => {
-    const press = () => { st.chosen = r.template; st.values = r.template!.fields[0] && st.firstArg ? { [r.template!.fields[0].name]: st.firstArg } : {}; st.message = ''; redraw() }
+    const press = () => { st.chosen = r.template; st.values = r.template!.fields[0] && st.firstArg ? { [r.template!.fields[0].name]: st.firstArg } : {}; st.purposeOpen = false; st.message = ''; redraw() }
     return k ? k.action(`start-${r.key}`, 'Start', press, 'go') : Button({ key: `start-${r.key}`, label: 'Start', variant: 'primary', onPress: press })
   }
   if (row) {
@@ -126,16 +126,15 @@ export async function formScreen(c: Ctx): Promise<unknown[]> {
   const d = await templateDetail(files, template.path)
   const asks = d ? d.steps.filter(s => s.approval).length : 0
   const purpose = d?.purpose ?? ''
-  // The header: name, category, purpose cut to two lines, a chip for each step (a lock on an approval step), one count line.
+  // The header: name, category, the purpose (cut at 170 characters until Show more), a row for each step ("asks you" on an approval step).
+  const long = purpose.length > 170
   const headBody = [
     Box({ flexDirection: 'row', columnGap: 1, children: [line(template.name, { bold: true }), ...(k ? [k.pill(template.category, HEX.waiting)] : [line(`(${template.category})`, { dimColor: true })])] }),
-    ...(purpose ? [line(purpose.length > 170 ? `${purpose.slice(0, 169)}…` : purpose, { dimColor: true })] : []),
-    ...(d && d.steps.length ? [
-      k ? Box({ flexDirection: 'row', flexWrap: 'wrap', columnGap: 1, children: d.steps.map(s => k.chip(`${s.number} ${s.name}${s.approval ? ' 🔒' : ''}`, s.approval ? 'active' : 'idle')) })
-        : line(d.steps.map(s => `${s.number} ${s.name}${s.approval ? ' 🔒' : ''}`).join(' › ')),
-      line(`${d.steps.length} step${d.steps.length === 1 ? '' : 's'}${asks ? `  ·  asks for your approval ${asks === 1 ? 'once' : `${asks} times`}` : ''}`, { dimColor: true }),
-    ] : []),
+    ...(purpose ? [line(long && !st.purposeOpen ? `${purpose.slice(0, 169)}…` : purpose, { dimColor: true })] : []),
+    ...(long ? [Button({ key: 'purpose-more', label: st.purposeOpen ? 'Show less' : 'Show more', plain: true, onPress: () => { st.purposeOpen = !st.purposeOpen; redraw() } })] : []),
+    ...(d ? d.steps.map(s => Box({ key: `step-${s.number}`, flexDirection: 'row', columnGap: 1, children: [line(String(s.number), { bold: true }), line(s.name), ...(s.approval ? [k ? k.pill('asks you 🔒', HEX.waiting) : line('🔒 asks you', { color: 'warning' })] : [])] })) : []),
   ]
+  const heading = (title: string, hex: string, key: string) => (k ? k.heading(title, hex) : line(title, { bold: true, color: key }))
   // A field: the label with a star (or "optional"), the hint, then the input at full width. Enter in the field creates.
   const field = (f: (typeof template.fields)[number], i: number) => Box({ key: `fld-${f.name}`, flexDirection: 'column', children: [
     Box({ flexDirection: 'row', columnGap: 1, children: [line(f.name, { bold: true }), f.required ? line('*', { color: 'warning' }) : line('optional', { dimColor: true })] }),
@@ -144,22 +143,24 @@ export async function formScreen(c: Ctx): Promise<unknown[]> {
       key: `field-${f.name}`, placeholder: f.example ? `e.g. ${f.example}` : f.description,
       value: st.values[f.name] ?? '', ...(i === 0 ? { autoFocus: true } : {}),
       onInput: (text: string) => { const was = missingFields(template, st.values).length; st.values[f.name] = text; if (missingFields(template, st.values).length !== was) redraw() }, // redraw only when the hint changes
-      submitLabel: 'Create', onSubmit: async (text: string) => { st.values[f.name] = text; await create() },
+      submitLabel: 'Enter ↵', onSubmit: async (text: string) => { st.values[f.name] = text; await create() },
     }),
   ] })
   const fields = template.fields.map(field)
-  // Beside Create: what is left, or "ready".
+  // Above Create: what is left, or "ready".
   const hint = missing.length ? line(`${missing.length} field${missing.length === 1 ? '' : 's'} left: ${missing.join(', ')}`, { color: 'warning' }) : line('ready', { color: 'success' })
-  return [
-    k ? k.card('form-head', headBody) : card('form-head', headBody),
-    ...(k ? [k.stack(fields)] : fields),
-    Box({
+  const actions = Box({
+    flexDirection: 'column', children: [hint, Box({
       flexDirection: 'row', columnGap: 3,
       children: [
         k ? k.action('create', 'Create', create, 'go') : Button({ key: 'create', label: 'Create', dimColor: missing.length > 0, onPress: create }), // a press with a field empty still says what is missing
-        Button({ key: 'back', label: 'Back', plain: true, onPress: () => { st.chosen = undefined; st.message = ''; redraw() } }),
-        hint,
+        Button({ key: 'back', label: 'Back', plain: true, onPress: () => { st.chosen = undefined; st.purposeOpen = false; st.message = ''; redraw() } }),
       ],
-    }),
+    })],
+  })
+  const blocks = [
+    heading('What runs', '#9aa3b8', 'inactive'), k ? k.card('form-head', headBody) : card('form-head', headBody),
+    heading('What you give', PALETTE.favorites, 'warning'), ...(k ? [k.stack(fields)] : fields), actions,
   ]
+  return k ? [k.stack(blocks)] : blocks.flatMap(b => [b, line(' ')])
 }

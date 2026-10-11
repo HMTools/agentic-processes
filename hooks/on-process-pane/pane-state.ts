@@ -45,6 +45,7 @@ export const st = {
   templates: [] as TemplateInfo[],
   processes: [] as ProcessInfo[],
   chosen: undefined as TemplateInfo | undefined,
+  purposeOpen: false, // the Start form shows the whole purpose
   values: {} as Record<string, string>,
   message: '',
   sourceErrors: {} as Record<string, string>, // the last refresh error of each marketplace
